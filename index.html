@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnproX - Login & Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="brand-section">
+            <div class="brand-content">
+                <h1 class="logo">Earnpro<span>X</span></h1>
+                <h2 class="tagline">Start your Hustle Era.</h2>
+                <p class="description">Join India's most trusted gig platform. Complete quick micro-tasks, build your skills, and get instant payouts.</p>
+                
+                <div class="trust-badges">
+                    <div class="badge">
+                        <span class="icon">🔒</span>
+                        <span>Bank-Grade Security</span>
+                    </div>
+                    <div class="badge">
+                        <span class="icon">⚡</span>
+                        <span>Instant Escrow Payouts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-card">
+                <h3>Welcome to EarnproX</h3>
+                <p class="subtitle">Enter your mobile number to continue</p>
+
+                <div class="role-toggle">
+                    <button class="role-btn active" id="studentBtn">🎓 I'm a Student</button>
+                    <button class="role-btn" id="companyBtn">🏢 I'm a Business</button>
+                </div>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="phone">Mobile Number</label>
+                        <div class="phone-input-wrapper">
+                            <span class="country-code">+91</span>
+                            <input type="tel" id="phone" placeholder="Enter 10-digit number" maxlength="10" required autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="primary-btn">Get OTP <span class="arrow">&rarr;</span></button>
+                </form>
+
+                <p class="terms">
+                    By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const studentBtn = document.getElementById('studentBtn');
+        const companyBtn = document.getElementById('companyBtn');
+
+        studentBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            studentBtn.classList.add('active');
+            companyBtn.classList.remove('active');
+        });
+
+        companyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            companyBtn.classList.add('active');
+            studentBtn.classList.remove('active');
+        });
+    </script>
+</body>
+</html>
