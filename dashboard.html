@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnproX | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: white; padding-bottom: 100px; }
+        .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-btn.active { color: #3B82F6; font-weight: 800; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-5">
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-xs text-slate-400 uppercase tracking-widest font-bold">Hustle Era 🚀</h1>
+            <p class="text-xl font-extrabold text-white">Earnpro<span class="text-blue-500">X</span></p>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center font-bold shadow-lg">A</div>
+    </div>
+
+    <div id="view-tasks" class="tab-content active">
+        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> New Gigs Available
+        </h3>
+        <div class="space-y-4">
+            <div class="glass-card p-4 rounded-2xl">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-bold text-sm text-white">Anime Faceless Video Edit</p>
+                        <p class="text-xs text-slate-400 mt-1">CapCut • 30 Secs</p>
+                    </div>
+                    <p class="text-green-400 font-extrabold bg-green-400/10 px-3 py-1 rounded-full text-xs">₹150</p>
+                </div>
+                <button class="w-full mt-3 bg-white/10 hover:bg-blue-600 text-white font-bold py-2 rounded-xl text-xs transition">Accept Task</button>
+            </div>
+            <div class="glass-card p-4 rounded-2xl">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-bold text-sm text-white">Cafe Google Maps Review</p>
+                        <p class="text-xs text-slate-400 mt-1">Local • 2 Mins</p>
+                    </div>
+                    <p class="text-green-400 font-extrabold bg-green-400/10 px-3 py-1 rounded-full text-xs">₹20</p>
+                </div>
+                <button class="w-full mt-3 bg-white/10 hover:bg-blue-600 text-white font-bold py-2 rounded-xl text-xs transition">Accept Task</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-submit" class="tab-content">
+        <h3 class="text-lg font-bold mb-4">📤 Submit Proof</h3>
+        <div class="glass-card p-5 rounded-2xl">
+            <p class="text-sm text-slate-300 mb-4">Paste your video link or Drive folder here for client approval.</p>
+            <input type="text" placeholder="Paste link here (Instagram/Drive)..." class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 mb-4 outline-none">
+            
+            <div class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center mb-4">
+                <p class="text-xs text-slate-400">Or Upload Screenshot</p>
+            </div>
+            
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">Submit Task</button>
+        </div>
+    </div>
+
+    <div id="view-wallet" class="tab-content">
+        <h3 class="text-lg font-bold mb-4">💳 Wallet</h3>
+        <div class="glass-card rounded-3xl p-6 mb-6 text-center bg-gradient-to-br from-blue-900/40 to-slate-900">
+            <h2 class="text-sm text-blue-200 opacity-80 mb-2 uppercase tracking-wide">Available Balance</h2>
+            <p class="text-5xl font-black mb-4 tracking-tight">₹450<span class="text-2xl text-slate-400">.00</span></p>
+            <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 px-8 rounded-full text-sm shadow-[0_0_15px_rgba(59,130,246,0.5)] active:scale-95 transition">Withdraw to UPI</button>
+        </div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Recent Transactions</p>
+        <div class="glass-card p-3 rounded-xl flex justify-between items-center mb-2">
+            <p class="text-sm font-medium">Reel Editing Task</p>
+            <p class="text-sm font-bold text-green-400">+ ₹150</p>
+        </div>
+        <div class="glass-card p-3 rounded-xl flex justify-between items-center">
+            <p class="text-sm font-medium">UPI Withdrawal</p>
+            <p class="text-sm font-bold text-red-400">- ₹200</p>
+        </div>
+    </div>
+
+    <div id="view-profile" class="tab-content">
+        <h3 class="text-lg font-bold mb-4">👤 Profile Settings</h3>
+        <div class="glass-card p-5 rounded-2xl text-center mb-4">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 mx-auto mb-3 flex items-center justify-center text-2xl font-bold">A</div>
+            <h2 class="text-xl font-bold">Akash</h2>
+            <p class="text-sm text-green-400 font-medium">Level: Pro Hustler</p>
+        </div>
+        <div class="space-y-2">
+            <button class="w-full glass-card p-4 rounded-xl text-left text-sm font-medium flex justify-between">UPI Settings <span>›</span></button>
+            <button class="w-full glass-card p-4 rounded-xl text-left text-sm font-medium flex justify-between">Help & Support <span>›</span></button>
+            <button class="w-full glass-card p-4 rounded-xl text-left text-sm font-medium text-red-400 flex justify-between border border-red-900/30">Logout <span>›</span></button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-4 left-4 right-4 glass-card rounded-2xl p-3 flex justify-around items-center shadow-2xl z-50">
+        <button onclick="switchTab('tasks', this)" class="nav-btn active flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">📋</span><span class="text-[10px] uppercase">Tasks</span>
+        </button>
+        <button onclick="switchTab('submit', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">📤</span><span class="text-[10px] uppercase">Submit</span>
+        </button>
+        <button onclick="switchTab('wallet', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">💳</span><span class="text-[10px] uppercase">Wallet</span>
+        </button>
+        <button onclick="switchTab('profile', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">👤</span><span class="text-[10px] uppercase">Profile</span>
+        </button>
+    </div>
+
+    <script>
+        function switchTab(tabId, btnElement) {
+            // Hide all views
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Remove active state from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected view
+            document.getElementById('view-' + tabId).classList.add('active');
+            // Add active state to clicked button
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>
