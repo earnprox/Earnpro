@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnproX | Admin Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f0a1a; color: white; padding-bottom: 100px; }
+        .admin-card { background: rgba(30, 20, 40, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 100, 100, 0.15); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-btn.active { color: #f87171; font-weight: 800; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-5">
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-xs text-red-400 uppercase tracking-widest font-bold animate-pulse">🔴 Live System</h1>
+            <p class="text-2xl font-black text-white">Master<span class="text-red-500">Admin</span></p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-red-900 border border-red-500 flex items-center justify-center font-bold shadow-[0_0_15px_rgba(239,68,68,0.5)]">👑</div>
+    </div>
+
+    <div id="view-overview" class="tab-content active">
+        <h3 class="text-lg font-bold mb-4">📊 Platform Stats</h3>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="admin-card p-4 rounded-2xl text-center border-b-4 border-b-blue-500">
+                <p class="text-xs text-slate-400 uppercase">Total Users</p>
+                <p class="text-2xl font-black mt-1">142</p>
+            </div>
+            <div class="admin-card p-4 rounded-2xl text-center border-b-4 border-b-green-500">
+                <p class="text-xs text-slate-400 uppercase">Active Gigs</p>
+                <p class="text-2xl font-black mt-1">08</p>
+            </div>
+            <div class="admin-card p-4 rounded-2xl text-center border-b-4 border-b-orange-500 col-span-2">
+                <p class="text-xs text-slate-400 uppercase">Pending Payouts</p>
+                <p class="text-3xl font-black mt-1 text-orange-400">₹1,250</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-gigs" class="tab-content">
+        <h3 class="text-lg font-bold mb-4">➕ Add New Gig</h3>
+        <div class="admin-card p-5 rounded-2xl mb-6">
+            <input type="text" placeholder="Gig Title (e.g. Faceless Anime Video)" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl p-3 mb-3 outline-none focus:border-red-500">
+            <div class="flex gap-3 mb-3">
+                <input type="number" placeholder="Price (₹)" class="w-1/2 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl p-3 outline-none focus:border-red-500">
+                <input type="text" placeholder="Time (e.g. 10 Mins)" class="w-1/2 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl p-3 outline-none focus:border-red-500">
+            </div>
+            <textarea placeholder="Instructions for user..." class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl p-3 mb-4 outline-none focus:border-red-500" rows="3"></textarea>
+            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">Publish Gig to All Users</button>
+        </div>
+    </div>
+
+    <div id="view-approvals" class="tab-content">
+        <h3 class="text-lg font-bold mb-4">👀 Pending Approvals</h3>
+        
+        <div class="admin-card p-4 rounded-2xl mb-4">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <p class="font-bold text-sm text-white">Rahul (User #102)</p>
+                    <p class="text-xs text-slate-400 mt-1">Task: Anime Faceless Video Edit</p>
+                </div>
+                <p class="text-blue-400 font-bold text-xs">₹150</p>
+            </div>
+            <a href="#" class="text-xs text-blue-400 underline mb-4 block">🔗 View Google Drive Proof</a>
+            <div class="flex gap-2">
+                <button class="w-1/2 bg-green-600/20 text-green-400 border border-green-600 hover:bg-green-600 hover:text-white font-bold py-2 rounded-xl text-xs transition">✅ Approve (Pay)</button>
+                <button class="w-1/2 bg-red-600/20 text-red-400 border border-red-600 hover:bg-red-600 hover:text-white font-bold py-2 rounded-xl text-xs transition">❌ Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-payouts" class="tab-content">
+        <h3 class="text-lg font-bold mb-4">💸 Withdrawal Requests</h3>
+        
+        <div class="admin-card p-4 rounded-2xl border-l-4 border-l-orange-500 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <p class="font-bold text-sm text-white">Priya (User #045)</p>
+                    <p class="text-xs text-slate-400 mt-1">Requested 2 hours ago</p>
+                </div>
+                <p class="text-orange-400 font-black text-lg">₹450</p>
+            </div>
+            <div class="bg-slate-900 p-2 rounded-lg mb-3 flex justify-between items-center">
+                <p class="text-xs font-mono text-slate-300">UPI: priya@ybl</p>
+                <button class="text-xs text-blue-400 font-bold">Copy</button>
+            </div>
+            <button class="w-full bg-orange-600 text-white font-bold py-2 rounded-xl shadow-lg active:scale-95 transition">Mark as Paid</button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-4 left-4 right-4 admin-card rounded-2xl p-3 flex justify-around items-center shadow-[0_10px_30px_rgba(0,0,0,0.8)] z-50">
+        <button onclick="switchAdminTab('overview', this)" class="nav-btn active flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">📊</span><span class="text-[10px] uppercase">Stats</span>
+        </button>
+        <button onclick="switchAdminTab('gigs', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">➕</span><span class="text-[10px] uppercase">Add Gig</span>
+        </button>
+        <button onclick="switchAdminTab('approvals', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">👀</span><span class="text-[10px] uppercase">Review</span>
+        </button>
+        <button onclick="switchAdminTab('payouts', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all w-16">
+            <span class="text-xl">💸</span><span class="text-[10px] uppercase">Payouts</span>
+        </button>
+    </div>
+
+    <script>
+        function switchAdminTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('view-' + tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>
