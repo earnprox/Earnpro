@@ -40,6 +40,12 @@
         #loading-overlay { display: none; }
         #loading-overlay.active { display: flex; }
     </style>
+
+    <script>
+        if (!localStorage.getItem("earnprox_user_phone")) {
+            window.location.href = "index.html";
+        }
+    </script>
 </head>
 <body class="relative min-h-screen selection:bg-blue-100">
 
@@ -49,12 +55,12 @@
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Good Morning</p>
-                    <span class="bg-orange-100 text-orange-600 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">🔥 3 Days</span>
+                    <span class="bg-orange-100 text-orange-600 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">🔥 New User</span>
                 </div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-900">Akash <span class="text-blue-500">.</span></h1>
+                <h1 class="text-2xl font-black tracking-tight text-slate-900"><span id="header-user-name">User</span> <span class="text-blue-500">.</span></h1>
             </div>
             <div class="w-12 h-12 rounded-full premium-card flex items-center justify-center p-1 relative">
-                <img src="https://ui-avatars.com/api/?name=Akash&background=3B82F6&color=fff&bold=true" alt="Profile" class="w-full h-full rounded-full object-cover">
+                <img id="header-avatar" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff&bold=true" alt="Profile" class="w-full h-full rounded-full object-cover">
             </div>
         </header>
 
@@ -123,7 +129,6 @@
                         <button onclick="copyReferLink()" class="bg-blue-100 hover:bg-blue-200 text-blue-600 px-3 py-2 rounded-lg font-bold text-sm active:scale-95 transition">Copy Link</button>
                     </div>
                     <button onclick="shareOnWhatsApp()" class="w-full mt-4 bg-[#25D366] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-green-500/30 flex justify-center items-center gap-2 active:scale-95">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                         Share on WhatsApp
                     </button>
                 </div>
@@ -138,7 +143,7 @@
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Withdrawable Balance</p>
                     <button onclick="openFullPage('withdraw-page')" class="bg-blue-500 text-white font-bold py-1.5 px-4 rounded-lg flex items-center gap-1 shadow-sm transition hover:bg-blue-400 active:scale-95 text-xs">Withdraw</button>
                 </div>
-                <h2 class="text-4xl font-black tracking-tighter mb-4 relative z-10" id="main-balance-display">₹ 450<span class="text-xl text-slate-500 font-bold">.00</span></h2>
+                <h2 class="text-4xl font-black tracking-tighter mb-4 relative z-10" id="main-balance-display">₹ 0<span class="text-xl text-slate-500 font-bold">.00</span></h2>
             </div>
 
             <div class="premium-card rounded-2xl overflow-hidden mb-8">
@@ -168,10 +173,10 @@
         <div id="view-profile" class="tab-content">
             <div class="premium-card rounded-[2rem] p-6 mb-6 text-center">
                 <div class="w-20 h-20 rounded-full bg-blue-50 mx-auto mb-3 border-4 border-white shadow-lg overflow-hidden relative">
-                    <img src="https://api.dicebear.com/7.x/micah/svg?seed=Akash&backgroundColor=b6e3f4" alt="Avatar" class="w-full h-full object-cover">
+                    <img id="profile-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=User&backgroundColor=b6e3f4" alt="Avatar" class="w-full h-full object-cover">
                 </div>
-                <h2 class="text-2xl font-black text-slate-800">Akash</h2>
-                <p class="text-sm text-slate-500 mb-4">+91 7500673337</p>
+                <h2 class="text-2xl font-black text-slate-800" id="profile-user-name">User</h2>
+                <p class="text-sm text-slate-500 mb-4" id="profile-user-phone">+91 0000000000</p>
             </div>
             
             <div class="premium-card rounded-2xl overflow-hidden mb-6">
@@ -228,7 +233,7 @@
         <div class="p-5 flex-1 overflow-y-auto">
             <div class="premium-card rounded-2xl p-6 text-center mb-6 border-blue-100 bg-blue-50/30">
                 <p class="text-sm text-slate-500 mb-2">Available Balance</p>
-                <h2 class="text-4xl font-black text-slate-800 mb-2" id="withdraw-page-balance">₹450</h2>
+                <h2 class="text-4xl font-black text-slate-800 mb-2" id="withdraw-page-balance">₹0</h2>
             </div>
             
             <div class="mb-6">
@@ -316,16 +321,12 @@
             <h3 class="font-black text-xl text-slate-800 mt-2">Ledger</h3>
             <button onclick="closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
+        
         <div class="p-5 overflow-y-auto space-y-4" id="history-container">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-bold">↓</div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">Anime Reel Edit</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Gig Reward</p>
-                    </div>
-                </div>
-                <p class="text-sm font-black text-emerald-500">+ ₹150</p>
+            <div class="text-center py-10 opacity-60" id="empty-history">
+                <span class="text-5xl mb-3 block">📭</span>
+                <p class="text-sm font-bold text-slate-800">No transactions yet</p>
+                <p class="text-xs text-slate-500 mt-1">Complete tasks to earn money.</p>
             </div>
         </div>
     </div>
@@ -338,13 +339,27 @@
     <div id="toast">Message Here</div>
 
     <script>
-        let currentBalance = 450;
+        // Start Balance at ZERO
+        let currentBalance = 0;
         let savedUPI = "";
         
-        // 🚀 NEW: Referral Variables
         const REFERRAL_CODE = "AM8M27ZY";
-        // Agar aapki website earnprox.in hai toh link waisa banega:
         const REFERRAL_LINK = `https://earnprox.in/index.html?ref=${REFERRAL_CODE}`;
+
+        // ================= DYNAMIC USER DATA LOAD =================
+        window.onload = () => {
+            const savedName = localStorage.getItem("earnprox_user_name") || "User";
+            const savedPhone = localStorage.getItem("earnprox_user_phone") || "0000000000";
+
+            // Update Header Name
+            document.getElementById("header-user-name").innerText = savedName.split(" ")[0]; // First name only
+            document.getElementById("header-avatar").src = `https://ui-avatars.com/api/?name=${savedName}&background=3B82F6&color=fff&bold=true`;
+            
+            // Update Profile Name & Phone
+            document.getElementById("profile-user-name").innerText = savedName;
+            document.getElementById("profile-user-phone").innerText = "+91 " + savedPhone;
+            document.getElementById("profile-avatar").src = `https://api.dicebear.com/7.x/micah/svg?seed=${savedName}&backgroundColor=b6e3f4`;
+        };
 
         function updateBalanceUI() {
             document.getElementById("main-balance-display").innerHTML = `₹ ${currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
@@ -468,6 +483,10 @@
             currentBalance -= amt; 
             updateBalanceUI(); 
             
+            // Remove empty history message if it exists
+            const emptyMsg = document.getElementById("empty-history");
+            if(emptyMsg) emptyMsg.remove();
+            
             const historyHTML = `
             <div class="flex justify-between items-center border-b border-slate-100 pb-4 mt-4">
                 <div class="flex items-center gap-3">
@@ -491,14 +510,17 @@
         function logoutUser() {
             const loader = document.getElementById("loading-overlay");
             loader.classList.add("active"); 
+            
+            // Clear memory on logout
+            localStorage.removeItem("earnprox_user_phone");
+            localStorage.removeItem("earnprox_user_name");
+
             setTimeout(() => {
                 window.location.href = "index.html"; 
             }, 1500);
         }
 
-        // ================= NEW: REAL REFERRAL LOGIC =================
         function copyReferLink() {
-            // Asli link user ke phone clipboard me copy karna
             navigator.clipboard.writeText(REFERRAL_LINK).then(() => {
                 showToast("✅ Referral Link Copied to Clipboard!");
             }).catch(err => {
@@ -507,13 +529,8 @@
         }
 
         function shareOnWhatsApp() {
-            // WhatsApp message with formatting
             const promoMessage = `🔥 Bro! I just found this crazy app *EarnproX*. Complete simple micro-tasks and earn real cash daily directly to UPI! 💸\n\nUse my invite code *${REFERRAL_CODE}* or click here to join and get a sign-up bonus:\n👇👇\n${REFERRAL_LINK} 🚀`;
-            
-            // Encode link for URL
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`;
-            
-            // Open WhatsApp
             window.open(whatsappUrl, '_blank');
         }
 
@@ -541,8 +558,13 @@
                 return;
             }
             showToast("⏳ Submitting to Server...");
+            
+            // Get user phone to attach to task
+            const userPhone = localStorage.getItem("earnprox_user_phone") || "Unknown";
+
             try {
                 await addDoc(collection(db, "task_submissions"), {
+                    userPhone: userPhone,
                     gigName: "Review Shop on Maps",
                     proofLink: linkInput.value,
                     status: "Pending Approval",
