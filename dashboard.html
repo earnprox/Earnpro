@@ -6,9 +6,7 @@
     <title>EarnproX | Premium App</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="dashboard.css">
-
     <script>
         if (!localStorage.getItem("earnprox_user_phone")) {
             window.location.href = "index.html";
@@ -78,7 +76,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="grid grid-cols-2 gap-4 mb-8">
                 <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[1.5rem] p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('project')">
                     <p class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-1">Live Gigs</p>
                     <h4 class="font-black text-xl leading-tight mb-4">Complete<br>Tasks</h4>
@@ -91,17 +89,6 @@
                 </div>
             </div>
             
-            <div class="bg-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl cursor-pointer mb-8" onclick="window.switchTab('wallet')">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center text-xl">💳</div>
-                    <div>
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Available Balance</p>
-                        <h4 class="text-white font-black text-lg" id="home-mini-balance">₹0</h4>
-                    </div>
-                </div>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">Withdraw</button>
-            </div>
-
             <div class="text-center mt-12 mb-8">
                 <h3 class="text-2xl font-black text-slate-800 tracking-tight">You <span class="text-rose-500 text-3xl align-middle">💖</span> EarnproX</h3>
                 <p class="text-slate-500 text-sm mt-1 mb-5 font-medium">Your friends are going to love us too!</p>
@@ -283,26 +270,38 @@
 
     </div>
 
-    <div id="withdraw-page" class="fixed inset-0 z-[150] bg-[#F4F7F9] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
-        <div class="bg-white border-b border-slate-200 px-5 py-4 flex items-center gap-4">
-            <button onclick="window.closeFullPage('withdraw-page')" class="text-slate-500 hover:bg-slate-100 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
-            <h2 class="text-lg font-bold text-slate-800">Withdraw Money</h2>
+    <div id="withdraw-page" class="fixed inset-0 z-[150] bg-white transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="px-5 py-4 flex items-center gap-4 border-b border-slate-100">
+            <button onclick="window.closeFullPage('withdraw-page')" class="text-slate-800 p-1 active:scale-90 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </button>
         </div>
-        <div class="p-5 flex-1 overflow-y-auto">
-            <div class="premium-card rounded-2xl p-6 text-center mb-6 border-blue-100 bg-blue-50/30">
-                <p class="text-sm text-slate-500 mb-2">Available Balance</p>
-                <h2 class="text-4xl font-black text-slate-800 mb-2" id="withdraw-page-balance">₹0</h2>
+
+        <div class="flex flex-col items-center mt-6">
+            <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-2xl mb-3 shadow-inner border border-blue-100">
+                <span id="withdraw-avatar-text">U</span>
             </div>
-            <div class="mb-6">
-                <label class="block text-sm font-bold text-slate-700 mb-3">Amount to withdraw</label>
-                <div class="relative flex items-center bg-white border-2 border-slate-200 rounded-2xl px-4 py-2 focus-within:border-blue-500 transition">
-                    <span class="text-2xl text-slate-400 font-bold mr-2">₹</span>
-                    <input type="number" id="withdraw-amount" placeholder="0" class="w-full text-3xl font-black text-slate-800 bg-transparent outline-none py-3">
-                </div>
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-1">Bank Transfer <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg></h2>
+            <p class="text-xs font-bold text-slate-500 mt-0.5" id="withdraw-page-upi">Processing...</p>
+        </div>
+
+        <div class="flex-1 flex flex-col justify-center items-center px-8 pb-10">
+            <div class="flex items-center justify-center w-full relative">
+                <span class="text-5xl font-medium text-slate-400 absolute left-1/2 -translate-x-[calc(50%+60px)]">₹</span>
+                <input type="number" id="withdraw-amount" placeholder="0" class="w-full text-center text-7xl font-black text-slate-800 bg-transparent outline-none p-0 hide-arrows" style="max-width: 250px;">
+            </div>
+            
+            <div class="mt-8 bg-slate-50 px-5 py-2.5 rounded-full border border-slate-200 flex items-center gap-2 cursor-pointer active:scale-95 transition" onclick="document.getElementById('withdraw-amount').value = window.currentBalance">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Available Balance</span>
+                <span class="text-sm font-black text-slate-800" id="withdraw-page-balance">₹0</span>
             </div>
         </div>
-        <div class="p-5 bg-white border-t border-slate-200">
-            <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition">Request Payout</button>
+
+        <div class="p-5 w-full mt-auto mb-4">
+            <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-[#00BAF2] hover:bg-[#00A5D9] text-white font-black py-4 rounded-2xl shadow-lg shadow-[#00BAF2]/30 text-lg active:scale-95 transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                Proceed Securely
+            </button>
         </div>
     </div>
 
