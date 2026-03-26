@@ -1,114 +1,19 @@
-/* ================= DASHBOARD MASTER STYLES ================= */
-body { 
-    font-family: 'Inter', sans-serif; 
-    background-color: #F4F7F9; 
-    color: #0F172A; 
-    -webkit-tap-highlight-color: transparent; 
-    overflow-x: hidden;
-}
-
-/* Base Components */
-.premium-card { 
-    background: #FFFFFF; 
-    border: 1px solid #E2E8F0; 
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04); 
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-/* Hover/Active Effect for Task Cards */
-#gigs-container .premium-card:active {
-    transform: scale(0.98);
-    border-color: #3b82f6;
-}
-
-/* Main Navigation Tabs */
-.tab-content { 
-    display: none; 
-    opacity: 0; 
-    transform: translateY(10px); 
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-}
-.tab-content.active { 
-    display: block; 
-    opacity: 1; 
-    transform: translateY(0); 
-}
-
-/* Workspace Sub-Tabs (Zomato/Fiverr Style) */
-.ws-tab { 
-    color: #64748b; 
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-}
-.ws-content { 
-    display: none; 
-}
-.ws-content.active { 
-    display: block; 
-    animation: slideIn 0.3s ease-out; 
-}
-
-@keyframes slideIn { 
-    from { opacity: 0; transform: translateX(20px); } 
-    to { opacity: 1; transform: translateX(0); } 
-}
-
-@keyframes fadeIn { 
-    from { opacity: 0; } 
-    to { opacity: 1; } 
-}
-
-/* UI Overlays & Sheets */
+body { font-family: 'Inter', sans-serif; background-color: #F4F7F9; color: #0F172A; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+.premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04); transition: transform 0.2s; }
+.tab-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+.tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+.ws-tab { transition: all 0.3s; color: #64748b; }
+.ws-content { display: none; animation: slideIn 0.3s ease-out; }
+.ws-content.active { display: block; }
 .modal-active { opacity: 1 !important; pointer-events: auto !important; }
 .sheet-active { transform: translateY(0) !important; }
 .full-page-active { transform: translateX(0) !important; } 
-
-/* Utils */
 ::-webkit-scrollbar { display: none; }
-
-/* 🔥 PAYTM STYLE: HIDE NUMBER INPUT ARROWS */
-.hide-arrows::-webkit-outer-spin-button,
-.hide-arrows::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-.hide-arrows[type=number] {
-    -moz-appearance: textfield;
-}
-
-/* Toast Notifications */
-#toast {
-    visibility: hidden; 
-    min-width: 250px; 
-    background-color: #1E293B; 
-    color: #fff; 
-    text-align: center; 
-    border-radius: 12px; 
-    padding: 16px; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 50%; 
-    bottom: 30px; 
-    transform: translateX(-50%) translateY(20px); 
-    opacity: 0; 
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-    font-weight: 600; 
-    font-size: 14px;
-}
-#toast.show { 
-    visibility: visible; 
-    opacity: 1; 
-    transform: translateX(-50%) translateY(0); 
-}
-
-/* Full Screen Loader Overlay */
-#loading-overlay { 
-    display: none; 
-}
-#loading-overlay.active { 
-    display: flex; 
-}
-
-/* Profile Image Glow Effect */
-#home-profile-avatar {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
-}
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+#toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s; font-weight: 600; }
+#toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+#loading-overlay { display: none; position: fixed; inset: 0; background: white; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+#loading-overlay.active { display: flex; }
+.hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.hide-arrows[type=number] { -moz-appearance: textfield; }
+#home-profile-avatar { box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
