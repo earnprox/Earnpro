@@ -1,0 +1,102 @@
+/* ================= DASHBOARD STYLES ================= */
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #F4F7F9; 
+    color: #0F172A; 
+    -webkit-tap-highlight-color: transparent; 
+    overflow-x: hidden;
+}
+
+/* Base Components */
+.premium-card { 
+    background: #FFFFFF; 
+    border: 1px solid #E2E8F0; 
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04); 
+}
+
+/* Main Navigation Tabs */
+.tab-content { 
+    display: none; 
+    opacity: 0; 
+    transform: translateY(10px); 
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+.tab-content.active { 
+    display: block; 
+    opacity: 1; 
+    transform: translateY(0); 
+}
+
+/* Workspace Sub-Tabs */
+.ws-tab { 
+    color: #64748b; 
+    border-bottom: 2px solid transparent; 
+    transition: all 0.2s; 
+}
+.ws-tab.active { 
+    color: #2563eb; 
+    border-bottom: 2px solid #2563eb; 
+    font-weight: 700; 
+}
+.ws-content { 
+    display: none; 
+}
+.ws-content.active { 
+    display: block; 
+    animation: fadeIn 0.3s ease; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+
+/* UI Overlays & Sheets */
+.modal-active { 
+    opacity: 1 !important; 
+    pointer-events: auto !important; 
+}
+.sheet-active { 
+    transform: translateY(0) !important; 
+}
+.full-page-active { 
+    transform: translateX(0) !important; 
+} 
+
+/* Utils */
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+/* Toast Notifications */
+#toast {
+    visibility: hidden; 
+    min-width: 250px; 
+    background-color: #1E293B; 
+    color: #fff; 
+    text-align: center; 
+    border-radius: 12px; 
+    padding: 16px; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 50%; 
+    bottom: 30px; 
+    transform: translateX(-50%) translateY(20px); 
+    opacity: 0; 
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+    font-weight: 600; 
+    font-size: 14px;
+}
+#toast.show { 
+    visibility: visible; 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+}
+
+/* Full Screen Loader */
+#loading-overlay { 
+    display: none; 
+}
+#loading-overlay.active { 
+    display: flex; 
+}
