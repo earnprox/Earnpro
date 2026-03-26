@@ -3,134 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnproX | Admin God Mode</title>
+    <title>EarnproX | Admin God Mode 4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; padding-bottom: 70px; }
-        .nav-active { color: #2563EB !important; font-weight: 900; border-top: 3px solid #2563EB; }
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; padding-bottom: 80px; }
+        .nav-active { color: #2563EB !important; font-weight: 900; border-top: 4px solid #2563EB; background: #F1F5F9; }
         @media (min-width: 768px) { 
-            body { padding-bottom: 0; padding-left: 260px; }
-            .nav-active { border-top: none; border-right: 4px solid #2563EB; background: #F1F5F9; }
+            body { padding-bottom: 0; padding-left: 280px; } 
+            .nav-active { border-top: none; border-right: 5px solid #2563EB; }
         }
-        .view-section { display: none; opacity: 0; }
-        .view-section.active { display: block; opacity: 1; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        #auth-screen { display: flex; z-index: 999; }
+        .view-section { display: none; opacity: 0; transform: translateY(10px); }
+        .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.3s ease; }
+        #auth-screen { display: flex; z-index: 9999; position: fixed; inset: 0; background: #0F172A; }
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
-        
-        .modal { display: none; z-index: 1000; }
+        .modal { display: none; z-index: 10000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); }
         .modal.active { display: flex; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div id="auth-screen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center p-6">
-        <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 mx-auto flex items-center justify-center text-white font-black text-2xl shadow-xl rotate-3">X</div>
-            <h2 class="text-2xl font-black mb-1 text-slate-800">Admin Access</h2>
-            <p class="text-sm text-slate-400 mb-8 font-medium">Control the EarnproX Ecosystem</p>
-            <input type="password" id="admin-pass" placeholder="Enter Password" class="w-full bg-slate-100 p-4 rounded-2xl mb-4 outline-none focus:ring-2 ring-blue-500 font-black tracking-widest text-center">
-            <button onclick="window.doLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition">Unlock Dashboard 🔓</button>
+    <div id="auth-screen" class="flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-white p-10 rounded-[3rem] w-full max-w-sm shadow-2xl">
+            <div class="w-20 h-20 bg-blue-600 rounded-3xl mb-6 mx-auto flex items-center justify-center text-white font-black text-3xl shadow-xl rotate-3 italic">X</div>
+            <h2 class="text-3xl font-black mb-2 text-slate-800 tracking-tight">Admin Pro</h2>
+            <p class="text-sm text-slate-500 mb-8 font-medium italic">"With great power comes great responsibility"</p>
+            <input type="password" id="admin-pass" placeholder="••••••••" class="w-full bg-slate-100 p-5 rounded-2xl mb-5 outline-none border-2 border-transparent focus:border-blue-500 font-black text-center tracking-widest text-xl">
+            <button onclick="window.doLogin()" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg shadow-blue-500/40 active:scale-95 transition text-lg">Unlock System 🔓</button>
         </div>
     </div>
 
     <div id="admin-app">
-        <aside class="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r hidden md:flex flex-col p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-10">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-sm italic">X</div>
-                <h1 class="text-xl font-black tracking-tighter">Admin<span class="text-blue-600">Pro</span></h1>
-            </div>
-            <nav class="flex flex-col gap-2">
-                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600"><span>📊</span> Dashboard</button>
-                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600"><span>👥</span> Users</button>
-                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600 relative">
-                    <span>🔍</span> Reviews 
+        <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r hidden md:flex flex-col p-8 shadow-sm">
+            <h1 class="text-2xl font-black mb-12 tracking-tighter">EarnproX<span class="text-blue-600">.</span></h1>
+            <nav class="flex flex-col gap-3">
+                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left rounded-2xl font-bold flex items-center gap-3"><span>📊</span> Dashboard</button>
+                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left rounded-2xl font-bold flex items-center gap-3"><span>👥</span> All Users</button>
+                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left rounded-2xl font-bold flex items-center gap-3 relative">
+                    <span>🔍</span> Review Tasks 
                     <span id="badge-count" class="absolute right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
                 </button>
-                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600"><span>🚀</span> Add Gigs</button>
+                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left rounded-2xl font-bold flex items-center gap-3"><span>🚀</span> Upload Gigs</button>
             </nav>
-            <button onclick="window.doLogout()" class="mt-auto p-4 text-left text-red-500 font-bold hover:bg-red-50 rounded-xl transition">Logout 🚪</button>
+            <button onclick="window.doLogout()" class="mt-auto p-4 text-red-500 font-black hover:bg-red-50 rounded-2xl transition flex items-center gap-2"><span>🚪</span> Secure Logout</button>
         </aside>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-2 z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
-            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-active"><span class="text-xl">📊</span><span class="text-[10px] font-black uppercase mt-1">Dash</span></button>
-            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">👥</span><span class="text-[10px] font-black uppercase mt-1">Users</span></button>
-            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">🔍</span><span class="text-[10px] font-black uppercase mt-1">Review</span></button>
-            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">🚀</span><span class="text-[10px] font-black uppercase mt-1">Gigs</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-3 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-active"><span class="text-2xl">📊</span><span class="text-[10px] font-black uppercase mt-1">Dash</span></button>
+            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-2xl">👥</span><span class="text-[10px] font-black uppercase mt-1">Users</span></button>
+            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-2xl">🔍</span><span class="text-[10px] font-black uppercase mt-1">Review</span></button>
+            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-2xl">🚀</span><span class="text-[10px] font-black uppercase mt-1">Gigs</span></button>
         </nav>
 
-        <main class="p-5 md:p-10 max-w-6xl mx-auto">
+        <main class="p-6 md:p-12 max-w-5xl mx-auto">
             
             <section id="view-dash" class="view-section active">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">System Overview</h2>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Live Users</p>
-                        <h3 id="stat-users" class="text-4xl font-black text-blue-600">0</h3>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">To Review</p>
-                        <h3 id="stat-pending" class="text-4xl font-black text-orange-500">0</h3>
-                    </div>
-                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-[2rem] font-bold text-sm col-span-2 md:col-span-1 shadow-lg active:scale-95 transition">Sync Database 🔄</button>
+                <h2 class="text-4xl font-black text-slate-900 mb-10 tracking-tight">System Stats</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Total Users</p><h3 id="stat-users" class="text-5xl font-black text-blue-600 mt-2">0</h3></div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Pending Review</p><h3 id="stat-pending" class="text-5xl font-black text-orange-500 mt-2">0</h3></div>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-[2.5rem] font-black text-lg shadow-xl active:scale-95 transition">Refresh 🔄</button>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">User Database</h2>
-                <div id="user-list" class="grid gap-3">
-                    <p class="text-center text-slate-400 py-20 font-medium">Fetching users from cloud...</p>
+                <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tight">Manage Users</h2>
+                <div id="user-list" class="grid gap-4">
+                    <p class="text-slate-400 text-center py-20 font-bold italic">Contacting Firebase Database...</p>
                 </div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">Pending Proofs</h2>
-                <div id="review-list" class="grid gap-4">
-                    <p class="text-center text-slate-400 py-20 font-medium italic">No pending proofs to show.</p>
+                <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tight">Review Proofs</h2>
+                <div id="review-list" class="grid gap-6">
+                    <p class="text-slate-400 text-center py-20 font-bold italic">All clean! No pending tasks.</p>
                 </div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">Publish New Gig</h2>
-                <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm max-w-lg">
-                    <div class="space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-2xl border">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Gig Title</label>
-                            <input type="text" id="gig-title" placeholder="e.g. Join Telegram Channel" class="w-full bg-transparent font-bold outline-none">
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Reward Amount (₹)</label>
-                            <input type="number" id="gig-reward" placeholder="20" class="w-full bg-transparent font-black text-2xl text-emerald-600 outline-none">
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Step-by-Step Instructions</label>
-                            <textarea id="gig-desc" placeholder="1. Open link\n2. Screenshot after join..." class="w-full bg-transparent font-medium outline-none h-24"></textarea>
-                        </div>
-                        <button onclick="window.addGigToDB()" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition">Publish Task Live 🚀</button>
+                <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tight">New Gig</h2>
+                <div class="bg-white p-10 rounded-[3rem] border shadow-sm max-w-lg space-y-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Task Title</label>
+                        <input type="text" id="gig-title" placeholder="e.g. Subscribe My Channel" class="w-full bg-transparent font-bold outline-none text-slate-800">
                     </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Reward (₹)</label>
+                        <input type="number" id="gig-reward" placeholder="50" class="w-full bg-transparent font-black text-3xl text-emerald-600 outline-none">
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Instructions</label>
+                        <textarea id="gig-desc" placeholder="Step 1: Open link..." class="w-full bg-transparent font-medium outline-none h-32"></textarea>
+                    </div>
+                    <button onclick="window.addGigToDB()" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-2xl shadow-blue-500/30 text-xl active:scale-95 transition">Go Live 🚀</button>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="modal-bal" class="modal fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
-            <h3 class="text-2xl font-black text-slate-800 mb-1">Adjust Wallet</h3>
-            <p id="target-user-name" class="text-sm text-slate-500 mb-6 font-bold"></p>
-            <div class="bg-blue-50 p-6 rounded-[2rem] mb-8 border border-blue-100">
-                <label class="text-[10px] font-black text-blue-400 uppercase mb-2 block tracking-widest">New Balance (₹)</label>
-                <input type="number" id="target-new-bal" class="w-full bg-transparent text-5xl font-black text-blue-600 outline-none" placeholder="0">
+    <div id="modal-bal" class="modal flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 shadow-2xl text-center">
+            <h3 class="text-2xl font-black text-slate-900 mb-1">Adjust Wallet</h3>
+            <p id="target-user-name" class="text-sm text-slate-500 mb-8 font-bold"></p>
+            <div class="bg-blue-50 p-8 rounded-[2rem] border-2 border-blue-100 mb-8">
+                <label class="text-[10px] font-black text-blue-400 uppercase mb-2 block tracking-widest">Balance Amount (₹)</label>
+                <input type="number" id="target-new-bal" class="w-full bg-transparent text-6xl font-black text-blue-600 outline-none text-center" placeholder="0">
             </div>
-            <div class="flex gap-3">
-                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition">Save</button>
-                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-2xl active:scale-95 transition">Cancel</button>
+            <div class="flex gap-4">
+                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-slate-900 text-white font-black py-5 rounded-2xl shadow-xl active:scale-95 transition">Save</button>
+                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-bold py-5 rounded-2xl">Cancel</button>
             </div>
         </div>
     </div>
@@ -139,6 +122,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
             authDomain: "earnproxuc.firebaseapp.com",
@@ -150,156 +134,135 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let activeUserDocId = "";
+        let activeId = "";
 
-        // --- AUTH ---
+        // --- GLOBAL ADMIN FUNCTIONS ---
+        
         window.doLogin = () => {
             const p = document.getElementById('admin-pass').value;
             if(p === "admin123") {
-                localStorage.setItem("admin_auth", "true");
+                localStorage.setItem("earn_admin", "true");
                 document.body.classList.add('authenticated');
-                initAdmin();
-            } else { alert("❌ Wrong Password! Admin access only."); }
-        };
-        window.doLogout = () => {
-            localStorage.removeItem("admin_auth");
-            location.reload();
+                startSync();
+            } else { alert("Wrong password! ❌"); }
         };
 
-        // --- NAVIGATION ---
+        window.doLogout = () => { localStorage.removeItem("earn_admin"); location.reload(); };
+
         window.switchView = (id, btn) => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            btn.classList.add('nav-active');
+            if(btn) btn.classList.add('nav-active');
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        // --- LOAD DATA (onSnapshot for Live Updates) ---
-        function initAdmin() {
-            // Live Users Sync
+        // --- REAL-TIME DATABASE SYNC ---
+        function startSync() {
+            // 1. Sync Users
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
-                let html = "";
+                let h = "";
                 snap.forEach(d => {
                     const u = d.data();
-                    html += `
-                    <div class="bg-white p-5 rounded-[2rem] border flex justify-between items-center shadow-sm">
+                    h += `
+                    <div class="bg-white p-6 rounded-[2.5rem] border flex justify-between items-center shadow-sm">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center font-black text-blue-600 border border-slate-100 italic">${u.name.charAt(0)}</div>
+                            <div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center font-black text-blue-600 border italic text-xl">${u.name.charAt(0)}</div>
                             <div>
-                                <p class="font-black text-sm text-slate-800">${u.name}</p>
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider">+91 ${u.phone}</p>
-                                <p class="text-[9px] text-blue-500 font-black uppercase mt-1">UPI: ${u.upi || 'PENDING'}</p>
+                                <p class="font-black text-slate-800">${u.name}</p>
+                                <p class="text-[10px] font-bold text-slate-400 tracking-widest">+91 ${u.phone}</p>
+                                <p class="text-[10px] text-blue-500 font-black mt-1 uppercase">UPI: ${u.upi || 'NOT SET'}</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-black text-emerald-600 text-lg mb-2">₹${u.balance || 0}</p>
-                            <div class="flex gap-1">
-                                <button onclick="window.openBalModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest">Adjust</button>
-                                <button onclick="window.blockUser('${d.id}')" class="bg-red-50 text-red-500 text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest">Block</button>
+                            <p class="font-black text-emerald-600 text-xl mb-3">₹${u.balance || 0}</p>
+                            <div class="flex gap-2">
+                                <button onclick="window.openModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest">Adjust</button>
+                                <button onclick="window.blockUser('${d.id}')" class="bg-red-50 text-red-500 text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest">Block</button>
                             </div>
                         </div>
                     </div>`;
                 });
-                document.getElementById('user-list').innerHTML = html || "<p class='text-center text-slate-400'>No users registered yet.</p>";
+                document.getElementById('user-list').innerHTML = h || "No users found.";
             });
 
-            // Live Tasks Sync
+            // 2. Sync Reviews
             onSnapshot(collection(db, "task_submissions"), (snap) => {
-                let pendingCount = 0;
-                let html = "";
+                let p = 0; let h = "";
                 snap.forEach(d => {
                     const t = d.data();
                     if(t.status === "Pending Approval") {
-                        pendingCount++;
-                        html += `
-                        <div class="bg-white p-6 rounded-[2.5rem] border shadow-sm border-l-8 border-l-orange-400">
-                            <p class="text-[10px] font-black text-orange-400 mb-1 uppercase tracking-widest">${t.gigName}</p>
-                            <p class="font-bold text-sm mb-1 text-slate-800">Submitted by: +91 ${t.userPhone}</p>
-                            <a href="${t.proofLink}" target="_blank" class="text-blue-500 font-bold text-xs underline block mb-5 italic">Open Proof Link ↗</a>
-                            <div class="flex gap-2">
-                                <button onclick="window.approveTask('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition">APPROVE & PAY</button>
-                                <button onclick="window.rejectTask('${d.id}')" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl text-xs active:scale-95 transition">REJECT</button>
+                        p++;
+                        h += `
+                        <div class="bg-white p-8 rounded-[3rem] border shadow-sm border-l-8 border-l-orange-400">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <p class="text-[10px] font-black text-orange-400 mb-1 uppercase tracking-widest">${t.gigName}</p>
+                                    <h4 class="font-black text-xl text-slate-800">+91 ${t.userPhone}</h4>
+                                </div>
+                                <a href="${t.proofLink}" target="_blank" class="bg-blue-50 text-blue-600 font-black text-[10px] px-4 py-2 rounded-full border border-blue-100 uppercase tracking-widest">Check Link ↗</a>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="window.approve('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-95 transition">APPROVE & PAY</button>
+                                <button onclick="window.reject('${d.id}')" class="flex-1 bg-slate-100 text-slate-400 font-black py-5 rounded-2xl active:scale-95 transition">REJECT</button>
                             </div>
                         </div>`;
                     }
                 });
-                document.getElementById('stat-pending').innerText = pendingCount;
-                document.getElementById('review-list').innerHTML = html || "<p class='text-center text-slate-400 py-10 font-bold'>✨ All task reviews are completed!</p>";
+                document.getElementById('stat-pending').innerText = p;
+                document.getElementById('review-list').innerHTML = h || "All submissions reviewed! ✨";
                 
-                // Update badge
-                const badge = document.getElementById('badge-count');
-                if(pendingCount > 0) {
-                    badge.innerText = pendingCount;
-                    badge.classList.remove('hidden');
-                } else { badge.classList.add('hidden'); }
+                const bc = document.getElementById('badge-count');
+                if(p > 0) { bc.innerText = p; bc.classList.remove('hidden'); } else { bc.classList.add('hidden'); }
             });
         }
 
         // --- DATABASE ACTIONS ---
 
-        // Adjust Balance (GLOBAL)
-        window.openBalModal = (id, name, bal) => {
-            activeUserDocId = id;
-            document.getElementById('target-user-name').innerText = name;
+        window.openModal = (id, name, bal) => {
+            activeId = id; document.getElementById('target-user-name').innerText = name;
             document.getElementById('target-new-bal').value = bal;
             document.getElementById('modal-bal').classList.add('active');
         };
 
         window.updateBalanceInDB = async () => {
-            const newBal = parseInt(document.getElementById('target-new-bal').value);
-            if(isNaN(newBal)) return alert("Enter valid number!");
-            await updateDoc(doc(db, "users", activeUserDocId), { balance: newBal });
+            const b = parseInt(document.getElementById('target-new-bal').value);
+            if(isNaN(b)) return alert("Invalid amount!");
+            await updateDoc(doc(db, "users", activeId), { balance: b });
             document.getElementById('modal-bal').classList.remove('active');
-            alert("Success: User balance updated! ✅");
+            alert("Success: User balance updated! 💸");
         };
 
-        // Approve Task (GLOBAL)
-        window.approveTask = async (taskId, userPhone, reward) => {
-            await updateDoc(doc(db, "task_submissions", taskId), { status: "Completed" });
-            const q = query(collection(db, "users"), where("phone", "==", userPhone));
+        window.approve = async (id, phone, reward) => {
+            await updateDoc(doc(db, "task_submissions", id), { status: "Completed" });
+            const q = query(collection(db, "users"), where("phone", "==", phone));
             const uSnap = await getDocs(q);
             if(!uSnap.empty) {
-                const uDoc = uSnap.docs[0];
-                const newBal = (uDoc.data().balance || 0) + reward;
-                await updateDoc(doc(db, "users", uDoc.id), { balance: newBal });
-                alert("💰 Approved: Reward sent to user!");
+                const ud = uSnap.docs[0];
+                const nb = (ud.data().balance || 0) + reward;
+                await updateDoc(doc(db, "users", ud.id), { balance: nb });
+                alert("Approved: ₹"+reward+" sent! 💰");
             }
         };
 
-        // Add New Gig (GLOBAL)
+        window.reject = async (id) => { if(confirm("Reject this submission?")) await deleteDoc(doc(db, "task_submissions", id)); };
+
         window.addGigToDB = async () => {
-            const title = document.getElementById('gig-title').value;
-            const reward = parseInt(document.getElementById('gig-reward').value);
-            const desc = document.getElementById('gig-desc').value;
-
-            if(!title || isNaN(reward)) return alert("⚠️ Please fill Gig Title and Reward!");
-
-            await addDoc(collection(db, "gigs"), {
-                title, reward, desc, timestamp: new Date()
-            });
-            alert("🚀 Boom! New task is live on the app.");
-            document.getElementById('gig-title').value = "";
-            document.getElementById('gig-reward').value = "";
-            document.getElementById('gig-desc').value = "";
+            const t = document.getElementById('gig-title').value;
+            const r = parseInt(document.getElementById('gig-reward').value);
+            const d = document.getElementById('gig-desc').value;
+            if(!t || isNaN(r)) return alert("Fill title and reward!");
+            await addDoc(collection(db, "gigs"), { title: t, reward: r, desc: d, timestamp: new Date() });
+            alert("New Gig is LIVE! 🚀");
+            document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = "";
         };
 
-        window.rejectTask = async (id) => {
-            if(confirm("Confirm Reject? This will delete the submission.")) {
-                await deleteDoc(doc(db, "task_submissions", id));
-            }
-        };
+        window.blockUser = async (id) => { if(confirm("Block/Delete this user permanently?")) await deleteDoc(doc(db, "users", id)); };
 
-        window.blockUser = async (id) => {
-            if(confirm("🚨 WARNING: This will permanently DELETE this user! Proceed?")) {
-                await deleteDoc(doc(db, "users", id));
-            }
-        };
-
-        // Final Boot
-        if(localStorage.getItem("admin_auth")) {
+        // Auto Boot
+        if(localStorage.getItem("earn_admin")) {
             document.body.classList.add('authenticated');
-            initAdmin();
+            startSync();
         }
     </script>
 </body>
