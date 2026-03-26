@@ -19,7 +19,7 @@
         .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; }
         .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; }
         
-        .otp-box { width: 40px; height: 50px; text-align: center; font-size: 20px; font-weight: 800; border-radius: 10px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
+        .otp-box { width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
         .otp-box:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
         
         #toast {
@@ -30,7 +30,7 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-blue-100">
 
-    <div class="text-center mb-6 mt-4">
+    <div class="text-center mb-8 mt-4">
         <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(37,99,235,0.3)] transform -rotate-6">
             <span class="text-3xl text-white font-black">X</span>
         </div>
@@ -38,11 +38,11 @@
         <p class="text-sm text-slate-500 font-medium mt-1">Complete micro-tasks, earn real money.</p>
     </div>
 
-    <div class="premium-card rounded-[2rem] p-6 w-full max-w-md relative overflow-hidden min-h-[460px] flex flex-col justify-start">
+    <div class="premium-card rounded-[2rem] p-6 w-full max-w-md relative overflow-hidden min-h-[420px] flex flex-col justify-start">
         
         <div id="step-1" class="form-step step-active">
             <h2 class="text-2xl font-black text-slate-800 mb-2">Let's get started</h2>
-            <p class="text-sm text-slate-500 mb-6">Enter your mobile number to securely login or register.</p>
+            <p class="text-sm text-slate-500 mb-8">Enter your mobile number to login or create a new account.</p>
             
             <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Mobile Number</label>
@@ -52,18 +52,16 @@
                 </div>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-8">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Invite Code (Optional)</label>
                 <input type="text" id="refer-input" placeholder="Have a referral code?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition uppercase tracking-widest">
             </div>
 
-            <div id="recaptcha-container" class="mb-4 flex justify-center"></div>
-
-            <button onclick="window.sendRealOTP()" id="send-otp-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
-                Get Secure OTP <span class="text-xl">→</span>
+            <button onclick="window.sendOTP()" id="send-otp-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
+                Get OTP <span class="text-xl">→</span>
             </button>
             
-            <p class="text-[10px] text-center text-slate-400 mt-4 font-medium">By continuing, you agree to our Terms of Service & Privacy Policy.</p>
+            <p class="text-[10px] text-center text-slate-400 mt-5 font-medium">By continuing, you agree to our Terms of Service & Privacy Policy.</p>
         </div>
 
         <div id="step-2" class="form-step step-in-right">
@@ -72,7 +70,7 @@
                 <span class="text-xs font-bold">Back</span>
             </button>
             <h2 class="text-2xl font-black text-slate-800 mb-2">Verify it's you</h2>
-            <p class="text-sm text-slate-500 mb-6">We've sent a 6-digit code to <b id="display-number" class="text-slate-800">+91 XXXXXXXXXX</b></p>
+            <p class="text-sm text-slate-500 mb-6">We've sent a 4-digit code to <b id="display-number" class="text-slate-800">+91 XXXXXXXXXX</b></p>
             
             <div id="name-container" class="mb-6 hidden">
                 <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 bg-blue-50 inline-block px-2 py-1 rounded">New User Setup</label>
@@ -81,21 +79,24 @@
 
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter 6-Digit OTP</label>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter OTP</label>
+                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded">Test OTP: 1234</span>
                 </div>
-                <div class="flex gap-2 justify-center">
+                <div class="flex gap-3 justify-center">
                     <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event)">
                     <input type="tel" maxlength="1" class="otp-box" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event)">
                     <input type="tel" maxlength="1" class="otp-box" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event)">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="window.moveToNext(this, 'otp5', event)">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp5" onkeyup="window.moveToNext(this, 'otp6', event)">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp6" onkeyup="window.checkBackspace(this, 'otp5', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="window.checkBackspace(this, 'otp3', event)">
                 </div>
             </div>
 
-            <button onclick="window.verifyRealOTP()" id="verify-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
-                Verify & Secure Login
+            <button onclick="window.verifyAndLogin()" id="verify-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
+                Verify & Save Data
             </button>
+            
+            <div class="text-center mt-6">
+                <p class="text-sm text-slate-500 font-medium">Didn't receive the code? <button onclick="window.showToast('Test mode: Please use OTP 1234')" class="text-blue-600 font-bold ml-1 hover:underline">Resend</button></p>
+            </div>
         </div>
 
     </div>
@@ -105,9 +106,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-        // 🔥 Aapki Exact Keys
+        // 🔥 Aapke Database ki Keys
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
           authDomain: "earnproxuc.firebaseapp.com",
@@ -116,19 +116,18 @@
           messagingSenderId: "411733884378",
           appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
         };
-        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        auth.useDeviceLanguage();
 
+        // Logic Variables
         let isNewUser = true;
-        let existingUserName = "User";
-        let confirmationResultObj = null; // Asli OTP save karne ke liye
+        let existingUserName = ""; 
 
+        // Auto-apply Refer Code
         window.onload = () => {
+            // Agar pehle se login hai, toh dashboard par bhej do
             if(localStorage.getItem("earnprox_user_phone")) {
-                window.location.href = "dashboard.html"; // Pehle se login hai toh bhej do
+                window.location.href = "dashboard.html"; 
             }
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -138,14 +137,6 @@
                 document.getElementById('refer-input').classList.add('border-emerald-300', 'bg-emerald-50', 'text-emerald-700');
                 window.showToast("🎁 Invite code applied automatically!");
             }
-
-            // RECAPTCHA Setup (Google Security)
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-              'size': 'normal',
-              'callback': (response) => {
-                // reCAPTCHA solved
-              }
-            });
         };
 
         window.showToast = function(message) {
@@ -167,57 +158,52 @@
             if (event.key === "Backspace" && current.value === "") { document.getElementById(prevFieldID).focus(); }
         }
 
-        // ================= SEND REAL OTP =================
-        window.sendRealOTP = async function() {
-            const phoneStr = document.getElementById('mobile-input').value;
-            if(phoneStr.length !== 10) {
+        // STEP 1 -> STEP 2 (Real Database Check)
+        window.sendOTP = async function() {
+            const phone = document.getElementById('mobile-input').value;
+            if(phone.length !== 10) {
                 window.showToast("⚠️ Please enter a valid 10-digit number.");
                 return;
             }
             
-            const phoneNumber = "+91" + phoneStr;
-            document.getElementById('display-number').innerText = phoneNumber;
-            
+            document.getElementById('display-number').innerText = "+91 " + phone;
             const btn = document.getElementById('send-otp-btn');
-            btn.innerText = "Sending SMS...";
+            btn.innerText = "Checking User...";
             btn.disabled = true;
 
             try {
-                // 1. Check if user exists in Database
+                // REAL FIREBASE CHECK: Kya ye number pehle se hai?
                 const usersRef = collection(db, "users");
-                const q = query(usersRef, where("phone", "==", phoneStr));
+                const q = query(usersRef, where("phone", "==", phone));
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
+                    // OLD USER
                     isNewUser = false;
                     querySnapshot.forEach((doc) => { existingUserName = doc.data().name; });
                     document.getElementById('name-container').classList.add('hidden');
+                    window.showToast(`Welcome back, ${existingUserName}! OTP Sent.`);
                 } else {
+                    // NEW USER
                     isNewUser = true;
                     document.getElementById('name-container').classList.remove('hidden');
+                    window.showToast("👋 New User! OTP Sent.");
                 }
-
-                // 2. SEND REAL SMS VIA FIREBASE
-                const appVerifier = window.recaptchaVerifier;
-                confirmationResultObj = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-                
-                window.showToast("📲 OTP Sent successfully to your phone!");
-                
-                // Slide to Step 2
-                document.getElementById('step-1').classList.remove('step-active');
-                document.getElementById('step-1').classList.add('step-out-left');
-                document.getElementById('step-2').classList.remove('step-in-right');
-                document.getElementById('step-2').classList.add('step-active');
-                
-            } catch (error) {
-                console.error("SMS Error:", error);
-                window.showToast("❌ Failed to send OTP. Try again.");
-                // Reset Recaptcha on error
-                if(window.recaptchaVerifier) window.recaptchaVerifier.render();
+            } catch(e) {
+                console.error("DB Query Error:", e);
+                window.showToast("⚠️ Network issue. Continuing as new user.");
+                isNewUser = true;
+                document.getElementById('name-container').classList.remove('hidden');
             } finally {
-                btn.innerHTML = `Get Secure OTP <span class="text-xl">→</span>`;
+                btn.innerHTML = `Get OTP <span class="text-xl">→</span>`;
                 btn.disabled = false;
             }
+
+            // Slide Animation
+            document.getElementById('step-1').classList.remove('step-active');
+            document.getElementById('step-1').classList.add('step-out-left');
+            document.getElementById('step-2').classList.remove('step-in-right');
+            document.getElementById('step-2').classList.add('step-active');
         }
 
         window.goBack = function() {
@@ -226,19 +212,25 @@
             document.getElementById('step-1').classList.remove('step-out-left');
             document.getElementById('step-1').classList.add('step-active');
             
-            // Clear boxes
-            for(let i=1; i<=6; i++) { document.getElementById('otp'+i).value = ""; }
+            for(let i=1; i<=4; i++) { document.getElementById('otp'+i).value = ""; }
         }
 
-        // ================= VERIFY REAL OTP =================
-        window.verifyRealOTP = async function() {
+        // VERIFY BYPASS OTP (1234) & SAVE TO DATABASE
+        window.verifyAndLogin = async function() {
             const o1 = document.getElementById('otp1').value; const o2 = document.getElementById('otp2').value;
             const o3 = document.getElementById('otp3').value; const o4 = document.getElementById('otp4').value;
-            const o5 = document.getElementById('otp5').value; const o6 = document.getElementById('otp6').value;
-            const enteredOtp = o1 + o2 + o3 + o4 + o5 + o6;
+            const enteredOtp = o1 + o2 + o3 + o4;
             
-            if(enteredOtp.length < 6) {
-                window.showToast("⚠️ Please enter the complete 6-digit OTP.");
+            if(enteredOtp.length < 4) {
+                window.showToast("⚠️ Please enter the complete 4-digit OTP.");
+                return;
+            }
+
+            // BYPASS LOGIC 🚨
+            if(enteredOtp !== "1234") {
+                window.showToast("❌ Invalid OTP! Hint: Use 1234.");
+                for(let i=1; i<=4; i++) { document.getElementById('otp'+i).value = ""; }
+                document.getElementById('otp1').focus();
                 return;
             }
 
@@ -251,49 +243,32 @@
                     window.showToast("⚠️ Please enter your full name.");
                     return;
                 }
-            }
-
-            const btn = document.getElementById('verify-btn');
-            btn.innerText = "Verifying Code...";
-            btn.disabled = true;
-
-            try {
-                // CHECK WITH GOOGLE IF OTP IS CORRECT
-                const result = await confirmationResultObj.confirm(enteredOtp);
-                const user = result.user; // Asli verify ho gaya!
                 
-                window.showToast("✅ Authenticated! Securing your account...");
-
-                // Agar naya user hai, toh Database mein save karo
-                if(isNewUser) {
-                    const referCode = document.getElementById('refer-input').value;
+                window.showToast("⏳ Saving Account...");
+                const referCode = document.getElementById('refer-input').value;
+                
+                try {
+                    // FIREBASE DATA SAVE (Sirf Naye User ka hoga)
                     await addDoc(collection(db, "users"), {
                         phone: phone,
                         name: finalName,
                         referCodeUsed: referCode ? referCode : "None",
                         timestamp: new Date()
                     });
+                } catch(e) {
+                    console.error("Save Error:", e);
                 }
-
-                // SECURE LOCAL SESSION (Ab hack nahi hoga)
-                localStorage.setItem("earnprox_user_phone", phone);
-                localStorage.setItem("earnprox_user_name", finalName);
-                localStorage.setItem("earnprox_auth_token", user.accessToken); // Real security token
-
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 1000);
-
-            } catch (error) {
-                console.error("Verification Error:", error);
-                window.showToast("❌ Incorrect OTP! Please try again.");
-                // Clear boxes
-                for(let i=1; i<=6; i++) { document.getElementById('otp'+i).value = ""; }
-                document.getElementById('otp1').focus();
-            } finally {
-                btn.innerText = "Verify & Secure Login";
-                btn.disabled = false;
             }
+
+            // PHONE KI MEMORY MEIN LOGIN SAVE (Session)
+            localStorage.setItem("earnprox_user_phone", phone);
+            localStorage.setItem("earnprox_user_name", finalName);
+
+            window.showToast("✅ Login Successful! Redirecting...");
+            
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
         }
     </script>
 </body>
