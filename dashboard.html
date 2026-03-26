@@ -229,7 +229,7 @@
                 <div onclick="window.openSheet('kyc-sheet')" class="flex justify-between items-center p-4 hover:bg-slate-50 transition cursor-pointer">
                     <div class="flex items-center gap-3">
                         <span class="bg-slate-100 p-2 rounded-lg text-slate-600">🏦</span>
-                        <div><p class="text-sm font-semibold text-slate-800">Payout Settings</p><p class="text-xs text-slate-500 mt-0.5" id="upi-display-text">UPI not linked</p></div>
+                        <div><p class="text-sm font-semibold text-slate-800" id="upi-display-text">Payout Settings</p><p class="text-xs text-slate-500 mt-0.5" id="bank-display-text">Link your account</p></div>
                     </div>
                     <span class="text-[11px] font-bold text-red-500 border border-red-200 bg-red-50 px-2 py-1 rounded" id="upi-status-badge">Pending</span>
                 </div>
@@ -281,8 +281,8 @@
             <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-2xl mb-3 shadow-inner border border-blue-100">
                 <span id="withdraw-avatar-text">U</span>
             </div>
-            <h2 class="text-lg font-black text-slate-800 flex items-center gap-1">Bank Transfer <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg></h2>
-            <p class="text-xs font-bold text-slate-500 mt-0.5" id="withdraw-page-upi">Processing...</p>
+            <h2 class="text-lg font-black text-slate-800 flex items-center gap-1" id="withdraw-display-name">Bank Transfer</h2>
+            <p class="text-xs font-bold text-slate-500 mt-0.5" id="withdraw-display-upi">Processing...</p>
         </div>
 
         <div class="flex-1 flex flex-col justify-center items-center px-8 pb-10">
@@ -306,6 +306,27 @@
     </div>
 
     <div id="universal-overlay" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="window.closeAllSheets()"></div>
+
+    <div id="kyc-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out shadow-[0_-20px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh]">
+        <div class="flex justify-between items-center p-5 pb-2">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
+            <h3 class="font-black text-xl text-slate-800 mt-2">Payout Settings</h3>
+            <button onclick="window.closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div class="p-5 overflow-y-auto">
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Banking Name (As per Bank)</label>
+                <input type="text" id="bank-name-input" placeholder="eg. Akash Kumar" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-4 py-4 outline-none focus:border-blue-500 focus:bg-white transition">
+            </div>
+            <div class="mb-5">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your UPI ID</label>
+                <input type="text" id="upi-input-box" placeholder="eg. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-4 py-4 outline-none focus:border-blue-500 focus:bg-white transition">
+            </div>
+        </div>
+        <div class="p-5 border-t border-slate-100 bg-white">
+            <button onclick="window.saveRealKYC()" class="w-full bg-[#1E293B] text-white font-bold py-4 rounded-xl shadow-lg text-lg active:scale-95 transition">Save Payout Details</button>
+        </div>
+    </div>
 
     <div id="task-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out shadow-[0_-20px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh]">
         <div class="flex justify-between items-center p-5 pb-2">
@@ -334,23 +355,6 @@
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
             <button onclick="window.acceptTask()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Accept & Start Task</button>
-        </div>
-    </div>
-
-    <div id="kyc-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out shadow-[0_-20px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh]">
-        <div class="flex justify-between items-center p-5 pb-2">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-800 mt-2">Payout Settings</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="p-5 overflow-y-auto">
-            <div class="mb-5">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your UPI ID</label>
-                <input type="text" id="upi-input-box" placeholder="eg. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-4 py-4 outline-none focus:border-blue-500 focus:bg-white transition">
-            </div>
-        </div>
-        <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="window.saveRealKYC()" class="w-full bg-[#1E293B] text-white font-bold py-4 rounded-xl shadow-lg text-lg active:scale-95 transition">Save UPI Details</button>
         </div>
     </div>
 
