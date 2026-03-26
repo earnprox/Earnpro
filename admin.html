@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | Admin Master Control</title>
+    <title>EarnproX | Server Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -17,7 +17,7 @@
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04); }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; }
         .modal.active { display: flex; align-items: center; justify-content: center; }
     </style>
@@ -25,12 +25,11 @@
 <body>
 
     <div id="auth-screen" class="flex flex-col items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center border border-white/20">
-            <div class="w-16 h-16 bg-indigo-600 rounded-2xl mb-6 mx-auto flex items-center justify-center text-white font-black text-2xl shadow-lg rotate-3 italic">X</div>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Master Login</h2>
-            <p class="text-sm text-slate-400 mb-8 font-medium">Verify credentials to continue</p>
-            <input type="password" id="admin-pass" placeholder="••••" class="w-full bg-slate-100 p-4 rounded-2xl mb-4 outline-none border-2 border-transparent focus:border-indigo-500 font-black text-center tracking-[0.5em]">
-            <button onclick="window.doLogin()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 active:scale-95 transition">Access Database 🔓</button>
+        <div class="bg-white p-10 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Server Login</h2>
+            <p class="text-sm text-slate-400 mb-8 font-medium">EarnproX Database Access</p>
+            <input type="password" id="admin-pass" placeholder="••••" class="w-full bg-slate-100 p-4 rounded-2xl mb-4 outline-none border-2 focus:border-indigo-500 font-black text-center tracking-[0.5em]">
+            <button onclick="window.doLogin()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition">Connect to Server 🔗</button>
         </div>
     </div>
 
@@ -46,7 +45,7 @@
                 </button>
                 <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 transition">🚀 Add Gig</button>
             </nav>
-            <button onclick="window.doLogout()" class="mt-auto p-4 text-rose-500 font-bold hover:bg-rose-50 rounded-xl transition flex items-center gap-2">🚪 Sign Out</button>
+            <button onclick="window.doLogout()" class="mt-auto p-4 text-rose-500 font-bold hover:bg-rose-50 rounded-xl transition flex items-center gap-2">🚪 Disconnect</button>
         </aside>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-3 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
@@ -59,33 +58,33 @@
         <main class="p-4 md:p-12 max-w-5xl mx-auto">
             
             <section id="view-dash" class="view-section active">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">System Stats</h2>
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Database Stats</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Users</p><h3 id="stat-users" class="text-4xl font-black text-indigo-600">0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Users</p><h3 id="stat-users" class="text-4xl font-black text-indigo-600">0</h3></div>
                     <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending</p><h3 id="stat-pending" class="text-4xl font-black text-orange-500">0</h3></div>
-                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-3xl font-bold text-sm h-full flex items-center justify-center p-4 active:scale-95 transition">🔄 Sync Data</button>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-3xl font-bold text-sm h-full flex items-center justify-center p-4">🔄 Refresh</button>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Database Users</h2>
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Server Users</h2>
                 <div id="user-list" class="grid gap-3">
-                    <p class="text-slate-400 text-center py-20 font-bold italic">Loading Firebase Cloud Data...</p>
+                    <p class="text-slate-400 text-center py-20 font-bold italic">Connecting to Server...</p>
                 </div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Review Submissions</h2>
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Task Approvals</h2>
                 <div id="review-list" class="grid gap-6"></div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">New Gig</h2>
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Upload to Server</h2>
                 <div class="bg-white p-8 rounded-3xl border card-shadow max-w-lg space-y-4">
-                    <input type="text" id="gig-title" placeholder="Gig Title" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold text-slate-800">
-                    <input type="number" id="gig-reward" placeholder="Reward ₹" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-black text-emerald-600">
-                    <input type="text" id="gig-link" placeholder="Instruction Link" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium text-slate-500">
-                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition">Go Live 🚀</button>
+                    <input type="text" id="gig-title" placeholder="Gig Title (e.g. Rate 5 Star)" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold text-slate-800">
+                    <input type="number" id="gig-reward" placeholder="Reward ₹ (e.g. 50)" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-black text-emerald-600">
+                    <input type="text" id="gig-link" placeholder="Instruction Link (URL)" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium text-slate-500">
+                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition">Upload Task 🚀</button>
                 </div>
             </section>
         </main>
@@ -93,7 +92,7 @@
 
     <div id="modal-edit" class="modal p-4">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl relative">
-            <h3 class="text-2xl font-black text-slate-900 mb-6">Edit User Account</h3>
+            <h3 class="text-2xl font-black text-slate-900 mb-6">Edit Server Data</h3>
             
             <div class="space-y-4 mb-8">
                 <div>
@@ -115,7 +114,7 @@
             </div>
 
             <div class="flex gap-3">
-                <button onclick="window.saveUserData()" class="flex-1 bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition">Update Cloud ✅</button>
+                <button onclick="window.saveUserData()" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition">Save to Server</button>
                 <button onclick="document.getElementById('modal-edit').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-bold py-4 rounded-2xl active:scale-95 transition">Cancel</button>
             </div>
         </div>
@@ -125,6 +124,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // 🔥 FIREBASE KEYS
         const firebaseConfig = {
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
             authDomain: "earnproxuc.firebaseapp.com",
@@ -136,15 +136,18 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let currentUserId = "";
+        // GLOBAL VARIABLES (No HTML breaking issues anymore)
+        let globalUsersData = {}; 
+        let globalTasksData = {};
+        let activeUserId = "";
 
         // AUTH & NAV
         window.doLogin = () => {
             if(document.getElementById('admin-pass').value === "admin123") {
                 localStorage.setItem("adm_p", "t");
                 document.body.classList.add('authenticated');
-                startLiveSync();
-            } else { alert("❌ Wrong Password!"); }
+                startServerSync();
+            } else { alert("❌ Access Denied!"); }
         };
         window.doLogout = () => { localStorage.removeItem("adm_p"); location.reload(); };
 
@@ -155,137 +158,176 @@
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        // LIVE DATABASE SYNC
-        function startLiveSync() {
+        // 🟢 SYNC WITH SERVER
+        function startServerSync() {
+            
             // Sync Users
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
                 let html = "";
+                
                 snap.forEach(d => {
                     const u = d.data();
-                    const userName = u.name ? u.name : "User";
-                    const initial = userName.charAt(0).toUpperCase();
+                    globalUsersData[d.id] = u; // Save safely in JS memory, not HTML!
 
+                    const initial = (u.name ? u.name.charAt(0) : "U").toUpperCase();
                     html += `
                     <div class="bg-white p-5 rounded-3xl border card-shadow flex justify-between items-center">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black italic border border-indigo-100 text-lg">${initial}</div>
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-lg border border-indigo-100">${initial}</div>
                             <div>
-                                <p class="font-extrabold text-slate-800 text-sm">${userName}</p>
-                                <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone}</p>
-                                <p class="text-[9px] text-indigo-500 font-black uppercase mt-1">UPI: ${u.upi || 'PENDING'}</p>
+                                <p class="font-extrabold text-slate-800 text-sm">${u.name || "Unknown"}</p>
+                                <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone || "N/A"}</p>
+                                <p class="text-[9px] text-indigo-500 font-black uppercase mt-1">UPI: ${u.upi && u.upi !== "None" ? u.upi : 'NOT SET'}</p>
                             </div>
                         </div>
                         <div class="text-right">
                             <p class="font-black text-emerald-600 text-lg">₹${u.balance || 0}</p>
                             <div class="flex gap-1 mt-2">
-                                <button onclick="window.openEditModal('${d.id}', '${userName}', '${u.phone}', '${u.upi || ''}', ${u.balance || 0})" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest active:scale-95 transition">Edit</button>
+                                <button onclick="window.openEditModal('${d.id}')" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase active:scale-95 transition">Edit</button>
                                 <button onclick="window.blockUser('${d.id}')" class="bg-rose-50 text-rose-500 text-[9px] font-black px-3 py-2 rounded-xl uppercase active:scale-95 transition">Block</button>
                             </div>
                         </div>
                     </div>`;
                 });
-                document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 text-slate-400 font-bold'>No users yet.</p>";
+                document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 text-slate-400 font-bold'>Database Empty</p>";
             });
 
-            // Sync Reviews
+            // Sync Tasks
             onSnapshot(collection(db, "task_submissions"), (snap) => {
                 let p = 0; let html = "";
                 snap.forEach(d => {
                     const t = d.data();
+                    globalTasksData[d.id] = t; // Save safely in JS memory
+
                     if(t.status === "Pending Approval") {
                         p++;
                         html += `
                         <div class="bg-white p-6 rounded-3xl border card-shadow border-l-8 border-l-orange-400">
                             <div class="flex justify-between items-start mb-5">
                                 <div><p class="text-[10px] font-black text-orange-400 mb-1 uppercase tracking-widest">${t.gigName}</p><h4 class="font-black text-slate-800">+91 ${t.userPhone}</h4></div>
-                                <a href="${t.proofLink}" target="_blank" class="bg-indigo-50 text-indigo-600 font-black text-[9px] px-4 py-2 rounded-full border border-indigo-100 uppercase">Link ↗</a>
+                                <a href="${t.proofLink}" target="_blank" class="bg-indigo-50 text-indigo-600 font-black text-[9px] px-4 py-2 rounded-full border border-indigo-100 uppercase">View ↗</a>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="window.approve('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs active:scale-95 transition shadow-lg shadow-emerald-500/20">Approve</button>
+                                <button onclick="window.approve('${d.id}')" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs active:scale-95 transition shadow-lg shadow-emerald-500/20">Approve</button>
                                 <button onclick="window.reject('${d.id}')" class="flex-1 bg-slate-50 text-slate-400 font-black py-4 rounded-2xl text-xs active:scale-95 transition">Reject</button>
                             </div>
                         </div>`;
                     }
                 });
                 document.getElementById('stat-pending').innerText = p;
-                document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic'>Clear! No pending tasks. ✨</p>";
+                document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic'>Clear! ✨</p>";
                 const bc = document.getElementById('badge-count');
                 if(p > 0) { bc.innerText = p; bc.classList.remove('hidden'); } else { bc.classList.add('hidden'); }
             });
         }
 
-        // ACTIONS
-        window.openEditModal = (id, name, phone, upi, bal) => {
-            currentUserId = id;
-            document.getElementById('edit-name').value = name;
-            document.getElementById('edit-phone').value = phone;
-            document.getElementById('edit-upi').value = upi;
-            document.getElementById('edit-bal').value = bal;
+        // ================= FULL SERVER ACTIONS =================
+
+        // 1. OPEN MODAL SAFELY (Data strictly picked from memory, not HTML)
+        window.openEditModal = (docId) => {
+            activeUserId = docId;
+            const userData = globalUsersData[docId]; // Picking exact data from Server snapshot
+            
+            document.getElementById('edit-name').value = userData.name || "";
+            document.getElementById('edit-phone').value = userData.phone || "";
+            document.getElementById('edit-upi').value = (userData.upi && userData.upi !== "None") ? userData.upi : "";
+            document.getElementById('edit-bal').value = userData.balance || 0;
+            
             document.getElementById('modal-edit').classList.add('active');
         };
 
+        // 2. UPDATE SERVER SAFELY
         window.saveUserData = async () => {
-            let newBal = parseInt(document.getElementById('edit-bal').value);
-            if (isNaN(newBal)) newBal = 0; // 🛡️ Guard against NaN error
+            const btn = event.target;
+            btn.innerText = "Updating...";
 
-            const phoneInput = document.getElementById('edit-phone').value;
-            if (!phoneInput) {
-                alert("⚠️ Phone number cannot be empty!");
+            const newName = document.getElementById('edit-name').value.trim();
+            const newPhone = document.getElementById('edit-phone').value.trim();
+            const newUpi = document.getElementById('edit-upi').value.trim();
+            let newBal = parseInt(document.getElementById('edit-bal').value);
+            
+            if (isNaN(newBal)) newBal = 0;
+            if (!newPhone || !newName) {
+                alert("⚠️ Error: Name and Phone are required on Server.");
+                btn.innerText = "Save to Server";
                 return;
             }
 
-            const upData = {
-                name: document.getElementById('edit-name').value || "User",
-                phone: phoneInput,
-                upi: document.getElementById('edit-upi').value || "None",
-                balance: newBal
-            };
-
             try {
-                await updateDoc(doc(db, "users", currentUserId), upData);
+                // Sending direct query to Firestore
+                await updateDoc(doc(db, "users", activeUserId), {
+                    name: newName,
+                    phone: newPhone,
+                    upi: newUpi || "None",
+                    balance: newBal
+                });
+                
                 document.getElementById('modal-edit').classList.remove('active');
+                alert(`✅ Server Updated Successfully!\nName: ${newName}\nPhone: ${newPhone}\nBalance: ₹${newBal}`);
             } catch (error) {
-                alert("❌ Error: " + error.message);
+                alert("❌ Server Error: " + error.message);
+            } finally {
+                btn.innerText = "Save to Server";
             }
         };
 
-        window.approve = async (id, phone, reward) => {
+        // 3. APPROVE TASK SAFELY
+        window.approve = async (taskId) => {
             try {
-                await updateDoc(doc(db, "task_submissions", id), { status: "Completed" });
-                const q = query(collection(db, "users"), where("phone", "==", phone));
+                const taskData = globalTasksData[taskId];
+                const userPhone = taskData.userPhone;
+                
+                // Set task completed
+                await updateDoc(doc(db, "task_submissions", taskId), { status: "Completed" });
+                
+                // Find user and add money
+                const q = query(collection(db, "users"), where("phone", "==", userPhone));
                 const uSnap = await getDocs(q);
+                
                 if(!uSnap.empty) {
                     const ud = uSnap.docs[0];
-                    const nb = (ud.data().balance || 0) + reward; // 💰 Adding 20 Rs default reward
+                    const nb = (ud.data().balance || 0) + 20; // 20 Rs reward
                     await updateDoc(doc(db, "users", ud.id), { balance: nb });
+                    alert("✅ Task Approved. Reward added to server.");
+                } else {
+                    alert("⚠️ Task approved, but user phone not found in database.");
                 }
             } catch (error) {
-                alert("❌ Approval failed.");
+                alert("❌ Approval failed: " + error.message);
             }
         };
 
-        window.reject = async (id) => { if(confirm("Reject and delete this submission?")) await deleteDoc(doc(db, "task_submissions", id)); };
-        
-        window.blockUser = async (id) => { if(confirm("🚨 Delete user completely? This cannot be undone.")) await deleteDoc(doc(db, "users", id)); };
-        
+        // 4. ADD TASK TO SERVER
         window.addGigToDB = async () => {
-            const t = document.getElementById('gig-title').value;
-            const r = parseInt(document.getElementById('gig-reward').value);
-            const l = document.getElementById('gig-link').value;
+            const btn = event.target;
+            const t = document.getElementById('gig-title').value.trim();
+            const rStr = document.getElementById('gig-reward').value;
+            const r = parseInt(rStr);
+            const l = document.getElementById('gig-link').value.trim();
             
-            if(!t || isNaN(r)) return alert("⚠️ Please fill Title and Reward amount!");
+            if(!t || isNaN(r)) {
+                alert("⚠️ Fill Title and Reward to push to Server!");
+                return;
+            }
             
+            btn.innerText = "Uploading...";
             try {
                 await addDoc(collection(db, "gigs"), { title: t, reward: r, link: l, timestamp: new Date() });
-                alert("🚀 Gig Published Successfully!");
+                alert("🚀 Gig Uploaded to Server!");
                 document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = ""; document.getElementById('gig-link').value = "";
             } catch (e) {
-                alert("❌ Failed to add gig.");
+                alert("❌ Database Error: " + e.message);
+            } finally {
+                btn.innerText = "Upload Task 🚀";
             }
         };
 
-        if(localStorage.getItem("adm_p")) { document.body.classList.add('authenticated'); startLiveSync(); }
+        window.reject = async (id) => { if(confirm("Delete this submission from server?")) await deleteDoc(doc(db, "task_submissions", id)); };
+        window.blockUser = async (id) => { if(confirm("🚨 Delete user permanently from Server?")) await deleteDoc(doc(db, "users", id)); };
+
+        // BOOT APP
+        if(localStorage.getItem("adm_p")) { document.body.classList.add('authenticated'); startServerSync(); }
     </script>
 </body>
 </html>
