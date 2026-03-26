@@ -108,16 +108,61 @@
             </div>
         </div>
 
-        <div id="view-refer" class="tab-content">
-            <div class="text-center py-4">
-                <h2 class="text-3xl font-black tracking-tight mb-2 text-slate-800">Earn 10% Forever</h2>
-                <div class="premium-card rounded-2xl p-5 mx-2 relative overflow-hidden text-left mt-6">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your Invite Code</p>
-                    <div class="flex justify-between items-center bg-slate-50 border border-slate-200 rounded-xl p-4 border-dashed">
-                        <h3 class="text-2xl font-black tracking-widest text-blue-600" id="referral-code-text">AM8M27ZY</h3>
-                        <button onclick="window.copyReferLink()" class="bg-blue-100 hover:bg-blue-200 text-blue-600 px-3 py-2 rounded-lg font-bold text-sm active:scale-95 transition">Copy Link</button>
+        <div id="view-refer" class="tab-content relative -mx-5 -mt-5">
+            <div class="bg-gradient-to-b from-blue-100 to-[#F4F7F9] p-6 pb-4 pt-10 border-b border-blue-200/50">
+                <div class="flex items-center gap-4">
+                    <img id="refer-profile-img" src="https://ui-avatars.com/api/?name=User" class="w-16 h-16 rounded-[1.25rem] border-4 border-white shadow-lg object-cover">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800" id="refer-page-name">User</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs font-bold text-slate-600 bg-white px-2 py-1 rounded shadow-sm border border-slate-200" id="referral-code-text">AM8M27ZY</span>
+                            <button onclick="window.copyReferLink()" class="p-1.5 bg-white rounded shadow-sm border border-slate-200 hover:bg-slate-50 active:scale-95 transition">
+                                <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                            <button onclick="window.shareOnWhatsApp()" class="p-1.5 bg-[#25D366] rounded shadow-sm hover:bg-[#20b858] active:scale-95 transition">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="window.shareOnWhatsApp()" class="w-full mt-4 bg-[#25D366] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-green-500/30 flex justify-center items-center gap-2 active:scale-95">Share on WhatsApp</button>
+                </div>
+            </div>
+
+            <div class="px-5 pt-6 pb-4">
+                <div class="flex items-end gap-2 mb-6 border-b border-slate-200 pb-5">
+                    <h1 class="text-5xl font-black text-blue-600 leading-none" id="total-refers-count">0</h1>
+                    <p class="text-xs font-bold text-slate-500 mb-1 leading-tight">Total registered<br>members</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.03)]">
+                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Total Bonus</p>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="w-5 h-5 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-[10px] font-black">₹</span>
+                            <h3 class="text-2xl font-black text-slate-800" id="total-refer-earnings">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.03)]">
+                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Today's Joins</p>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="w-5 h-5 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-[10px] font-black">👥</span>
+                            <h3 class="text-2xl font-black text-slate-800" id="today-refers-count">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-6 border-b border-slate-200 mb-4 px-2">
+                    <button class="pb-3 border-b-2 border-blue-600 text-blue-600 font-black text-sm tracking-tight">Direct Members</button>
+                    <button class="pb-3 border-b-2 border-transparent text-slate-400 font-bold text-sm tracking-tight opacity-50">Levels (Locked)</button>
+                </div>
+
+                <div class="bg-blue-50/50 rounded-xl p-3 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 border border-blue-100">
+                    <div class="w-1/2">User Name</div>
+                    <div class="w-1/4 text-center">Date</div>
+                    <div class="w-1/4 text-right">Bonus</div>
+                </div>
+
+                <div id="referral-list-container" class="space-y-3 pb-10">
+                    <p class="text-center text-slate-400 py-10 font-bold text-sm">No referrals yet. Share your link!</p>
                 </div>
             </div>
         </div>
@@ -286,6 +331,8 @@
         window.currentBalance = 0;
         window.savedUPI = "";
         window.selectedGigData = null;
+        window.myReferCode = ""; 
+        window.referBonusPerUser = 10; // Earn ₹10 per referral (Visual)
 
         window.showToast = function(message) {
             const toast = document.getElementById("toast");
@@ -352,17 +399,18 @@
             setTimeout(() => { window.location.href = "index.html"; }, 1500);
         }
 
-        const REFERRAL_CODE = "AM8M27ZY";
-        const REFERRAL_LINK = `https://earnprox.in/index.html?ref=${REFERRAL_CODE}`;
-        
         window.copyReferLink = function() {
-            navigator.clipboard.writeText(REFERRAL_LINK).then(() => {
+            if(!window.myReferCode) return;
+            const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
+            navigator.clipboard.writeText(link).then(() => {
                 showToast("✅ Referral Link Copied!");
             }).catch(err => { showToast("⚠️ Failed to copy!"); });
         }
 
         window.shareOnWhatsApp = function() {
-            const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${REFERRAL_CODE}*\n👇👇\n${REFERRAL_LINK} 🚀`;
+            if(!window.myReferCode) return;
+            const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
+            const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${window.myReferCode}*\n👇👇\n${link} 🚀`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`, '_blank');
         }
     </script>
@@ -385,6 +433,16 @@
         let userDocId = null;
         const userPhone = localStorage.getItem("earnprox_user_phone");
 
+        // Helper to check if a date is today
+        const isToday = (dateObj) => {
+            if(!dateObj) return false;
+            const today = new Date();
+            const dateToCheck = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
+            return dateToCheck.getDate() === today.getDate() &&
+                   dateToCheck.getMonth() === today.getMonth() &&
+                   dateToCheck.getFullYear() === today.getFullYear();
+        };
+
         // 🟢 1. LIVE USER DATA & BLOCK SYSTEM
         if(userPhone) {
             const q = query(collection(db, "users"), where("phone", "==", userPhone));
@@ -395,6 +453,7 @@
                         if(docSnap.exists()) {
                             const userData = docSnap.data();
                             
+                            // Block Check
                             if(userData.status === 'blocked') {
                                 document.body.innerHTML = '<div style="height:100vh;display:flex;align-items:center;justify-content:center;background:#0F172A;color:white;flex-direction:column;"><h1 style="font-size:3rem;margin-bottom:10px;">🚫</h1><h2 style="font-size:1.5rem;font-weight:bold;">Account Banned</h2><p style="color:#94A3B8;margin-top:10px;">Contact Admin for support.</p></div>';
                                 localStorage.removeItem("earnprox_user_phone");
@@ -403,11 +462,23 @@
                             }
                             
                             const n = userData.name || "User";
+                            const p = userData.phone || "0000000000";
+                            
+                            // Dynamic Refer Code Generator (First 3 letters of name + Last 4 of phone)
+                            window.myReferCode = (n.substring(0,3) + p.substring(p.length - 4)).toUpperCase();
+                            document.getElementById("referral-code-text").innerText = window.myReferCode;
+
+                            // UI Updates
                             document.getElementById("header-user-name").innerText = n.split(" ")[0];
                             document.getElementById("profile-user-name").innerText = n;
-                            document.getElementById("header-avatar").src = `https://ui-avatars.com/api/?name=${n}&background=3B82F6&color=fff&bold=true`;
-                            document.getElementById("profile-avatar").src = `https://api.dicebear.com/7.x/micah/svg?seed=${n}&backgroundColor=b6e3f4`;
-                            document.getElementById("profile-user-phone").innerText = "+91 " + userData.phone;
+                            document.getElementById("refer-page-name").innerText = n;
+                            
+                            const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${n}&backgroundColor=b6e3f4`;
+                            document.getElementById("header-avatar").src = avatarUrl;
+                            document.getElementById("profile-avatar").src = avatarUrl;
+                            document.getElementById("refer-profile-img").src = avatarUrl;
+                            
+                            document.getElementById("profile-user-phone").innerText = "+91 " + p;
 
                             window.currentBalance = userData.balance || 0;
                             document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
@@ -420,8 +491,53 @@
                                 document.getElementById("upi-status-badge").innerText = "Verified ✅";
                                 document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
                             }
+
+                            // 🟢 FETCH REFERRALS FOR THIS USER
+                            fetchReferrals();
                         }
                     });
+                }
+            });
+        }
+
+        // 🟢 NEW: REFERRAL SYSTEM FETCH
+        function fetchReferrals() {
+            if(!window.myReferCode) return;
+            
+            const refQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
+            onSnapshot(refQ, (snap) => {
+                let totalRef = 0;
+                let todayRef = 0;
+                let html = "";
+                
+                // Sort to show newest first
+                const docsArr = [];
+                snap.forEach(d => docsArr.push(d.data()));
+                docsArr.sort((a,b) => b.timestamp - a.timestamp);
+
+                docsArr.forEach(u => {
+                    totalRef++;
+                    if(isToday(u.timestamp)) todayRef++;
+                    
+                    const joinDate = u.timestamp ? new Date(u.timestamp.toDate ? u.timestamp.toDate() : u.timestamp).toLocaleDateString('en-GB') : "Recently";
+                    
+                    html += `
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                        <div class="w-1/2 flex items-center gap-2 overflow-hidden">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0">${u.name.charAt(0).toUpperCase()}</div>
+                            <p class="text-xs font-bold text-slate-800 truncate">${u.name}</p>
+                        </div>
+                        <div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div>
+                        <div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div>
+                    </div>`;
+                });
+
+                document.getElementById('total-refers-count').innerText = totalRef;
+                document.getElementById('today-refers-count').innerText = todayRef;
+                document.getElementById('total-refer-earnings').innerText = totalRef * window.referBonusPerUser;
+                
+                if(html) {
+                    document.getElementById('referral-list-container').innerHTML = html;
                 }
             });
         }
@@ -524,14 +640,13 @@
             }
         }
 
-        // 🟢 4. LIVE TRANSACTION HISTORY (FULL LEDGER FIX)
+        // 🟢 4. LIVE TRANSACTION HISTORY (FULL LEDGER)
         if(userPhone) {
             let combinedLedger = [];
 
-            // Helper to render ledger
             const renderLedger = () => {
                 let html = "";
-                combinedLedger.sort((a,b) => b.timestamp - a.timestamp); // Sort by Newest First
+                combinedLedger.sort((a,b) => b.timestamp - a.timestamp);
 
                 combinedLedger.forEach(item => {
                     if (item.type === 'withdrawal') {
@@ -556,7 +671,7 @@
                                     <p class="text-[10px] text-slate-400 mt-0.5">Task: <span class="text-emerald-500 font-bold">${item.data.gigName}</span></p>
                                 </div>
                             </div>
-                            <p class="text-sm font-black text-emerald-500">+ ₹${item.data.gigReward}</p>
+                            <p class="text-sm font-black text-emerald-500">+ ₹${item.data.gigReward || 0}</p>
                         </div>`;
                     }
                 });
@@ -568,7 +683,6 @@
                     </div>`;
             };
 
-            // Fetch Withdrawals
             const histQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
             onSnapshot(histQ, (snap) => {
                 combinedLedger = combinedLedger.filter(item => item.type !== 'withdrawal');
@@ -576,7 +690,6 @@
                 renderLedger();
             });
 
-            // Fetch Completed Tasks
             const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed"));
             onSnapshot(taskQ, (snap) => {
                 combinedLedger = combinedLedger.filter(item => item.type !== 'task');
