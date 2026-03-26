@@ -21,6 +21,7 @@ const app = initializeApp(firebaseConfig); const db = getFirestore(app); const u
 const isToday = (dateObj) => { if(!dateObj) return false; const today = new Date(); const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj); return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(); };
 const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
 
+// 🟢 1. MASTER SYNC ENGINE
 if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
         if(!snap.empty) {
@@ -50,6 +51,7 @@ if(userPhone) {
     });
 }
 
+// 🟢 2. SYNC STATS & HISTORY
 async function syncStatsAndHistory() {
     if(!userPhone || !window.myReferCode) return;
     const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone));
@@ -76,6 +78,7 @@ function updateTotalEarning() {
     document.getElementById("stat-total-earn").innerText = `₹${t + r}`;
 }
 
+// 🟢 3. LEDGER RENDERER
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); let combined = [...withs];
     const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed")));
@@ -83,6 +86,7 @@ async function renderLedger(withs) {
     const referSnap = await getDocs(query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode)));
     referSnap.forEach(d => combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Refer Bonus (${d.data().name})`, amt: window.referBonusPerUser, status: 'Completed' }));
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
+    
     let html = "";
     combined.forEach(item => {
         const isDebit = item.type === 'debit'; const isPending = item.status === 'Pending';
@@ -93,6 +97,7 @@ async function renderLedger(withs) {
     historyCont.innerHTML = html || "<div class='text-center py-10 opacity-60'><span class='text-5xl mb-3 block'>📭</span><p class='text-sm font-bold text-slate-800'>No transactions yet</p></div>";
 }
 
+// 🟢 4. ACTIONS (KYC, Withdraw)
 window.saveRealKYC = async function() {
     const n = document.getElementById("bank-name-input").value.trim(); const u = document.getElementById("upi-input-box").value.trim();
     if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI");
@@ -106,11 +111,17 @@ window.processWithdrawReal = async function() {
     try { await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); window.showToast("🚀 Sent securely!"); window.closeFullPage('withdraw-page'); } catch(e) { window.showToast("❌ Failed"); } finally { btn.innerHTML = `Proceed Securely`; btn.disabled = false; }
 }
 
-// 🟢 5. GIG ENGINE (THE UPDATE)
+// 🟢 5. GIG ENGINE (THE FIX)
+window.liveGigs = {}; // Database se aaya hua sara data idhar store hoga
+
 onSnapshot(collection(db, "gigs"), (snap) => {
     let html = "";
+    window.liveGigs = {}; // Clear old memory
+    
     snap.forEach(doc => {
         const g = doc.data();
+        window.liveGigs[doc.id] = g; // Memory mein save kiya using Firebase ID
+        
         html += `<div class="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden mb-4">
             <div class="absolute -right-4 -top-2 opacity-[0.03] text-8xl pointer-events-none">🚀</div>
             <h4 class="font-black text-xl text-slate-800 mb-2">${g.title}</h4>
@@ -118,18 +129,27 @@ onSnapshot(collection(db, "gigs"), (snap) => {
                 <span class="text-emerald-500 font-bold text-sm">Reward: ₹${g.reward}</span>
                 <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded-md">Direct Pay</span>
             </div>
-            <button onclick="window.openGigSheet('${g.title}', ${g.reward}, '${g.link}', 'explore')" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition">View Task Details</button>
+            <button onclick="window.openGigSheet('${doc.id}', 'explore')" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition">View Task Details</button>
         </div>`;
     });
     document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No tasks available</p>";
 });
 
 // 🔥 DYNAMIC SHEET HANDLER
-window.openGigSheet = (t, r, d, l, mode) => {
-    document.getElementById('sheet-gig-title').innerText = t;
-    document.getElementById('sheet-gig-reward').innerText = `₹${r} Reward`;
-    document.getElementById('sheet-gig-desc').innerText = d;
-    window.selectedGigData = { title: t, reward: r, link: l, desc: d };
+window.openGigSheet = (gigIdOrNull, mode) => {
+    let g;
+    if(mode === 'explore') {
+        g = window.liveGigs[gigIdOrNull];
+        if(g) window.selectedGigData = g; // Set current task in memory
+    } else {
+        g = window.selectedGigData; // Fetch from memory for "In Progress"
+    }
+
+    if(!g) return; // Fail safe
+
+    document.getElementById('sheet-gig-title').innerText = g.title;
+    document.getElementById('sheet-gig-reward').innerText = `₹${g.reward} Reward`;
+    document.getElementById('sheet-gig-desc').innerText = g.desc || g.link || "Follow the instructions provided.";
     
     // Toggle UI based on mode
     if(mode === 'explore') {
@@ -142,40 +162,43 @@ window.openGigSheet = (t, r, d, l, mode) => {
     window.openSheet('task-sheet');
 }
 
+// Function to handle the "Submit Proof" button in "In Progress" tab
+window.openSubmitSheet = () => {
+    window.openGigSheet(null, 'progress');
+}
+
 // Accept Flow
 window.acceptTask = () => {
     if(!window.selectedGigData) return;
     
-    // Update active tab UI
+    // Update "In Progress" UI
     document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
     document.getElementById('active-gig-reward').innerText = `Reward: ₹${window.selectedGigData.reward}`;
     document.getElementById('active-task-card').classList.remove('hidden');
     document.getElementById('no-active-task').classList.add('hidden');
     
-    // Auto-open link
-    if(window.selectedGigData.link) {
-        window.open(window.selectedGigData.link, '_blank');
+    // Auto-open link if it exists and looks like a valid URL
+    const taskLink = window.selectedGigData.link;
+    if(taskLink && taskLink.startsWith('http')) {
+        window.open(taskLink, '_blank');
+    } else {
+        window.showToast("✅ Task Accepted! (No external link provided)");
     }
     
     window.closeAllSheets(); 
     window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
-    window.showToast("✅ Task Accepted!");
-}
-
-// Re-open from "In Progress"
-window.openSubmitSheet = () => {
-    if(!window.selectedGigData) return;
-    window.openGigSheet(window.selectedGigData.title, window.selectedGigData.reward, window.selectedGigData.desc, window.selectedGigData.link, 'progress');
 }
 
 // Submit Flow
 window.submitTaskProofReal = async () => {
     const f = document.getElementById("proof-image").files[0];
-    const remark = document.getElementById("proof-remark").value;
-    if(!f) return window.showToast("⚠️ Select screenshot proof!");
+    const remarkField = document.getElementById("proof-remark");
+    const remark = remarkField ? remarkField.value : "No Remark";
+
+    if(!f) return window.showToast("⚠️ Please select a screenshot proof!");
     
     const btn = document.getElementById("submit-proof-btn");
-    btn.disabled = true; btn.innerText = "Uploading Screenshot...";
+    btn.disabled = true; btn.innerText = "Uploading...";
     
     try {
         const formData = new FormData(); formData.append("image", f);
@@ -186,13 +209,15 @@ window.submitTaskProofReal = async () => {
             gigName: window.selectedGigData.title, 
             gigReward: window.selectedGigData.reward, 
             proofLink: res.data.url, 
-            remark: remark || "No Remark",
+            remark: remark,
             status: "Pending Approval", 
             timestamp: new Date() 
         });
         
+        // Reset form
         document.getElementById("proof-image").value = "";
-        document.getElementById("proof-remark").value = "";
+        if(remarkField) remarkField.value = "";
+        
         document.getElementById('active-task-card').classList.add('hidden');
         document.getElementById('no-active-task').classList.remove('hidden');
         window.selectedGigData = null;
@@ -200,6 +225,11 @@ window.submitTaskProofReal = async () => {
         window.showToast("🚀 Successfully Submitted!"); 
         window.closeAllSheets();
         window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]);
-    } catch (e) { window.showToast("❌ Upload Failed."); }
-    finally { btn.disabled = false; btn.innerText = "Submit For Verification"; }
+    } catch (e) { 
+        window.showToast("❌ Upload Failed. Try again."); 
+    }
+    finally { 
+        btn.disabled = false; 
+        btn.innerText = "Submit For Verification"; 
+    }
 }
