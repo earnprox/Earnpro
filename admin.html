@@ -151,7 +151,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 🔥 FIREBASE KEYS
         const firebaseConfig = {
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
             authDomain: "earnproxuc.firebaseapp.com",
@@ -163,12 +162,20 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // GLOBAL MEMORY
         let globalUsersData = {}; 
         let globalTasksData = {};
         let activeUserId = "";
 
-        // AUTH & NAV
+        // Function to check if a Date is "Today"
+        const isToday = (dateObj) => {
+            if(!dateObj) return false;
+            const today = new Date();
+            const dateToCheck = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
+            return dateToCheck.getDate() === today.getDate() &&
+                   dateToCheck.getMonth() === today.getMonth() &&
+                   dateToCheck.getFullYear() === today.getFullYear();
+        };
+
         window.doLogin = () => {
             if(document.getElementById('admin-pass').value === "admin123") {
                 localStorage.setItem("adm_p", "t");
@@ -185,10 +192,9 @@
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        // 🟢 SYNC WITH SERVER
         function startServerSync() {
             
-            // 1. Sync Users
+            // 1. Sync Users & Referrals
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
                 let html = "";
@@ -230,20 +236,25 @@
                 
                 document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 text-slate-400 font-bold'>Database Empty</p>";
                 document.getElementById('stat-blocked-users').innerText = blockedCount;
-                document.getElementById('stat-total-refers').innerText = referCount;
+                document.getElementById('stat-total-refers').innerHTML = `${referCount} <span class="text-xs text-slate-400 font-bold">Total</span>`;
             });
 
             // 2. Sync Tasks
             onSnapshot(collection(db, "task_submissions"), (snap) => {
-                let p = 0; let totalTasksDone = 0; let html = "";
+                let p = 0; let totalTasksDone = 0; let todayTasks = 0; let html = "";
                 snap.forEach(d => {
                     const t = d.data();
                     globalTasksData[d.id] = t; 
 
-                    if(t.status === "Completed") totalTasksDone++;
+                    if(t.status === "Completed") {
+                        totalTasksDone++;
+                        if(isToday(t.timestamp)) todayTasks++;
+                    }
 
                     if(t.status === "Pending Approval") {
                         p++;
+                        const exactReward = t.gigReward || 0;
+
                         html += `
                         <div class="bg-white p-6 rounded-3xl border card-shadow border-l-8 border-l-orange-400">
                             <div class="flex justify-between items-start mb-5">
@@ -251,14 +262,14 @@
                                 <a href="${t.proofLink}" target="_blank" class="bg-indigo-50 text-indigo-600 font-black text-[9px] px-4 py-2 rounded-full border border-indigo-100 uppercase">View Proof ↗</a>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="window.approveTask('${d.id}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs active:scale-95 transition shadow-lg shadow-emerald-500/20">Approve & Pay ₹20</button>
+                                <button onclick="window.approveTask('${d.id}')" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs active:scale-95 transition shadow-lg shadow-emerald-500/20">Approve & Pay ₹${exactReward}</button>
                                 <button onclick="window.rejectTask('${d.id}')" class="flex-1 bg-slate-50 text-slate-400 font-black py-4 rounded-2xl text-xs active:scale-95 transition">Reject</button>
                             </div>
                         </div>`;
                     }
                 });
                 
-                document.getElementById('stat-total-tasks').innerText = totalTasksDone;
+                document.getElementById('stat-total-tasks').innerHTML = `${todayTasks} <span class="text-xs text-slate-400 font-bold">Today</span> <br><span class="text-sm">${totalTasksDone} Total</span>`;
                 document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic'>Clear! No pending tasks. ✨</p>";
                 
                 const bc = document.getElementById('badge-proofs');
@@ -267,10 +278,9 @@
 
             // 3. Sync Withdrawals (PAYOUT MANAGER)
             onSnapshot(collection(db, "withdrawals"), (snap) => {
-                let pendingAmt = 0; let totalPaid = 0; let pCount = 0;
+                let pendingAmt = 0; let totalPaid = 0; let todayPaid = 0; let pCount = 0;
                 let html = "";
                 
-                // Sort by newest first
                 const docsArr = [];
                 snap.forEach(d => { docsArr.push({ id: d.id, ...d.data() }); });
                 docsArr.sort((a, b) => b.timestamp - a.timestamp);
@@ -293,10 +303,11 @@
                         </div>`;
                     } else if (w.status === "Completed") {
                         totalPaid += w.amount;
+                        if(isToday(w.completedAt || w.timestamp)) todayPaid += w.amount;
                     }
                 });
 
-                document.getElementById('stat-total-payouts').innerText = `₹${totalPaid}`;
+                document.getElementById('stat-total-payouts').innerHTML = `₹${todayPaid} <span class="text-xs text-slate-400 font-bold">Today</span> <br><span class="text-sm text-emerald-600">₹${totalPaid} Total</span>`;
                 document.getElementById('stat-pending-payouts').innerText = `₹${pendingAmt}`;
                 document.getElementById('payouts-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic'>All cleared! No pending payouts. 💸</p>";
                 
@@ -304,7 +315,7 @@
                 if(pCount > 0) { bp.innerText = pCount; bp.classList.remove('hidden'); } else { bp.classList.add('hidden'); }
             });
 
-            // 4. Sync Gigs (To Allow Deletion)
+            // 4. Sync Gigs
             onSnapshot(collection(db, "gigs"), (snap) => {
                 document.getElementById('stat-active-gigs').innerText = snap.size;
                 let html = "";
@@ -325,7 +336,6 @@
 
         // ================= ACTION FUNCTIONS =================
 
-        // 1. OPEN USER MODAL
         window.openEditModal = (docId) => {
             activeUserId = docId;
             const userData = globalUsersData[docId]; 
@@ -336,7 +346,6 @@
             document.getElementById('modal-edit').classList.add('active');
         };
 
-        // 2. SAVE USER
         window.saveUserData = async () => {
             const btn = event.target;
             btn.innerText = "Updating...";
@@ -356,36 +365,36 @@
             finally { btn.innerText = "Save"; }
         };
 
-        // 3. TOGGLE BLOCK STATUS
         window.toggleBlockUser = async (userId, currentStatus) => {
             const isBlocked = currentStatus === 'blocked';
             const action = isBlocked ? "Unblock" : "Block";
-            if(confirm(`Are you sure you want to ${action} this user?`)) {
+            if(confirm(`Are you sure you want to ${action} this user? They will be logged out immediately if blocked.`)) {
                 try {
                     await updateDoc(doc(db, "users", userId), { status: isBlocked ? "active" : "blocked" });
                 } catch (e) { alert("❌ Failed to update status."); }
             }
         };
 
-        // 4. APPROVE TASK
-        window.approveTask = async (taskId, reward) => {
+        window.approveTask = async (taskId) => {
             try {
                 const taskData = globalTasksData[taskId];
+                const rewardAmount = taskData.gigReward || 0;
+                
                 await updateDoc(doc(db, "task_submissions", taskId), { status: "Completed" });
+                
                 const q = query(collection(db, "users"), where("phone", "==", taskData.userPhone));
                 const uSnap = await getDocs(q);
                 if(!uSnap.empty) {
                     const ud = uSnap.docs[0];
-                    const nb = (ud.data().balance || 0) + reward;
+                    const nb = (ud.data().balance || 0) + rewardAmount;
                     await updateDoc(doc(db, "users", ud.id), { balance: nb });
-                    alert("✅ Task Approved & Reward Sent!");
+                    alert(`✅ Task Approved! ₹${rewardAmount} transferred to user's wallet.`);
                 }
             } catch (error) { alert("❌ Approval failed."); }
         };
 
         window.rejectTask = async (id) => { if(confirm("Reject and delete this task?")) await deleteDoc(doc(db, "task_submissions", id)); };
 
-        // 5. MANAGE PAYOUTS
         window.markAsPaid = async (withdrawalId) => {
             if(confirm("Confirm that you have transferred the money via PhonePe/Paytm?")) {
                 try {
@@ -394,7 +403,6 @@
             }
         };
 
-        // 6. MANAGE GIGS
         window.addGigToDB = async () => {
             const btn = event.target;
             const t = document.getElementById('gig-title').value.trim();
