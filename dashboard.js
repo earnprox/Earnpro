@@ -7,7 +7,7 @@ window.savedUPI = "";
 window.selectedGigData = null;
 window.myReferCode = ""; 
 window.referBonusPerUser = 5; 
-window.userDocId = null; // 🔥 Global Doc ID for updates
+window.userDocId = null;
 
 window.showToast = function(message) {
     const toast = document.getElementById("toast");
@@ -65,7 +65,7 @@ window.closeAllSheets = function() {
 }
 
 window.openFullPage = function(pageId) {
-    if(!window.savedUPI) { window.showToast("⚠️ Save UPI ID in Profile first!"); return; }
+    if(!window.savedUPI) { window.showToast("⚠️ Save UPI ID in Payout Settings first!"); return; }
     document.getElementById(pageId).classList.add('full-page-active');
     if(pageId === 'withdraw-page') {
         setTimeout(() => document.getElementById("withdraw-amount").focus(), 300);
@@ -97,42 +97,56 @@ const db = getFirestore(app);
 
 const userPhone = localStorage.getItem("earnprox_user_phone");
 
-// 🟢 1. LIVE USER SYNC & LOCK SYSTEM
+// 🟢 1. LIVE USER SYNC & BADGE FIX
 if(userPhone) {
     const q = query(collection(db, "users"), where("phone", "==", userPhone));
     onSnapshot(q, (snapshot) => {
         if(!snapshot.empty) {
             const docData = snapshot.docs[0];
-            window.userDocId = docData.id; // 🔥 Storing the real ID
+            window.userDocId = docData.id; 
             const userData = docData.data();
             
-            // UI Update Logic
             document.getElementById("home-user-name").innerText = userData.name || "User";
             document.getElementById("home-top-balance").innerText = `₹ ${userData.balance || 0}`;
-            document.getElementById("withdraw-page-balance").innerText = `₹ ${userData.balance || 0}`;
             window.currentBalance = userData.balance || 0;
 
-            // UPI Lock Logic
-            if(userData.upi && userData.upi !== "") {
+            // 🔥 UPI STATUS BADGE LOGIC (The Fix)
+            const statusBadge = document.getElementById("upi-status-badge");
+            const upiDisplayText = document.getElementById("upi-display-text");
+            const upiBox = document.getElementById("upi-input-box");
+            const saveBtn = document.querySelector("#kyc-sheet button");
+
+            if(userData.upi && userData.upi !== "" && userData.upi !== "None") {
                 window.savedUPI = userData.upi;
-                const upiBox = document.getElementById("upi-input-box");
+                
+                // Update Main Vault View
+                upiDisplayText.innerText = userData.upi;
+                statusBadge.innerText = "Verified ✅";
+                statusBadge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+                
+                // Update KYC Sheet View
                 if(upiBox) {
                     upiBox.value = userData.upi;
                     upiBox.disabled = true;
+                    upiBox.classList.add("bg-slate-100", "text-slate-400");
                 }
-                // Update Button
-                const btn = document.querySelector("#kyc-sheet button");
-                if(btn) {
-                    btn.innerText = "Verified & Locked 🔒";
-                    btn.disabled = true;
-                    btn.classList.add("bg-emerald-500");
+                if(saveBtn) {
+                    saveBtn.innerText = "Verified & Locked 🔒";
+                    saveBtn.disabled = true;
+                    saveBtn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg text-lg opacity-80 cursor-not-allowed";
+                    saveBtn.onclick = null;
                 }
+            } else {
+                // Keep it Pending if no UPI
+                statusBadge.innerText = "Pending";
+                statusBadge.className = "text-[11px] font-bold text-red-500 border border-red-200 bg-red-50 px-2 py-1 rounded";
+                upiDisplayText.innerText = "UPI not linked";
             }
         }
     });
 }
 
-// 🟢 2. REAL UPI SAVE FUNCTION (The Fix)
+// 🟢 2. SAVE UPI FUNCTION
 window.saveRealKYC = async function() {
     const upiInput = document.getElementById("upi-input-box").value.trim();
     
@@ -142,37 +156,41 @@ window.saveRealKYC = async function() {
     }
 
     if(!window.userDocId) {
-        window.showToast("❌ System Error: Try logging in again.");
+        window.showToast("❌ Error: User ID not found");
         return;
     }
 
-    window.showToast("⏳ Saving UPI...");
+    window.showToast("⏳ Linking Account...");
     
     try {
         const userRef = doc(db, "users", window.userDocId);
         await updateDoc(userRef, {
             upi: upiInput
         });
-        window.showToast("✅ UPI Saved & Locked!");
+        window.showToast("✅ UPI Linked Successfully!");
         setTimeout(() => { window.closeAllSheets(); }, 1000);
     } catch (e) {
-        console.error(e);
-        window.showToast("❌ Error saving to server.");
+        window.showToast("❌ Server Error.");
     }
 }
 
-// Gig and Ledger Sync (Old Logic remains same but inside the module)
+// Gig Sync (In Progress logic)
 onSnapshot(collection(db, "gigs"), (snap) => {
     let html = "";
     snap.forEach(doc => {
         const g = doc.data();
-        html += `<div class="premium-card p-5 rounded-3xl mb-4">
-            <h4 class="font-black text-slate-800">${g.title}</h4>
-            <p class="text-emerald-500 font-bold">₹${g.reward}</p>
-            <button onclick="window.openGigSheet('${g.title}', ${g.reward}, '${g.link}')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl mt-3 text-sm">View Details</button>
+        html += `<div class="premium-card p-5 rounded-3xl mb-4 border border-slate-100 shadow-sm">
+            <div class="flex justify-between items-start">
+               <div>
+                  <h4 class="font-black text-slate-800 text-lg">${g.title}</h4>
+                  <p class="text-emerald-600 font-bold text-sm mt-1">Reward: ₹${g.reward}</p>
+               </div>
+               <div class="bg-blue-50 p-2 rounded-xl text-xl">🚀</div>
+            </div>
+            <button onclick="window.openGigSheet('${g.title}', ${g.reward}, '${g.link}')" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl mt-4 text-sm active:scale-95 transition">View Task Details</button>
         </div>`;
     });
-    document.getElementById('gigs-container').innerHTML = html;
+    document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 text-slate-400 font-bold'>No tasks available</p>";
 });
 
 window.openGigSheet = function(title, reward, desc) {
@@ -187,7 +205,9 @@ window.acceptTask = function() {
     if(!window.selectedGigData) return;
     document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
     document.getElementById('active-gig-reward').innerText = `₹${window.selectedGigData.reward}`;
+    document.getElementById('active-gig-desc').innerText = "Follow instructions and upload screenshot.";
     window.closeAllSheets();
     window.switchTab('project');
-    window.showToast("✅ Accepted!");
+    window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
+    window.showToast("✅ Gig Accepted!");
 }
