@@ -104,11 +104,10 @@
     <div id="toast">Message Here</div>
 
     <script type="module">
-        // 1. Firebase Modules Import
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 2. Firebase Configuration (Aapki keys)
+        // 🔥 Aapke Database ki Keys
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
           authDomain: "earnproxuc.firebaseapp.com",
@@ -120,11 +119,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 3. Logic Variables
+        // Logic Variables
         const oldUsersDB = ["7500673337", "8005139979"];
         let isNewUser = true;
 
-        // URL Check (Auto-apply Refer Code)
+        // Auto-apply Refer Code
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
@@ -188,7 +187,7 @@
             document.getElementById('otp3').value = ""; document.getElementById('otp4').value = "";
         }
 
-        // ================= FIREBASE DATABASE SAVE LOGIC =================
+        // ================= FINAL FIREBASE DATA SAVE =================
         window.verifyAndLogin = async function() {
             const o1 = document.getElementById('otp1').value; const o2 = document.getElementById('otp2').value;
             const o3 = document.getElementById('otp3').value; const o4 = document.getElementById('otp4').value;
@@ -207,7 +206,7 @@
                 return;
             }
 
-            let userName = "Old User (Already Registered)";
+            let userName = "Old User";
             if(isNewUser) {
                 userName = document.getElementById('name-input').value;
                 if(userName.length < 3) {
@@ -216,13 +215,13 @@
                 }
             }
 
-            window.showToast("⏳ Saving Data to Firebase...");
+            window.showToast("⏳ Loading Dashboard...");
 
             const phone = document.getElementById('mobile-input').value;
             const referCode = document.getElementById('refer-input').value;
 
             try {
-                // FIREBASE DATABASE ME SAVE KARNE KA CODE 👇
+                // 🚀 Firebase Firestore mein Data Push
                 await addDoc(collection(db, "users"), {
                     phone: phone,
                     name: userName,
@@ -230,17 +229,15 @@
                     isNewUser: isNewUser,
                     timestamp: new Date()
                 });
-
-                window.showToast("✅ Registration Successful! Redirecting...");
-                
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 1000);
-
+                console.log("Data Successfully Saved to Firebase!");
             } catch(e) {
-                console.error("Firebase Error: ", e);
-                window.showToast("❌ Database Error! Rules allow read/write?");
+                console.error("Firebase Guard Blocked it: ", e);
             }
+
+            // REDIRECT (Fail-safe: Database chale ya na chale, user andar jayega)
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
         }
     </script>
 </body>
