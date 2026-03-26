@@ -15,11 +15,10 @@ window.showToast = function(message) {
     setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-// 🔥 NAVIGATION SYSTEM (No bottom nav logic anymore)
+// 🔥 NAVIGATION SYSTEM 
 window.switchTab = function(tabId) {
     const mainHeader = document.getElementById('main-header');
     
-    // Hide header on Home, show on other tabs for "Back" navigation
     if(tabId === 'home') {
         mainHeader.style.opacity = '0';
         setTimeout(() => mainHeader.style.display = 'none', 200);
@@ -71,7 +70,13 @@ window.closeAllSheets = function() {
 window.openFullPage = function(pageId) {
     if(!window.savedUPI) { window.showToast("⚠️ Save UPI ID in Profile first!"); return; }
     document.getElementById(pageId).classList.add('full-page-active');
+    
+    // Focus the giant input field automatically for a real app feel
+    if(pageId === 'withdraw-page') {
+        setTimeout(() => document.getElementById("withdraw-amount").focus(), 300);
+    }
 }
+
 window.closeFullPage = function(pageId) {
     document.getElementById(pageId).classList.remove('full-page-active');
     document.getElementById("withdraw-amount").value = "";
@@ -122,7 +127,7 @@ const isToday = (dateObj) => {
            dateToCheck.getFullYear() === today.getFullYear();
 };
 
-// 🟢 1. LIVE USER DATA & BLOCK SYSTEM
+// 🟢 1. LIVE USER DATA 
 if(userPhone) {
     const q = query(collection(db, "users"), where("phone", "==", userPhone));
     getDocs(q).then((querySnapshot) => {
@@ -145,10 +150,16 @@ if(userPhone) {
                     window.myReferCode = (n.substring(0,3) + p.substring(p.length - 4)).toUpperCase();
                     document.getElementById("referral-code-text").innerText = window.myReferCode;
 
+                    // Text fields
                     document.getElementById("home-user-name").innerText = n.split(" ")[0];
+                    document.getElementById("header-user-name").innerText = n.split(" ")[0];
                     document.getElementById("profile-user-name").innerText = n;
                     document.getElementById("refer-page-name").innerText = n;
                     
+                    // Set Withdraw page Avatar text (First letter of Name)
+                    document.getElementById("withdraw-avatar-text").innerText = n.charAt(0).toUpperCase();
+                    
+                    // Avatars
                     const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${n}&backgroundColor=b6e3f4`;
                     document.getElementById("home-profile-avatar").src = avatarUrl;
                     document.getElementById("header-avatar").src = avatarUrl;
@@ -157,10 +168,10 @@ if(userPhone) {
                     
                     document.getElementById("profile-user-phone").innerText = "+91 " + p;
 
+                    // Balances
                     window.currentBalance = userData.balance || 0;
                     document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
                     document.getElementById("withdraw-page-balance").innerText = `₹ ${window.currentBalance}`;
-                    document.getElementById("home-mini-balance").innerText = `₹ ${window.currentBalance}`;
                     
                     // Top Right Home Balance
                     document.getElementById("home-top-balance").innerText = `₹ ${window.currentBalance}`;
@@ -168,7 +179,7 @@ if(userPhone) {
                     if(userData.upi && userData.upi !== "None" && userData.upi !== "") {
                         window.savedUPI = userData.upi;
                         document.getElementById("upi-display-text").innerText = userData.upi;
-                        document.getElementById("withdraw-page-upi").innerText = userData.upi;
+                        document.getElementById("withdraw-page-upi").innerText = userData.upi; // Paytm style receiver ID
                         document.getElementById("upi-status-badge").innerText = "Verified ✅";
                         document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
                     }
@@ -323,7 +334,7 @@ window.submitTaskProofReal = async function() {
     }
 }
 
-// 🟢 5. FULL TRANSACTION HISTORY (TASKS + WITHDRAWALS)
+// 🟢 5. FULL TRANSACTION HISTORY 
 if(userPhone) {
     let combinedLedger = [];
 
@@ -390,7 +401,7 @@ window.processWithdrawReal = async function() {
     if(!amt || amt < 50) { window.showToast("⚠️ Minimum withdrawal is ₹50"); return; }
     if(amt > window.currentBalance) { window.showToast("⚠️ Insufficient balance!"); return; }
 
-    btn.innerText = "Processing...";
+    btn.innerText = "Processing Securely...";
     btn.disabled = true;
 
     if(userDocId) {
@@ -407,11 +418,11 @@ window.processWithdrawReal = async function() {
             });
 
             window.closeFullPage('withdraw-page');
-            setTimeout(() => { window.showToast(`💸 ₹${amt} request sent to Admin!`); amtBox.value = ""; }, 400);
+            setTimeout(() => { window.showToast(`💸 ₹${amt} request sent securely!`); amtBox.value = ""; }, 400);
         } catch(e) { 
             window.showToast("❌ Withdrawal Failed. Try again."); 
         } finally {
-            btn.innerText = "Proceed to Transfer";
+            btn.innerHTML = `<svg class="w-5 h-5 inline-block -mt-1 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Proceed Securely`;
             btn.disabled = false;
         }
     }
