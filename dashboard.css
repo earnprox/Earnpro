@@ -38,13 +38,8 @@ body {
     border-bottom: 2px solid #2563eb; 
     font-weight: 700; 
 }
-.ws-content { 
-    display: none; 
-}
-.ws-content.active { 
-    display: block; 
-    animation: fadeIn 0.3s ease; 
-}
+.ws-content { display: none; }
+.ws-content.active { display: block; animation: fadeIn 0.3s ease; }
 
 @keyframes fadeIn { 
     from { opacity: 0; } 
@@ -52,51 +47,30 @@ body {
 }
 
 /* UI Overlays & Sheets */
-.modal-active { 
-    opacity: 1 !important; 
-    pointer-events: auto !important; 
-}
-.sheet-active { 
-    transform: translateY(0) !important; 
-}
-.full-page-active { 
-    transform: translateX(0) !important; 
-} 
+.modal-active { opacity: 1 !important; pointer-events: auto !important; }
+.sheet-active { transform: translateY(0) !important; }
+.full-page-active { transform: translateX(0) !important; } 
 
 /* Utils */
-::-webkit-scrollbar { 
-    display: none; 
+::-webkit-scrollbar { display: none; }
+
+/* 🔥 HIDE NUMBER INPUT ARROWS (PAYTM STYLE) */
+.hide-arrows::-webkit-outer-spin-button,
+.hide-arrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.hide-arrows[type=number] {
+    -moz-appearance: textfield;
 }
 
 /* Toast Notifications */
 #toast {
-    visibility: hidden; 
-    min-width: 250px; 
-    background-color: #1E293B; 
-    color: #fff; 
-    text-align: center; 
-    border-radius: 12px; 
-    padding: 16px; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 50%; 
-    bottom: 30px; 
-    transform: translateX(-50%) translateY(20px); 
-    opacity: 0; 
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-    font-weight: 600; 
-    font-size: 14px;
+    visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; 
+    text-align: center; border-radius: 12px; padding: 16px; position: fixed; 
+    z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); 
+    opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px;
 }
-#toast.show { 
-    visibility: visible; 
-    opacity: 1; 
-    transform: translateX(-50%) translateY(0); 
-}
-
-/* Full Screen Loader */
-#loading-overlay { 
-    display: none; 
-}
-#loading-overlay.active { 
-    display: flex; 
-}
+#toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+#loading-overlay { display: none; }
+#loading-overlay.active { display: flex; }
