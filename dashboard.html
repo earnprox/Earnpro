@@ -21,7 +21,6 @@
         .modal-active { opacity: 1 !important; pointer-events: auto !important; }
         .sheet-active { transform: translateY(0) !important; }
         
-        /* Premium Toast Notification */
         #toast {
             visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; 
             text-align: center; border-radius: 12px; padding: 16px; position: fixed; 
@@ -83,7 +82,7 @@
                 </div>
                 <input type="text" id="proof-link" placeholder="Paste Proof Link Here (Drive/Insta)..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 outline-none focus:border-blue-500 mb-3">
                 
-                <button onclick="submitTaskProof()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-blue-500/20 active:scale-95">Submit Task</button>
+                <button onclick="submitTaskProofReal()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-blue-500/20 active:scale-95">Submit Task</button>
             </div>
         </div>
 
@@ -150,20 +149,6 @@
                     </div>
                     <span class="text-slate-400 text-lg">›</span>
                 </div>
-                <div onclick="openSheet('history-sheet')" class="flex justify-between items-center p-4 border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer">
-                    <div>
-                        <p class="text-sm font-semibold text-slate-800">My Gig Earnings</p>
-                        <p class="text-xs text-slate-500 mt-0.5">View all task income</p>
-                    </div>
-                    <span class="text-slate-400 text-lg">›</span>
-                </div>
-                <div onclick="switchTab('refer', document.getElementById('nav-refer'))" class="flex justify-between items-center p-4 hover:bg-slate-50 transition cursor-pointer">
-                    <div>
-                        <p class="text-sm font-semibold text-slate-800">Referral Commission</p>
-                        <p class="text-xs text-slate-500 mt-0.5">View all referral details</p>
-                    </div>
-                    <span class="text-slate-400 text-lg">›</span>
-                </div>
             </div>
         </div>
 
@@ -191,14 +176,6 @@
                 <div onclick="openSheet('kyc-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
                     <p class="text-sm font-medium text-slate-700">KYC & Bank Account</p>
                     <span class="text-slate-400 text-lg">›</span>
-                </div>
-                <div onclick="showToast('Help & Support opening... 💬')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
-                    <p class="text-sm font-medium text-slate-700">Help & Support</p>
-                    <span class="text-slate-400 text-lg">›</span>
-                </div>
-                <div onclick="showToast('Logging out... 🔒')" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 transition cursor-pointer group">
-                    <p class="text-sm font-medium text-slate-700 group-hover:text-red-600 transition">Logout</p>
-                    <span class="text-slate-400 text-lg group-hover:text-red-400 transition">›</span>
                 </div>
             </div>
         </div>
@@ -244,13 +221,6 @@
                     <p class="text-sm text-emerald-500 font-black mt-1">₹150 Reward</p>
                 </div>
             </div>
-            <h5 class="font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">How to do this:</h5>
-            <ul class="space-y-4 mb-6">
-                <li class="flex gap-3 items-start">
-                    <span class="bg-blue-100 text-blue-600 font-bold w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">1</span>
-                    <p class="text-sm text-slate-600">Download raw footage from Google Drive.</p>
-                </li>
-            </ul>
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
             <button onclick="acceptTask()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Start Gig Now</button>
@@ -266,26 +236,16 @@
         <div class="p-5 overflow-y-auto text-center">
             <p class="text-sm text-slate-500 mb-2">Available Balance</p>
             <h2 class="text-4xl font-black text-slate-800 mb-6">₹450.00</h2>
-            
             <div class="text-left mb-6">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Enter Amount to Withdraw</label>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Enter Amount</label>
                 <div class="relative">
                     <span class="absolute left-4 top-4 text-slate-500 font-bold">₹</span>
                     <input type="number" id="withdraw-amount" placeholder="0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-lg font-bold rounded-xl pl-8 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
                 </div>
-                <p class="text-[10px] text-slate-400 mt-2 font-medium">Minimum withdrawal amount is ₹50.</p>
-            </div>
-
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex justify-between items-center mb-2">
-                <div class="flex items-center gap-2">
-                    <span class="bg-blue-200 p-2 rounded-lg text-blue-600 text-xs font-bold">UPI</span>
-                    <p class="text-xs font-bold text-slate-800">akash@ybl</p>
-                </div>
-                <button onclick="openSheet('kyc-sheet')" class="text-[10px] font-bold text-blue-600 underline">Change</button>
             </div>
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="processWithdraw()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Confirm Withdrawal</button>
+            <button onclick="processWithdraw()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Confirm</button>
         </div>
     </div>
 
@@ -296,7 +256,6 @@
             <button onclick="closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         <div class="p-5 overflow-y-auto">
-            <p class="text-sm text-slate-500 mb-6">Add your UPI ID to receive instant payments.</p>
             <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">UPI ID</label>
                 <input type="text" placeholder="eg. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition">
@@ -315,24 +274,8 @@
         </div>
         <div class="p-5 overflow-y-auto space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-bold">↓</div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">Anime Reel Edit</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">25 Oct, 10:30 AM • Reward</p>
-                    </div>
-                </div>
+                <p class="text-sm font-bold text-slate-800">Anime Reel Edit</p>
                 <p class="text-sm font-black text-emerald-500">+ ₹150</p>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold">↑</div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">Withdrawal to UPI</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">22 Oct, 04:15 PM • Success</p>
-                    </div>
-                </div>
-                <p class="text-sm font-black text-slate-800">- ₹450</p>
             </div>
         </div>
     </div>
@@ -340,7 +283,6 @@
     <div id="toast">Message Here</div>
 
     <script>
-        // Tab Switching
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
@@ -361,7 +303,6 @@
             }
         }
 
-        // Custom Premium Toast Alert
         function showToast(message) {
             const toast = document.getElementById("toast");
             toast.innerText = message;
@@ -369,18 +310,15 @@
             setTimeout(function(){ toast.classList.remove("show"); }, 3000);
         }
 
-        // Bottom Sheet Logic
         const overlay = document.getElementById('universal-overlay');
         let currentOpenSheet = null;
 
         function openSheet(sheetId) {
-            if(currentOpenSheet) closeAllSheets(); // close previous if any
+            if(currentOpenSheet) closeAllSheets();
             const sheet = document.getElementById(sheetId);
             if(!sheet) return;
-            
             overlay.classList.add('modal-active');
             currentOpenSheet = sheet;
-            
             setTimeout(() => { sheet.classList.add('sheet-active'); }, 10);
         }
 
@@ -394,23 +332,12 @@
             }
         }
 
-        // Button Actions
         function acceptTask() {
             closeAllSheets();
             setTimeout(() => {
                 switchTab('project', document.querySelectorAll('.nav-item')[1]);
                 showToast("✅ Gig added to your Projects!");
             }, 300);
-        }
-
-        function submitTaskProof() {
-            const linkInput = document.getElementById("proof-link");
-            if(linkInput.value === "") {
-                showToast("⚠️ Please paste your proof link first!");
-            } else {
-                linkInput.value = "";
-                showToast("🚀 Task Submitted! Under Review.");
-            }
         }
 
         function processWithdraw() {
@@ -429,6 +356,58 @@
         function saveKYC() {
             closeAllSheets();
             setTimeout(() => showToast("🏦 Details Saved Successfully!"), 300);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 🔥 Aapki exact keys jo aapne bheji hain:
+        const firebaseConfig = {
+          apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
+          authDomain: "earnproxuc.firebaseapp.com",
+          projectId: "earnproxuc",
+          storageBucket: "earnproxuc.firebasestorage.app",
+          messagingSenderId: "411733884378",
+          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3",
+          measurementId: "G-GG4XMDW9KY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app); // Database chaloo!
+
+        // Firebase Submit Task Function
+        window.submitTaskProofReal = async function() {
+            const linkInput = document.getElementById("proof-link");
+            
+            if(linkInput.value === "") {
+                showToast("⚠️ Please paste your proof link first!");
+                return;
+            }
+
+            showToast("⏳ Submitting to Server...");
+
+            try {
+                // Asli Firebase Save Command
+                const docRef = await addDoc(collection(db, "task_submissions"), {
+                    gigName: "Review Shop on Maps",
+                    proofLink: linkInput.value,
+                    status: "Pending Approval",
+                    reward: "₹20",
+                    timestamp: new Date()
+                });
+                
+                console.log("Task Saved! ID: ", docRef.id);
+                linkInput.value = ""; 
+                showToast("🚀 Task Submitted! Database Updated.");
+                
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showToast("❌ Error! Database Rules check karein.");
+            }
         }
     </script>
 </body>
