@@ -8,18 +8,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; padding-bottom: 70px; }
-        .nav-item-active { color: #2563EB; font-weight: 800; border-top: 3px solid #2563EB; }
+        .nav-active { color: #2563EB !important; font-weight: 900; border-top: 3px solid #2563EB; }
         @media (min-width: 768px) { 
             body { padding-bottom: 0; padding-left: 260px; }
-            .nav-item-active { border-top: none; border-right: 4px solid #2563EB; background: #F1F5F9; }
+            .nav-active { border-top: none; border-right: 4px solid #2563EB; background: #F1F5F9; }
         }
         .view-section { display: none; opacity: 0; }
         .view-section.active { display: block; opacity: 1; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         #auth-screen { display: flex; z-index: 999; }
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
+        
         .modal { display: none; z-index: 1000; }
         .modal.active { display: flex; }
     </style>
@@ -27,90 +29,108 @@
 <body class="min-h-screen">
 
     <div id="auth-screen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center p-6">
-        <div class="bg-white p-8 rounded-[2rem] w-full max-w-sm shadow-2xl">
-            <div class="w-12 h-12 bg-blue-600 rounded-xl mb-4 flex items-center justify-center text-white font-black text-xl italic">X</div>
-            <h2 class="text-2xl font-black mb-1">Admin Login</h2>
-            <p class="text-sm text-slate-500 mb-6">Enter master password</p>
-            <input type="password" id="admin-pass" placeholder="••••••••" class="w-full bg-slate-100 p-4 rounded-xl mb-4 outline-none focus:ring-2 ring-blue-500 font-black tracking-widest">
-            <button onclick="window.doLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">Unlock 🔓</button>
+        <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 mx-auto flex items-center justify-center text-white font-black text-2xl shadow-xl rotate-3">X</div>
+            <h2 class="text-2xl font-black mb-1 text-slate-800">Admin Access</h2>
+            <p class="text-sm text-slate-400 mb-8 font-medium">Control the EarnproX Ecosystem</p>
+            <input type="password" id="admin-pass" placeholder="Enter Password" class="w-full bg-slate-100 p-4 rounded-2xl mb-4 outline-none focus:ring-2 ring-blue-500 font-black tracking-widest text-center">
+            <button onclick="window.doLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition">Unlock Dashboard 🔓</button>
         </div>
     </div>
 
     <div id="admin-app">
-        <aside class="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r hidden md:flex flex-col p-6">
-            <h1 class="text-xl font-black mb-10">EarnproX <span class="text-blue-600">Admin</span></h1>
+        <aside class="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r hidden md:flex flex-col p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-sm italic">X</div>
+                <h1 class="text-xl font-black tracking-tighter">Admin<span class="text-blue-600">Pro</span></h1>
+            </div>
             <nav class="flex flex-col gap-2">
-                <button onclick="window.switchView('dash', this)" class="nav-btn nav-item-active p-4 text-left rounded-xl transition font-bold">📊 Dashboard</button>
-                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left rounded-xl transition font-bold">👥 Users</button>
-                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left rounded-xl transition font-bold relative">🔍 Reviews <span id="badge-count" class="absolute right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span></button>
-                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left rounded-xl transition font-bold">🚀 Add Gigs</button>
+                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600"><span>📊</span> Dashboard</button>
+                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600"><span>👥</span> Users</button>
+                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600 relative">
+                    <span>🔍</span> Reviews 
+                    <span id="badge-count" class="absolute right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left rounded-xl transition flex items-center gap-3 font-bold text-slate-600"><span>🚀</span> Add Gigs</button>
             </nav>
-            <button onclick="window.doLogout()" class="mt-auto p-4 text-left text-red-500 font-bold">Logout 🚪</button>
+            <button onclick="window.doLogout()" class="mt-auto p-4 text-left text-red-500 font-bold hover:bg-red-50 rounded-xl transition">Logout 🚪</button>
         </aside>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-2 z-50">
-            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-item-active"><span class="text-lg">📊</span><span class="text-[10px] font-bold">Dash</span></button>
-            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">👥</span><span class="text-[10px] font-bold">Users</span></button>
-            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">🔍</span><span class="text-[10px] font-bold">Review</span></button>
-            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">🚀</span><span class="text-[10px] font-bold">Gigs</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-2 z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-active"><span class="text-xl">📊</span><span class="text-[10px] font-black uppercase mt-1">Dash</span></button>
+            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">👥</span><span class="text-[10px] font-black uppercase mt-1">Users</span></button>
+            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">🔍</span><span class="text-[10px] font-black uppercase mt-1">Review</span></button>
+            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">🚀</span><span class="text-[10px] font-black uppercase mt-1">Gigs</span></button>
         </nav>
 
-        <main class="p-4 md:p-10">
+        <main class="p-5 md:p-10 max-w-6xl mx-auto">
             
             <section id="view-dash" class="view-section active">
-                <h2 class="text-2xl font-black mb-6">Live Overview</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-3xl border shadow-sm">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Total Users</p>
-                        <h3 id="stat-users" class="text-3xl font-black text-blue-600">0</h3>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">System Overview</h2>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Live Users</p>
+                        <h3 id="stat-users" class="text-4xl font-black text-blue-600">0</h3>
                     </div>
-                    <div class="bg-white p-5 rounded-3xl border shadow-sm">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Pending Review</p>
-                        <h3 id="stat-pending" class="text-3xl font-black text-orange-500">0</h3>
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">To Review</p>
+                        <h3 id="stat-pending" class="text-4xl font-black text-orange-500">0</h3>
                     </div>
-                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-3xl font-bold text-sm col-span-2 md:col-span-1">Refresh Data 🔄</button>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-[2rem] font-bold text-sm col-span-2 md:col-span-1 shadow-lg active:scale-95 transition">Sync Database 🔄</button>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <h2 class="text-2xl font-black mb-6">User Database</h2>
+                <h2 class="text-3xl font-black text-slate-800 mb-6">User Database</h2>
                 <div id="user-list" class="grid gap-3">
-                    <p class="text-center text-slate-400 py-10">Loading users...</p>
+                    <p class="text-center text-slate-400 py-20 font-medium">Fetching users from cloud...</p>
                 </div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-2xl font-black mb-6">Task Submissions</h2>
+                <h2 class="text-3xl font-black text-slate-800 mb-6">Pending Proofs</h2>
                 <div id="review-list" class="grid gap-4">
-                    <p class="text-center text-slate-400 py-10">No pending proofs.</p>
+                    <p class="text-center text-slate-400 py-20 font-medium italic">No pending proofs to show.</p>
                 </div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-2xl font-black mb-6">Create New Task</h2>
-                <div class="bg-white p-6 rounded-[2rem] border shadow-sm max-w-lg">
+                <h2 class="text-3xl font-black text-slate-800 mb-6">Publish New Gig</h2>
+                <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm max-w-lg">
                     <div class="space-y-4">
-                        <input type="text" id="gig-title" placeholder="Gig Title" class="w-full bg-slate-50 p-4 rounded-xl outline-none border focus:border-blue-500 font-bold">
-                        <input type="number" id="gig-reward" placeholder="Reward (₹)" class="w-full bg-slate-50 p-4 rounded-xl outline-none border focus:border-blue-500 font-bold">
-                        <textarea id="gig-desc" placeholder="Step-by-step instructions..." class="w-full bg-slate-50 p-4 rounded-xl outline-none border focus:border-blue-500 font-medium h-32"></textarea>
-                        <button onclick="window.addGigToDB()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">Publish Task Live 🚀</button>
+                        <div class="bg-slate-50 p-4 rounded-2xl border">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Gig Title</label>
+                            <input type="text" id="gig-title" placeholder="e.g. Join Telegram Channel" class="w-full bg-transparent font-bold outline-none">
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Reward Amount (₹)</label>
+                            <input type="number" id="gig-reward" placeholder="20" class="w-full bg-transparent font-black text-2xl text-emerald-600 outline-none">
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Step-by-Step Instructions</label>
+                            <textarea id="gig-desc" placeholder="1. Open link\n2. Screenshot after join..." class="w-full bg-transparent font-medium outline-none h-24"></textarea>
+                        </div>
+                        <button onclick="window.addGigToDB()" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition">Publish Task Live 🚀</button>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="modal-bal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl">
-            <h3 class="text-xl font-black mb-1">Adjust Balance</h3>
+    <div id="modal-bal" class="modal fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
+            <h3 class="text-2xl font-black text-slate-800 mb-1">Adjust Wallet</h3>
             <p id="target-user-name" class="text-sm text-slate-500 mb-6 font-bold"></p>
-            <div class="bg-slate-50 p-4 rounded-2xl mb-6 border">
-                <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">New Balance (₹)</label>
-                <input type="number" id="target-new-bal" class="w-full bg-transparent text-3xl font-black outline-none" placeholder="0">
+            <div class="bg-blue-50 p-6 rounded-[2rem] mb-8 border border-blue-100">
+                <label class="text-[10px] font-black text-blue-400 uppercase mb-2 block tracking-widest">New Balance (₹)</label>
+                <input type="number" id="target-new-bal" class="w-full bg-transparent text-5xl font-black text-blue-600 outline-none" placeholder="0">
             </div>
-            <div class="flex gap-2">
-                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-xl shadow-lg">Save</button>
-                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-xl">Cancel</button>
+            <div class="flex gap-3">
+                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition">Save</button>
+                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-2xl active:scale-95 transition">Cancel</button>
             </div>
         </div>
     </div>
@@ -139,7 +159,7 @@
                 localStorage.setItem("admin_auth", "true");
                 document.body.classList.add('authenticated');
                 initAdmin();
-            } else { alert("Wrong Password!"); }
+            } else { alert("❌ Wrong Password! Admin access only."); }
         };
         window.doLogout = () => {
             localStorage.removeItem("admin_auth");
@@ -148,13 +168,13 @@
 
         // --- NAVIGATION ---
         window.switchView = (id, btn) => {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-item-active'));
-            btn.classList.add('nav-item-active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            btn.classList.add('nav-active');
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        // --- LOAD DATA ---
+        // --- LOAD DATA (onSnapshot for Live Updates) ---
         function initAdmin() {
             // Live Users Sync
             onSnapshot(collection(db, "users"), (snap) => {
@@ -163,22 +183,25 @@
                 snap.forEach(d => {
                     const u = d.data();
                     html += `
-                    <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm">
-                        <div>
-                            <p class="font-black text-sm">${u.name}</p>
-                            <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone}</p>
-                            <p class="text-[10px] text-blue-500 font-bold">${u.upi || 'No UPI'}</p>
+                    <div class="bg-white p-5 rounded-[2rem] border flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center font-black text-blue-600 border border-slate-100 italic">${u.name.charAt(0)}</div>
+                            <div>
+                                <p class="font-black text-sm text-slate-800">${u.name}</p>
+                                <p class="text-[10px] font-bold text-slate-400 tracking-wider">+91 ${u.phone}</p>
+                                <p class="text-[9px] text-blue-500 font-black uppercase mt-1">UPI: ${u.upi || 'PENDING'}</p>
+                            </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-black text-emerald-600 mb-1">₹${u.balance || 0}</p>
+                            <p class="font-black text-emerald-600 text-lg mb-2">₹${u.balance || 0}</p>
                             <div class="flex gap-1">
-                                <button onclick="window.openBalModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[8px] font-black px-2 py-1.5 rounded-lg uppercase">Edit</button>
-                                <button onclick="window.blockUser('${d.id}')" class="bg-red-50 text-red-500 text-[8px] font-black px-2 py-1.5 rounded-lg uppercase">Block</button>
+                                <button onclick="window.openBalModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest">Adjust</button>
+                                <button onclick="window.blockUser('${d.id}')" class="bg-red-50 text-red-500 text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest">Block</button>
                             </div>
                         </div>
                     </div>`;
                 });
-                document.getElementById('user-list').innerHTML = html;
+                document.getElementById('user-list').innerHTML = html || "<p class='text-center text-slate-400'>No users registered yet.</p>";
             });
 
             // Live Tasks Sync
@@ -190,25 +213,32 @@
                     if(t.status === "Pending Approval") {
                         pendingCount++;
                         html += `
-                        <div class="bg-white p-5 rounded-2xl border shadow-sm">
-                            <p class="text-[10px] font-black text-blue-600 mb-1 uppercase">${t.gigName}</p>
-                            <p class="font-bold text-sm mb-2">User: +91 ${t.userPhone}</p>
-                            <a href="${t.proofLink}" target="_blank" class="text-blue-500 font-bold text-xs underline block mb-4 italic">Check Proof Link ↗</a>
+                        <div class="bg-white p-6 rounded-[2.5rem] border shadow-sm border-l-8 border-l-orange-400">
+                            <p class="text-[10px] font-black text-orange-400 mb-1 uppercase tracking-widest">${t.gigName}</p>
+                            <p class="font-bold text-sm mb-1 text-slate-800">Submitted by: +91 ${t.userPhone}</p>
+                            <a href="${t.proofLink}" target="_blank" class="text-blue-500 font-bold text-xs underline block mb-5 italic">Open Proof Link ↗</a>
                             <div class="flex gap-2">
-                                <button onclick="window.approveTask('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-3 rounded-xl text-xs">APPROVE</button>
-                                <button onclick="window.rejectTask('${d.id}')" class="flex-1 bg-slate-100 text-slate-400 font-black py-3 rounded-xl text-xs">REJECT</button>
+                                <button onclick="window.approveTask('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition">APPROVE & PAY</button>
+                                <button onclick="window.rejectTask('${d.id}')" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl text-xs active:scale-95 transition">REJECT</button>
                             </div>
                         </div>`;
                     }
                 });
                 document.getElementById('stat-pending').innerText = pendingCount;
-                document.getElementById('review-list').innerHTML = html || "<p class='text-center text-slate-400 py-10'>No tasks to review.</p>";
+                document.getElementById('review-list').innerHTML = html || "<p class='text-center text-slate-400 py-10 font-bold'>✨ All task reviews are completed!</p>";
+                
+                // Update badge
+                const badge = document.getElementById('badge-count');
+                if(pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.classList.remove('hidden');
+                } else { badge.classList.add('hidden'); }
             });
         }
 
         // --- DATABASE ACTIONS ---
 
-        // Adjust Balance
+        // Adjust Balance (GLOBAL)
         window.openBalModal = (id, name, bal) => {
             activeUserDocId = id;
             document.getElementById('target-user-name').innerText = name;
@@ -218,52 +248,55 @@
 
         window.updateBalanceInDB = async () => {
             const newBal = parseInt(document.getElementById('target-new-bal').value);
+            if(isNaN(newBal)) return alert("Enter valid number!");
             await updateDoc(doc(db, "users", activeUserDocId), { balance: newBal });
             document.getElementById('modal-bal').classList.remove('active');
-            alert("Balance Updated! ✅");
+            alert("Success: User balance updated! ✅");
         };
 
-        // Approve Task
+        // Approve Task (GLOBAL)
         window.approveTask = async (taskId, userPhone, reward) => {
-            // Update Task
             await updateDoc(doc(db, "task_submissions", taskId), { status: "Completed" });
-            // Find User & Pay
             const q = query(collection(db, "users"), where("phone", "==", userPhone));
             const uSnap = await getDocs(q);
             if(!uSnap.empty) {
                 const uDoc = uSnap.docs[0];
                 const newBal = (uDoc.data().balance || 0) + reward;
                 await updateDoc(doc(db, "users", uDoc.id), { balance: newBal });
-                alert("Task Approved & User Paid! 💰");
+                alert("💰 Approved: Reward sent to user!");
             }
         };
 
-        // Add New Gig
+        // Add New Gig (GLOBAL)
         window.addGigToDB = async () => {
             const title = document.getElementById('gig-title').value;
             const reward = parseInt(document.getElementById('gig-reward').value);
             const desc = document.getElementById('gig-desc').value;
 
-            if(!title || !reward) return alert("Fill data!");
+            if(!title || isNaN(reward)) return alert("⚠️ Please fill Gig Title and Reward!");
 
             await addDoc(collection(db, "gigs"), {
                 title, reward, desc, timestamp: new Date()
             });
-            alert("New Task is Live! 🚀");
+            alert("🚀 Boom! New task is live on the app.");
             document.getElementById('gig-title').value = "";
             document.getElementById('gig-reward').value = "";
             document.getElementById('gig-desc').value = "";
         };
 
         window.rejectTask = async (id) => {
-            if(confirm("Reject this proof?")) await deleteDoc(doc(db, "task_submissions", id));
+            if(confirm("Confirm Reject? This will delete the submission.")) {
+                await deleteDoc(doc(db, "task_submissions", id));
+            }
         };
 
         window.blockUser = async (id) => {
-            if(confirm("Block this user?")) await deleteDoc(doc(db, "users", id));
+            if(confirm("🚨 WARNING: This will permanently DELETE this user! Proceed?")) {
+                await deleteDoc(doc(db, "users", id));
+            }
         };
 
-        // Check Session
+        // Final Boot
         if(localStorage.getItem("admin_auth")) {
             document.body.classList.add('authenticated');
             initAdmin();
