@@ -3,76 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnproX - Login & Signup</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>EarnproX | Login & Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; background-color: #F4F7F9; color: #0F172A; 
+            -webkit-tap-highlight-color: transparent; overflow-x: hidden;
+        }
+        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08); }
+        
+        /* Smooth Sliding Forms */
+        .form-step { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: absolute; top: 0; left: 0; padding: 24px; }
+        .step-out-left { transform: translateX(-120%); opacity: 0; pointer-events: none; }
+        .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; }
+        .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; }
+        
+        .otp-box { width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
+        .otp-box:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px;
+        }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-blue-100">
 
-    <div class="auth-container">
-        <div class="brand-section">
-            <div class="brand-content">
-                <h1 class="logo">Earnpro<span>X</span></h1>
-                <h2 class="tagline">Start your Hustle Era.</h2>
-                <p class="description">Join India's most trusted gig platform. Complete quick micro-tasks, build your skills, and get instant payouts.</p>
-                
-                <div class="trust-badges">
-                    <div class="badge">
-                        <span class="icon">🔒</span>
-                        <span>Bank-Grade Security</span>
-                    </div>
-                    <div class="badge">
-                        <span class="icon">⚡</span>
-                        <span>Instant Escrow Payouts</span>
-                    </div>
-                </div>
-            </div>
+    <div class="text-center mb-8 mt-4">
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(37,99,235,0.3)] transform -rotate-6">
+            <span class="text-3xl text-white font-black">X</span>
         </div>
-
-        <div class="form-section">
-            <div class="form-card">
-                <h3>Welcome to EarnproX</h3>
-                <p class="subtitle">Enter your mobile number to continue</p>
-
-                <div class="role-toggle">
-                    <button class="role-btn active" id="studentBtn">🎓 I'm a Student</button>
-                    <button class="role-btn" id="companyBtn">🏢 I'm a Business</button>
-                </div>
-
-                <form id="loginForm">
-                    <div class="input-group">
-                        <label for="phone">Mobile Number</label>
-                        <div class="phone-input-wrapper">
-                            <span class="country-code">+91</span>
-                            <input type="tel" id="phone" placeholder="Enter 10-digit number" maxlength="10" required autocomplete="off">
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="primary-btn">Get OTP <span class="arrow">&rarr;</span></button>
-                </form>
-
-                <p class="terms">
-                    By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-                </p>
-            </div>
-        </div>
+        <h1 class="text-3xl font-black tracking-tight text-slate-900">Earnpro<span class="text-blue-600">X</span></h1>
+        <p class="text-sm text-slate-500 font-medium mt-1">Complete micro-tasks, earn real money.</p>
     </div>
 
+    <div class="premium-card rounded-[2rem] p-6 w-full max-w-md relative overflow-hidden min-h-[420px] flex flex-col justify-start">
+        
+        <div id="step-1" class="form-step step-active">
+            <h2 class="text-2xl font-black text-slate-800 mb-2">Let's get started</h2>
+            <p class="text-sm text-slate-500 mb-8">Enter your mobile number to login or create a new account.</p>
+            
+            <div class="mb-5">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Mobile Number</label>
+                <div class="relative flex items-center bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-1 focus-within:border-blue-500 transition">
+                    <span class="text-slate-500 font-bold mr-2 border-r border-slate-300 pr-2">+91</span>
+                    <input type="tel" id="mobile-input" maxlength="10" placeholder="98765 43210" class="w-full text-lg font-bold text-slate-800 bg-transparent outline-none py-3 tracking-wider">
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Invite Code (Optional)</label>
+                <input type="text" id="refer-input" placeholder="Have a referral code?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition uppercase tracking-widest">
+            </div>
+
+            <button onclick="sendOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
+                Send OTP <span class="text-xl">→</span>
+            </button>
+            
+            <p class="text-[10px] text-center text-slate-400 mt-5 font-medium">By continuing, you agree to our Terms of Service & Privacy Policy.</p>
+        </div>
+
+        <div id="step-2" class="form-step step-in-right">
+            <button onclick="goBack()" class="text-slate-400 hover:text-slate-800 mb-4 transition flex items-center gap-1 -ml-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span class="text-xs font-bold">Back</span>
+            </button>
+            <h2 class="text-2xl font-black text-slate-800 mb-2">Verify it's you</h2>
+            <p class="text-sm text-slate-500 mb-6">We've sent a 4-digit code to <b id="display-number" class="text-slate-800">+91 XXXXXXXXXX</b></p>
+            
+            <div id="name-container" class="mb-6 hidden">
+                <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 bg-blue-50 inline-block px-2 py-1 rounded">New User Setup</label>
+                <input type="text" id="name-input" placeholder="What's your full name?" class="w-full bg-white border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition">
+            </div>
+
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter OTP</label>
+                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded">Test OTP: 1234</span>
+                </div>
+                <div class="flex gap-3 justify-center">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="moveToNext(this, 'otp2')">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp2" onkeyup="moveToNext(this, 'otp3', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp3" onkeyup="moveToNext(this, 'otp4', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="checkBackspace(this, 'otp3', event)">
+                </div>
+            </div>
+
+            <button onclick="verifyAndLogin()" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
+                Verify & Login
+            </button>
+            
+            <div class="text-center mt-6">
+                <p class="text-sm text-slate-500 font-medium">Didn't receive the code? <button onclick="showToast('Test mode: Please use OTP 1234')" class="text-blue-600 font-bold ml-1 hover:underline">Resend</button></p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast">Message Here</div>
+
     <script>
-        const studentBtn = document.getElementById('studentBtn');
-        const companyBtn = document.getElementById('companyBtn');
+        // Fake Database representing "Old Users"
+        const oldUsersDB = ["7500673337", "8005139979"];
+        let isNewUser = true;
 
-        studentBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            studentBtn.classList.add('active');
-            companyBtn.classList.remove('active');
-        });
+        // Auto-fill referral code if present in URL
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if(refCode) {
+                document.getElementById('refer-input').value = refCode;
+                document.getElementById('refer-input').classList.add('border-emerald-300', 'bg-emerald-50', 'text-emerald-700');
+                showToast("🎁 Invite code applied automatically!");
+            }
+        };
 
-        companyBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            companyBtn.classList.add('active');
-            studentBtn.classList.remove('active');
-        });
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.classList.add("show");
+            setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+        }
+
+        // Improved OTP Auto-focus and Backspace logic
+        function moveToNext(current, nextFieldID, event) {
+            // If user types a number, move forward
+            if (current.value.length >= 1) {
+                document.getElementById(nextFieldID).focus();
+            }
+            // If user presses backspace and box is empty, move backward
+            if (event && event.key === "Backspace" && current.value === "") {
+                const prevId = current.id.replace(/\d/, (n) => parseInt(n) - 1);
+                if(document.getElementById(prevId)) {
+                    document.getElementById(prevId).focus();
+                }
+            }
+        }
+        
+        function checkBackspace(current, prevFieldID, event) {
+            if (event.key === "Backspace" && current.value === "") {
+                document.getElementById(prevFieldID).focus();
+            }
+        }
+
+        // STEP 1 -> STEP 2
+        function sendOTP() {
+            const phone = document.getElementById('mobile-input').value;
+            
+            if(phone.length !== 10) {
+                showToast("⚠️ Please enter a valid 10-digit number.");
+                return;
+            }
+
+            document.getElementById('display-number').innerText = "+91 " + phone;
+
+            if(oldUsersDB.includes(phone)) {
+                isNewUser = false;
+                document.getElementById('name-container').classList.add('hidden');
+                showToast("📲 Welcome back! OTP Sent.");
+            } else {
+                isNewUser = true;
+                document.getElementById('name-container').classList.remove('hidden');
+                showToast("👋 New User! OTP Sent.");
+            }
+
+            // Slide Animation
+            document.getElementById('step-1').classList.remove('step-active');
+            document.getElementById('step-1').classList.add('step-out-left');
+            
+            document.getElementById('step-2').classList.remove('step-in-right');
+            document.getElementById('step-2').classList.add('step-active');
+        }
+
+        function goBack() {
+            document.getElementById('step-2').classList.remove('step-active');
+            document.getElementById('step-2').classList.add('step-in-right');
+            
+            document.getElementById('step-1').classList.remove('step-out-left');
+            document.getElementById('step-1').classList.add('step-active');
+            
+            // Clear OTP fields when going back
+            document.getElementById('otp1').value = "";
+            document.getElementById('otp2').value = "";
+            document.getElementById('otp3').value = "";
+            document.getElementById('otp4').value = "";
+        }
+
+        // ================= THE FAKE OTP LOGIC =================
+        function verifyAndLogin() {
+            const o1 = document.getElementById('otp1').value;
+            const o2 = document.getElementById('otp2').value;
+            const o3 = document.getElementById('otp3').value;
+            const o4 = document.getElementById('otp4').value;
+            const enteredOtp = o1 + o2 + o3 + o4;
+            
+            if(enteredOtp.length < 4) {
+                showToast("⚠️ Please enter the complete 4-digit OTP.");
+                return;
+            }
+
+            // 🔥 BYPASS TEST OTP CHECK 🔥
+            if(enteredOtp !== "1234") {
+                showToast("❌ Invalid OTP! Hint: Use 1234 for testing.");
+                
+                // Vibrate and clear boxes on wrong OTP
+                document.getElementById('otp1').value = "";
+                document.getElementById('otp2').value = "";
+                document.getElementById('otp3').value = "";
+                document.getElementById('otp4').value = "";
+                document.getElementById('otp1').focus();
+                return;
+            }
+
+            if(isNewUser) {
+                const name = document.getElementById('name-input').value;
+                if(name.length < 3) {
+                    showToast("⚠️ Please enter your full name to proceed.");
+                    return;
+                }
+            }
+
+            showToast("✅ Verification Successful! Loading Dashboard...");
+            
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
+        }
     </script>
 </body>
 </html>
