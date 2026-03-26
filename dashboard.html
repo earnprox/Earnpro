@@ -42,6 +42,7 @@
     </style>
 
     <script>
+        // SECURITY: Check login status
         if (!localStorage.getItem("earnprox_user_phone")) {
             window.location.href = "index.html";
         }
@@ -55,7 +56,7 @@
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Good Morning</p>
-                    <span class="bg-orange-100 text-orange-600 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">🔥 New User</span>
+                    <span class="bg-orange-100 text-orange-600 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">🔥 Live</span>
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-900"><span id="header-user-name">User</span> <span class="text-blue-500">.</span></h1>
             </div>
@@ -98,12 +99,12 @@
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">To Do</span>
-                            <h4 class="font-bold text-sm text-slate-800">Review Shop on Maps</h4>
+                            <h4 class="font-bold text-sm text-slate-800">Anime Reel Edit</h4>
                         </div>
-                        <p class="text-sm font-bold text-emerald-500">₹20</p>
+                        <p class="text-sm font-bold text-emerald-500">₹150</p>
                     </div>
                     <input type="text" id="proof-link" placeholder="Paste Proof Link Here..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 outline-none focus:border-blue-500 mb-3">
-                    <button onclick="submitTaskProofReal()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-blue-500/20 active:scale-95">Submit Work</button>
+                    <button onclick="window.submitTaskProofReal()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-blue-500/20 active:scale-95">Submit Work</button>
                 </div>
             </div>
 
@@ -112,7 +113,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">Checking</span>
-                            <h4 class="font-bold text-sm text-slate-800">Waiting for approval</h4>
+                            <h4 class="font-bold text-sm text-slate-800">Waiting for Admin Approval</h4>
                         </div>
                     </div>
                 </div>
@@ -162,7 +163,7 @@
                         <span class="bg-slate-100 p-2 rounded-lg text-slate-600">🏦</span>
                         <div>
                             <p class="text-sm font-semibold text-slate-800">Payout Settings</p>
-                            <p class="text-xs text-slate-500 mt-0.5" id="upi-display-text">UPI not linked yet</p>
+                            <p class="text-xs text-slate-500 mt-0.5" id="upi-display-text">UPI not linked</p>
                         </div>
                     </div>
                     <span class="text-[11px] font-bold text-red-500 border border-red-200 bg-red-50 px-2 py-1 rounded" id="upi-status-badge">Pending</span>
@@ -256,7 +257,7 @@
         </div>
         
         <div class="p-5 bg-white border-t border-slate-200">
-            <button onclick="processWithdrawReal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition">Proceed to Transfer</button>
+            <button onclick="window.processWithdrawReal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition">Proceed to Transfer</button>
         </div>
     </div>
 
@@ -296,7 +297,7 @@
             </div>
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="saveRealKYC()" class="w-full bg-[#1E293B] text-white font-bold py-4 rounded-xl shadow-lg text-lg active:scale-95 transition">Save UPI Details</button>
+            <button onclick="window.saveRealKYC()" class="w-full bg-[#1E293B] text-white font-bold py-4 rounded-xl shadow-lg text-lg active:scale-95 transition">Save UPI Details</button>
         </div>
     </div>
 
@@ -339,47 +340,29 @@
     <div id="toast">Message Here</div>
 
     <script>
-        // Start Balance at ZERO
-        let currentBalance = 0;
-        let savedUPI = "";
-        
         const REFERRAL_CODE = "AM8M27ZY";
         const REFERRAL_LINK = `https://earnprox.in/index.html?ref=${REFERRAL_CODE}`;
 
-        // ================= DYNAMIC USER DATA LOAD =================
-        window.onload = () => {
+        // Basic Local Load
+        window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem("earnprox_user_name") || "User";
-            const savedPhone = localStorage.getItem("earnprox_user_phone") || "0000000000";
-
-            // Update Header Name
-            document.getElementById("header-user-name").innerText = savedName.split(" ")[0]; // First name only
-            document.getElementById("header-avatar").src = `https://ui-avatars.com/api/?name=${savedName}&background=3B82F6&color=fff&bold=true`;
-            
-            // Update Profile Name & Phone
+            document.getElementById("header-user-name").innerText = savedName.split(" ")[0];
             document.getElementById("profile-user-name").innerText = savedName;
-            document.getElementById("profile-user-phone").innerText = "+91 " + savedPhone;
+            document.getElementById("header-avatar").src = `https://ui-avatars.com/api/?name=${savedName}&background=3B82F6&color=fff&bold=true`;
             document.getElementById("profile-avatar").src = `https://api.dicebear.com/7.x/micah/svg?seed=${savedName}&backgroundColor=b6e3f4`;
-        };
+        });
 
-        function updateBalanceUI() {
-            document.getElementById("main-balance-display").innerHTML = `₹ ${currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
-            document.getElementById("withdraw-page-balance").innerText = `₹ ${currentBalance}`;
+        // Utilities
+        window.showToast = function(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.classList.add("show");
+            setTimeout(() => { toast.classList.remove("show"); }, 3000);
         }
 
-        function updateUpiUI() {
-            if(savedUPI) {
-                document.getElementById("upi-display-text").innerText = savedUPI;
-                document.getElementById("withdraw-page-upi").innerText = savedUPI;
-                const badge = document.getElementById("upi-status-badge");
-                badge.innerText = "Verified ✅";
-                badge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
-            }
-        }
-
-        function switchTab(tabId, btnElement) {
+        window.switchTab = function(tabId, btnElement) {
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
-
             const mainHeader = document.getElementById('main-header');
             if(tabId === 'profile' || tabId === 'refer') {
                 mainHeader.style.opacity = '0';
@@ -388,32 +371,22 @@
                 mainHeader.style.display = 'flex';
                 setTimeout(() => mainHeader.style.opacity = '1', 50);
             }
-
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             const targetView = document.getElementById('view-' + tabId);
-            if(targetView) {
-                setTimeout(() => targetView.classList.add('active'), 50);
-            }
+            if(targetView) { setTimeout(() => targetView.classList.add('active'), 50); }
         }
 
-        function switchWsTab(wsId, btnElement) {
+        window.switchWsTab = function(wsId, btnElement) {
             document.querySelectorAll('.ws-tab').forEach(tab => tab.classList.remove('active'));
             btnElement.classList.add('active');
             document.querySelectorAll('.ws-content').forEach(content => content.classList.remove('active'));
             document.getElementById('ws-' + wsId).classList.add('active');
         }
 
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.classList.add("show");
-            setTimeout(function(){ toast.classList.remove("show"); }, 3000);
-        }
-
         const overlay = document.getElementById('universal-overlay');
         let currentOpenSheet = null;
 
-        function openSheet(sheetId) {
+        window.openSheet = function(sheetId) {
             if(currentOpenSheet) closeAllSheets();
             const sheet = document.getElementById(sheetId);
             if(!sheet) return;
@@ -422,7 +395,7 @@
             setTimeout(() => { sheet.classList.add('sheet-active'); }, 10);
         }
 
-        function closeAllSheets() {
+        window.closeAllSheets = function() {
             if(currentOpenSheet) {
                 currentOpenSheet.classList.remove('sheet-active');
                 setTimeout(() => {
@@ -432,22 +405,20 @@
             }
         }
 
-        function openFullPage(pageId) {
-            if(!savedUPI) {
+        window.openFullPage = function(pageId) {
+            if(!window.savedUPI) {
                 showToast("⚠️ Please Save your UPI ID in Profile first!");
                 return;
             }
-            updateBalanceUI();
-            updateUpiUI();
             document.getElementById(pageId).classList.add('full-page-active');
         }
 
-        function closeFullPage(pageId) {
+        window.closeFullPage = function(pageId) {
             document.getElementById(pageId).classList.remove('full-page-active');
             document.getElementById("withdraw-amount").value = "";
         }
 
-        function acceptTask() {
+        window.acceptTask = function() {
             closeAllSheets();
             setTimeout(() => {
                 switchTab('project', document.querySelectorAll('.nav-item')[1]);
@@ -455,90 +426,29 @@
             }, 300);
         }
 
-        function saveRealKYC() {
-            const inputBox = document.getElementById("upi-input-box");
-            if(inputBox.value.includes("@")) {
-                savedUPI = inputBox.value;
-                updateUpiUI(); 
-                closeAllSheets();
-                setTimeout(() => showToast("🏦 UPI Linked Successfully!"), 300);
-            } else {
-                showToast("⚠️ Enter a valid UPI ID (e.g. name@ybl)");
-            }
-        }
-
-        function processWithdrawReal() {
-            const amtBox = document.getElementById("withdraw-amount");
-            const amt = parseInt(amtBox.value);
-            
-            if(!amt || amt < 50) {
-                showToast("⚠️ Minimum withdrawal is ₹50");
-                return;
-            }
-            if(amt > currentBalance) {
-                showToast("⚠️ Insufficient balance!");
-                return;
-            }
-
-            currentBalance -= amt; 
-            updateBalanceUI(); 
-            
-            // Remove empty history message if it exists
-            const emptyMsg = document.getElementById("empty-history");
-            if(emptyMsg) emptyMsg.remove();
-            
-            const historyHTML = `
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold">↑</div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">Withdrawal to UPI</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Processing...</p>
-                    </div>
-                </div>
-                <p class="text-sm font-black text-slate-800">- ₹${amt}</p>
-            </div>`;
-            document.getElementById("history-container").innerHTML = historyHTML + document.getElementById("history-container").innerHTML;
-
-            closeFullPage('withdraw-page');
-            setTimeout(() => {
-                showToast(`💸 ₹${amt} is being transferred to ${savedUPI}`);
-                amtBox.value = "";
-            }, 400);
-        }
-
-        function logoutUser() {
+        window.logoutUser = function() {
             const loader = document.getElementById("loading-overlay");
             loader.classList.add("active"); 
-            
-            // Clear memory on logout
             localStorage.removeItem("earnprox_user_phone");
             localStorage.removeItem("earnprox_user_name");
-
-            setTimeout(() => {
-                window.location.href = "index.html"; 
-            }, 1500);
+            setTimeout(() => { window.location.href = "index.html"; }, 1500);
         }
 
-        function copyReferLink() {
+        window.copyReferLink = function() {
             navigator.clipboard.writeText(REFERRAL_LINK).then(() => {
-                showToast("✅ Referral Link Copied to Clipboard!");
-            }).catch(err => {
-                showToast("⚠️ Failed to copy! Try again.");
-            });
+                showToast("✅ Referral Link Copied!");
+            }).catch(err => { showToast("⚠️ Failed to copy!"); });
         }
 
-        function shareOnWhatsApp() {
-            const promoMessage = `🔥 Bro! I just found this crazy app *EarnproX*. Complete simple micro-tasks and earn real cash daily directly to UPI! 💸\n\nUse my invite code *${REFERRAL_CODE}* or click here to join and get a sign-up bonus:\n👇👇\n${REFERRAL_LINK} 🚀`;
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`;
-            window.open(whatsappUrl, '_blank');
+        window.shareOnWhatsApp = function() {
+            const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${REFERRAL_CODE}*\n👇👇\n${REFERRAL_LINK} 🚀`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`, '_blank');
         }
-
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
@@ -551,30 +461,128 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // GLOBALS
+        window.currentBalance = 0;
+        window.savedUPI = "";
+        let userDocId = null;
+        
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        document.getElementById("profile-user-phone").innerText = "+91 " + (userPhone || "0000000000");
+
+        // 🟢 1. LIVE USER SYNC (Listens to Admin Changes)
+        if(userPhone) {
+            const q = query(collection(db, "users"), where("phone", "==", userPhone));
+            onSnapshot(q, (snapshot) => {
+                if(!snapshot.empty) {
+                    const docSnap = snapshot.docs[0];
+                    userDocId = docSnap.id; // Save ID for updating later
+                    const userData = docSnap.data();
+
+                    // Live Balance Update
+                    window.currentBalance = userData.balance || 0;
+                    document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
+                    document.getElementById("withdraw-page-balance").innerText = `₹ ${window.currentBalance}`;
+
+                    // Live Name Update
+                    if(userData.name) {
+                        document.getElementById("header-user-name").innerText = userData.name.split(" ")[0];
+                        document.getElementById("profile-user-name").innerText = userData.name;
+                    }
+
+                    // Live UPI Update
+                    if(userData.upi && userData.upi !== "None" && userData.upi !== "") {
+                        window.savedUPI = userData.upi;
+                        document.getElementById("upi-display-text").innerText = userData.upi;
+                        document.getElementById("withdraw-page-upi").innerText = userData.upi;
+                        const badge = document.getElementById("upi-status-badge");
+                        badge.innerText = "Verified ✅";
+                        badge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+                    } else {
+                        window.savedUPI = "";
+                        document.getElementById("upi-display-text").innerText = "UPI not linked yet";
+                        document.getElementById("withdraw-page-upi").innerText = "Not linked";
+                        const badge = document.getElementById("upi-status-badge");
+                        badge.innerText = "Pending";
+                        badge.className = "text-[11px] font-bold text-red-500 border border-red-200 bg-red-50 px-2 py-1 rounded";
+                    }
+                }
+            });
+        }
+
+        // 🟢 2. SUBMIT PROOF (Sends to Admin)
         window.submitTaskProofReal = async function() {
             const linkInput = document.getElementById("proof-link");
-            if(linkInput.value === "") {
-                showToast("⚠️ Please paste your proof link first!");
-                return;
-            }
-            showToast("⏳ Submitting to Server...");
+            if(linkInput.value === "") { showToast("⚠️ Please paste your proof link first!"); return; }
             
-            // Get user phone to attach to task
-            const userPhone = localStorage.getItem("earnprox_user_phone") || "Unknown";
-
+            showToast("⏳ Submitting to Server...");
             try {
                 await addDoc(collection(db, "task_submissions"), {
-                    userPhone: userPhone,
-                    gigName: "Review Shop on Maps",
+                    userPhone: userPhone || "Unknown",
+                    gigName: "Anime Reel Edit",
                     proofLink: linkInput.value,
                     status: "Pending Approval",
                     timestamp: new Date()
                 });
                 linkInput.value = ""; 
                 showToast("🚀 Work Submitted! Shifted to 'In Review'");
-                setTimeout(() => { switchWsTab('review', document.querySelectorAll('.ws-tab')[1]); }, 1000);
+                setTimeout(() => { window.switchWsTab('review', document.querySelectorAll('.ws-tab')[1]); }, 1000);
             } catch (e) {
                 showToast("❌ Error connecting to Database.");
+            }
+        }
+
+        // 🟢 3. SAVE KYC/UPI (Updates Firestore so Admin can see it)
+        window.saveRealKYC = async function() {
+            const inputBox = document.getElementById("upi-input-box");
+            if(inputBox.value.includes("@")) {
+                if(userDocId) {
+                    showToast("⏳ Saving to Database...");
+                    try {
+                        await updateDoc(doc(db, "users", userDocId), { upi: inputBox.value });
+                        window.closeAllSheets();
+                        showToast("🏦 UPI Linked Successfully!");
+                    } catch(e) { showToast("❌ Error saving UPI."); }
+                } else { showToast("⚠️ User session error."); }
+            } else { showToast("⚠️ Enter a valid UPI ID (e.g. name@ybl)"); }
+        }
+
+        // 🟢 4. PROCESS WITHDRAW (Deducts directly from DB)
+        window.processWithdrawReal = async function() {
+            const amtBox = document.getElementById("withdraw-amount");
+            const amt = parseInt(amtBox.value);
+            
+            if(!amt || amt < 50) { showToast("⚠️ Minimum withdrawal is ₹50"); return; }
+            if(amt > window.currentBalance) { showToast("⚠️ Insufficient balance!"); return; }
+
+            if(userDocId) {
+                try {
+                    // Update Database Balance
+                    const newBal = window.currentBalance - amt;
+                    await updateDoc(doc(db, "users", userDocId), { balance: newBal });
+                    
+                    // Add to History UI
+                    const emptyMsg = document.getElementById("empty-history");
+                    if(emptyMsg) emptyMsg.remove();
+                    const historyHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-4 mt-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold">↑</div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">Withdrawal to UPI</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Processing...</p>
+                            </div>
+                        </div>
+                        <p class="text-sm font-black text-slate-800">- ₹${amt}</p>
+                    </div>`;
+                    document.getElementById("history-container").innerHTML = historyHTML + document.getElementById("history-container").innerHTML;
+
+                    window.closeFullPage('withdraw-page');
+                    setTimeout(() => {
+                        showToast(`💸 ₹${amt} requested to ${window.savedUPI}`);
+                        amtBox.value = "";
+                    }, 400);
+
+                } catch(e) { showToast("❌ Withdrawal Failed. Try again."); }
             }
         }
     </script>
