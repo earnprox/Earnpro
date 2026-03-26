@@ -20,8 +20,8 @@
         ::-webkit-scrollbar { display: none; }
         .modal-active { opacity: 1 !important; pointer-events: auto !important; }
         .sheet-active { transform: translateY(0) !important; }
+        .full-page-active { transform: translateX(0) !important; } /* For Full Screen Withdraw */
         
-        /* Workspace Sub-tabs */
         .ws-tab { color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
         .ws-tab.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 700; }
         .ws-content { display: none; }
@@ -36,6 +36,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-weight: 600; font-size: 14px;
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        /* Loading Overlay for Logout */
+        #loading-overlay { display: none; }
+        #loading-overlay.active { display: flex; }
     </style>
 </head>
 <body class="relative min-h-screen selection:bg-blue-100">
@@ -51,23 +55,14 @@
                 <h1 class="text-2xl font-black tracking-tight text-slate-900">Akash <span class="text-blue-500">.</span></h1>
             </div>
             <div class="w-12 h-12 rounded-full premium-card flex items-center justify-center p-1 relative">
-                <img src="https://ui-avatars.com/api/?name=Akash&background=3B82F6&color=fff&bold=true" alt="Profile" class="w-full h-full rounded-full">
-                <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                <img src="https://ui-avatars.com/api/?name=Akash&background=3B82F6&color=fff&bold=true" alt="Profile" class="w-full h-full rounded-full object-cover">
             </div>
         </header>
 
         <div id="view-home" class="tab-content active">
-            <div class="flex gap-3 overflow-x-auto mb-6 pb-2">
-                <button class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-md shadow-blue-500/20 whitespace-nowrap">All Gigs</button>
-                <button class="bg-white border border-slate-200 text-slate-600 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap">📱 Video Edit</button>
-                <button class="bg-white border border-slate-200 text-slate-600 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap">⭐ Reviews</button>
-                <button class="bg-white border border-slate-200 text-slate-600 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap">🌐 Web Tasks</button>
-            </div>
-
             <div class="flex justify-between items-end mb-4">
                 <h3 class="text-xl font-bold tracking-tight text-slate-800">Featured Gigs</h3>
             </div>
-            
             <div class="space-y-4">
                 <div class="premium-card p-5 rounded-3xl relative overflow-hidden group">
                     <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
@@ -88,11 +83,9 @@
 
         <div id="view-project" class="tab-content">
             <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Workspace</h2>
-            
             <div class="flex border-b border-slate-200 mb-5">
                 <button onclick="switchWsTab('active', this)" class="ws-tab active flex-1 pb-3 text-sm font-medium text-center">Active</button>
                 <button onclick="switchWsTab('review', this)" class="ws-tab flex-1 pb-3 text-sm font-medium text-center">In Review</button>
-                <button onclick="switchWsTab('done', this)" class="ws-tab flex-1 pb-3 text-sm font-medium text-center">Completed</button>
             </div>
 
             <div id="ws-active" class="ws-content active">
@@ -114,22 +107,8 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">Checking</span>
-                            <h4 class="font-bold text-sm text-slate-800">Anime Reel Edit</h4>
+                            <h4 class="font-bold text-sm text-slate-800">Waiting for approval</h4>
                         </div>
-                        <p class="text-sm font-bold text-slate-500">₹150</p>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-3 bg-slate-50 p-2 rounded-lg border border-slate-100">Admin is verifying your proof link. Amount will be added to wallet soon.</p>
-                </div>
-            </div>
-
-            <div id="ws-done" class="ws-content">
-                <div class="premium-card p-5 rounded-2xl mb-4 border-l-4 border-l-emerald-400">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">Paid ✅</span>
-                            <h4 class="font-bold text-sm text-slate-800">Download App Task</h4>
-                        </div>
-                        <p class="text-sm font-bold text-emerald-500">+ ₹30</p>
                     </div>
                 </div>
             </div>
@@ -137,29 +116,12 @@
 
         <div id="view-refer" class="tab-content">
             <div class="text-center py-4">
-                <div class="inline-block bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-200 text-orange-600 font-black text-xs px-3 py-1 rounded-full mb-4 shadow-sm uppercase tracking-wide">
-                    Passive Income Unlocked 💰
-                </div>
-                
                 <h2 class="text-3xl font-black tracking-tight mb-2 text-slate-800">Earn 10% Forever</h2>
-                <p class="text-slate-500 text-sm mb-6 px-4">Get <b class="text-slate-800">10% commission</b> on every task your friends complete. If they earn ₹1000, you get ₹100 for doing nothing!</p>
-                
-                <div class="flex gap-3 mb-6 mx-2">
-                    <div class="flex-1 premium-card p-3 rounded-2xl">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">My Network</p>
-                        <p class="text-xl font-black text-blue-600 mt-1">12 <span class="text-xs text-slate-500 font-medium">Friends</span></p>
-                    </div>
-                    <div class="flex-1 premium-card p-3 rounded-2xl">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">Commission</p>
-                        <p class="text-xl font-black text-emerald-500 mt-1">₹450</p>
-                    </div>
-                </div>
-
-                <div class="premium-card rounded-2xl p-5 mx-2 relative overflow-hidden text-left">
+                <div class="premium-card rounded-2xl p-5 mx-2 relative overflow-hidden text-left mt-6">
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your Invite Code</p>
                     <div class="flex justify-between items-center bg-slate-50 border border-slate-200 rounded-xl p-4 border-dashed">
                         <h3 class="text-2xl font-black tracking-widest text-blue-600">AM8M27ZY</h3>
-                        <button onclick="showToast('Code Copied! Share it everywhere. 🚀')" class="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg font-bold text-sm active:scale-95 transition">Copy</button>
+                        <button onclick="showToast('Code Copied! 📋')" class="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg font-bold text-sm active:scale-95 transition">Copy</button>
                     </div>
                     <button onclick="showToast('Opening WhatsApp... 🟢')" class="w-full mt-4 bg-[#25D366] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-green-500/30 flex justify-center items-center gap-2 active:scale-95">Share & Build Network</button>
                 </div>
@@ -171,24 +133,12 @@
             
             <div class="premium-card rounded-3xl p-6 mb-6 bg-gradient-to-br from-[#0F172A] to-[#1E293B] border-none text-white shadow-xl shadow-slate-900/20 relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
-                
-                <div class="flex justify-between items-start mb-6">
+                <div class="flex justify-between items-start mb-6 relative z-10">
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Withdrawable Balance</p>
-                    <button onclick="openSheet('withdraw-sheet')" class="bg-blue-500 text-white font-bold py-1.5 px-4 rounded-lg flex items-center gap-1 shadow-sm transition hover:bg-blue-400 active:scale-95 text-xs">Withdraw</button>
+                    <button onclick="openFullPage('withdraw-page')" class="bg-blue-500 text-white font-bold py-1.5 px-4 rounded-lg flex items-center gap-1 shadow-sm transition hover:bg-blue-400 active:scale-95 text-xs">Withdraw</button>
                 </div>
                 
-                <h2 class="text-4xl font-black tracking-tighter mb-4">₹ 450<span class="text-xl text-slate-500 font-bold">.00</span></h2>
-                
-                <div class="border-t border-slate-700 pt-4 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pending in Review</p>
-                        <p class="text-sm font-bold text-orange-400 mt-1">₹ 150.00</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Lifetime Earnings</p>
-                        <p class="text-sm font-bold text-emerald-400 mt-1">₹ 1,200.00</p>
-                    </div>
-                </div>
+                <h2 class="text-4xl font-black tracking-tighter mb-4 relative z-10" id="main-balance-display">₹ 450<span class="text-xl text-slate-500 font-bold">.00</span></h2>
             </div>
 
             <div class="premium-card rounded-2xl overflow-hidden mb-8">
@@ -197,7 +147,7 @@
                         <span class="bg-slate-100 p-2 rounded-lg text-slate-600">📊</span>
                         <div>
                             <p class="text-sm font-semibold text-slate-800">Ledger & History</p>
-                            <p class="text-xs text-slate-500 mt-0.5">Track your tasks & withdrawals</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Track your tasks</p>
                         </div>
                     </div>
                     <span class="text-slate-400 text-lg">›</span>
@@ -207,10 +157,10 @@
                         <span class="bg-slate-100 p-2 rounded-lg text-slate-600">🏦</span>
                         <div>
                             <p class="text-sm font-semibold text-slate-800">Payout Settings</p>
-                            <p class="text-xs text-slate-500 mt-0.5">Manage your UPI ID</p>
+                            <p class="text-xs text-slate-500 mt-0.5" id="upi-display-text">UPI not linked yet</p>
                         </div>
                     </div>
-                    <span class="text-slate-400 text-lg">›</span>
+                    <span class="text-[11px] font-bold text-red-500 border border-red-200 bg-red-50 px-2 py-1 rounded" id="upi-status-badge">Pending</span>
                 </div>
             </div>
         </div>
@@ -222,14 +172,6 @@
                 </div>
                 <h2 class="text-2xl font-black text-slate-800">Akash</h2>
                 <p class="text-sm text-slate-500 mb-4">+91 7500673337</p>
-                
-                <div class="inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-lg shadow-slate-900/20">
-                    <span class="text-yellow-400 text-lg">⭐</span>
-                    <div class="text-left">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Current Tier</p>
-                        <p class="text-sm font-black text-white">Pro Hustler</p>
-                    </div>
-                </div>
             </div>
             
             <div class="premium-card rounded-2xl overflow-hidden mb-6">
@@ -237,15 +179,15 @@
                     <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
                     <h3 class="font-bold text-slate-800 text-lg">Account</h3>
                 </div>
-                <div onclick="showToast('Help & Support opening... 💬')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
-                    <p class="text-sm font-medium text-slate-700">Help & Support</p>
+                <div onclick="openSheet('kyc-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
+                    <p class="text-sm font-medium text-slate-700">KYC & Bank Account</p>
                     <span class="text-slate-400 text-lg">›</span>
                 </div>
-                <div class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
+                <div onclick="openSheet('privacy-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
                     <p class="text-sm font-medium text-slate-700">Privacy Policy</p>
                     <span class="text-slate-400 text-lg">›</span>
                 </div>
-                <div onclick="showToast('Logging out... 🔒')" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 transition cursor-pointer group">
+                <div onclick="logoutUser()" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 transition cursor-pointer group">
                     <p class="text-sm font-medium text-red-500 transition">Logout</p>
                     <span class="text-slate-400 text-lg group-hover:text-red-400 transition">›</span>
                 </div>
@@ -277,6 +219,46 @@
         </div>
     </div>
 
+    <div id="withdraw-page" class="fixed inset-0 z-[150] bg-[#F4F7F9] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="bg-white border-b border-slate-200 px-5 py-4 flex items-center gap-4">
+            <button onclick="closeFullPage('withdraw-page')" class="text-slate-500 hover:bg-slate-100 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
+            <h2 class="text-lg font-bold text-slate-800">Withdraw Money</h2>
+        </div>
+        
+        <div class="p-5 flex-1 overflow-y-auto">
+            <div class="premium-card rounded-2xl p-6 text-center mb-6 border-blue-100 bg-blue-50/30">
+                <p class="text-sm text-slate-500 mb-2">Available Balance</p>
+                <h2 class="text-4xl font-black text-slate-800 mb-2" id="withdraw-page-balance">₹450</h2>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-slate-700 mb-3">Amount to withdraw</label>
+                <div class="relative flex items-center bg-white border-2 border-slate-200 rounded-2xl px-4 py-2 focus-within:border-blue-500 transition">
+                    <span class="text-2xl text-slate-400 font-bold mr-2">₹</span>
+                    <input type="number" id="withdraw-amount" placeholder="0" class="w-full text-3xl font-black text-slate-800 bg-transparent outline-none py-3">
+                </div>
+                <div class="flex justify-between items-center mt-3">
+                    <p class="text-xs text-slate-500 font-medium">Min. ₹50</p>
+                    <button onclick="document.getElementById('withdraw-amount').value = currentBalance" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">Max</button>
+                </div>
+            </div>
+
+            <div class="premium-card rounded-xl p-4 flex justify-between items-center mb-2 border-slate-200 bg-white">
+                <div class="flex items-center gap-3">
+                    <span class="bg-indigo-100 p-2.5 rounded-lg text-indigo-600 text-sm font-black">UPI</span>
+                    <div>
+                        <p class="text-xs text-slate-500">Sending to</p>
+                        <p class="text-sm font-bold text-slate-800" id="withdraw-page-upi">Not linked</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-5 bg-white border-t border-slate-200">
+            <button onclick="processWithdrawReal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition">Proceed to Transfer</button>
+        </div>
+    </div>
+
     <div id="universal-overlay" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeAllSheets()"></div>
 
     <div id="task-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out shadow-[0_-20px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh]">
@@ -293,32 +275,10 @@
                     <p class="text-sm text-emerald-500 font-black mt-1">₹150 Reward</p>
                 </div>
             </div>
-            <p class="text-sm text-slate-600 mb-4 border-l-2 border-blue-500 pl-3">Edit the CapCut template exactly as requested in the Google Drive instructions file.</p>
+            <p class="text-sm text-slate-600 mb-4 border-l-2 border-blue-500 pl-3">Edit the CapCut template exactly as requested.</p>
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="acceptTask()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Accept & Move to Workspace</button>
-        </div>
-    </div>
-
-    <div id="withdraw-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out shadow-[0_-20px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh]">
-        <div class="flex justify-between items-center p-5 pb-2">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-800 mt-2">Withdraw Funds</h3>
-            <button onclick="closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="p-5 overflow-y-auto text-center">
-            <p class="text-sm text-slate-500 mb-2">Available to Withdraw</p>
-            <h2 class="text-4xl font-black text-slate-800 mb-6">₹450.00</h2>
-            <div class="text-left mb-6">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Enter Amount</label>
-                <div class="relative">
-                    <span class="absolute left-4 top-4 text-slate-500 font-bold">₹</span>
-                    <input type="number" id="withdraw-amount" placeholder="0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-lg font-bold rounded-xl pl-8 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                </div>
-            </div>
-        </div>
-        <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="processWithdraw()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Confirm Transfer</button>
+            <button onclick="acceptTask()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Accept Task</button>
         </div>
     </div>
 
@@ -331,11 +291,28 @@
         <div class="p-5 overflow-y-auto">
             <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your UPI ID</label>
-                <input type="text" placeholder="eg. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition">
+                <input type="text" id="upi-input-box" placeholder="eg. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-4 py-4 outline-none focus:border-blue-500 focus:bg-white transition">
             </div>
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="saveKYC()" class="w-full bg-[#1E293B] text-white font-bold py-4 rounded-xl shadow-lg text-lg active:scale-95 transition">Save Details</button>
+            <button onclick="saveRealKYC()" class="w-full bg-[#1E293B] text-white font-bold py-4 rounded-xl shadow-lg text-lg active:scale-95 transition">Save UPI Details</button>
+        </div>
+    </div>
+
+    <div id="privacy-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out shadow-[0_-20px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh] h-[80vh]">
+        <div class="flex justify-between items-center p-5 pb-2 border-b border-slate-100">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
+            <h3 class="font-black text-xl text-slate-800 mt-2">Privacy Policy</h3>
+            <button onclick="closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div class="p-5 overflow-y-auto space-y-4">
+            <h4 class="font-bold text-slate-800">1. Data Collection</h4>
+            <p class="text-sm text-slate-600 leading-relaxed">We only collect necessary information such as your Name, Phone Number, and UPI ID to ensure payments are processed successfully. We do not sell your data.</p>
+            <h4 class="font-bold text-slate-800">2. Platform Rules</h4>
+            <p class="text-sm text-slate-600 leading-relaxed">Submitting fake proofs or spam links will result in a permanent ban. EarnproX strictly monitors gig submissions.</p>
+            <h4 class="font-bold text-slate-800">3. Payments</h4>
+            <p class="text-sm text-slate-600 leading-relaxed">Withdrawals are processed securely via your saved UPI ID. Allow up to 24 hours for the amount to reflect in your bank account.</p>
+            <div class="h-10"></div>
         </div>
     </div>
 
@@ -345,17 +322,7 @@
             <h3 class="font-black text-xl text-slate-800 mt-2">Ledger</h3>
             <button onclick="closeAllSheets()" class="bg-slate-100 text-slate-500 p-2 rounded-full mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-        <div class="p-5 overflow-y-auto space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold text-lg">🤝</div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">10% Network Commission</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">From Rahul's Gig</p>
-                    </div>
-                </div>
-                <p class="text-sm font-black text-emerald-500">+ ₹15</p>
-            </div>
+        <div class="p-5 overflow-y-auto space-y-4" id="history-container">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-bold">↓</div>
@@ -369,9 +336,35 @@
         </div>
     </div>
 
+    <div id="loading-overlay" class="fixed inset-0 z-[999] bg-white flex flex-col items-center justify-center">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+        <h2 class="text-xl font-black text-slate-800">Logging out...</h2>
+    </div>
+
     <div id="toast">Message Here</div>
 
     <script>
+        // App Variables
+        let currentBalance = 450;
+        let savedUPI = "";
+
+        // UI Updates for Balance
+        function updateBalanceUI() {
+            document.getElementById("main-balance-display").innerHTML = `₹ ${currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
+            document.getElementById("withdraw-page-balance").innerText = `₹ ${currentBalance}`;
+        }
+
+        // UI Updates for UPI
+        function updateUpiUI() {
+            if(savedUPI) {
+                document.getElementById("upi-display-text").innerText = savedUPI;
+                document.getElementById("withdraw-page-upi").innerText = savedUPI;
+                const badge = document.getElementById("upi-status-badge");
+                badge.innerText = "Verified ✅";
+                badge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+            }
+        }
+
         // Tab Switching
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
@@ -393,11 +386,9 @@
             }
         }
 
-        // Workspace Sub-Tabs Switching
         function switchWsTab(wsId, btnElement) {
             document.querySelectorAll('.ws-tab').forEach(tab => tab.classList.remove('active'));
             btnElement.classList.add('active');
-
             document.querySelectorAll('.ws-content').forEach(content => content.classList.remove('active'));
             document.getElementById('ws-' + wsId).classList.add('active');
         }
@@ -409,6 +400,7 @@
             setTimeout(function(){ toast.classList.remove("show"); }, 3000);
         }
 
+        // Popups and Overlays
         const overlay = document.getElementById('universal-overlay');
         let currentOpenSheet = null;
 
@@ -431,6 +423,23 @@
             }
         }
 
+        // Full Page Logic (For Withdraw)
+        function openFullPage(pageId) {
+            if(!savedUPI) {
+                showToast("⚠️ Please Save your UPI ID in Profile first!");
+                return;
+            }
+            updateBalanceUI();
+            updateUpiUI();
+            document.getElementById(pageId).classList.add('full-page-active');
+        }
+
+        function closeFullPage(pageId) {
+            document.getElementById(pageId).classList.remove('full-page-active');
+            document.getElementById("withdraw-amount").value = "";
+        }
+
+        // Actions
         function acceptTask() {
             closeAllSheets();
             setTimeout(() => {
@@ -439,77 +448,102 @@
             }, 300);
         }
 
-        function processWithdraw() {
-            const amt = document.getElementById("withdraw-amount").value;
-            if(amt < 50) {
-                showToast("⚠️ Minimum withdrawal is ₹50");
-            } else {
+        function saveRealKYC() {
+            const inputBox = document.getElementById("upi-input-box");
+            if(inputBox.value.includes("@")) {
+                savedUPI = inputBox.value;
+                updateUpiUI(); // Updates UI immediately
                 closeAllSheets();
-                setTimeout(() => {
-                    showToast("💸 ₹" + amt + " transferred to vault pending!");
-                    document.getElementById("withdraw-amount").value = "";
-                }, 300);
+                setTimeout(() => showToast("🏦 UPI Linked Successfully!"), 300);
+            } else {
+                showToast("⚠️ Enter a valid UPI ID (e.g. name@ybl)");
             }
         }
 
-        function saveKYC() {
-            closeAllSheets();
-            setTimeout(() => showToast("🏦 Bank Details Saved!"), 300);
+        function processWithdrawReal() {
+            const amtBox = document.getElementById("withdraw-amount");
+            const amt = parseInt(amtBox.value);
+            
+            if(!amt || amt < 50) {
+                showToast("⚠️ Minimum withdrawal is ₹50");
+                return;
+            }
+            if(amt > currentBalance) {
+                showToast("⚠️ Insufficient balance!");
+                return;
+            }
+
+            // Real Calculation Logic
+            currentBalance -= amt; 
+            updateBalanceUI(); // Decreases balance everywhere
+            
+            // Add to history
+            const historyHTML = `
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mt-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold">↑</div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-800">Withdrawal to UPI</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Processing...</p>
+                    </div>
+                </div>
+                <p class="text-sm font-black text-slate-800">- ₹${amt}</p>
+            </div>`;
+            document.getElementById("history-container").innerHTML = historyHTML + document.getElementById("history-container").innerHTML;
+
+            closeFullPage('withdraw-page');
+            setTimeout(() => {
+                showToast(`💸 ₹${amt} is being transferred to ${savedUPI}`);
+                amtBox.value = "";
+            }, 400);
+        }
+
+        // NEW: Real Logout Function
+        function logoutUser() {
+            const loader = document.getElementById("loading-overlay");
+            loader.classList.add("active"); // Show full white loading screen
+            
+            // Simulate API call delay then redirect to login page
+            setTimeout(() => {
+                window.location.href = "index.html"; // Redirects to Login/Signup screen
+            }, 1500);
         }
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Aapki khud ki Firebase keys
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
           authDomain: "earnproxuc.firebaseapp.com",
           projectId: "earnproxuc",
           storageBucket: "earnproxuc.firebasestorage.app",
           messagingSenderId: "411733884378",
-          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3",
-          measurementId: "G-GG4XMDW9KY"
+          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
         };
-
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // Firebase Submit Task Function
         window.submitTaskProofReal = async function() {
             const linkInput = document.getElementById("proof-link");
-            
             if(linkInput.value === "") {
                 showToast("⚠️ Please paste your proof link first!");
                 return;
             }
-
             showToast("⏳ Submitting to Server...");
-
             try {
-                const docRef = await addDoc(collection(db, "task_submissions"), {
+                await addDoc(collection(db, "task_submissions"), {
                     gigName: "Review Shop on Maps",
                     proofLink: linkInput.value,
                     status: "Pending Approval",
-                    reward: "₹20",
                     timestamp: new Date()
                 });
-                
-                console.log("Task Saved! ID: ", docRef.id);
                 linkInput.value = ""; 
                 showToast("🚀 Work Submitted! Shifted to 'In Review'");
-                
-                // Automatic shift to 'Review' tab to show "Pro" feel
-                setTimeout(() => {
-                    switchWsTab('review', document.querySelectorAll('.ws-tab')[1]);
-                }, 1000);
-                
+                setTimeout(() => { switchWsTab('review', document.querySelectorAll('.ws-tab')[1]); }, 1000);
             } catch (e) {
-                console.error("Error adding document: ", e);
-                showToast("❌ Error! Database Rules check karein.");
+                showToast("❌ Error connecting to Database.");
             }
         }
     </script>
