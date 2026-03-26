@@ -128,9 +128,12 @@
             </div>
 
             <div class="px-5 pt-6 pb-4">
-                <div class="flex items-end gap-2 mb-6 border-b border-slate-200 pb-5">
-                    <h1 class="text-5xl font-black text-blue-600 leading-none" id="total-refers-count">0</h1>
-                    <p class="text-xs font-bold text-slate-500 mb-1 leading-tight">Total registered<br>members</p>
+                <div class="mb-6 border-b border-slate-200 pb-5">
+                    <h2 class="text-3xl font-black tracking-tight mb-3 text-slate-800">Earn ₹5 + 5% Lifetime</h2>
+                    <div class="flex items-end gap-2 mt-2">
+                        <h1 class="text-5xl font-black text-blue-600 leading-none" id="total-refers-count">0</h1>
+                        <p class="text-xs font-bold text-slate-500 mb-1 leading-tight">Total registered<br>members</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
@@ -332,7 +335,9 @@
         window.savedUPI = "";
         window.selectedGigData = null;
         window.myReferCode = ""; 
-        window.referBonusPerUser = 10; // Earn ₹10 per referral (Visual)
+        
+        // 🔥 Flat ₹5 per referral
+        window.referBonusPerUser = 5; 
 
         window.showToast = function(message) {
             const toast = document.getElementById("toast");
@@ -410,7 +415,7 @@
         window.shareOnWhatsApp = function() {
             if(!window.myReferCode) return;
             const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
-            const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${window.myReferCode}*\n👇👇\n${link} 🚀`;
+            const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${window.myReferCode}* and get joining bonus!\n👇👇\n${link} 🚀`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`, '_blank');
         }
     </script>
@@ -464,11 +469,9 @@
                             const n = userData.name || "User";
                             const p = userData.phone || "0000000000";
                             
-                            // Dynamic Refer Code Generator (First 3 letters of name + Last 4 of phone)
                             window.myReferCode = (n.substring(0,3) + p.substring(p.length - 4)).toUpperCase();
                             document.getElementById("referral-code-text").innerText = window.myReferCode;
 
-                            // UI Updates
                             document.getElementById("header-user-name").innerText = n.split(" ")[0];
                             document.getElementById("profile-user-name").innerText = n;
                             document.getElementById("refer-page-name").innerText = n;
@@ -492,7 +495,6 @@
                                 document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
                             }
 
-                            // 🟢 FETCH REFERRALS FOR THIS USER
                             fetchReferrals();
                         }
                     });
@@ -510,7 +512,6 @@
                 let todayRef = 0;
                 let html = "";
                 
-                // Sort to show newest first
                 const docsArr = [];
                 snap.forEach(d => docsArr.push(d.data()));
                 docsArr.sort((a,b) => b.timestamp - a.timestamp);
@@ -640,12 +641,13 @@
             }
         }
 
-        // 🟢 4. LIVE TRANSACTION HISTORY (FULL LEDGER)
+        // 🟢 4. FULL TRANSACTION HISTORY (TASKS + WITHDRAWALS)
         if(userPhone) {
             let combinedLedger = [];
 
             const renderLedger = () => {
                 let html = "";
+                // Sort to show newest first
                 combinedLedger.sort((a,b) => b.timestamp - a.timestamp);
 
                 combinedLedger.forEach(item => {
@@ -683,6 +685,7 @@
                     </div>`;
             };
 
+            // Fetch Withdrawals
             const histQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
             onSnapshot(histQ, (snap) => {
                 combinedLedger = combinedLedger.filter(item => item.type !== 'withdrawal');
@@ -690,6 +693,7 @@
                 renderLedger();
             });
 
+            // Fetch Completed Tasks
             const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed"));
             onSnapshot(taskQ, (snap) => {
                 combinedLedger = combinedLedger.filter(item => item.type !== 'task');
