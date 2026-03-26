@@ -53,6 +53,12 @@ window.switchWsTab = (id, btn) => {
 window.openSheet = (id) => { 
     document.getElementById('universal-overlay').classList.add('modal-active'); 
     document.getElementById(id).classList.add('sheet-active'); 
+    
+    // Notification Clear Badge Logic
+    if(id === 'notification-sheet') {
+        const badge = document.getElementById("notification-badge");
+        if(badge) badge.classList.add("hidden");
+    }
 };
 
 window.closeAllSheets = () => { 
@@ -114,11 +120,21 @@ const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).get
 if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
         if(!snap.empty) {
-            document.getElementById("loading-overlay").classList.remove("active");
+            const overlay = document.getElementById("loading-overlay");
+            if(overlay) overlay.classList.remove("active");
+
             const docSnap = snap.docs[0]; 
             window.userDocId = docSnap.id; 
             const u = docSnap.data();
             
+            // Check if user is blocked by Admin
+            if(u.status === "blocked") {
+                alert("🚨 Your account has been suspended by the Admin.");
+                localStorage.removeItem("earnprox_user_phone");
+                window.location.href="index.html";
+                return;
+            }
+
             window.savedUPI = u.upi || ""; 
             window.savedBankName = u.bankName || ""; 
             window.myReferrerCode = u.referCodeUsed || ""; 
@@ -127,37 +143,46 @@ if(userPhone) {
 
             window.myActiveGig = u.activeGig || null;
             if(window.myActiveGig) {
-                document.getElementById('active-gig-name').innerText = window.myActiveGig.title;
-                document.getElementById('active-gig-reward').innerText = `Reward: ₹${window.myActiveGig.reward}`;
-                document.getElementById('active-task-card').classList.remove('hidden');
-                document.getElementById('no-active-task').classList.add('hidden');
+                const gigNameObj = document.getElementById('active-gig-name');
+                if(gigNameObj) gigNameObj.innerText = window.myActiveGig.title;
+                const gigRewardObj = document.getElementById('active-gig-reward');
+                if(gigRewardObj) gigRewardObj.innerText = `Reward: ₹${window.myActiveGig.reward}`;
+                
+                const activeCard = document.getElementById('active-task-card');
+                if(activeCard) activeCard.classList.remove('hidden');
+                const noTask = document.getElementById('no-active-task');
+                if(noTask) noTask.classList.add('hidden');
             } else {
-                document.getElementById('active-task-card').classList.add('hidden');
-                document.getElementById('no-active-task').classList.remove('hidden');
+                const activeCard = document.getElementById('active-task-card');
+                if(activeCard) activeCard.classList.add('hidden');
+                const noTask = document.getElementById('no-active-task');
+                if(noTask) noTask.classList.remove('hidden');
             }
             if(Object.keys(window.liveGigs).length > 0) renderExploreGigs();
 
-            // Set UI details
-            document.getElementById("home-user-name").innerText = realName.split(" ")[0]; 
-            document.getElementById("profile-user-name").innerText = realName;
-            document.getElementById("profile-user-phone").innerText = "+91 " + userPhone; 
-            document.getElementById("refer-page-name").innerText = realName;
-            document.getElementById("referral-code-text").innerText = window.myReferCode; 
-            document.getElementById("withdraw-display-name").innerText = window.savedBankName || "Bank Transfer";
-            document.getElementById("withdraw-display-upi").innerText = window.savedUPI || "Processing..."; 
-            document.getElementById("withdraw-avatar-text").innerText = (window.savedBankName || realName).charAt(0).toUpperCase();
+            // Set UI details safely
+            if(document.getElementById("home-user-name")) document.getElementById("home-user-name").innerText = realName.split(" ")[0]; 
+            if(document.getElementById("profile-user-name")) document.getElementById("profile-user-name").innerText = realName;
+            if(document.getElementById("profile-user-phone")) document.getElementById("profile-user-phone").innerText = "+91 " + userPhone; 
+            if(document.getElementById("refer-page-name")) document.getElementById("refer-page-name").innerText = realName;
+            if(document.getElementById("referral-code-text")) document.getElementById("referral-code-text").innerText = window.myReferCode; 
+            if(document.getElementById("withdraw-display-name")) document.getElementById("withdraw-display-name").innerText = window.savedBankName || "Bank Transfer";
+            if(document.getElementById("withdraw-display-upi")) document.getElementById("withdraw-display-upi").innerText = window.savedUPI || "Processing..."; 
+            if(document.getElementById("withdraw-avatar-text")) document.getElementById("withdraw-avatar-text").innerText = (window.savedBankName || realName).charAt(0).toUpperCase();
 
             const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${realName}&backgroundColor=b6e3f4`;
-            document.getElementById("home-profile-avatar").src = avatarUrl; 
-            document.getElementById("header-avatar").src = avatarUrl; 
-            document.getElementById("profile-avatar").src = avatarUrl; 
-            document.getElementById("refer-profile-img").src = avatarUrl;
+            if(document.getElementById("home-profile-avatar")) document.getElementById("home-profile-avatar").src = avatarUrl; 
+            if(document.getElementById("header-avatar")) document.getElementById("header-avatar").src = avatarUrl; 
+            if(document.getElementById("profile-avatar")) document.getElementById("profile-avatar").src = avatarUrl; 
+            if(document.getElementById("refer-profile-img")) document.getElementById("refer-profile-img").src = avatarUrl;
 
             if(window.savedUPI) {
-                document.getElementById("upi-status-badge").innerText = "Verified ✅"; 
-                document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
-                document.getElementById("bank-display-text").innerText = window.savedBankName; 
-                document.getElementById("upi-display-text").innerText = window.savedUPI;
+                if(document.getElementById("upi-status-badge")) {
+                    document.getElementById("upi-status-badge").innerText = "Verified ✅"; 
+                    document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+                }
+                if(document.getElementById("bank-display-text")) document.getElementById("bank-display-text").innerText = window.savedBankName; 
+                if(document.getElementById("upi-display-text")) document.getElementById("upi-display-text").innerText = window.savedUPI;
                 if(document.getElementById("bank-name-input")) { document.getElementById("bank-name-input").value = window.savedBankName; document.getElementById("bank-name-input").disabled = true; }
                 if(document.getElementById("upi-input-box")) { document.getElementById("upi-input-box").value = window.savedUPI; document.getElementById("upi-input-box").disabled = true; }
                 const kycBtn = document.querySelector("#kyc-sheet button"); 
@@ -165,6 +190,35 @@ if(userPhone) {
             }
             syncStatsAndHistory();
         }
+    });
+
+    // 🔥 NOTIFICATION ENGINE
+    onSnapshot(collection(db, "notifications"), (snap) => {
+        let notifHtml = "";
+        let newNotifs = false;
+        const notifArr = [];
+        
+        snap.forEach(d => notifArr.push({ id: d.id, ...d.data() }));
+        notifArr.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
+
+        notifArr.forEach(n => {
+            newNotifs = true;
+            const timeDate = n.timestamp ? new Date(getSafeTime(n.timestamp)).toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : 'Recently';
+            notifHtml += `
+            <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 mb-3">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-black text-indigo-900 text-sm">${n.title}</h4>
+                    <span class="text-[9px] font-bold text-indigo-400 bg-white px-2 py-1 rounded border border-indigo-50">${timeDate}</span>
+                </div>
+                <p class="text-xs text-indigo-700 font-medium leading-relaxed">${n.message}</p>
+            </div>`;
+        });
+
+        const notifContainer = document.getElementById("notification-container");
+        if(notifContainer) notifContainer.innerHTML = notifHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No new alerts.</p>";
+
+        const badge = document.getElementById("notification-badge");
+        if(badge && newNotifs) badge.classList.remove("hidden");
     });
 }
 
@@ -176,10 +230,10 @@ window.updateLiveBalance = function() {
     window.currentBalance = Math.floor(totalEarned - totalWithdrawn);
     if(window.currentBalance < 0) window.currentBalance = 0; 
 
-    document.getElementById("stat-total-earn").innerText = `₹${totalEarned.toFixed(0)}`;
-    document.getElementById("home-top-balance").innerText = `₹${window.currentBalance}`;
-    document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
-    document.getElementById("withdraw-page-balance").innerText = `₹${window.currentBalance}`;
+    if(document.getElementById("stat-total-earn")) document.getElementById("stat-total-earn").innerText = `₹${totalEarned.toFixed(0)}`;
+    if(document.getElementById("home-top-balance")) document.getElementById("home-top-balance").innerText = `₹${window.currentBalance}`;
+    if(document.getElementById("main-balance-display")) document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
+    if(document.getElementById("withdraw-page-balance")) document.getElementById("withdraw-page-balance").innerText = `₹${window.currentBalance}`;
     
     if(window.userDocId) {
         updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance }).catch(e => console.log(e));
@@ -208,7 +262,7 @@ async function syncStatsAndHistory() {
             }
         }); 
         window.taskEarned = taskTotal;
-        document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`; 
+        if(document.getElementById("stat-task-earn")) document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`; 
         renderExploreGigs(); 
         renderReviewTab(); 
         window.updateLiveBalance(); 
@@ -241,10 +295,10 @@ async function syncStatsAndHistory() {
             referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div></div>`; 
         });
         
-        document.getElementById('total-refers-count').innerText = totalCount; 
-        document.getElementById('today-refers-count').innerText = todayCount; 
+        if(document.getElementById('total-refers-count')) document.getElementById('total-refers-count').innerText = totalCount; 
+        if(document.getElementById('today-refers-count')) document.getElementById('today-refers-count').innerText = todayCount; 
         window.referFlatBonus = totalCount * window.referBonusPerUser;
-        document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet.</p>"; 
+        if(document.getElementById('referral-list-container')) document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet.</p>"; 
         updateReferUI(); 
         window.updateLiveBalance();
     });
@@ -260,7 +314,7 @@ async function syncStatsAndHistory() {
             allTransactions.push({ type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal to Bank', amt: data.amount, status: data.status }); 
         });
         window.withTotal = withTotal;
-        document.getElementById("stat-total-withdraw").innerText = `₹${withTotal}`; 
+        if(document.getElementById("stat-total-withdraw")) document.getElementById("stat-total-withdraw").innerText = `₹${withTotal}`; 
         renderLedger(allTransactions); 
         window.updateLiveBalance();
     });
@@ -268,14 +322,16 @@ async function syncStatsAndHistory() {
 
 function updateReferUI() {
     const totalReferEarning = window.referFlatBonus + window.referCommission;
-    document.getElementById('stat-refer-earn').innerText = `₹${totalReferEarning.toFixed(0)}`; 
+    if(document.getElementById('stat-refer-earn')) document.getElementById('stat-refer-earn').innerText = `₹${totalReferEarning.toFixed(0)}`; 
     const referBonusPageText = document.getElementById('total-refer-earnings');
     if(referBonusPageText) referBonusPageText.innerText = totalReferEarning.toFixed(0);
 }
 
-// 🟢 4. LEDGER FIX (Safe formatting)
+// 🟢 4. LEDGER FIX
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); 
+    if(!historyCont) return;
+
     let combined = [...withs];
     
     const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)));
@@ -294,7 +350,7 @@ async function renderLedger(withs) {
     commSnap.forEach(d => { 
         if(d.data().status === 'Approved' || d.data().status === 'Completed') { 
             const comm = d.data().gigReward * 0.05; 
-            combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `5% Commission (${d.data().gigName})`, amt: parseFloat(comm.toFixed(2)), status: 'Completed' }); 
+            combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `5% Comm. (${d.data().gigName})`, amt: parseFloat(comm.toFixed(2)), status: 'Completed' }); 
         } 
     });
 
@@ -345,7 +401,8 @@ window.renderExploreGigs = function() {
             <button onclick="window.openGigSheet('${g.title}', 'explore')" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition">View Task Details</button>
         </div>`;
     });
-    document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No new tasks available. Check back later!</p>";
+    const gc = document.getElementById('gigs-container');
+    if(gc) gc.innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No new tasks available. Check back later!</p>";
 }
 
 // 🟢 6. RENDER REVIEW TAB
@@ -359,7 +416,8 @@ window.renderReviewTab = function() {
         if(sub.status === "Rejected") { badgeColor = "bg-rose-50 text-rose-600 border-rose-100"; icon = "❌"; }
         html += `<div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] mb-4"><div class="flex justify-between items-start mb-3"><h4 class="font-black text-lg text-slate-800 pr-2">${sub.gigName}</h4><span class="${badgeColor} text-[10px] font-black px-2 py-1 rounded-md border shrink-0">${icon} ${sub.status}</span></div><p class="text-xs font-bold text-emerald-500 bg-emerald-50 inline-block px-2 py-1 rounded border border-emerald-100">Reward: ₹${sub.gigReward}</p></div>`;
     });
-    document.getElementById('review-container').innerHTML = html || `<div class="text-center py-20 text-slate-400 font-bold"><div class="text-5xl mb-4 opacity-50">📂</div>No tasks under review.</div>`;
+    const rc = document.getElementById('review-container');
+    if(rc) rc.innerHTML = html || `<div class="text-center py-20 text-slate-400 font-bold"><div class="text-5xl mb-4 opacity-50">📂</div>No tasks under review.</div>`;
 }
 
 // FETCH GIGS FROM DB
@@ -375,16 +433,19 @@ window.openGigSheet = (gigTitleOrNull, mode) => {
     else { window.viewingGigData = window.myActiveGig; }
     if(!window.viewingGigData) return; 
     
-    document.getElementById('sheet-gig-title').innerText = window.viewingGigData.title; 
-    document.getElementById('sheet-gig-reward').innerText = `₹${window.viewingGigData.reward} Reward`; 
-    document.getElementById('sheet-gig-desc').innerText = window.viewingGigData.desc || window.viewingGigData.link || "Follow the instructions provided.";
+    const tOb = document.getElementById('sheet-gig-title'); if(tOb) tOb.innerText = window.viewingGigData.title; 
+    const rOb = document.getElementById('sheet-gig-reward'); if(rOb) rOb.innerText = `₹${window.viewingGigData.reward} Reward`; 
+    const dOb = document.getElementById('sheet-gig-desc'); if(dOb) dOb.innerText = window.viewingGigData.desc || window.viewingGigData.link || "Follow the instructions provided.";
     
+    const ex = document.getElementById('task-action-explore');
+    const su = document.getElementById('task-action-submit');
+
     if(mode === 'explore') { 
-        document.getElementById('task-action-explore').classList.remove('hidden'); 
-        document.getElementById('task-action-submit').classList.add('hidden'); 
+        if(ex) ex.classList.remove('hidden'); 
+        if(su) su.classList.add('hidden'); 
     } else { 
-        document.getElementById('task-action-explore').classList.add('hidden'); 
-        document.getElementById('task-action-submit').classList.remove('hidden'); 
+        if(ex) ex.classList.add('hidden'); 
+        if(su) su.classList.remove('hidden'); 
     }
     window.openSheet('task-sheet');
 }
@@ -421,7 +482,7 @@ window.submitTaskProofReal = async () => {
     
     if(!f) return window.showToast("⚠️ Please select a screenshot proof!");
     const btn = document.getElementById("submit-proof-btn"); 
-    btn.disabled = true; btn.innerText = "Uploading...";
+    if(btn) { btn.disabled = true; btn.innerText = "Uploading..."; }
     
     try {
         const formData = new FormData(); formData.append("image", f);
@@ -440,7 +501,7 @@ window.submitTaskProofReal = async () => {
         });
         
         await updateDoc(doc(db, "users", window.userDocId), { activeGig: null });
-        document.getElementById("proof-image").value = ""; 
+        const pi = document.getElementById("proof-image"); if(pi) pi.value = ""; 
         if(remarkField) remarkField.value = "";
         
         window.showToast("🚀 Successfully Submitted!"); 
@@ -449,7 +510,7 @@ window.submitTaskProofReal = async () => {
     } catch (e) { 
         window.showToast("❌ Upload Failed. Try again."); 
     } finally { 
-        btn.disabled = false; btn.innerText = "Submit For Verification"; 
+        if(btn) { btn.disabled = false; btn.innerText = "Submit For Verification"; }
     }
 }
 
@@ -467,7 +528,7 @@ window.processWithdrawReal = async function() {
     if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance"); 
     
     const btn = document.getElementById("withdraw-btn"); 
-    btn.disabled = true; btn.innerText = "Processing Securely..."; 
+    if(btn) { btn.disabled = true; btn.innerText = "Processing Securely..."; }
     
     try { 
         await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); 
@@ -476,6 +537,6 @@ window.processWithdrawReal = async function() {
     } catch(e) { 
         window.showToast("❌ Failed"); 
     } finally { 
-        btn.innerHTML = `Proceed Securely`; btn.disabled = false; 
+        if(btn) { btn.innerHTML = `Proceed Securely`; btn.disabled = false; }
     } 
 }
