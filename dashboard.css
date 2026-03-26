@@ -1,4 +1,4 @@
-/* ================= DASHBOARD STYLES ================= */
+/* ================= DASHBOARD MASTER STYLES ================= */
 body { 
     font-family: 'Inter', sans-serif; 
     background-color: #F4F7F9; 
@@ -12,6 +12,13 @@ body {
     background: #FFFFFF; 
     border: 1px solid #E2E8F0; 
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04); 
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover/Active Effect for Task Cards */
+#gigs-container .premium-card:active {
+    transform: scale(0.98);
+    border-color: #3b82f6;
 }
 
 /* Main Navigation Tabs */
@@ -27,19 +34,23 @@ body {
     transform: translateY(0); 
 }
 
-/* Workspace Sub-Tabs */
+/* Workspace Sub-Tabs (Zomato/Fiverr Style) */
 .ws-tab { 
     color: #64748b; 
-    border-bottom: 2px solid transparent; 
-    transition: all 0.2s; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
 }
-.ws-tab.active { 
-    color: #2563eb; 
-    border-bottom: 2px solid #2563eb; 
-    font-weight: 700; 
+.ws-content { 
+    display: none; 
 }
-.ws-content { display: none; }
-.ws-content.active { display: block; animation: fadeIn 0.3s ease; }
+.ws-content.active { 
+    display: block; 
+    animation: slideIn 0.3s ease-out; 
+}
+
+@keyframes slideIn { 
+    from { opacity: 0; transform: translateX(20px); } 
+    to { opacity: 1; transform: translateX(0); } 
+}
 
 @keyframes fadeIn { 
     from { opacity: 0; } 
@@ -54,7 +65,7 @@ body {
 /* Utils */
 ::-webkit-scrollbar { display: none; }
 
-/* 🔥 HIDE NUMBER INPUT ARROWS (PAYTM STYLE) */
+/* 🔥 PAYTM STYLE: HIDE NUMBER INPUT ARROWS */
 .hide-arrows::-webkit-outer-spin-button,
 .hide-arrows::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -66,11 +77,38 @@ body {
 
 /* Toast Notifications */
 #toast {
-    visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; 
-    text-align: center; border-radius: 12px; padding: 16px; position: fixed; 
-    z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); 
-    opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px;
+    visibility: hidden; 
+    min-width: 250px; 
+    background-color: #1E293B; 
+    color: #fff; 
+    text-align: center; 
+    border-radius: 12px; 
+    padding: 16px; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 50%; 
+    bottom: 30px; 
+    transform: translateX(-50%) translateY(20px); 
+    opacity: 0; 
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+    font-weight: 600; 
+    font-size: 14px;
 }
-#toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
-#loading-overlay { display: none; }
-#loading-overlay.active { display: flex; }
+#toast.show { 
+    visibility: visible; 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+}
+
+/* Full Screen Loader Overlay */
+#loading-overlay { 
+    display: none; 
+}
+#loading-overlay.active { 
+    display: flex; 
+}
+
+/* Profile Image Glow Effect */
+#home-profile-avatar {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+}
