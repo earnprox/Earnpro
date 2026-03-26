@@ -6,36 +6,8 @@
     <title>EarnproX | Premium App</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Bottom padding removed since nav is gone */
-        body { 
-            font-family: 'Inter', sans-serif; background-color: #F4F7F9; color: #0F172A; 
-            -webkit-tap-highlight-color: transparent; overflow-x: hidden;
-        }
-        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04); }
-        .tab-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
-        ::-webkit-scrollbar { display: none; }
-        .modal-active { opacity: 1 !important; pointer-events: auto !important; }
-        .sheet-active { transform: translateY(0) !important; }
-        .full-page-active { transform: translateX(0) !important; } 
-        
-        .ws-tab { color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
-        .ws-tab.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 700; }
-        .ws-content { display: none; }
-        .ws-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        #toast {
-            visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; 
-            text-align: center; border-radius: 12px; padding: 16px; position: fixed; 
-            z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); 
-            opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px;
-        }
-        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
-        #loading-overlay { display: none; }
-        #loading-overlay.active { display: flex; }
-    </style>
+    
+    <link rel="stylesheet" href="dashboard.css">
 
     <script>
         if (!localStorage.getItem("earnprox_user_phone")) {
@@ -131,7 +103,7 @@
             </div>
 
             <div class="text-center mt-12 mb-8">
-                <h3 class="text-2xl font-black text-slate-800 tracking-tight">You <span class="text-rose-500 text-3xl align-middle">❤️</span> EarnproX</h3>
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight">You <span class="text-rose-500 text-3xl align-middle">💖</span> EarnproX</h3>
                 <p class="text-slate-500 text-sm mt-1 mb-5 font-medium">Your friends are going to love us too!</p>
                 <button onclick="window.switchTab('refer')" class="text-blue-600 font-black text-sm bg-blue-50 px-6 py-3 rounded-full border border-blue-100 shadow-sm active:scale-95 transition">Refer & Win ₹5 →</button>
             </div>
