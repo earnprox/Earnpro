@@ -57,7 +57,7 @@
                 <input type="text" id="refer-input" placeholder="Have a referral code?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition uppercase tracking-widest">
             </div>
 
-            <button onclick="sendOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
+            <button onclick="window.sendOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
                 Send OTP <span class="text-xl">→</span>
             </button>
             
@@ -65,7 +65,7 @@
         </div>
 
         <div id="step-2" class="form-step step-in-right">
-            <button onclick="goBack()" class="text-slate-400 hover:text-slate-800 mb-4 transition flex items-center gap-1 -ml-2">
+            <button onclick="window.goBack()" class="text-slate-400 hover:text-slate-800 mb-4 transition flex items-center gap-1 -ml-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span class="text-xs font-bold">Back</span>
             </button>
@@ -83,19 +83,19 @@
                     <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded">Test OTP: 1234</span>
                 </div>
                 <div class="flex gap-3 justify-center">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="moveToNext(this, 'otp2')">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp2" onkeyup="moveToNext(this, 'otp3', event)">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp3" onkeyup="moveToNext(this, 'otp4', event)">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="checkBackspace(this, 'otp3', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="window.checkBackspace(this, 'otp3', event)">
                 </div>
             </div>
 
-            <button onclick="verifyAndLogin()" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
-                Verify & Login
+            <button onclick="window.verifyAndLogin()" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
+                Verify & Save Data
             </button>
             
             <div class="text-center mt-6">
-                <p class="text-sm text-slate-500 font-medium">Didn't receive the code? <button onclick="showToast('Test mode: Please use OTP 1234')" class="text-blue-600 font-bold ml-1 hover:underline">Resend</button></p>
+                <p class="text-sm text-slate-500 font-medium">Didn't receive the code? <button onclick="window.showToast('Test mode: Please use OTP 1234')" class="text-blue-600 font-bold ml-1 hover:underline">Resend</button></p>
             </div>
         </div>
 
@@ -103,132 +103,144 @@
 
     <div id="toast">Message Here</div>
 
-    <script>
-        // Fake Database representing "Old Users"
+    <script type="module">
+        // 1. Firebase Modules Import
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 2. Firebase Configuration (Aapki keys)
+        const firebaseConfig = {
+          apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
+          authDomain: "earnproxuc.firebaseapp.com",
+          projectId: "earnproxuc",
+          storageBucket: "earnproxuc.firebasestorage.app",
+          messagingSenderId: "411733884378",
+          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 3. Logic Variables
         const oldUsersDB = ["7500673337", "8005139979"];
         let isNewUser = true;
 
-        // Auto-fill referral code if present in URL
+        // URL Check (Auto-apply Refer Code)
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if(refCode) {
                 document.getElementById('refer-input').value = refCode;
                 document.getElementById('refer-input').classList.add('border-emerald-300', 'bg-emerald-50', 'text-emerald-700');
-                showToast("🎁 Invite code applied automatically!");
+                window.showToast("🎁 Invite code applied automatically!");
             }
         };
 
-        function showToast(message) {
+        window.showToast = function(message) {
             const toast = document.getElementById("toast");
             toast.innerText = message;
             toast.classList.add("show");
             setTimeout(function(){ toast.classList.remove("show"); }, 3000);
         }
 
-        // Improved OTP Auto-focus and Backspace logic
-        function moveToNext(current, nextFieldID, event) {
-            // If user types a number, move forward
-            if (current.value.length >= 1) {
-                document.getElementById(nextFieldID).focus();
-            }
-            // If user presses backspace and box is empty, move backward
+        window.moveToNext = function(current, nextFieldID, event) {
+            if (current.value.length >= 1) { document.getElementById(nextFieldID).focus(); }
             if (event && event.key === "Backspace" && current.value === "") {
                 const prevId = current.id.replace(/\d/, (n) => parseInt(n) - 1);
-                if(document.getElementById(prevId)) {
-                    document.getElementById(prevId).focus();
-                }
+                if(document.getElementById(prevId)) { document.getElementById(prevId).focus(); }
             }
         }
         
-        function checkBackspace(current, prevFieldID, event) {
-            if (event.key === "Backspace" && current.value === "") {
-                document.getElementById(prevFieldID).focus();
-            }
+        window.checkBackspace = function(current, prevFieldID, event) {
+            if (event.key === "Backspace" && current.value === "") { document.getElementById(prevFieldID).focus(); }
         }
 
-        // STEP 1 -> STEP 2
-        function sendOTP() {
+        window.sendOTP = function() {
             const phone = document.getElementById('mobile-input').value;
-            
             if(phone.length !== 10) {
-                showToast("⚠️ Please enter a valid 10-digit number.");
+                window.showToast("⚠️ Please enter a valid 10-digit number.");
                 return;
             }
-
             document.getElementById('display-number').innerText = "+91 " + phone;
 
             if(oldUsersDB.includes(phone)) {
                 isNewUser = false;
                 document.getElementById('name-container').classList.add('hidden');
-                showToast("📲 Welcome back! OTP Sent.");
+                window.showToast("📲 Welcome back! OTP Sent.");
             } else {
                 isNewUser = true;
                 document.getElementById('name-container').classList.remove('hidden');
-                showToast("👋 New User! OTP Sent.");
+                window.showToast("👋 New User! OTP Sent.");
             }
 
-            // Slide Animation
             document.getElementById('step-1').classList.remove('step-active');
             document.getElementById('step-1').classList.add('step-out-left');
-            
             document.getElementById('step-2').classList.remove('step-in-right');
             document.getElementById('step-2').classList.add('step-active');
         }
 
-        function goBack() {
+        window.goBack = function() {
             document.getElementById('step-2').classList.remove('step-active');
             document.getElementById('step-2').classList.add('step-in-right');
-            
             document.getElementById('step-1').classList.remove('step-out-left');
             document.getElementById('step-1').classList.add('step-active');
             
-            // Clear OTP fields when going back
-            document.getElementById('otp1').value = "";
-            document.getElementById('otp2').value = "";
-            document.getElementById('otp3').value = "";
-            document.getElementById('otp4').value = "";
+            document.getElementById('otp1').value = ""; document.getElementById('otp2').value = "";
+            document.getElementById('otp3').value = ""; document.getElementById('otp4').value = "";
         }
 
-        // ================= THE FAKE OTP LOGIC =================
-        function verifyAndLogin() {
-            const o1 = document.getElementById('otp1').value;
-            const o2 = document.getElementById('otp2').value;
-            const o3 = document.getElementById('otp3').value;
-            const o4 = document.getElementById('otp4').value;
+        // ================= FIREBASE DATABASE SAVE LOGIC =================
+        window.verifyAndLogin = async function() {
+            const o1 = document.getElementById('otp1').value; const o2 = document.getElementById('otp2').value;
+            const o3 = document.getElementById('otp3').value; const o4 = document.getElementById('otp4').value;
             const enteredOtp = o1 + o2 + o3 + o4;
             
             if(enteredOtp.length < 4) {
-                showToast("⚠️ Please enter the complete 4-digit OTP.");
+                window.showToast("⚠️ Please enter the complete 4-digit OTP.");
                 return;
             }
 
-            // 🔥 BYPASS TEST OTP CHECK 🔥
             if(enteredOtp !== "1234") {
-                showToast("❌ Invalid OTP! Hint: Use 1234 for testing.");
-                
-                // Vibrate and clear boxes on wrong OTP
-                document.getElementById('otp1').value = "";
-                document.getElementById('otp2').value = "";
-                document.getElementById('otp3').value = "";
-                document.getElementById('otp4').value = "";
+                window.showToast("❌ Invalid OTP! Hint: Use 1234 for testing.");
+                document.getElementById('otp1').value = ""; document.getElementById('otp2').value = "";
+                document.getElementById('otp3').value = ""; document.getElementById('otp4').value = "";
                 document.getElementById('otp1').focus();
                 return;
             }
 
+            let userName = "Old User (Already Registered)";
             if(isNewUser) {
-                const name = document.getElementById('name-input').value;
-                if(name.length < 3) {
-                    showToast("⚠️ Please enter your full name to proceed.");
+                userName = document.getElementById('name-input').value;
+                if(userName.length < 3) {
+                    window.showToast("⚠️ Please enter your full name to proceed.");
                     return;
                 }
             }
 
-            showToast("✅ Verification Successful! Loading Dashboard...");
-            
-            setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 1000);
+            window.showToast("⏳ Saving Data to Firebase...");
+
+            const phone = document.getElementById('mobile-input').value;
+            const referCode = document.getElementById('refer-input').value;
+
+            try {
+                // FIREBASE DATABASE ME SAVE KARNE KA CODE 👇
+                await addDoc(collection(db, "users"), {
+                    phone: phone,
+                    name: userName,
+                    referCodeUsed: referCode ? referCode : "None",
+                    isNewUser: isNewUser,
+                    timestamp: new Date()
+                });
+
+                window.showToast("✅ Registration Successful! Redirecting...");
+                
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1000);
+
+            } catch(e) {
+                console.error("Firebase Error: ", e);
+                window.showToast("❌ Database Error! Rules allow read/write?");
+            }
         }
     </script>
 </body>
