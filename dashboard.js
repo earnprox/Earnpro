@@ -3,14 +3,16 @@ import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs, up
 
 // ================= UI GLOBALS =================
 window.currentBalance = 0; window.savedUPI = ""; window.savedBankName = ""; window.userDocId = null; window.myReferCode = ""; window.referBonusPerUser = 5;
-window.myReferrerCode = ""; // Jisne mujhe refer kiya
-window.referCommission = 0; // 5% task commission tracker
-window.referFlatBonus = 0;  // ₹5 joining bonus tracker
+window.myReferrerCode = ""; 
+window.referCommission = 0; 
+window.referFlatBonus = 0;  
 
-// Data Holders
+// 🔥 Data Holders
 window.liveGigs = {}; 
 window.mySubmissionsMap = {}; 
 window.mySubmissionsList = [];
+window.myActiveGig = null; // Jo task abhi chal raha hai
+window.viewingGigData = null; // Jo sheet mein dikh raha hai
 
 window.showToast = (m) => { const t = document.getElementById("toast"); if(t) { t.innerText = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3000); } };
 window.switchTab = (id) => { const h = document.getElementById('main-header'); if(id === 'home') { if(h) h.style.display = 'none'; } else { if(h) { h.style.display = 'flex'; h.style.opacity = '1'; } } document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); const target = document.getElementById('view-' + id); if(target) target.classList.add('active'); window.scrollTo(0,0); };
@@ -34,9 +36,23 @@ if(userPhone) {
         if(!snap.empty) {
             const docSnap = snap.docs[0]; window.userDocId = docSnap.id; const u = docSnap.data();
             window.currentBalance = u.balance || 0; window.savedUPI = u.upi || ""; window.savedBankName = u.bankName || "";
-            window.myReferrerCode = u.referCodeUsed || ""; // 🔥 Fetch kisne refer kiya tha
+            window.myReferrerCode = u.referCodeUsed || ""; 
             const realName = u.name || "User"; window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
 
+            // 🔥 ACTIVE GIG SYNC (Fix for refresh issue)
+            window.myActiveGig = u.activeGig || null;
+            if(window.myActiveGig) {
+                document.getElementById('active-gig-name').innerText = window.myActiveGig.title;
+                document.getElementById('active-gig-reward').innerText = `Reward: ₹${window.myActiveGig.reward}`;
+                document.getElementById('active-task-card').classList.remove('hidden');
+                document.getElementById('no-active-task').classList.add('hidden');
+            } else {
+                document.getElementById('active-task-card').classList.add('hidden');
+                document.getElementById('no-active-task').classList.remove('hidden');
+            }
+            if(Object.keys(window.liveGigs).length > 0) renderExploreGigs(); // Refresh Explore UI
+
+            // Profile UI Updates
             document.getElementById("home-user-name").innerText = realName.split(" ")[0]; document.getElementById("profile-user-name").innerText = realName;
             document.getElementById("profile-user-phone").innerText = "+91 " + userPhone; document.getElementById("home-top-balance").innerText = `₹${window.currentBalance}`;
             document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
@@ -66,9 +82,8 @@ async function syncStatsAndHistory() {
     const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone));
     const referQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
     const withQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
-    const referCommissionQ = query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode)); // 🔥 Query for 5% commission
+    const referCommissionQ = query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode));
 
-    // A. MY TASK SUBMISSIONS
     onSnapshot(taskQ, (snap) => { 
         let taskTotal = 0; 
         window.mySubmissionsMap = {};
@@ -85,20 +100,16 @@ async function syncStatsAndHistory() {
         renderExploreGigs(); renderReviewTab(); updateTotalEarning(); 
     });
 
-    // B. MY 5% COMMISSION EARNINGS
     onSnapshot(referCommissionQ, (snap) => {
         let commTotal = 0;
         snap.forEach(d => {
             const data = d.data();
-            if(data.status === "Approved" || data.status === "Completed") {
-                commTotal += (data.gigReward * 0.05); // Calculate 5%
-            }
+            if(data.status === "Approved" || data.status === "Completed") commTotal += (data.gigReward * 0.05);
         });
         window.referCommission = parseFloat(commTotal.toFixed(2));
         updateReferUI();
     });
 
-    // C. REFERRALS (Joining Bonus)
     onSnapshot(referQ, (snap) => {
         let totalCount = 0, todayCount = 0, referListHtml = ""; const docsArr = [];
         snap.forEach(d => docsArr.push(d.data())); docsArr.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
@@ -116,7 +127,6 @@ async function syncStatsAndHistory() {
         updateReferUI();
     });
 
-    // D. WITHDRAWALS
     onSnapshot(withQ, (snap) => {
         let withTotal = 0; const allTransactions = [];
         snap.forEach(d => { const data = d.data(); withTotal += (data.amount || 0); allTransactions.push({ type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal to Bank', amt: data.amount, status: data.status }); });
@@ -140,26 +150,14 @@ function updateTotalEarning() {
 
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); let combined = [...withs];
-    
-    // My Tasks
     const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)));
     taskSnap.forEach(d => { if(d.data().status === 'Approved' || d.data().status === 'Completed') combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Task: ${d.data().gigName}`, amt: d.data().gigReward, status: 'Completed' }); });
-    
-    // Joining Bonus
     const referSnap = await getDocs(query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode)));
     referSnap.forEach(d => combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Refer Bonus (${d.data().name})`, amt: window.referBonusPerUser, status: 'Completed' }));
-    
-    // 5% Commission
     const commSnap = await getDocs(query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode)));
-    commSnap.forEach(d => { 
-        if(d.data().status === 'Approved' || d.data().status === 'Completed') {
-            const comm = d.data().gigReward * 0.05;
-            combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `5% Commission (${d.data().gigName})`, amt: parseFloat(comm.toFixed(2)), status: 'Completed' }); 
-        }
-    });
+    commSnap.forEach(d => { if(d.data().status === 'Approved' || d.data().status === 'Completed') { const comm = d.data().gigReward * 0.05; combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `5% Commission (${d.data().gigName})`, amt: parseFloat(comm.toFixed(2)), status: 'Completed' }); } });
 
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-    
     let html = "";
     combined.forEach(item => {
         const isDebit = item.type === 'debit'; const isPending = item.status === 'Pending';
@@ -174,8 +172,8 @@ async function renderLedger(withs) {
 window.renderExploreGigs = function() {
     let html = ""; let tasksFound = false;
     Object.values(window.liveGigs).forEach(g => {
-        if(window.mySubmissionsMap[g.title]) return;
-        if(window.selectedGigData && window.selectedGigData.title === g.title) return;
+        if(window.mySubmissionsMap[g.title]) return; // Hides submitted tasks
+        if(window.myActiveGig && window.myActiveGig.title === g.title) return; // 🔥 Hides accepted active task!
         tasksFound = true;
         html += `<div class="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden mb-4">
             <div class="absolute -right-4 -top-2 opacity-[0.03] text-8xl pointer-events-none">🚀</div>
@@ -211,14 +209,14 @@ onSnapshot(collection(db, "gigs"), (snap) => {
 
 // DYNAMIC SHEET HANDLER
 window.openGigSheet = (gigTitleOrNull, mode) => {
-    let g;
-    if(mode === 'explore') { g = window.liveGigs[gigTitleOrNull]; if(g) window.selectedGigData = g; } 
-    else { g = window.selectedGigData; }
-    if(!g) return; 
+    if(mode === 'explore') { window.viewingGigData = window.liveGigs[gigTitleOrNull]; } 
+    else { window.viewingGigData = window.myActiveGig; }
+    
+    if(!window.viewingGigData) return; 
 
-    document.getElementById('sheet-gig-title').innerText = g.title;
-    document.getElementById('sheet-gig-reward').innerText = `₹${g.reward} Reward`;
-    document.getElementById('sheet-gig-desc').innerText = g.desc || g.link || "Follow the instructions provided.";
+    document.getElementById('sheet-gig-title').innerText = window.viewingGigData.title;
+    document.getElementById('sheet-gig-reward').innerText = `₹${window.viewingGigData.reward} Reward`;
+    document.getElementById('sheet-gig-desc').innerText = window.viewingGigData.desc || window.viewingGigData.link || "Follow the instructions provided.";
     
     if(mode === 'explore') {
         document.getElementById('task-action-explore').classList.remove('hidden');
@@ -232,28 +230,45 @@ window.openGigSheet = (gigTitleOrNull, mode) => {
 
 window.openSubmitSheet = () => { window.openGigSheet(null, 'progress'); }
 
-// ACCEPT TASK
-window.acceptTask = () => {
-    if(!window.selectedGigData) return;
-    if(window.selectedGigData.link && window.selectedGigData.link.startsWith('http')) window.open(window.selectedGigData.link, '_blank');
-    
-    document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
-    document.getElementById('active-gig-reward').innerText = `Reward: ₹${window.selectedGigData.reward}`;
-    document.getElementById('active-task-card').classList.remove('hidden');
-    document.getElementById('no-active-task').classList.add('hidden');
-    
-    window.closeAllSheets(); renderExploreGigs(); window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
-    window.showToast("✅ Task Accepted & Link Opened!");
+// 🟢 ACCEPT TASK (FIREBASE FIX)
+window.acceptTask = async () => {
+    if(!window.viewingGigData) return;
+    if(window.myActiveGig) return window.showToast("⚠️ You already have an active task!");
+
+    const btn = document.querySelector("#task-action-explore button");
+    if(btn) { btn.disabled = true; btn.innerText = "Accepting..."; }
+
+    try {
+        // 🔥 Save active task to Firebase database!
+        await updateDoc(doc(db, "users", window.userDocId), { 
+            activeGig: window.viewingGigData 
+        });
+
+        // Open link
+        if(window.viewingGigData.link && window.viewingGigData.link.startsWith('http')) {
+            window.open(window.viewingGigData.link, '_blank');
+        }
+        
+        window.closeAllSheets(); 
+        window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
+        window.showToast("✅ Task Accepted & Saved!");
+    } catch (e) {
+        window.showToast("❌ Failed to accept task. Try again.");
+    } finally {
+        if(btn) { btn.disabled = false; btn.innerText = "Accept & Start Task"; }
+    }
 }
 
-// 🟢 SUBMIT PROOF (With Referrer tracking)
+// 🟢 SUBMIT PROOF (FIREBASE FIX)
 window.submitTaskProofReal = async () => {
+    if(!window.myActiveGig) return window.showToast("⚠️ No active task found!");
+
     const f = document.getElementById("proof-image").files[0];
     const remarkField = document.getElementById("proof-remark");
     const remark = remarkField ? remarkField.value : "No Remark";
 
     if(!f) return window.showToast("⚠️ Please select a screenshot proof!");
-    const btn = document.getElementById("submit-proof-btn"); btn.disabled = true; btn.innerText = "Uploading Screenshot...";
+    const btn = document.getElementById("submit-proof-btn"); btn.disabled = true; btn.innerText = "Uploading...";
     
     try {
         const formData = new FormData(); formData.append("image", f);
@@ -262,19 +277,24 @@ window.submitTaskProofReal = async () => {
         
         await addDoc(collection(db, "task_submissions"), { 
             userPhone, 
-            gigName: window.selectedGigData.title, 
-            gigReward: window.selectedGigData.reward, 
+            gigName: window.myActiveGig.title, 
+            gigReward: window.myActiveGig.reward, 
             proofLink: res.data.url, 
             remark: remark,
-            referrerCode: window.myReferrerCode, // 🔥 Saving Referrer code for 5% commission!
+            referrerCode: window.myReferrerCode, 
             status: "Pending Approval", 
             timestamp: new Date() 
         });
         
+        // 🔥 Clear active task from Firebase
+        await updateDoc(doc(db, "users", window.userDocId), { activeGig: null });
+        
+        // Reset Inputs
         document.getElementById("proof-image").value = ""; if(remarkField) remarkField.value = "";
-        document.getElementById('active-task-card').classList.add('hidden'); document.getElementById('no-active-task').classList.remove('hidden');
-        window.selectedGigData = null; window.showToast("🚀 Successfully Submitted!"); 
-        window.closeAllSheets(); renderExploreGigs(); window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]);
+        
+        window.showToast("🚀 Successfully Submitted!"); 
+        window.closeAllSheets(); 
+        window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]);
     } catch (e) { window.showToast("❌ Upload Failed. Try again."); }
     finally { btn.disabled = false; btn.innerText = "Submit For Verification"; }
 }
