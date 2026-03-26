@@ -7,293 +7,290 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; overflow-x: hidden; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .nav-item { transition: all 0.3s; }
-        .nav-item.active { background-color: #EFF6FF; color: #2563EB; border-right: 4px solid #2563EB; font-weight: 700; }
-        .view-section { display: none; opacity: 0; transition: opacity 0.3s; }
-        .view-section.active { display: block; opacity: 1; }
-        .modal { display: none; }
-        .modal.active { display: flex; animation: fadeIn 0.2s ease-out; }
+        body { font-family: 'Inter', sans-serif; background-color: #F1F5F9; color: #0F172A; }
+        .nav-item.active { background-color: #E2E8F0; color: #2563EB; border-right: 4px solid #2563EB; font-weight: 700; }
+        
+        /* Views & Auth Toggling */
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        
+        #admin-auth-screen { display: flex; }
+        #admin-main-app { display: none; }
+        
+        .authenticated #admin-auth-screen { display: none; }
+        .authenticated #admin-main-app { display: flex; }
+        
+        .modal { display: none; }
+        .modal.active { display: flex; }
     </style>
-
-    <script>
-        const adminPass = prompt("Enter Admin Password to access Command Center:");
-        if (adminPass !== "admin123") {
-            alert("❌ Access Denied! Redirecting to home...");
-            window.location.href = "index.html";
-        }
-    </script>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-blue-200">
+<body class="h-screen overflow-hidden">
 
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex z-20 shadow-xl">
-        <div class="h-20 flex items-center px-6 border-b border-slate-100">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md transform -rotate-6">
-                <span class="text-white font-black text-lg">X</span>
+    <div id="admin-auth-screen" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center p-6">
+        <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl shadow-blue-500/40 rotate-12">
+            <span class="text-4xl text-white font-black">X</span>
+        </div>
+        <div class="bg-white p-8 rounded-[2rem] w-full max-w-sm shadow-2xl">
+            <h2 class="text-2xl font-black text-slate-800 mb-2">Admin Login</h2>
+            <p class="text-sm text-slate-500 mb-8 font-medium">Enter your master password to access control.</p>
+            
+            <input type="password" id="admin-pass-input" placeholder="••••••••" class="w-full bg-slate-100 border-2 border-slate-100 rounded-xl px-4 py-4 mb-4 outline-none focus:border-blue-500 focus:bg-white transition font-black tracking-widest">
+            
+            <button onclick="attemptAdminLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 transition active:scale-95">
+                Unlock Dashboard 🔓
+            </button>
+        </div>
+        <p class="text-slate-500 text-xs mt-8 font-bold uppercase tracking-widest opacity-50">EarnproX Secure Layer v2.0</p>
+    </div>
+
+    <div id="admin-main-app" class="h-full w-full flex">
+        
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shadow-lg z-20">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black">X</div>
+                <h1 class="text-xl font-black">Earnpro<span class="text-blue-600">Admin</span></h1>
             </div>
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Admin<span class="text-blue-600">Pro</span></h1>
-        </div>
-        
-        <nav class="flex-1 py-6 flex flex-col gap-2">
-            <button onclick="switchView('dashboard', this)" class="nav-item active flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left">
-                <span class="mr-3 text-lg">📊</span> Dashboard
-            </button>
-            <button onclick="switchView('users', this)" class="nav-item flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left">
-                <span class="mr-3 text-lg">👥</span> Manage Users
-            </button>
-            <button onclick="switchView('tasks', this)" class="nav-item flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left">
-                <span class="mr-3 text-lg">📝</span> Upload Gigs
-            </button>
-            <button onclick="switchView('reviews', this)" class="nav-item flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left relative">
-                <span class="mr-3 text-lg">🔍</span> Review Proofs
-                <span id="nav-pending-badge" class="absolute right-4 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
-            <button onclick="switchView('payouts', this)" class="nav-item flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left">
-                <span class="mr-3 text-lg">💸</span> Withdrawals
-            </button>
-        </nav>
+            <nav class="flex-1 py-4">
+                <button onclick="switchView('dashboard', this)" class="nav-item active w-full flex items-center px-6 py-4 text-sm font-semibold transition">📊 Dashboard</button>
+                <button onclick="switchView('users', this)" class="nav-item w-full flex items-center px-6 py-4 text-sm font-semibold transition">👥 All Users</button>
+                <button onclick="switchView('reviews', this)" class="nav-item w-full flex items-center px-6 py-4 text-sm font-semibold transition relative">🔍 Review Tasks <span id="badge-count" class="ml-2 bg-orange-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span></button>
+                <button onclick="switchView('tasks', this)" class="nav-item w-full flex items-center px-6 py-4 text-sm font-semibold transition">📝 Upload Gigs</button>
+            </nav>
+            <div class="p-4 border-t">
+                <button onclick="adminLogout()" class="w-full bg-red-50 text-red-600 font-black py-3 rounded-xl hover:bg-red-100 transition">Logout Admin</button>
+            </div>
+        </aside>
 
-        <div class="p-6 border-t border-slate-100">
-            <button onclick="window.location.href='index.html'" class="flex items-center text-red-500 text-sm font-bold hover:text-red-700 transition">
-                <span class="mr-2">🚪</span> Secure Logout
-            </button>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F8FAFC]">
-        
-        <header class="bg-white h-16 border-b border-slate-200 flex items-center justify-between px-6 md:hidden">
-            <h1 class="text-xl font-black text-slate-800">Admin<span class="text-blue-600">Pro</span></h1>
-            <button class="text-slate-500 text-2xl">☰</button>
-        </header>
-
-        <div class="p-6 md:p-10 max-w-7xl mx-auto w-full">
-
+        <main class="flex-1 overflow-y-auto p-8 bg-[#F8FAFC]">
+            
             <div id="view-dashboard" class="view-section active">
-                <div class="flex justify-between items-end mb-8">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800">System Overview</h2>
-                        <p class="text-slate-500 text-sm mt-1">Live data from Firebase Database 🟢</p>
+                <h2 class="text-3xl font-black mb-8 text-slate-800">System Performance</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Active Users</p>
+                        <h3 class="text-4xl font-black text-blue-600 mt-2" id="stat-users">0</h3>
                     </div>
-                    <button onclick="window.loadRealData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-2">
-                        <span>🔄</span> Refresh Data
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pending Review</p>
+                        <h3 class="text-4xl font-black text-orange-500 mt-2" id="stat-pending">0</h3>
+                    </div>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white p-6 rounded-2xl font-black hover:bg-black transition flex items-center justify-center gap-2">
+                        <span>🔄</span> Sync Data
                     </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Users</p>
-                        <h3 class="text-3xl font-black text-slate-800" id="stat-total-users">0</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-emerald-500">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tasks Completed</p>
-                        <h3 class="text-3xl font-black text-slate-800" id="stat-total-tasks">0</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-orange-500">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pending Proofs</p>
-                        <h3 class="text-3xl font-black text-orange-600" id="stat-pending-proofs">0</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-red-500">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Withdrawals</p>
-                        <h3 class="text-3xl font-black text-red-600" id="stat-withdrawals">₹ 0</h3>
-                    </div>
                 </div>
             </div>
 
             <div id="view-users" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">User Management</h2>
-                
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                        <input type="text" placeholder="Search by Phone or Name..." class="px-4 py-2 border border-slate-200 rounded-lg text-sm w-64 outline-none focus:border-blue-500">
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
-                                    <th class="p-4 font-bold">User Details</th>
-                                    <th class="p-4 font-bold">Wallet Balance</th>
-                                    <th class="p-4 font-bold">UPI ID</th>
-                                    <th class="p-4 font-bold">Status</th>
-                                    <th class="p-4 font-bold text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-user-list">
-                                <tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold">Loading users from Firebase...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-reviews" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">Review Submissions</h2>
-                
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
-                                <th class="p-4 font-bold">User Phone</th>
-                                <th class="p-4 font-bold">Gig Info</th>
-                                <th class="p-4 font-bold">Proof Link</th>
-                                <th class="p-4 font-bold text-right">Action</th>
+                <h2 class="text-3xl font-black mb-6">User Database</h2>
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="p-4 text-[10px] font-black uppercase text-slate-400">Identity</th>
+                                <th class="p-4 text-[10px] font-black uppercase text-slate-400">Current Balance</th>
+                                <th class="p-4 text-[10px] font-black uppercase text-slate-400">Payment UPI</th>
+                                <th class="p-4 text-[10px] font-black uppercase text-slate-400 text-right">Control</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-tasks-list">
-                            <tr><td colspan="4" class="p-8 text-center text-slate-400 font-bold">Loading tasks from Firebase...</td></tr>
-                        </tbody>
+                        <tbody id="user-table-body"></tbody>
                     </table>
                 </div>
             </div>
 
+            <div id="view-reviews" class="view-section">
+                <h2 class="text-3xl font-black mb-6">Task Approvals</h2>
+                <div class="grid gap-4" id="review-list"></div>
+            </div>
+
             <div id="view-tasks" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">Upload Gigs (Coming Soon)</h2>
-            </div>
-            <div id="view-payouts" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">Withdrawal Requests (Coming Soon)</h2>
+                <h2 class="text-3xl font-black mb-6">Create New Gig</h2>
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-200 max-w-lg shadow-sm">
+                    <div class="space-y-4">
+                        <input type="text" id="gig-title" placeholder="Gig Title" class="w-full border-2 p-4 rounded-xl outline-none focus:border-blue-500 font-bold">
+                        <input type="number" id="gig-reward" placeholder="Reward (₹)" class="w-full border-2 p-4 rounded-xl outline-none focus:border-blue-500 font-bold">
+                        <textarea id="gig-desc" placeholder="Instructions..." class="w-full border-2 p-4 rounded-xl outline-none focus:border-blue-500 min-h-[100px]"></textarea>
+                        <button onclick="uploadGig()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition">Post Gig Live 🚀</button>
+                    </div>
+                </div>
             </div>
 
-        </div>
-    </main>
+        </main>
+    </div>
 
-    <div id="fund-modal" class="modal fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm items-center justify-center">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl relative transform transition-all">
-            <button onclick="closeModal('fund-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 text-xl font-bold">×</button>
-            <h3 class="text-xl font-black text-slate-800 mb-1">Manage Funds</h3>
-            <p class="text-sm text-slate-500 mb-6">Modifying balance for <b id="fund-user-name" class="text-slate-800">User</b></p>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 mb-2">Amount (₹)</label>
-                <input type="number" id="fund-amount" placeholder="Enter amount" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 font-black text-lg">
+    <div id="fund-modal" class="modal fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl">
+            <h3 class="text-2xl font-black mb-1">Edit Wallet</h3>
+            <p id="fund-user-info" class="text-sm text-slate-500 mb-6 font-medium"></p>
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
+                <label class="text-[10px] font-black text-slate-400 uppercase block mb-1">New Balance Amount</label>
+                <input type="number" id="new-balance" class="w-full bg-transparent border-none p-0 font-black text-3xl text-slate-800 outline-none" placeholder="0">
             </div>
             <div class="flex gap-3">
-                <button onclick="alert('Funds feature will be live in next DB update!')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">➕ Add</button>
-                <button onclick="alert('Funds feature will be live in next DB update!')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-red-500/20">➖ Deduct</button>
+                <button onclick="saveNewBalance()" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition">Save</button>
+                <button onclick="document.getElementById('fund-modal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-xl active:scale-95 transition">Cancel</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Aapki Firebase Keys
         const firebaseConfig = {
-          apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
-          authDomain: "earnproxuc.firebaseapp.com",
-          projectId: "earnproxuc",
-          storageBucket: "earnproxuc.firebasestorage.app",
-          messagingSenderId: "411733884378",
-          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
+            authDomain: "earnproxuc.firebaseapp.com",
+            projectId: "earnproxuc",
+            storageBucket: "earnproxuc.firebasestorage.app",
+            messagingSenderId: "411733884378",
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.switchView = function(viewId, element) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
+        let selectedUserDocId = null;
 
-            document.querySelectorAll('.view-section').forEach(el => { el.classList.remove('active'); });
-            document.getElementById('view-' + viewId).classList.add('active');
-        }
+        // --- AUTH LOGIC (NO MORE PROMPTS) ---
+        window.attemptAdminLogin = () => {
+            const passInput = document.getElementById('admin-pass-input').value;
+            if(passInput === "admin123") {
+                localStorage.setItem("earnprox_admin_token", "active_session_7788");
+                document.body.classList.add('authenticated');
+                loadData();
+            } else {
+                alert("❌ Wrong Master Password!");
+            }
+        };
 
-        window.openFundModal = function(name, phone) {
-            document.getElementById('fund-user-name').innerText = `${name} (${phone})`;
-            document.getElementById('fund-modal').classList.add('active');
-        }
-        window.closeModal = function(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-        window.blockUser = function(phone) {
-            if(confirm(`Block +91 ${phone}?`)) alert("User Blocked!");
-        }
+        window.adminLogout = () => {
+            localStorage.removeItem("earnprox_admin_token");
+            document.body.classList.remove('authenticated');
+            document.getElementById('admin-pass-input').value = "";
+        };
 
-        // ================= FETCH REAL DATA FROM FIREBASE =================
-        window.loadRealData = async function() {
+        // Check session on load
+        window.addEventListener('load', () => {
+            if(localStorage.getItem("earnprox_admin_token")) {
+                document.body.classList.add('authenticated');
+                loadData();
+            }
+        });
+
+        // --- CORE ADMIN FUNCTIONS ---
+        window.switchView = (id, btn) => {
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+        };
+
+        async function loadData() {
             try {
-                // 1. Fetch Users
-                const usersSnapshot = await getDocs(collection(db, "users"));
-                document.getElementById("stat-total-users").innerText = usersSnapshot.size;
-
-                let usersHTML = "";
-                usersSnapshot.forEach((doc) => {
-                    const user = doc.data();
-                    usersHTML += `
+                // Users Load
+                const userSnap = await getDocs(collection(db, "users"));
+                document.getElementById('stat-users').innerText = userSnap.size;
+                let userHTML = "";
+                userSnap.forEach(uDoc => {
+                    const u = uDoc.data();
+                    userHTML += `
                     <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
                         <td class="p-4">
-                            <p class="font-bold text-slate-800 text-sm">${user.name || 'Unknown'}</p>
-                            <p class="text-xs text-slate-500">+91 ${user.phone}</p>
+                            <p class="font-black text-slate-800 text-sm">${u.name}</p>
+                            <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone}</p>
                         </td>
-                        <td class="p-4">
-                            <p class="font-black text-emerald-600">₹ ${user.balance || 0}</p>
-                        </td>
-                        <td class="p-4">
-                            <p class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded inline-block">${user.upi || 'Not linked'}</p>
-                        </td>
-                        <td class="p-4">
-                            <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider">Active</span>
-                        </td>
-                        <td class="p-4 text-right flex justify-end gap-2">
-                            <button onclick="openFundModal('${user.name}', '${user.phone}')" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">Edit Funds</button>
-                            <button onclick="blockUser('${user.phone}')" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 transition">Block</button>
+                        <td class="p-4 font-black text-emerald-600">₹${u.balance || 0}</td>
+                        <td class="p-4"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-black uppercase">${u.upi || 'Pending'}</span></td>
+                        <td class="p-4 text-right">
+                            <button onclick="openFundModal('${uDoc.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider">Edit Fund</button>
                         </td>
                     </tr>`;
                 });
-                
-                if(usersHTML === "") usersHTML = "<tr><td colspan='5' class='p-4 text-center text-slate-400'>No users found.</td></tr>";
-                document.getElementById("admin-user-list").innerHTML = usersHTML;
+                document.getElementById('user-table-body').innerHTML = userHTML;
 
-                // 2. Fetch Tasks & Proofs
-                const tasksSnapshot = await getDocs(collection(db, "task_submissions"));
+                // Proofs Load
+                const taskSnap = await getDocs(collection(db, "task_submissions"));
                 let pendingCount = 0;
-                let totalTasks = tasksSnapshot.size;
-                let tasksHTML = "";
-
-                tasksSnapshot.forEach((doc) => {
-                    const task = doc.data();
-                    if(task.status === "Pending Approval") {
+                let reviewHTML = "";
+                taskSnap.forEach(tDoc => {
+                    const t = tDoc.data();
+                    if(t.status === "Pending Approval") {
                         pendingCount++;
-                        tasksHTML += `
-                        <tr class="border-b border-slate-100">
-                            <td class="p-4 font-bold text-sm text-slate-800">+91 ${task.userPhone || 'Unknown'}</td>
-                            <td class="p-4 text-sm font-semibold text-slate-600">${task.gigName}</td>
-                            <td class="p-4">
-                                <a href="${task.proofLink}" target="_blank" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-100">View Proof ↗</a>
-                            </td>
-                            <td class="p-4 text-right flex justify-end gap-2">
-                                <button onclick="alert('Will approve and add funds in next DB update!')" class="bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-emerald-600">Approve</button>
-                                <button onclick="alert('Proof Rejected!')" class="bg-slate-200 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-300">Reject</button>
-                            </td>
-                        </tr>`;
+                        reviewHTML += `
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 flex justify-between items-center shadow-sm">
+                            <div class="flex gap-4 items-center">
+                                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-xl">📝</div>
+                                <div>
+                                    <p class="text-[10px] font-black text-blue-500 uppercase">${t.gigName}</p>
+                                    <h4 class="font-black text-slate-800">+91 ${t.userPhone}</h4>
+                                    <a href="${t.proofLink}" target="_blank" class="text-blue-600 font-bold text-xs underline">Check Submission Link ↗</a>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="approveTask('${tDoc.id}', '${t.userPhone}', 20)" class="bg-emerald-500 text-white px-5 py-2 rounded-xl font-black text-xs shadow-lg shadow-emerald-500/20">APPROVE</button>
+                                <button onclick="rejectTask('${tDoc.id}')" class="bg-slate-100 text-slate-400 px-5 py-2 rounded-xl font-black text-xs">REJECT</button>
+                            </div>
+                        </div>`;
                     }
                 });
-
-                document.getElementById("stat-total-tasks").innerText = totalTasks;
-                document.getElementById("stat-pending-proofs").innerText = pendingCount;
+                document.getElementById('stat-pending').innerText = pendingCount;
+                document.getElementById('review-list').innerHTML = reviewHTML || "<p class='text-slate-400 text-center py-12 font-bold'>Everything Clear! No new proofs.</p>";
                 
-                // Update badge in sidebar
+                const badge = document.getElementById('badge-count');
                 if(pendingCount > 0) {
-                    const badge = document.getElementById("nav-pending-badge");
                     badge.innerText = pendingCount;
-                    badge.classList.remove("hidden");
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
                 }
+            } catch(e) { console.error(e); }
+        }
 
-                if(tasksHTML === "") tasksHTML = "<tr><td colspan='4' class='p-4 text-center text-slate-400'>No pending proofs.</td></tr>";
-                document.getElementById("admin-tasks-list").innerHTML = tasksHTML;
+        window.openFundModal = (id, name, bal) => {
+            selectedUserDocId = id;
+            document.getElementById('fund-user-info').innerText = name;
+            document.getElementById('new-balance').value = bal;
+            document.getElementById('fund-modal').classList.add('active');
+        };
 
-            } catch(e) {
-                console.error("Error fetching admin data:", e);
-                alert("Error connecting to Firebase to fetch data!");
+        window.saveNewBalance = async () => {
+            const amt = document.getElementById('new-balance').value;
+            await updateDoc(doc(db, "users", selectedUserDocId), { balance: parseInt(amt) });
+            alert("✅ Balance Synchronized!");
+            loadData();
+            document.getElementById('fund-modal').classList.remove('active');
+        };
+
+        window.approveTask = async (id, phone, reward) => {
+            await updateDoc(doc(db, "task_submissions", id), { status: "Completed" });
+            const uQuery = query(collection(db, "users"), where("phone", "==", phone));
+            const uSnap = await getDocs(uQuery);
+            if(!uSnap.empty) {
+                const userDocId = uSnap.docs[0].id;
+                const oldBal = uSnap.docs[0].data().balance || 0;
+                await updateDoc(doc(db, "users", userDocId), { balance: oldBal + reward });
             }
-        }
+            loadData();
+            alert("💰 Approved & Paid!");
+        };
 
-        // Load data automatically when page opens
-        window.onload = () => {
-            window.loadRealData();
-        }
+        window.rejectTask = async (id) => {
+            if(confirm("Reject this proof?")) {
+                await deleteDoc(doc(db, "task_submissions", id));
+                loadData();
+            }
+        };
+
+        window.uploadGig = async () => {
+            const title = document.getElementById('gig-title').value;
+            const reward = document.getElementById('gig-reward').value;
+            const desc = document.getElementById('gig-desc').value;
+            if(!title || !reward) return alert("Fill all fields!");
+            await addDoc(collection(db, "gigs"), { title, reward: parseInt(reward), desc, timestamp: new Date() });
+            alert("🚀 Gig is now LIVE on the App!");
+            document.getElementById('gig-title').value = "";
+            document.getElementById('gig-reward').value = "";
+            document.getElementById('gig-desc').value = "";
+        };
     </script>
 </body>
 </html>
