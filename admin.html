@@ -18,7 +18,7 @@
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-blur: blur(8px); z-index: 10000; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; }
         .modal.active { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -35,6 +35,7 @@
     </div>
 
     <div id="admin-app">
+        
         <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r hidden md:flex flex-col p-8 z-50">
             <h1 class="text-2xl font-black mb-12 tracking-tighter italic">EarnproX<span class="text-indigo-600">.</span></h1>
             <nav class="flex flex-col gap-2">
@@ -56,12 +57,13 @@
         </nav>
 
         <main class="p-4 md:p-12 max-w-5xl mx-auto">
+            
             <section id="view-dash" class="view-section active">
                 <h2 class="text-3xl font-extrabold mb-8 tracking-tight">System Stats</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                     <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Users</p><h3 id="stat-users" class="text-4xl font-black text-indigo-600">0</h3></div>
                     <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending</p><h3 id="stat-pending" class="text-4xl font-black text-orange-500">0</h3></div>
-                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-3xl font-bold text-sm h-full flex items-center justify-center">🔄 Sync Data</button>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-3xl font-bold text-sm h-full flex items-center justify-center p-4">🔄 Sync Data</button>
                 </div>
             </section>
 
@@ -83,7 +85,7 @@
                     <input type="text" id="gig-title" placeholder="Gig Title" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold">
                     <input type="number" id="gig-reward" placeholder="Reward ₹" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-black text-emerald-600">
                     <input type="text" id="gig-link" placeholder="Instruction Link" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium text-slate-500">
-                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl">Go Live 🚀</button>
+                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition">Go Live 🚀</button>
                 </div>
             </section>
         </main>
@@ -164,20 +166,20 @@
                     html += `
                     <div class="bg-white p-5 rounded-3xl border card-shadow flex justify-between items-center">
                         <div>
-                            <p class="font-extrabold text-slate-800 text-sm">${u.name}</p>
+                            <p class="font-extrabold text-slate-800 text-sm">${u.name || 'User'}</p>
                             <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone}</p>
                             <p class="text-[9px] text-indigo-500 font-black uppercase mt-1">UPI: ${u.upi || 'PENDING'}</p>
                         </div>
                         <div class="text-right">
                             <p class="font-black text-emerald-600 text-lg">₹${u.balance || 0}</p>
                             <div class="flex gap-1 mt-2">
-                                <button onclick="window.openEditModal('${d.id}', '${u.name}', '${u.phone}', '${u.upi || ''}', ${u.balance || 0})" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest">Edit</button>
+                                <button onclick="window.openEditModal('${d.id}', '${u.name || ''}', '${u.phone}', '${u.upi || ''}', ${u.balance || 0})" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-widest">Edit</button>
                                 <button onclick="window.blockUser('${d.id}')" class="bg-rose-50 text-rose-500 text-[9px] font-black px-3 py-2 rounded-xl uppercase">Block</button>
                             </div>
                         </div>
                     </div>`;
                 });
-                document.getElementById('user-list').innerHTML = html || "No users yet.";
+                document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 text-slate-400'>No users yet.</p>";
             });
 
             // Sync Reviews
@@ -194,8 +196,8 @@
                                 <a href="${t.proofLink}" target="_blank" class="bg-indigo-50 text-indigo-600 font-black text-[9px] px-4 py-2 rounded-full border border-indigo-100 uppercase">Link ↗</a>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="window.approve('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs">Approve</button>
-                                <button onclick="window.reject('${d.id}')" class="flex-1 bg-slate-50 text-slate-400 font-black py-4 rounded-2xl text-xs">Reject</button>
+                                <button onclick="window.approve('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs active:scale-95 transition">Approve</button>
+                                <button onclick="window.reject('${d.id}')" class="flex-1 bg-slate-50 text-slate-400 font-black py-4 rounded-2xl text-xs active:scale-95 transition">Reject</button>
                             </div>
                         </div>`;
                     }
@@ -207,7 +209,7 @@
             });
         }
 
-        // --- ACTIONS ---
+        // ACTIONS (Fixed Bugs Here)
         window.openEditModal = (id, name, phone, upi, bal) => {
             currentUserId = id;
             document.getElementById('edit-name').value = name;
@@ -218,37 +220,63 @@
         };
 
         window.saveUserData = async () => {
-            const up = {
-                name: document.getElementById('edit-name').value,
-                phone: document.getElementById('edit-phone').value,
-                upi: document.getElementById('edit-upi').value,
-                balance: parseInt(document.getElementById('edit-bal').value)
+            let newBal = parseInt(document.getElementById('edit-bal').value);
+            if (isNaN(newBal)) newBal = 0; // Guard against NaN error
+
+            const phoneInput = document.getElementById('edit-phone').value;
+            if (!phoneInput) {
+                alert("⚠️ Phone number cannot be empty!");
+                return;
+            }
+
+            const upData = {
+                name: document.getElementById('edit-name').value || "User",
+                phone: phoneInput,
+                upi: document.getElementById('edit-upi').value || "None",
+                balance: newBal
             };
-            await updateDoc(doc(db, "users", currentUserId), up);
-            document.getElementById('modal-edit').classList.remove('active');
-            alert("Cloud Updated Successfully! ☁️");
+
+            try {
+                await updateDoc(doc(db, "users", currentUserId), upData);
+                document.getElementById('modal-edit').classList.remove('active');
+            } catch (error) {
+                alert("❌ Error: " + error.message);
+            }
         };
 
         window.approve = async (id, phone, reward) => {
-            await updateDoc(doc(db, "task_submissions", id), { status: "Completed" });
-            const q = query(collection(db, "users"), where("phone", "==", phone));
-            const uSnap = await getDocs(q);
-            if(!uSnap.empty) {
-                const ud = uSnap.docs[0];
-                const nb = (ud.data().balance || 0) + reward;
-                await updateDoc(doc(db, "users", ud.id), { balance: nb });
+            try {
+                await updateDoc(doc(db, "task_submissions", id), { status: "Completed" });
+                const q = query(collection(db, "users"), where("phone", "==", phone));
+                const uSnap = await getDocs(q);
+                if(!uSnap.empty) {
+                    const ud = uSnap.docs[0];
+                    const nb = (ud.data().balance || 0) + reward; // Adding 20 Rs reward
+                    await updateDoc(doc(db, "users", ud.id), { balance: nb });
+                }
+            } catch (error) {
+                alert("❌ Approval failed.");
             }
         };
 
         window.reject = async (id) => { if(confirm("Reject?")) await deleteDoc(doc(db, "task_submissions", id)); };
-        window.blockUser = async (id) => { if(confirm("Delete user?")) await deleteDoc(doc(db, "users", id)); };
+        
+        window.blockUser = async (id) => { if(confirm("Delete user completely?")) await deleteDoc(doc(db, "users", id)); };
+        
         window.addGigToDB = async () => {
             const t = document.getElementById('gig-title').value;
             const r = parseInt(document.getElementById('gig-reward').value);
             const l = document.getElementById('gig-link').value;
-            if(!t || !r) return alert("Fill data!");
-            await addDoc(collection(db, "gigs"), { title: t, reward: r, link: l, timestamp: new Date() });
-            alert("Gig Published! 🚀");
+            
+            if(!t || isNaN(r)) return alert("⚠️ Please fill Title and Reward amount!");
+            
+            try {
+                await addDoc(collection(db, "gigs"), { title: t, reward: r, link: l, timestamp: new Date() });
+                alert("🚀 Gig Published Successfully!");
+                document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = ""; document.getElementById('gig-link').value = "";
+            } catch (e) {
+                alert("❌ Failed to add gig.");
+            }
         };
 
         if(localStorage.getItem("adm_p")) { document.body.classList.add('authenticated'); startLiveSync(); }
