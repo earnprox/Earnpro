@@ -3,153 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | Master Admin Panel</title>
+    <title>EarnproX | Master Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F9FAFB; color: #111827; padding-bottom: 80px; overflow-x: hidden;}
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F9FAFB; color: #111827; padding-bottom: 80px; }
         @media (min-width: 768px) { body { padding-bottom: 0; padding-left: 280px; } }
         .nav-active { background: #EEF2FF; color: #4F46E5 !important; border-radius: 16px; font-weight: 800; }
         @media (max-width: 767px) { .nav-active { background: transparent; border-top: 4px solid #4F46E5; border-radius: 0; } }
         .view-section { display: none; opacity: 0; transform: translateY(10px); }
-        .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.3s ease; }
         #auth-screen { display: flex; position: fixed; inset: 0; background: #0F172A; z-index: 9999; }
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04); transition: transform 0.2s; }
-        .card-shadow:hover { transform: translateY(-2px); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: 10000; }
-        .modal.active { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; scale: 0.95; } to { opacity: 1; scale: 1; } }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen" class="flex flex-col items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
-            <h2 class="text-3xl font-extrabold text-slate-900 mb-2 relative z-10">Master Login</h2>
-            <p class="text-sm text-slate-400 mb-8 font-bold relative z-10">EarnproX Secure Access</p>
-            <input type="password" id="admin-pass" placeholder="••••" class="w-full bg-slate-50 p-4 rounded-2xl mb-6 outline-none border-2 focus:border-indigo-500 font-black text-center tracking-[0.5em] text-2xl relative z-10">
-            <button onclick="window.doLogin()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-500/30 active:scale-95 transition relative z-10">Connect Server 🚀</button>
+        <div class="bg-white p-10 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center">
+            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Master Login</h2>
+            <input type="password" id="admin-pass" placeholder="••••" class="w-full bg-slate-50 p-4 rounded-2xl mb-6 outline-none border-2 focus:border-indigo-500 font-black text-center tracking-[0.5em] text-2xl">
+            <button onclick="window.doLogin()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition">Connect Server 🚀</button>
         </div>
     </div>
 
     <div id="admin-app">
-        
         <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r hidden md:flex flex-col p-8 z-50">
             <h1 class="text-3xl font-black mb-12 tracking-tighter text-slate-800">EarnproX<span class="text-indigo-600">.</span></h1>
             <nav class="flex flex-col gap-2">
-                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left flex items-center gap-3 font-bold text-slate-500 hover:text-indigo-600 transition">📊 Dashboard</button>
-                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 hover:text-indigo-600 transition">👥 Users</button>
-                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 hover:text-indigo-600 transition relative">
-                    🔍 Task Proofs <span id="badge-proofs" class="absolute right-4 bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
-                </button>
-                <button onclick="window.switchView('payouts', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 hover:text-indigo-600 transition relative">
-                    💸 Payouts <span id="badge-payouts" class="absolute right-4 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
-                </button>
-                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 hover:text-indigo-600 transition">🚀 Manage Gigs</button>
-                <button onclick="window.switchView('notify', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 hover:text-indigo-600 transition">📢 Notifications</button>
+                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left font-bold text-slate-500 transition">📊 Dashboard</button>
+                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left font-bold text-slate-500 transition">👥 Users</button>
+                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left font-bold text-slate-500 transition relative">🔍 Task Proofs</button>
+                <button onclick="window.switchView('payouts', this)" class="nav-btn p-4 text-left font-bold text-slate-500 transition relative">💸 Payouts</button>
+                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left font-bold text-slate-500 transition">🚀 Manage Gigs</button>
+                <button onclick="window.switchView('notify', this)" class="nav-btn p-4 text-left font-bold text-slate-500 transition">📢 Push Alerts</button>
             </nav>
-            <button onclick="window.doLogout()" class="mt-auto p-4 text-rose-500 font-bold bg-rose-50 rounded-xl active:scale-95 transition flex items-center justify-center gap-2">🚪 Disconnect</button>
+            <button onclick="window.doLogout()" class="mt-auto p-4 text-rose-500 font-bold bg-rose-50 rounded-xl active:scale-95 transition">🚪 Disconnect</button>
         </aside>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-2 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
             <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-active"><span class="text-lg">📊</span><span class="text-[9px] font-black mt-1">Dash</span></button>
             <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">👥</span><span class="text-[9px] font-black mt-1">Users</span></button>
-            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn relative"><span class="text-lg">🔍</span><span id="badge-proofs-mob" class="absolute top-1 right-2 w-2 h-2 bg-rose-500 rounded-full hidden"></span><span class="text-[9px] font-black mt-1">Proofs</span></button>
-            <button onclick="window.switchView('payouts', this)" class="flex flex-col items-center p-2 nav-btn relative"><span class="text-lg">💸</span><span id="badge-payouts-mob" class="absolute top-1 right-2 w-2 h-2 bg-emerald-500 rounded-full hidden"></span><span class="text-[9px] font-black mt-1">Pays</span></button>
+            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">🔍</span><span class="text-[9px] font-black mt-1">Proofs</span></button>
+            <button onclick="window.switchView('payouts', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">💸</span><span class="text-[9px] font-black mt-1">Pays</span></button>
             <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">🚀</span><span class="text-[9px] font-black mt-1">Gigs</span></button>
-            <button onclick="window.switchView('notify', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">📢</span><span class="text-[9px] font-black mt-1">Alerts</span></button>
         </nav>
 
         <main class="p-5 md:p-10 max-w-6xl mx-auto">
             
             <section id="view-dash" class="view-section active">
-                <h2 class="text-3xl md:text-4xl font-extrabold mb-8 tracking-tight text-slate-900">System Overview</h2>
+                <h2 class="text-3xl font-extrabold mb-8">System Overview</h2>
                 
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">💰 Payout Stats</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-6 rounded-3xl border card-shadow border-t-4 border-t-emerald-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Paid</p><h3 id="stat-total-payouts" class="text-2xl md:text-3xl font-black text-emerald-500 mt-2">₹0</h3></div>
-                    <div class="bg-white p-6 rounded-3xl border card-shadow border-t-4 border-t-rose-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Pay</p><h3 id="stat-pending-payouts" class="text-2xl md:text-3xl font-black text-rose-500 mt-2">₹0</h3></div>
-                    <div class="bg-white p-6 rounded-3xl border card-shadow border-t-4 border-t-indigo-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Users</p><h3 id="stat-users" class="text-2xl md:text-3xl font-black text-indigo-600 mt-2">0</h3></div>
-                    <div class="bg-white p-6 rounded-3xl border card-shadow border-t-4 border-t-blue-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tasks Done</p><h3 id="stat-total-tasks" class="text-2xl md:text-3xl font-black text-blue-500 mt-2">0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border border-t-4 border-t-emerald-500 card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Today Paid</p><h3 id="stat-today-paid" class="text-2xl font-black text-emerald-500 mt-1">₹0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border border-t-4 border-t-emerald-500 card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Total Paid</p><h3 id="stat-total-paid" class="text-2xl font-black text-emerald-600 mt-1">₹0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border border-t-4 border-t-rose-500 card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Pending Pay</p><h3 id="stat-pending-pay" class="text-2xl font-black text-rose-500 mt-1">₹0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border border-t-4 border-t-blue-500 card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Users Balance</p><h3 id="stat-user-bal" class="text-2xl font-black text-blue-600 mt-1">₹0</h3></div>
                 </div>
 
-                <div class="bg-indigo-600 p-8 rounded-3xl text-white shadow-lg shadow-indigo-600/30 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-2xl font-black mb-1">Server is Active 🟢</h3>
-                        <p class="text-indigo-200 text-sm font-medium">Real-time sync is enabled and monitoring all collections.</p>
-                    </div>
-                    <button onclick="location.reload()" class="bg-white text-indigo-600 font-black px-6 py-3 rounded-xl shadow-sm active:scale-95 transition hidden md:block">Refresh Sync</button>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">📈 Earning Distribution</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Today Tasks Earned</p><h3 id="stat-today-tasks" class="text-2xl font-black text-slate-800 mt-1">₹0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Total Tasks Earned</p><h3 id="stat-total-tasks" class="text-2xl font-black text-slate-800 mt-1">₹0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Total Refer Earned</p><h3 id="stat-refer-earn" class="text-2xl font-black text-slate-800 mt-1">₹0</h3></div>
+                    <div class="bg-white p-6 rounded-3xl border card-shadow"><p class="text-[10px] font-black text-slate-400 uppercase">Total Users</p><h3 id="stat-users" class="text-2xl font-black text-indigo-600 mt-1">0</h3></div>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Manage Users</h2>
-                <div id="user-list" class="grid gap-4">
-                    <p class="text-slate-400 text-center py-20 font-bold italic">Loading Users...</p>
-                </div>
+                <h2 class="text-3xl font-extrabold mb-8">Manage Users</h2>
+                <div id="user-list" class="grid gap-4"></div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Pending Proofs</h2>
+                <h2 class="text-3xl font-extrabold mb-8">Pending Proofs</h2>
                 <div id="review-list" class="grid gap-6"></div>
             </section>
 
             <section id="view-payouts" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Withdrawal Requests</h2>
-                <div id="payouts-list" class="grid gap-4">
-                    <p class="text-slate-400 text-center py-20 font-bold italic">No pending payouts! 💸</p>
-                </div>
+                <h2 class="text-3xl font-extrabold mb-8">Withdrawal Requests</h2>
+                <div id="payouts-list" class="grid gap-4"></div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Manage Gigs</h2>
-                
+                <h2 class="text-3xl font-extrabold mb-8">Manage Gigs</h2>
                 <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 mb-10 max-w-2xl">
-                    <div class="flex items-center gap-3 mb-4 border-b pb-4">
-                        <span class="text-3xl">📝</span>
-                        <div>
-                            <h3 class="font-black text-xl text-slate-800">Create New Task</h3>
-                            <p class="text-xs text-slate-400 font-bold">Instantly published to user apps.</p>
-                        </div>
-                    </div>
-                    
-                    <input type="text" id="gig-title" placeholder="Gig Title (e.g. Rate Us 5 Stars)" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold text-slate-800 focus:border-indigo-500 transition">
-                    
+                    <h3 class="font-black text-xl text-slate-800 border-b pb-4">Create New Task</h3>
+                    <input type="text" id="gig-title" placeholder="Gig Title" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold">
                     <div class="flex gap-4">
-                        <input type="number" id="gig-reward" placeholder="Reward ₹" class="w-1/3 bg-emerald-50 p-4 rounded-xl border border-emerald-100 outline-none font-black text-emerald-600 focus:border-emerald-400 transition">
-                        <input type="url" id="gig-link" placeholder="Target Link (Opens on Accept)" class="w-2/3 bg-slate-50 p-4 rounded-xl border outline-none font-medium text-slate-600 focus:border-indigo-500 transition">
+                        <input type="number" id="gig-reward" placeholder="Reward ₹" class="w-1/3 bg-emerald-50 p-4 rounded-xl border border-emerald-100 font-black text-emerald-600 outline-none">
+                        <input type="url" id="gig-link" placeholder="Task Link (URL)" class="w-2/3 bg-slate-50 p-4 rounded-xl border font-medium outline-none">
                     </div>
-                    
-                    <textarea id="gig-desc" placeholder="Step-by-step instructions for the user..." rows="3" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium text-slate-600 focus:border-indigo-500 transition resize-none"></textarea>
-                    
-                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-600/30 active:scale-95 transition mt-2">Publish Gig 🚀</button>
+                    <textarea id="gig-desc" placeholder="Instructions..." rows="3" class="w-full bg-slate-50 p-4 rounded-xl border font-medium outline-none"></textarea>
+                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">Publish Gig 🚀</button>
                 </div>
-
-                <h3 class="font-black text-xl text-slate-800 mb-4 px-2">Live Gigs on App</h3>
+                <h3 class="font-black text-xl text-slate-800 mb-4">Live Gigs</h3>
                 <div id="live-gigs-list" class="grid md:grid-cols-2 gap-4"></div>
             </section>
 
             <section id="view-notify" class="view-section">
-                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Push Notifications</h2>
-                
+                <h2 class="text-3xl font-extrabold mb-8">Push Notifications</h2>
                 <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl">
-                    <div class="flex items-center gap-3 mb-4 border-b pb-4">
-                        <span class="text-3xl">📢</span>
-                        <div>
-                            <h3 class="font-black text-xl text-slate-800">Send Global Alert</h3>
-                            <p class="text-xs text-slate-400 font-bold">Shows in the user's notification center.</p>
-                        </div>
-                    </div>
-                    
-                    <input type="text" id="notify-title" placeholder="Alert Title (e.g. 🔥 Mega Weekend Bonus!)" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold text-slate-800 focus:border-orange-500 transition">
-                    <textarea id="notify-msg" placeholder="Write your message here..." rows="3" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium text-slate-600 focus:border-orange-500 transition resize-none"></textarea>
-                    
-                    <button onclick="window.sendNotification()" class="w-full bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg shadow-orange-500/30 active:scale-95 transition mt-2">Broadcast Message 📡</button>
+                    <h3 class="font-black text-xl text-slate-800 border-b pb-4">Send Global Alert 🔔</h3>
+                    <input type="text" id="notify-title" placeholder="Alert Title" class="w-full bg-slate-50 p-4 rounded-xl border font-bold outline-none">
+                    <textarea id="notify-msg" placeholder="Message..." rows="3" class="w-full bg-slate-50 p-4 rounded-xl border font-medium outline-none"></textarea>
+                    <button onclick="window.sendNotification()" class="w-full bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">Broadcast Message 📡</button>
                 </div>
             </section>
 
@@ -159,16 +123,14 @@
     <div id="modal-edit" class="modal p-4">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative">
             <h3 class="text-xl font-black text-slate-900 mb-6 border-b pb-3">Edit User Data</h3>
-            
             <div class="space-y-4 mb-6">
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Full Name</label><input type="text" id="edit-name" class="w-full bg-slate-50 p-3 rounded-xl outline-none border focus:border-indigo-500 font-bold text-sm text-slate-800"></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Phone (+91)</label><input type="tel" id="edit-phone" class="w-full bg-slate-50 p-3 rounded-xl outline-none border focus:border-indigo-500 font-bold text-sm text-slate-800"></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">UPI ID</label><input type="text" id="edit-upi" class="w-full bg-slate-50 p-3 rounded-xl outline-none border focus:border-indigo-500 font-bold text-sm text-slate-800"></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Live Balance (₹)</label><input type="number" id="edit-bal" class="w-full bg-indigo-50 p-3 rounded-xl outline-none border border-indigo-200 text-indigo-600 font-black text-lg"></div>
+                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Full Name</label><input type="text" id="edit-name" class="w-full bg-slate-50 p-3 rounded-xl border font-bold text-sm outline-none"></div>
+                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Phone (+91)</label><input type="tel" id="edit-phone" class="w-full bg-slate-50 p-3 rounded-xl border font-bold text-sm outline-none"></div>
+                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">UPI ID</label><input type="text" id="edit-upi" class="w-full bg-slate-50 p-3 rounded-xl border font-bold text-sm outline-none"></div>
+                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Live Balance (₹)</label><input type="number" id="edit-bal" class="w-full bg-indigo-50 p-3 rounded-xl border border-indigo-200 text-indigo-600 font-black text-lg outline-none"></div>
             </div>
-
             <div class="flex gap-2">
-                <button onclick="window.saveUserData()" class="flex-1 bg-emerald-500 text-white font-black py-3 rounded-xl shadow-md active:scale-95 transition">Save</button>
+                <button onclick="window.saveUserData()" class="flex-1 bg-emerald-500 text-white font-black py-3 rounded-xl active:scale-95 transition">Save</button>
                 <button onclick="document.getElementById('modal-edit').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition">Cancel</button>
             </div>
         </div>
@@ -176,21 +138,14 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
-            authDomain: "earnproxuc.firebaseapp.com",
-            projectId: "earnproxuc",
-            storageBucket: "earnproxuc.firebasestorage.app",
-            messagingSenderId: "411733884378",
-            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const firebaseConfig = { apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", authDomain: "earnproxuc.firebaseapp.com", projectId: "earnproxuc", storageBucket: "earnproxuc.firebasestorage.app", messagingSenderId: "411733884378", appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
         let globalUsersData = {}; 
         let globalTasksData = {};
+        let globalWithdrawData = {};
         let activeUserId = "";
 
         const isToday = (dateObj) => {
@@ -200,139 +155,78 @@
             return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear();
         };
 
-        // --- NAVIGATION & AUTH ---
-        window.doLogin = () => {
-            if(document.getElementById('admin-pass').value === "admin123") {
-                localStorage.setItem("adm_p", "t"); document.body.classList.add('authenticated'); startServerSync();
-            } else { alert("❌ Incorrect Password!"); }
-        };
+        window.doLogin = () => { if(document.getElementById('admin-pass').value === "admin123") { localStorage.setItem("adm_p", "t"); document.body.classList.add('authenticated'); startServerSync(); } else { alert("❌ Incorrect Password!"); } };
         window.doLogout = () => { localStorage.removeItem("adm_p"); location.reload(); };
+        window.switchView = (id, btn) => { document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); if(btn) btn.classList.add('nav-active'); document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); };
 
-        window.switchView = (id, btn) => {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            if(btn) btn.classList.add('nav-active');
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
-        };
-
-        // --- MAIN SERVER SYNC ---
         function startServerSync() {
-            
-            // 1. SYNC USERS
+            // 1. SYNC USERS & REFER STATS
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
-                let html = "";
+                let html = ""; let totalUserBal = 0; let totalReferUsers = 0;
                 
                 snap.forEach(d => {
                     const u = d.data();
                     globalUsersData[d.id] = u; 
-                    
-                    const isBlocked = u.status === 'blocked';
-                    const initial = (u.name ? u.name.charAt(0) : "U").toUpperCase();
-                    const blockBtnTxt = isBlocked ? "Unblock" : "Block";
-                    const blockBtnCls = isBlocked ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600";
+                    totalUserBal += (u.balance || 0);
+                    if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
 
-                    html += `
-                    <div class="bg-white p-4 md:p-5 rounded-2xl border card-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isBlocked ? 'opacity-60 grayscale-[50%]' : ''}">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xl border border-indigo-100 shrink-0">${initial}</div>
-                            <div>
-                                <p class="font-extrabold text-slate-800 text-sm">${u.name || "Unknown"} ${isBlocked ? '🚫' : ''}</p>
-                                <p class="text-xs font-bold text-slate-400 mt-0.5">+91 ${u.phone || "N/A"}</p>
-                                <p class="text-[10px] font-black text-indigo-500 uppercase mt-1">UPI: ${u.upi && u.upi !== "None" ? u.upi : 'NOT LINKED'}</p>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-auto flex md:flex-col justify-between items-center md:items-end gap-2">
-                            <p class="font-black text-emerald-600 text-xl">₹${u.balance || 0}</p>
-                            <div class="flex gap-1.5">
-                                <button onclick="window.openEditModal('${d.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">Edit</button>
-                                <button onclick="window.toggleBlockUser('${d.id}', '${u.status}')" class="${blockBtnCls} text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">${blockBtnTxt}</button>
-                                <button onclick="window.deleteUser('${d.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">Delete</button>
-                            </div>
-                        </div>
-                    </div>`;
+                    const isBlocked = u.status === 'blocked';
+                    html += `<div class="bg-white p-4 md:p-5 rounded-2xl border card-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isBlocked ? 'opacity-50 grayscale' : ''}"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xl shrink-0">${(u.name?u.name.charAt(0):"U").toUpperCase()}</div><div><p class="font-extrabold text-slate-800 text-sm">${u.name || "Unknown"} ${isBlocked ? '🚫' : ''}</p><p class="text-xs font-bold text-slate-400 mt-0.5">+91 ${u.phone}</p><p class="text-[10px] font-black text-indigo-500 uppercase mt-1">UPI: ${u.upi || 'NOT LINKED'}</p></div></div><div class="w-full md:w-auto flex md:flex-col justify-between items-center md:items-end gap-2"><p class="font-black text-emerald-600 text-xl">₹${u.balance || 0}</p><div class="flex gap-1.5"><button onclick="window.openEditModal('${d.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase">Edit</button><button onclick="window.toggleBlockUser('${d.id}', '${u.status}')" class="${isBlocked?'bg-emerald-50 text-emerald-600':'bg-orange-50 text-orange-600'} text-[10px] font-black px-3 py-2 rounded-lg uppercase">${isBlocked?'Unblock':'Block'}</button><button onclick="window.deleteUser('${d.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase">Delete</button></div></div></div>`;
                 });
                 
-                document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 text-slate-400 font-bold'>No Users Found</p>";
+                document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 font-bold'>No Users</p>";
+                document.getElementById('stat-user-bal').innerText = `₹${totalUserBal}`;
+                document.getElementById('stat-refer-earn').innerText = `₹${totalReferUsers * 5}`;
             });
 
-            // 2. SYNC TASKS (PROOFS)
+            // 2. SYNC TASKS (PROOFS & STATS)
             onSnapshot(collection(db, "task_submissions"), (snap) => {
-                let pendingCount = 0; let totalDone = 0; let html = "";
-                
-                // Sort by newest first
+                let html = ""; let todayTaskEarn = 0; let totalTaskEarn = 0;
                 const tasks = [];
                 snap.forEach(d => tasks.push({id: d.id, ...d.data()}));
                 tasks.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
                 tasks.forEach(t => {
                     globalTasksData[t.id] = t; 
-                    if(t.status === "Completed" || t.status === "Approved") totalDone++;
+                    if(t.status === "Completed" || t.status === "Approved") {
+                        totalTaskEarn += (t.gigReward || 0);
+                        if(isToday(t.timestamp)) todayTaskEarn += (t.gigReward || 0);
+                    }
 
                     if(t.status === "Pending Approval") {
-                        pendingCount++;
-                        const reward = t.gigReward || 0;
-                        const remark = t.remark && t.remark !== "No Remark" ? `🗣️ "${t.remark}"` : "";
-
-                        html += `
-                        <div class="bg-white p-5 md:p-6 rounded-3xl border card-shadow border-l-8 border-l-orange-400">
-                            <div class="flex justify-between items-start mb-4 border-b border-slate-50 pb-4">
-                                <div>
-                                    <p class="text-[10px] font-black text-orange-500 mb-1 uppercase tracking-widest bg-orange-50 px-2 py-0.5 rounded inline-block">Task Review</p>
-                                    <h4 class="font-black text-slate-800 text-lg mt-1">${t.gigName}</h4>
-                                    <p class="text-xs font-bold text-slate-500 mt-1">User: +91 ${t.userPhone}</p>
-                                    ${remark ? `<p class="text-xs font-semibold text-indigo-600 mt-2 bg-indigo-50 p-2 rounded-lg inline-block border border-indigo-100">${remark}</p>` : ''}
-                                </div>
-                                <a href="${t.proofLink}" target="_blank" class="bg-slate-900 text-white font-black text-[10px] px-4 py-2.5 rounded-xl uppercase hover:bg-slate-800 transition shadow-md shrink-0 text-center">View<br>Proof ↗</a>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.approveTask('${t.id}')" class="flex-1 bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-sm">Approve (₹${reward})</button>
-                                <button onclick="window.rejectTask('${t.id}')" class="flex-1 bg-rose-50 text-rose-600 font-black py-3 rounded-xl text-xs active:scale-95 transition border border-rose-100">Reject</button>
-                            </div>
-                        </div>`;
+                        const remark = t.remark && t.remark !== "No Remark" ? `🗣️ User Remark: "${t.remark}"` : "";
+                        html += `<div class="bg-white p-5 rounded-3xl border card-shadow border-l-8 border-l-orange-400"><div class="flex justify-between items-start mb-4 border-b border-slate-50 pb-4"><div><p class="text-[10px] font-black text-orange-500 mb-1 uppercase tracking-widest bg-orange-50 px-2 py-0.5 rounded inline-block">Review Task</p><h4 class="font-black text-slate-800 text-lg mt-1">${t.gigName}</h4><p class="text-xs font-bold text-slate-500 mt-1">User: +91 ${t.userPhone}</p>${remark ? `<p class="text-xs font-semibold text-indigo-600 mt-2 bg-indigo-50 p-2 rounded-lg border border-indigo-100">${remark}</p>` : ''}</div><a href="${t.proofLink}" target="_blank" class="bg-slate-900 text-white font-black text-[10px] px-4 py-2.5 rounded-xl uppercase shadow-md shrink-0">View Proof ↗</a></div><div class="flex gap-2"><button onclick="window.approveTask('${t.id}')" class="flex-1 bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 shadow-sm">Approve (₹${t.gigReward})</button><button onclick="window.rejectTask('${t.id}')" class="flex-1 bg-rose-50 text-rose-600 font-black py-3 rounded-xl text-xs active:scale-95 border border-rose-100">Reject</button></div></div>`;
                     }
                 });
                 
-                document.getElementById('stat-total-tasks').innerText = totalDone;
-                document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>✨ All Caught Up! No pending proofs.</p>";
-                
-                const b1 = document.getElementById('badge-proofs'); const b2 = document.getElementById('badge-proofs-mob');
-                if(pendingCount > 0) { b1.innerText = pendingCount; b1.classList.remove('hidden'); b2.classList.remove('hidden'); } 
-                else { b1.classList.add('hidden'); b2.classList.add('hidden'); }
+                document.getElementById('stat-today-tasks').innerText = `₹${todayTaskEarn}`;
+                document.getElementById('stat-total-tasks').innerText = `₹${totalTaskEarn}`;
+                document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>No pending proofs. ✨</p>";
             });
 
-            // 3. SYNC PAYOUTS
+            // 3. SYNC PAYOUTS (WITHDRAWALS & REFUNDS)
             onSnapshot(collection(db, "withdrawals"), (snap) => {
-                let pendingAmt = 0; let totalPaid = 0; let pCount = 0; let html = "";
+                let html = ""; let pendingAmt = 0; let totalPaid = 0; let todayPaid = 0;
                 const withs = [];
                 snap.forEach(d => withs.push({ id: d.id, ...d.data() }));
                 withs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
                 withs.forEach(w => {
+                    globalWithdrawData[w.id] = w;
                     if(w.status === "Pending") {
-                        pendingAmt += w.amount; pCount++;
-                        html += `
-                        <div class="bg-white p-5 rounded-2xl border card-shadow flex justify-between items-center border-l-4 border-l-rose-500">
-                            <div>
-                                <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">UPI Transfer</p>
-                                <h4 class="font-black text-slate-800 text-sm">${w.upi}</h4>
-                                <p class="text-xs font-bold text-slate-400 mt-0.5">${w.userName || 'Unknown'} (+91 ${w.userPhone})</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-black text-rose-600 text-2xl mb-2">₹${w.amount}</p>
-                                <button onclick="window.markAsPaid('${w.id}')" class="bg-emerald-500 text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase active:scale-95 transition shadow-md">Mark Paid ✅</button>
-                            </div>
-                        </div>`;
-                    } else if (w.status === "Completed") { totalPaid += w.amount; }
+                        pendingAmt += w.amount;
+                        html += `<div class="bg-white p-5 rounded-2xl border card-shadow flex justify-between items-center border-l-4 border-l-rose-500"><div><p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">UPI Transfer</p><h4 class="font-black text-slate-800 text-sm">${w.upi}</h4><p class="text-xs font-bold text-slate-400 mt-0.5">${w.userName || 'Unknown'} (+91 ${w.userPhone})</p></div><div class="text-right"><p class="font-black text-rose-600 text-2xl mb-2">₹${w.amount}</p><div class="flex gap-2"><button onclick="window.markAsPaid('${w.id}')" class="bg-emerald-500 text-white text-[10px] font-black px-3 py-2 rounded-lg uppercase shadow-md active:scale-95">Paid ✅</button><button onclick="window.rejectPayout('${w.id}')" class="bg-rose-50 text-rose-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase active:scale-95">Reject</button></div></div></div>`;
+                    } else if (w.status === "Completed") { 
+                        totalPaid += w.amount; 
+                        if(isToday(w.completedAt || w.timestamp)) todayPaid += w.amount;
+                    }
                 });
 
-                document.getElementById('stat-total-payouts').innerText = `₹${totalPaid}`;
-                document.getElementById('stat-pending-payouts').innerText = `₹${pendingAmt}`;
-                document.getElementById('payouts-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>💸 All Clear!</p>";
-                
-                const b1 = document.getElementById('badge-payouts'); const b2 = document.getElementById('badge-payouts-mob');
-                if(pCount > 0) { b1.innerText = pCount; b1.classList.remove('hidden'); b2.classList.remove('hidden'); } 
-                else { b1.classList.add('hidden'); b2.classList.add('hidden'); }
+                document.getElementById('stat-today-paid').innerText = `₹${todayPaid}`;
+                document.getElementById('stat-total-paid').innerText = `₹${totalPaid}`;
+                document.getElementById('stat-pending-pay').innerText = `₹${pendingAmt}`;
+                document.getElementById('payouts-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>All Clear! 💸</p>";
             });
 
             // 4. SYNC GIGS
@@ -340,18 +234,7 @@
                 let html = "";
                 snap.forEach(d => {
                     const g = d.data();
-                    html += `
-                    <div class="bg-white p-5 rounded-2xl border card-shadow flex flex-col gap-3">
-                        <div class="flex justify-between items-start border-b border-slate-50 pb-3">
-                            <div>
-                                <h4 class="font-black text-slate-800 text-lg leading-tight mb-1">${g.title}</h4>
-                                <p class="text-[10px] font-black text-emerald-500 uppercase bg-emerald-50 inline-block px-2 py-1 rounded">Reward: ₹${g.reward}</p>
-                            </div>
-                            <button onclick="window.deleteGig('${d.id}')" class="bg-rose-50 text-rose-500 p-2 rounded-lg transition active:scale-95 text-xs font-bold shrink-0">Delete</button>
-                        </div>
-                        <p class="text-xs text-slate-500 font-medium truncate">Link: ${g.link || 'None'}</p>
-                        <p class="text-[10px] text-slate-400 bg-slate-50 p-2 rounded-lg line-clamp-2">${g.desc || 'No instructions provided.'}</p>
-                    </div>`;
+                    html += `<div class="bg-white p-5 rounded-2xl border card-shadow flex flex-col gap-3"><div class="flex justify-between items-start border-b border-slate-50 pb-3"><div><h4 class="font-black text-slate-800 text-lg leading-tight mb-1">${g.title}</h4><p class="text-[10px] font-black text-emerald-500 uppercase bg-emerald-50 inline-block px-2 py-1 rounded">Reward: ₹${g.reward}</p></div><button onclick="window.deleteGig('${d.id}')" class="bg-rose-50 text-rose-500 p-2 rounded-lg transition active:scale-95 text-xs font-bold shrink-0">Delete</button></div><p class="text-xs text-slate-500 font-medium truncate">Link: ${g.link || 'None'}</p></div>`;
                 });
                 document.getElementById('live-gigs-list').innerHTML = html || "<p class='text-slate-400 text-sm font-bold'>No gigs published yet.</p>";
             });
@@ -359,60 +242,73 @@
 
         // ================= ADMIN ACTIONS =================
 
-        // Users
+        // Users Editing
         window.openEditModal = (id) => { activeUserId = id; const u = globalUsersData[id]; document.getElementById('edit-name').value = u.name || ""; document.getElementById('edit-phone').value = u.phone || ""; document.getElementById('edit-upi').value = (u.upi && u.upi !== "None") ? u.upi : ""; document.getElementById('edit-bal').value = u.balance || 0; document.getElementById('modal-edit').classList.add('active'); };
         window.saveUserData = async () => { const btn = event.target; btn.innerText = "Saving..."; const n = document.getElementById('edit-name').value; const p = document.getElementById('edit-phone').value; const u = document.getElementById('edit-upi').value; let b = parseInt(document.getElementById('edit-bal').value); if (isNaN(b)) b = 0; try { await updateDoc(doc(db, "users", activeUserId), { name: n, phone: p, upi: u || "None", balance: b }); document.getElementById('modal-edit').classList.remove('active'); alert("✅ Saved!"); } catch (e) { alert("❌ Error"); } finally { btn.innerText = "Save"; } };
-        window.toggleBlockUser = async (id, status) => { const isB = status === 'blocked'; if(confirm(`Are you sure you want to ${isB ? 'Unblock' : 'Block'} this user?`)) await updateDoc(doc(db, "users", id), { status: isB ? "active" : "blocked" }); };
-        window.deleteUser = async (id) => { if(confirm("🚨 DANGER: This will permanently delete the user account. Proceed?")) await deleteDoc(doc(db, "users", id)); };
+        window.toggleBlockUser = async (id, status) => { const isB = status === 'blocked'; if(confirm(`User will be ${isB ? 'Unblocked' : 'Blocked & Logged Out'}. Confirm?`)) await updateDoc(doc(db, "users", id), { status: isB ? "active" : "blocked" }); };
+        window.deleteUser = async (id) => { if(confirm("🚨 DANGER: Delete user permanently?")) await deleteDoc(doc(db, "users", id)); };
 
-        // Tasks
+        // Review Tasks
         window.approveTask = async (id) => { 
             const btn = event.target; btn.innerText = "Approving...";
-            try { await updateDoc(doc(db, "task_submissions", id), { status: "Completed" }); } 
-            catch (e) { alert("❌ Failed to approve."); btn.innerText = "Approve"; } 
+            try { 
+                const tData = globalTasksData[id];
+                await updateDoc(doc(db, "task_submissions", id), { status: "Completed" }); 
+                // Add money to user
+                const uSnap = await getDocs(query(collection(db, "users"), where("phone", "==", tData.userPhone)));
+                if(!uSnap.empty) {
+                    const ud = uSnap.docs[0];
+                    await updateDoc(doc(db, "users", ud.id), { balance: (ud.data().balance || 0) + (tData.gigReward || 0) });
+                }
+            } catch (e) { alert("❌ Failed."); btn.innerText = "Approve"; } 
         };
+        
         window.rejectTask = async (id) => { 
-            if(confirm("Are you sure you want to reject this task?")) {
-                try { await updateDoc(doc(db, "task_submissions", id), { status: "Rejected" }); } 
+            const reason = prompt("Reason for rejection (Optional):") || "Instructions not followed or invalid proof.";
+            if(reason) {
+                try { await updateDoc(doc(db, "task_submissions", id), { status: "Rejected", adminRemark: reason }); } 
                 catch (e) { alert("❌ Failed to reject."); }
             }
         };
 
         // Payouts
         window.markAsPaid = async (id) => { if(confirm("Money sent? Mark as Completed?")) await updateDoc(doc(db, "withdrawals", id), { status: "Completed", completedAt: new Date() }); };
+        
+        // Payout Reject (REFUND)
+        window.rejectPayout = async (id) => {
+            const reason = prompt("Rejection Reason (Will refund amount to user):") || "UPI Error or Policy Violation.";
+            if(reason) {
+                try {
+                    const wData = globalWithdrawData[id];
+                    await updateDoc(doc(db, "withdrawals", id), { status: "Rejected", remark: reason });
+                    // Refund Money
+                    const uSnap = await getDocs(query(collection(db, "users"), where("phone", "==", wData.userPhone)));
+                    if(!uSnap.empty) {
+                        const ud = uSnap.docs[0];
+                        await updateDoc(doc(db, "users", ud.id), { balance: (ud.data().balance || 0) + (wData.amount || 0) });
+                        alert(`✅ Refunded ₹${wData.amount} back to User's Wallet.`);
+                    }
+                } catch(e) { alert("❌ Error rejecting payout."); }
+            }
+        };
 
-        // Gigs
+        // Manage Gigs
         window.addGigToDB = async () => {
             const btn = event.target;
-            const t = document.getElementById('gig-title').value.trim();
-            const r = parseInt(document.getElementById('gig-reward').value);
-            const l = document.getElementById('gig-link').value.trim();
-            const desc = document.getElementById('gig-desc').value.trim(); // 🔥 Added Instructions field
-
-            if(!t || isNaN(r)) return alert("⚠️ Title and Reward are required!");
+            const t = document.getElementById('gig-title').value.trim(); const r = parseInt(document.getElementById('gig-reward').value); const l = document.getElementById('gig-link').value.trim(); const desc = document.getElementById('gig-desc').value.trim();
+            if(!t || isNaN(r)) return alert("⚠️ Title and Reward required!");
             btn.innerText = "Publishing...";
-            try {
-                await addDoc(collection(db, "gigs"), { title: t, reward: r, link: l, desc: desc, timestamp: new Date() });
-                document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = ""; document.getElementById('gig-link').value = ""; document.getElementById('gig-desc').value = "";
-                alert("🚀 Gig Published Successfully!");
-            } catch (e) { alert("❌ Error Publishing."); } 
-            finally { btn.innerText = "Publish Gig 🚀"; }
+            try { await addDoc(collection(db, "gigs"), { title: t, reward: r, link: l, desc: desc, timestamp: new Date() }); document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = ""; document.getElementById('gig-link').value = ""; document.getElementById('gig-desc').value = ""; alert("🚀 Gig Published!"); } catch (e) { alert("❌ Error Publishing."); } finally { btn.innerText = "Publish Gig 🚀"; }
         };
-        window.deleteGig = async (id) => { if(confirm("Remove this Gig?")) await deleteDoc(doc(db, "gigs", id)); };
+        window.deleteGig = async (id) => { if(confirm("Delete Gig?")) await deleteDoc(doc(db, "gigs", id)); };
 
         // Notifications
         window.sendNotification = async () => {
             const btn = event.target;
-            const title = document.getElementById('notify-title').value.trim();
-            const msg = document.getElementById('notify-msg').value.trim();
-            if(!title || !msg) return alert("⚠️ Title and Message are required!");
+            const title = document.getElementById('notify-title').value.trim(); const msg = document.getElementById('notify-msg').value.trim();
+            if(!title || !msg) return alert("⚠️ Title and Message required!");
             btn.innerText = "Sending...";
-            try {
-                await addDoc(collection(db, "notifications"), { title: title, message: msg, timestamp: new Date() });
-                document.getElementById('notify-title').value = ""; document.getElementById('notify-msg').value = "";
-                alert("📡 Notification Broadcasted!");
-            } catch (e) { alert("❌ Error sending notification."); }
-            finally { btn.innerText = "Broadcast Message 📡"; }
+            try { await addDoc(collection(db, "notifications"), { title: title, message: msg, timestamp: new Date() }); document.getElementById('notify-title').value = ""; document.getElementById('notify-msg').value = ""; alert("📡 Notification Broadcasted!"); } catch (e) { alert("❌ Error sending notification."); } finally { btn.innerText = "Broadcast Message 📡"; }
         };
 
         if(localStorage.getItem("adm_p")) { document.body.classList.add('authenticated'); startServerSync(); }
