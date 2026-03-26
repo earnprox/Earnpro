@@ -99,10 +99,10 @@
         <div id="view-project" class="tab-content">
             <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Workspace</h2>
             
-            <div class="flex bg-slate-200/50 p-1 rounded-xl mb-6 border border-slate-200">
-                <button onclick="window.switchWsTab('explore', this)" class="ws-tab bg-white shadow-sm text-blue-600 flex-1 py-2.5 text-xs font-black text-center rounded-lg transition">Explore</button>
-                <button onclick="window.switchWsTab('active', this)" class="ws-tab text-slate-500 flex-1 py-2.5 text-xs font-black text-center rounded-lg transition">In Progress</button>
-                <button onclick="window.switchWsTab('review', this)" class="ws-tab text-slate-500 flex-1 py-2.5 text-xs font-black text-center rounded-lg transition">Review</button>
+            <div class="flex bg-slate-200/50 p-1 rounded-2xl mb-6 border border-slate-200">
+                <button onclick="window.switchWsTab('explore', this)" class="ws-tab bg-white shadow-sm text-blue-600 flex-1 py-2.5 text-xs font-black text-center rounded-xl transition">Explore</button>
+                <button onclick="window.switchWsTab('active', this)" class="ws-tab text-slate-500 flex-1 py-2.5 text-xs font-black text-center rounded-xl transition">In Progress</button>
+                <button onclick="window.switchWsTab('review', this)" class="ws-tab text-slate-500 flex-1 py-2.5 text-xs font-black text-center rounded-xl transition">Review</button>
             </div>
 
             <div id="ws-explore" class="ws-content active">
@@ -112,33 +112,35 @@
             </div>
 
             <div id="ws-active" class="ws-content">
-                <div class="premium-card p-5 rounded-3xl mb-4 border-t-4 border-t-blue-500 relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-7xl opacity-5">🚀</div>
-                    <div class="flex justify-between items-start mb-4 relative z-10">
+                <div id="active-task-card" class="premium-card p-6 rounded-[2rem] border-t-4 border-t-blue-500 relative overflow-hidden hidden">
+                    <div class="flex justify-between items-start mb-4">
                         <div>
-                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block border border-blue-100">Action Required</span>
-                            <h4 id="active-gig-name" class="font-black text-lg text-slate-800 leading-tight">No Task Accepted</h4>
-                            <p id="active-gig-desc" class="text-xs text-slate-500 mt-1 font-medium">Browse the explore tab to accept a task.</p>
+                            <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full uppercase border border-blue-100 mb-2 inline-block">Active Now</span>
+                            <h4 id="active-gig-name" class="font-black text-xl text-slate-800 leading-tight">Task Name</h4>
                         </div>
-                        <p id="active-gig-reward" class="text-xl font-black text-emerald-500 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-100">₹0</p>
+                        <p id="active-gig-reward" class="text-xl font-black text-emerald-500">₹0</p>
                     </div>
                     
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-4 relative z-10">
-                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Upload Screenshot Proof</label>
-                        <input type="file" id="proof-image" accept="image/*" class="w-full text-slate-800 text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-5">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Upload Work Proof</label>
+                        <input type="file" id="proof-image" accept="image/*" class="w-full text-slate-800 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-slate-900 file:text-white cursor-pointer">
                     </div>
                     
-                    <button id="submit-proof-btn" onclick="window.submitTaskProofReal()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl text-sm transition shadow-lg shadow-slate-900/20 active:scale-95 relative z-10">Submit Task For Review</button>
+                    <button id="submit-proof-btn" onclick="window.submitTaskProofReal()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition">Submit Screenshot</button>
+                </div>
+                <div id="no-active-task" class="text-center py-20">
+                    <div class="text-5xl mb-4">Empty</div>
+                    <p class="text-slate-400 font-bold">No tasks in progress.<br>Accept one from Explore!</p>
                 </div>
             </div>
 
             <div id="ws-review" class="ws-content">
-                <div class="premium-card p-6 rounded-3xl mb-4 border-t-4 border-t-orange-400 bg-orange-50/30">
+                <div class="premium-card p-6 rounded-[2rem] border-t-4 border-t-orange-400 bg-orange-50/20">
                     <div class="flex items-start gap-4">
                         <div class="text-4xl">⏳</div>
                         <div>
-                            <h4 class="font-black text-lg text-slate-800">Pending Approval</h4>
-                            <p class="text-sm text-slate-600 mt-1 font-medium">Your submission has been sent to the admin. Verification usually takes 2-4 hours.</p>
+                            <h4 class="font-black text-lg text-slate-800">Review in Progress</h4>
+                            <p class="text-sm text-slate-600 mt-1 font-medium">Your submission has been sent to the admin. Verification usually takes 1-4 hours.</p>
                         </div>
                     </div>
                 </div>
