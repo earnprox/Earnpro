@@ -3,139 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnproX | Admin Command Center</title>
+    <title>EarnproX | Admin God Mode</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F1F5F9; color: #0F172A; }
-        .nav-item.active { background-color: #E2E8F0; color: #2563EB; border-right: 4px solid #2563EB; font-weight: 700; }
-        
-        /* Views & Auth Toggling */
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        #admin-auth-screen { display: flex; }
-        #admin-main-app { display: none; }
-        
-        .authenticated #admin-auth-screen { display: none; }
-        .authenticated #admin-main-app { display: flex; }
-        
-        .modal { display: none; }
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; padding-bottom: 70px; }
+        .nav-item-active { color: #2563EB; font-weight: 800; border-top: 3px solid #2563EB; }
+        @media (min-width: 768px) { 
+            body { padding-bottom: 0; padding-left: 260px; }
+            .nav-item-active { border-top: none; border-right: 4px solid #2563EB; background: #F1F5F9; }
+        }
+        .view-section { display: none; opacity: 0; }
+        .view-section.active { display: block; opacity: 1; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #auth-screen { display: flex; z-index: 999; }
+        #admin-app { display: none; }
+        .authenticated #auth-screen { display: none; }
+        .authenticated #admin-app { display: block; }
+        .modal { display: none; z-index: 1000; }
         .modal.active { display: flex; }
     </style>
 </head>
-<body class="h-screen overflow-hidden">
+<body class="min-h-screen">
 
-    <div id="admin-auth-screen" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center p-6">
-        <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl shadow-blue-500/40 rotate-12">
-            <span class="text-4xl text-white font-black">X</span>
-        </div>
+    <div id="auth-screen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center p-6">
         <div class="bg-white p-8 rounded-[2rem] w-full max-w-sm shadow-2xl">
-            <h2 class="text-2xl font-black text-slate-800 mb-2">Admin Login</h2>
-            <p class="text-sm text-slate-500 mb-8 font-medium">Enter your master password to access control.</p>
-            
-            <input type="password" id="admin-pass-input" placeholder="••••••••" class="w-full bg-slate-100 border-2 border-slate-100 rounded-xl px-4 py-4 mb-4 outline-none focus:border-blue-500 focus:bg-white transition font-black tracking-widest">
-            
-            <button onclick="attemptAdminLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 transition active:scale-95">
-                Unlock Dashboard 🔓
-            </button>
+            <div class="w-12 h-12 bg-blue-600 rounded-xl mb-4 flex items-center justify-center text-white font-black text-xl italic">X</div>
+            <h2 class="text-2xl font-black mb-1">Admin Login</h2>
+            <p class="text-sm text-slate-500 mb-6">Enter master password</p>
+            <input type="password" id="admin-pass" placeholder="••••••••" class="w-full bg-slate-100 p-4 rounded-xl mb-4 outline-none focus:ring-2 ring-blue-500 font-black tracking-widest">
+            <button onclick="window.doLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">Unlock 🔓</button>
         </div>
-        <p class="text-slate-500 text-xs mt-8 font-bold uppercase tracking-widest opacity-50">EarnproX Secure Layer v2.0</p>
     </div>
 
-    <div id="admin-main-app" class="h-full w-full flex">
-        
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shadow-lg z-20">
-            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black">X</div>
-                <h1 class="text-xl font-black">Earnpro<span class="text-blue-600">Admin</span></h1>
-            </div>
-            <nav class="flex-1 py-4">
-                <button onclick="switchView('dashboard', this)" class="nav-item active w-full flex items-center px-6 py-4 text-sm font-semibold transition">📊 Dashboard</button>
-                <button onclick="switchView('users', this)" class="nav-item w-full flex items-center px-6 py-4 text-sm font-semibold transition">👥 All Users</button>
-                <button onclick="switchView('reviews', this)" class="nav-item w-full flex items-center px-6 py-4 text-sm font-semibold transition relative">🔍 Review Tasks <span id="badge-count" class="ml-2 bg-orange-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span></button>
-                <button onclick="switchView('tasks', this)" class="nav-item w-full flex items-center px-6 py-4 text-sm font-semibold transition">📝 Upload Gigs</button>
+    <div id="admin-app">
+        <aside class="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r hidden md:flex flex-col p-6">
+            <h1 class="text-xl font-black mb-10">EarnproX <span class="text-blue-600">Admin</span></h1>
+            <nav class="flex flex-col gap-2">
+                <button onclick="window.switchView('dash', this)" class="nav-btn nav-item-active p-4 text-left rounded-xl transition font-bold">📊 Dashboard</button>
+                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left rounded-xl transition font-bold">👥 Users</button>
+                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left rounded-xl transition font-bold relative">🔍 Reviews <span id="badge-count" class="absolute right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span></button>
+                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left rounded-xl transition font-bold">🚀 Add Gigs</button>
             </nav>
-            <div class="p-4 border-t">
-                <button onclick="adminLogout()" class="w-full bg-red-50 text-red-600 font-black py-3 rounded-xl hover:bg-red-100 transition">Logout Admin</button>
-            </div>
+            <button onclick="window.doLogout()" class="mt-auto p-4 text-left text-red-500 font-bold">Logout 🚪</button>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-8 bg-[#F8FAFC]">
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-2 z-50">
+            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-item-active"><span class="text-lg">📊</span><span class="text-[10px] font-bold">Dash</span></button>
+            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">👥</span><span class="text-[10px] font-bold">Users</span></button>
+            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">🔍</span><span class="text-[10px] font-bold">Review</span></button>
+            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-lg">🚀</span><span class="text-[10px] font-bold">Gigs</span></button>
+        </nav>
+
+        <main class="p-4 md:p-10">
             
-            <div id="view-dashboard" class="view-section active">
-                <h2 class="text-3xl font-black mb-8 text-slate-800">System Performance</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Active Users</p>
-                        <h3 class="text-4xl font-black text-blue-600 mt-2" id="stat-users">0</h3>
+            <section id="view-dash" class="view-section active">
+                <h2 class="text-2xl font-black mb-6">Live Overview</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-3xl border shadow-sm">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">Total Users</p>
+                        <h3 id="stat-users" class="text-3xl font-black text-blue-600">0</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pending Review</p>
-                        <h3 class="text-4xl font-black text-orange-500 mt-2" id="stat-pending">0</h3>
+                    <div class="bg-white p-5 rounded-3xl border shadow-sm">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">Pending Review</p>
+                        <h3 id="stat-pending" class="text-3xl font-black text-orange-500">0</h3>
                     </div>
-                    <button onclick="location.reload()" class="bg-slate-900 text-white p-6 rounded-2xl font-black hover:bg-black transition flex items-center justify-center gap-2">
-                        <span>🔄</span> Sync Data
-                    </button>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-3xl font-bold text-sm col-span-2 md:col-span-1">Refresh Data 🔄</button>
                 </div>
-            </div>
+            </section>
 
-            <div id="view-users" class="view-section">
-                <h2 class="text-3xl font-black mb-6">User Database</h2>
-                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-200">
-                            <tr>
-                                <th class="p-4 text-[10px] font-black uppercase text-slate-400">Identity</th>
-                                <th class="p-4 text-[10px] font-black uppercase text-slate-400">Current Balance</th>
-                                <th class="p-4 text-[10px] font-black uppercase text-slate-400">Payment UPI</th>
-                                <th class="p-4 text-[10px] font-black uppercase text-slate-400 text-right">Control</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body"></tbody>
-                    </table>
+            <section id="view-users" class="view-section">
+                <h2 class="text-2xl font-black mb-6">User Database</h2>
+                <div id="user-list" class="grid gap-3">
+                    <p class="text-center text-slate-400 py-10">Loading users...</p>
                 </div>
-            </div>
+            </section>
 
-            <div id="view-reviews" class="view-section">
-                <h2 class="text-3xl font-black mb-6">Task Approvals</h2>
-                <div class="grid gap-4" id="review-list"></div>
-            </div>
+            <section id="view-reviews" class="view-section">
+                <h2 class="text-2xl font-black mb-6">Task Submissions</h2>
+                <div id="review-list" class="grid gap-4">
+                    <p class="text-center text-slate-400 py-10">No pending proofs.</p>
+                </div>
+            </section>
 
-            <div id="view-tasks" class="view-section">
-                <h2 class="text-3xl font-black mb-6">Create New Gig</h2>
-                <div class="bg-white p-8 rounded-[2rem] border border-slate-200 max-w-lg shadow-sm">
+            <section id="view-gigs" class="view-section">
+                <h2 class="text-2xl font-black mb-6">Create New Task</h2>
+                <div class="bg-white p-6 rounded-[2rem] border shadow-sm max-w-lg">
                     <div class="space-y-4">
-                        <input type="text" id="gig-title" placeholder="Gig Title" class="w-full border-2 p-4 rounded-xl outline-none focus:border-blue-500 font-bold">
-                        <input type="number" id="gig-reward" placeholder="Reward (₹)" class="w-full border-2 p-4 rounded-xl outline-none focus:border-blue-500 font-bold">
-                        <textarea id="gig-desc" placeholder="Instructions..." class="w-full border-2 p-4 rounded-xl outline-none focus:border-blue-500 min-h-[100px]"></textarea>
-                        <button onclick="uploadGig()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition">Post Gig Live 🚀</button>
+                        <input type="text" id="gig-title" placeholder="Gig Title" class="w-full bg-slate-50 p-4 rounded-xl outline-none border focus:border-blue-500 font-bold">
+                        <input type="number" id="gig-reward" placeholder="Reward (₹)" class="w-full bg-slate-50 p-4 rounded-xl outline-none border focus:border-blue-500 font-bold">
+                        <textarea id="gig-desc" placeholder="Step-by-step instructions..." class="w-full bg-slate-50 p-4 rounded-xl outline-none border focus:border-blue-500 font-medium h-32"></textarea>
+                        <button onclick="window.addGigToDB()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">Publish Task Live 🚀</button>
                     </div>
                 </div>
-            </div>
-
+            </section>
         </main>
     </div>
 
-    <div id="fund-modal" class="modal fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] items-center justify-center p-4">
+    <div id="modal-bal" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl">
-            <h3 class="text-2xl font-black mb-1">Edit Wallet</h3>
-            <p id="fund-user-info" class="text-sm text-slate-500 mb-6 font-medium"></p>
-            <div class="bg-slate-50 p-4 rounded-2xl mb-6">
-                <label class="text-[10px] font-black text-slate-400 uppercase block mb-1">New Balance Amount</label>
-                <input type="number" id="new-balance" class="w-full bg-transparent border-none p-0 font-black text-3xl text-slate-800 outline-none" placeholder="0">
+            <h3 class="text-xl font-black mb-1">Adjust Balance</h3>
+            <p id="target-user-name" class="text-sm text-slate-500 mb-6 font-bold"></p>
+            <div class="bg-slate-50 p-4 rounded-2xl mb-6 border">
+                <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">New Balance (₹)</label>
+                <input type="number" id="target-new-bal" class="w-full bg-transparent text-3xl font-black outline-none" placeholder="0">
             </div>
-            <div class="flex gap-3">
-                <button onclick="saveNewBalance()" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition">Save</button>
-                <button onclick="document.getElementById('fund-modal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-xl active:scale-95 transition">Cancel</button>
+            <div class="flex gap-2">
+                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-xl shadow-lg">Save</button>
+                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-xl">Cancel</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
@@ -148,149 +130,144 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let selectedUserDocId = null;
+        let activeUserDocId = "";
 
-        // --- AUTH LOGIC (NO MORE PROMPTS) ---
-        window.attemptAdminLogin = () => {
-            const passInput = document.getElementById('admin-pass-input').value;
-            if(passInput === "admin123") {
-                localStorage.setItem("earnprox_admin_token", "active_session_7788");
+        // --- AUTH ---
+        window.doLogin = () => {
+            const p = document.getElementById('admin-pass').value;
+            if(p === "admin123") {
+                localStorage.setItem("admin_auth", "true");
                 document.body.classList.add('authenticated');
-                loadData();
-            } else {
-                alert("❌ Wrong Master Password!");
-            }
+                initAdmin();
+            } else { alert("Wrong Password!"); }
+        };
+        window.doLogout = () => {
+            localStorage.removeItem("admin_auth");
+            location.reload();
         };
 
-        window.adminLogout = () => {
-            localStorage.removeItem("earnprox_admin_token");
-            document.body.classList.remove('authenticated');
-            document.getElementById('admin-pass-input').value = "";
-        };
-
-        // Check session on load
-        window.addEventListener('load', () => {
-            if(localStorage.getItem("earnprox_admin_token")) {
-                document.body.classList.add('authenticated');
-                loadData();
-            }
-        });
-
-        // --- CORE ADMIN FUNCTIONS ---
+        // --- NAVIGATION ---
         window.switchView = (id, btn) => {
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-item-active'));
+            btn.classList.add('nav-item-active');
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        async function loadData() {
-            try {
-                // Users Load
-                const userSnap = await getDocs(collection(db, "users"));
-                document.getElementById('stat-users').innerText = userSnap.size;
-                let userHTML = "";
-                userSnap.forEach(uDoc => {
-                    const u = uDoc.data();
-                    userHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-                        <td class="p-4">
-                            <p class="font-black text-slate-800 text-sm">${u.name}</p>
+        // --- LOAD DATA ---
+        function initAdmin() {
+            // Live Users Sync
+            onSnapshot(collection(db, "users"), (snap) => {
+                document.getElementById('stat-users').innerText = snap.size;
+                let html = "";
+                snap.forEach(d => {
+                    const u = d.data();
+                    html += `
+                    <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm">
+                        <div>
+                            <p class="font-black text-sm">${u.name}</p>
                             <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone}</p>
-                        </td>
-                        <td class="p-4 font-black text-emerald-600">₹${u.balance || 0}</td>
-                        <td class="p-4"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-black uppercase">${u.upi || 'Pending'}</span></td>
-                        <td class="p-4 text-right">
-                            <button onclick="openFundModal('${uDoc.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider">Edit Fund</button>
-                        </td>
-                    </tr>`;
+                            <p class="text-[10px] text-blue-500 font-bold">${u.upi || 'No UPI'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-black text-emerald-600 mb-1">₹${u.balance || 0}</p>
+                            <div class="flex gap-1">
+                                <button onclick="window.openBalModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[8px] font-black px-2 py-1.5 rounded-lg uppercase">Edit</button>
+                                <button onclick="window.blockUser('${d.id}')" class="bg-red-50 text-red-500 text-[8px] font-black px-2 py-1.5 rounded-lg uppercase">Block</button>
+                            </div>
+                        </div>
+                    </div>`;
                 });
-                document.getElementById('user-table-body').innerHTML = userHTML;
+                document.getElementById('user-list').innerHTML = html;
+            });
 
-                // Proofs Load
-                const taskSnap = await getDocs(collection(db, "task_submissions"));
+            // Live Tasks Sync
+            onSnapshot(collection(db, "task_submissions"), (snap) => {
                 let pendingCount = 0;
-                let reviewHTML = "";
-                taskSnap.forEach(tDoc => {
-                    const t = tDoc.data();
+                let html = "";
+                snap.forEach(d => {
+                    const t = d.data();
                     if(t.status === "Pending Approval") {
                         pendingCount++;
-                        reviewHTML += `
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 flex justify-between items-center shadow-sm">
-                            <div class="flex gap-4 items-center">
-                                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-xl">📝</div>
-                                <div>
-                                    <p class="text-[10px] font-black text-blue-500 uppercase">${t.gigName}</p>
-                                    <h4 class="font-black text-slate-800">+91 ${t.userPhone}</h4>
-                                    <a href="${t.proofLink}" target="_blank" class="text-blue-600 font-bold text-xs underline">Check Submission Link ↗</a>
-                                </div>
-                            </div>
+                        html += `
+                        <div class="bg-white p-5 rounded-2xl border shadow-sm">
+                            <p class="text-[10px] font-black text-blue-600 mb-1 uppercase">${t.gigName}</p>
+                            <p class="font-bold text-sm mb-2">User: +91 ${t.userPhone}</p>
+                            <a href="${t.proofLink}" target="_blank" class="text-blue-500 font-bold text-xs underline block mb-4 italic">Check Proof Link ↗</a>
                             <div class="flex gap-2">
-                                <button onclick="approveTask('${tDoc.id}', '${t.userPhone}', 20)" class="bg-emerald-500 text-white px-5 py-2 rounded-xl font-black text-xs shadow-lg shadow-emerald-500/20">APPROVE</button>
-                                <button onclick="rejectTask('${tDoc.id}')" class="bg-slate-100 text-slate-400 px-5 py-2 rounded-xl font-black text-xs">REJECT</button>
+                                <button onclick="window.approveTask('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-3 rounded-xl text-xs">APPROVE</button>
+                                <button onclick="window.rejectTask('${d.id}')" class="flex-1 bg-slate-100 text-slate-400 font-black py-3 rounded-xl text-xs">REJECT</button>
                             </div>
                         </div>`;
                     }
                 });
                 document.getElementById('stat-pending').innerText = pendingCount;
-                document.getElementById('review-list').innerHTML = reviewHTML || "<p class='text-slate-400 text-center py-12 font-bold'>Everything Clear! No new proofs.</p>";
-                
-                const badge = document.getElementById('badge-count');
-                if(pendingCount > 0) {
-                    badge.innerText = pendingCount;
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            } catch(e) { console.error(e); }
+                document.getElementById('review-list').innerHTML = html || "<p class='text-center text-slate-400 py-10'>No tasks to review.</p>";
+            });
         }
 
-        window.openFundModal = (id, name, bal) => {
-            selectedUserDocId = id;
-            document.getElementById('fund-user-info').innerText = name;
-            document.getElementById('new-balance').value = bal;
-            document.getElementById('fund-modal').classList.add('active');
+        // --- DATABASE ACTIONS ---
+
+        // Adjust Balance
+        window.openBalModal = (id, name, bal) => {
+            activeUserDocId = id;
+            document.getElementById('target-user-name').innerText = name;
+            document.getElementById('target-new-bal').value = bal;
+            document.getElementById('modal-bal').classList.add('active');
         };
 
-        window.saveNewBalance = async () => {
-            const amt = document.getElementById('new-balance').value;
-            await updateDoc(doc(db, "users", selectedUserDocId), { balance: parseInt(amt) });
-            alert("✅ Balance Synchronized!");
-            loadData();
-            document.getElementById('fund-modal').classList.remove('active');
+        window.updateBalanceInDB = async () => {
+            const newBal = parseInt(document.getElementById('target-new-bal').value);
+            await updateDoc(doc(db, "users", activeUserDocId), { balance: newBal });
+            document.getElementById('modal-bal').classList.remove('active');
+            alert("Balance Updated! ✅");
         };
 
-        window.approveTask = async (id, phone, reward) => {
-            await updateDoc(doc(db, "task_submissions", id), { status: "Completed" });
-            const uQuery = query(collection(db, "users"), where("phone", "==", phone));
-            const uSnap = await getDocs(uQuery);
+        // Approve Task
+        window.approveTask = async (taskId, userPhone, reward) => {
+            // Update Task
+            await updateDoc(doc(db, "task_submissions", taskId), { status: "Completed" });
+            // Find User & Pay
+            const q = query(collection(db, "users"), where("phone", "==", userPhone));
+            const uSnap = await getDocs(q);
             if(!uSnap.empty) {
-                const userDocId = uSnap.docs[0].id;
-                const oldBal = uSnap.docs[0].data().balance || 0;
-                await updateDoc(doc(db, "users", userDocId), { balance: oldBal + reward });
-            }
-            loadData();
-            alert("💰 Approved & Paid!");
-        };
-
-        window.rejectTask = async (id) => {
-            if(confirm("Reject this proof?")) {
-                await deleteDoc(doc(db, "task_submissions", id));
-                loadData();
+                const uDoc = uSnap.docs[0];
+                const newBal = (uDoc.data().balance || 0) + reward;
+                await updateDoc(doc(db, "users", uDoc.id), { balance: newBal });
+                alert("Task Approved & User Paid! 💰");
             }
         };
 
-        window.uploadGig = async () => {
+        // Add New Gig
+        window.addGigToDB = async () => {
             const title = document.getElementById('gig-title').value;
-            const reward = document.getElementById('gig-reward').value;
+            const reward = parseInt(document.getElementById('gig-reward').value);
             const desc = document.getElementById('gig-desc').value;
-            if(!title || !reward) return alert("Fill all fields!");
-            await addDoc(collection(db, "gigs"), { title, reward: parseInt(reward), desc, timestamp: new Date() });
-            alert("🚀 Gig is now LIVE on the App!");
+
+            if(!title || !reward) return alert("Fill data!");
+
+            await addDoc(collection(db, "gigs"), {
+                title, reward, desc, timestamp: new Date()
+            });
+            alert("New Task is Live! 🚀");
             document.getElementById('gig-title').value = "";
             document.getElementById('gig-reward').value = "";
             document.getElementById('gig-desc').value = "";
         };
+
+        window.rejectTask = async (id) => {
+            if(confirm("Reject this proof?")) await deleteDoc(doc(db, "task_submissions", id));
+        };
+
+        window.blockUser = async (id) => {
+            if(confirm("Block this user?")) await deleteDoc(doc(db, "users", id));
+        };
+
+        // Check Session
+        if(localStorage.getItem("admin_auth")) {
+            document.body.classList.add('authenticated');
+            initAdmin();
+        }
     </script>
 </body>
 </html>
