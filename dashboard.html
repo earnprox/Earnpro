@@ -209,6 +209,7 @@
 
         <div id="view-wallet" class="tab-content">
             <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Vault</h2>
+            
             <div class="premium-card rounded-3xl p-6 mb-6 bg-gradient-to-br from-[#0F172A] to-[#1E293B] border-none text-white shadow-xl shadow-slate-900/20 relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
                 <div class="flex justify-between items-start mb-6 relative z-10">
@@ -216,6 +217,25 @@
                     <button onclick="window.openFullPage('withdraw-page')" class="bg-blue-500 text-white font-bold py-1.5 px-4 rounded-lg flex items-center gap-1 shadow-sm transition hover:bg-blue-400 active:scale-95 text-xs">Withdraw</button>
                 </div>
                 <h2 class="text-4xl font-black tracking-tighter mb-4 relative z-10" id="main-balance-display">₹ 0<span class="text-xl text-slate-500 font-bold">.00</span></h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Earning</p>
+                    <h4 class="text-xl font-black text-slate-800 mt-1" id="stat-total-earn">₹0</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Withdrawals</p>
+                    <h4 class="text-xl font-black text-rose-500 mt-1" id="stat-total-withdraw">₹0</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Task Earning</p>
+                    <h4 class="text-lg font-bold text-slate-700 mt-1" id="stat-task-earn">₹0</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Refer Earning</p>
+                    <h4 class="text-lg font-bold text-slate-700 mt-1" id="stat-refer-earn">₹0</h4>
+                </div>
             </div>
 
             <div class="premium-card rounded-2xl overflow-hidden mb-8">
