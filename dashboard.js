@@ -25,7 +25,8 @@ window.switchTab = function(tabId) {
         setTimeout(() => mainHeader.style.opacity = '1', 50);
     }
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById('view-' + tabId).classList.add('active');
+    const targetView = document.getElementById('view-' + tabId);
+    if(targetView) targetView.classList.add('active');
 }
 
 window.openSheet = function(sheetId) {
@@ -50,7 +51,7 @@ window.closeFullPage = function(pageId) {
     document.getElementById(pageId).classList.remove('full-page-active');
 }
 
-// ================= FIREBASE =================
+// ================= FIREBASE SETUP =================
 const firebaseConfig = {
   apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
   authDomain: "earnproxuc.firebaseapp.com",
@@ -63,7 +64,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const userPhone = localStorage.getItem("earnprox_user_phone");
 
-// 🟢 1. LIVE USER SYNC
+// 🟢 1. LIVE USER SYNC (NAME & UPI)
 if(userPhone) {
     const q = query(collection(db, "users"), where("phone", "==", userPhone));
     onSnapshot(q, (snapshot) => {
@@ -86,8 +87,8 @@ if(userPhone) {
             document.getElementById("withdraw-display-upi").innerText = window.savedUPI || "Not Linked";
             document.getElementById("withdraw-avatar-text").innerText = (window.savedBankName || "U").charAt(0).toUpperCase();
 
-            // Payout Sheet UI
-            if(window.savedUPI) {
+            // Payout Sheet UI & Lock System
+            if(window.savedUPI && window.savedBankName) {
                 const bnameInput = document.getElementById("bank-name-input");
                 const upiInput = document.getElementById("upi-input-box");
                 if(bnameInput) { bnameInput.value = window.savedBankName; bnameInput.disabled = true; }
@@ -97,7 +98,7 @@ if(userPhone) {
                 if(btn) {
                     btn.innerText = "Verified & Locked 🔒";
                     btn.disabled = true;
-                    btn.classList.add("bg-emerald-500");
+                    btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg text-lg opacity-80";
                 }
                 const badge = document.getElementById("upi-status-badge");
                 if(badge) {
@@ -109,46 +110,53 @@ if(userPhone) {
     });
 }
 
-// 🟢 2. SAVE KYC
+// 🟢 2. SAVE KYC (FIXED: NOW SAVES NAME + UPI)
 window.saveRealKYC = async function() {
-    const name = document.getElementById("bank-name-input").value.trim();
-    const upi = document.getElementById("upi-input-box").value.trim();
+    const nameInput = document.getElementById("bank-name-input").value.trim();
+    const upiInput = document.getElementById("upi-input-box").value.trim();
 
-    if(name.length < 3 || !upi.includes("@")) {
-        window.showToast("⚠️ Enter valid Name & UPI ID");
+    if(nameInput.length < 3) {
+        window.showToast("⚠️ Enter valid Banking Name");
+        return;
+    }
+    if(!upiInput.includes("@")) {
+        window.showToast("⚠️ Enter valid UPI ID");
         return;
     }
 
+    window.showToast("⏳ Saving Details...");
+
     try {
-        await updateDoc(doc(db, "users", window.userDocId), {
-            bankName: name,
-            upi: upi
+        const userRef = doc(db, "users", window.userDocId);
+        await updateDoc(userRef, {
+            bankName: nameInput, // 🔥 Name saving fix
+            upi: upiInput
         });
         window.showToast("✅ Details Locked!");
         setTimeout(() => { window.closeAllSheets(); }, 1000);
-    } catch (e) { window.showToast("❌ Save Failed"); }
+    } catch (e) { 
+        console.error(e);
+        window.showToast("❌ Save Failed"); 
+    }
 }
 
-// 🟢 3. WITHDRAWAL ACTION (Real Checks)
+// 🟢 3. WITHDRAWAL ACTION
 window.processWithdrawReal = async function() {
     const amt = parseInt(document.getElementById("withdraw-amount").value);
     
-    // 🔥 REAL CHECKS
-    if(!amt || isNaN(amt)) { window.showToast("⚠️ Enter amount first!"); return; }
-    if(amt < 50) { window.showToast("⚠️ Minimum withdrawal is ₹50"); return; }
+    if(!amt || isNaN(amt)) { window.showToast("⚠️ Enter amount!"); return; }
+    if(amt < 50) { window.showToast("⚠️ Minimum withdrawal ₹50"); return; }
     if(amt > window.currentBalance) { window.showToast("❌ Insufficient Balance!"); return; }
 
     const btn = document.getElementById("withdraw-btn");
-    btn.innerText = "Processing Securely...";
+    btn.innerText = "Processing...";
     btn.disabled = true;
 
     try {
-        // Deduct Balance
         await updateDoc(doc(db, "users", window.userDocId), { 
             balance: window.currentBalance - amt 
         });
         
-        // Add Request
         await addDoc(collection(db, "withdrawals"), {
             userPhone: userPhone,
             userName: window.savedBankName,
@@ -158,10 +166,10 @@ window.processWithdrawReal = async function() {
             timestamp: new Date()
         });
 
-        window.showToast("🚀 Request Sent Successfully!");
+        window.showToast("🚀 Success! Sent to Admin.");
         window.closeFullPage('withdraw-page');
     } catch(e) {
-        window.showToast("❌ Request Failed");
+        window.showToast("❌ Failed");
     } finally {
         btn.innerHTML = `<svg class="w-5 h-5 inline-block -mt-1 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Proceed Securely`;
         btn.disabled = false;
