@@ -50,7 +50,7 @@
             </button>
             <button onclick="switchView('reviews', this)" class="nav-item flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left relative">
                 <span class="mr-3 text-lg">🔍</span> Review Proofs
-                <span class="absolute right-4 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">New</span>
+                <span id="nav-pending-badge" class="absolute right-4 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full hidden">0</span>
             </button>
             <button onclick="switchView('payouts', this)" class="nav-item flex items-center px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 w-full text-left">
                 <span class="mr-3 text-lg">💸</span> Withdrawals
@@ -77,27 +77,29 @@
                 <div class="flex justify-between items-end mb-8">
                     <div>
                         <h2 class="text-3xl font-black text-slate-800">System Overview</h2>
-                        <p class="text-slate-500 text-sm mt-1">Live data from Firebase Database</p>
+                        <p class="text-slate-500 text-sm mt-1">Live data from Firebase Database 🟢</p>
                     </div>
-                    <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-slate-800 transition">Refresh Data</button>
+                    <button onclick="window.loadRealData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-2">
+                        <span>🔄</span> Refresh Data
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Users</p>
-                        <h3 class="text-3xl font-black text-slate-800">1,248</h3>
+                        <h3 class="text-3xl font-black text-slate-800" id="stat-total-users">0</h3>
                     </div>
                     <div class="glass-card p-6 rounded-2xl border-l-4 border-l-emerald-500">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tasks Completed</p>
-                        <h3 class="text-3xl font-black text-slate-800">4,890</h3>
+                        <h3 class="text-3xl font-black text-slate-800" id="stat-total-tasks">0</h3>
                     </div>
                     <div class="glass-card p-6 rounded-2xl border-l-4 border-l-orange-500">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pending Proofs</p>
-                        <h3 class="text-3xl font-black text-slate-800 text-orange-600">32</h3>
+                        <h3 class="text-3xl font-black text-orange-600" id="stat-pending-proofs">0</h3>
                     </div>
                     <div class="glass-card p-6 rounded-2xl border-l-4 border-l-red-500">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Withdrawal Requests</p>
-                        <h3 class="text-3xl font-black text-slate-800 text-red-600">₹ 12,500</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Withdrawals</p>
+                        <h3 class="text-3xl font-black text-red-600" id="stat-withdrawals">₹ 0</h3>
                     </div>
                 </div>
             </div>
@@ -121,79 +123,9 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-user-list">
-                                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-                                    <td class="p-4">
-                                        <p class="font-bold text-slate-800 text-sm">Akash Sharma</p>
-                                        <p class="text-xs text-slate-500">+91 7500673337</p>
-                                    </td>
-                                    <td class="p-4">
-                                        <p class="font-black text-emerald-600">₹ 450.00</p>
-                                    </td>
-                                    <td class="p-4">
-                                        <p class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded inline-block">akash@ybl</p>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider">Active</span>
-                                    </td>
-                                    <td class="p-4 text-right flex justify-end gap-2">
-                                        <button onclick="openFundModal('Akash Sharma', '7500673337')" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">Edit Funds</button>
-                                        <button onclick="blockUser('7500673337')" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 transition">Block</button>
-                                    </td>
-                                </tr>
+                                <tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold">Loading users from Firebase...</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-tasks" class="view-section">
-                <h2 class="text-3xl font-black text-slate-800 mb-6">Create New Gig</h2>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">Task Title</label>
-                                <input type="text" id="gig-title" placeholder="e.g. Download WinZo App" class="w-full border border-slate-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500">
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <label class="block text-xs font-bold text-slate-500 mb-1">Reward (₹)</label>
-                                    <input type="number" id="gig-reward" placeholder="50" class="w-full border border-slate-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500">
-                                </div>
-                                <div class="flex-1">
-                                    <label class="block text-xs font-bold text-slate-500 mb-1">Category</label>
-                                    <select class="w-full border border-slate-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500 bg-white">
-                                        <option>App Install</option>
-                                        <option>Video Edit</option>
-                                        <option>Review/Rating</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">Instructions / Drive Link</label>
-                                <textarea rows="3" placeholder="Step 1: Download from this link..." class="w-full border border-slate-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500"></textarea>
-                            </div>
-                            <button onclick="alert('Gig Uploaded Successfully to Database!')" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-black transition shadow-lg">Upload Task Live</button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <p class="text-sm font-bold text-slate-500 mb-4">Live App Preview</p>
-                        <div class="bg-white border border-slate-200 p-5 rounded-3xl relative overflow-hidden max-w-sm shadow-md">
-                            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 text-xl">🚀</div>
-                                    <div>
-                                        <h4 class="font-bold text-sm text-slate-800">New Task Preview</h4>
-                                        <p class="text-[11px] text-slate-500 font-medium mt-0.5">App Install</p>
-                                    </div>
-                                </div>
-                                <p class="text-lg font-black text-emerald-500">₹0</p>
-                            </div>
-                            <button class="w-full bg-slate-50 text-slate-400 font-bold py-3 rounded-xl text-sm border border-slate-200 mt-2 cursor-not-allowed">Accept Gig</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -206,26 +138,23 @@
                         <thead>
                             <tr class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
                                 <th class="p-4 font-bold">User Phone</th>
-                                <th class="p-4 font-bold">Gig Completed</th>
+                                <th class="p-4 font-bold">Gig Info</th>
                                 <th class="p-4 font-bold">Proof Link</th>
                                 <th class="p-4 font-bold text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="border-b border-slate-100">
-                                <td class="p-4 font-bold text-sm text-slate-800">+91 7500673337</td>
-                                <td class="p-4 text-sm font-semibold text-slate-600">Anime Reel Edit <span class="text-emerald-500 font-black text-xs">(₹150)</span></td>
-                                <td class="p-4">
-                                    <a href="#" class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100">Open Drive Link ↗</a>
-                                </td>
-                                <td class="p-4 text-right flex justify-end gap-2">
-                                    <button onclick="processProof('approve', 150)" class="bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-emerald-600">Approve & Pay</button>
-                                    <button onclick="processProof('reject', 0)" class="bg-slate-200 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-300">Reject</button>
-                                </td>
-                            </tr>
+                        <tbody id="admin-tasks-list">
+                            <tr><td colspan="4" class="p-8 text-center text-slate-400 font-bold">Loading tasks from Firebase...</td></tr>
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div id="view-tasks" class="view-section">
+                <h2 class="text-3xl font-black text-slate-800 mb-6">Upload Gigs (Coming Soon)</h2>
+            </div>
+            <div id="view-payouts" class="view-section">
+                <h2 class="text-3xl font-black text-slate-800 mb-6">Withdrawal Requests (Coming Soon)</h2>
             </div>
 
         </div>
@@ -234,18 +163,15 @@
     <div id="fund-modal" class="modal fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm items-center justify-center">
         <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl relative transform transition-all">
             <button onclick="closeModal('fund-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 text-xl font-bold">×</button>
-            
             <h3 class="text-xl font-black text-slate-800 mb-1">Manage Funds</h3>
             <p class="text-sm text-slate-500 mb-6">Modifying balance for <b id="fund-user-name" class="text-slate-800">User</b></p>
-            
             <div class="mb-4">
                 <label class="block text-xs font-bold text-slate-500 mb-2">Amount (₹)</label>
                 <input type="number" id="fund-amount" placeholder="Enter amount" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 font-black text-lg">
             </div>
-            
             <div class="flex gap-3">
-                <button onclick="alert('Funds Added Successfully to User Wallet!')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">➕ Add Fund</button>
-                <button onclick="alert('Funds Deducted from User Wallet!')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-red-500/20">➖ Deduct</button>
+                <button onclick="alert('Funds feature will be live in next DB update!')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">➕ Add</button>
+                <button onclick="alert('Funds feature will be live in next DB update!')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-red-500/20">➖ Deduct</button>
             </div>
         </div>
     </div>
@@ -254,7 +180,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Your Firebase Keys
+        // Aapki Firebase Keys
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
           authDomain: "earnproxuc.firebaseapp.com",
@@ -266,49 +192,108 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Sidebar Navigation Logic
         window.switchView = function(viewId, element) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if(element) element.classList.add('active');
 
-            document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.remove('active');
-            });
+            document.querySelectorAll('.view-section').forEach(el => { el.classList.remove('active'); });
             document.getElementById('view-' + viewId).classList.add('active');
         }
 
-        // Modal Logic
         window.openFundModal = function(name, phone) {
             document.getElementById('fund-user-name').innerText = `${name} (${phone})`;
-            document.getElementById('fund-amount').value = "";
             document.getElementById('fund-modal').classList.add('active');
         }
-
         window.closeModal = function(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
-
         window.blockUser = function(phone) {
-            if(confirm(`Are you sure you want to BLOCK +91 ${phone} permanently?`)) {
-                alert(`User +91 ${phone} has been blocked.`);
+            if(confirm(`Block +91 ${phone}?`)) alert("User Blocked!");
+        }
+
+        // ================= FETCH REAL DATA FROM FIREBASE =================
+        window.loadRealData = async function() {
+            try {
+                // 1. Fetch Users
+                const usersSnapshot = await getDocs(collection(db, "users"));
+                document.getElementById("stat-total-users").innerText = usersSnapshot.size;
+
+                let usersHTML = "";
+                usersSnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    usersHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+                        <td class="p-4">
+                            <p class="font-bold text-slate-800 text-sm">${user.name || 'Unknown'}</p>
+                            <p class="text-xs text-slate-500">+91 ${user.phone}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="font-black text-emerald-600">₹ ${user.balance || 0}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded inline-block">${user.upi || 'Not linked'}</p>
+                        </td>
+                        <td class="p-4">
+                            <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider">Active</span>
+                        </td>
+                        <td class="p-4 text-right flex justify-end gap-2">
+                            <button onclick="openFundModal('${user.name}', '${user.phone}')" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">Edit Funds</button>
+                            <button onclick="blockUser('${user.phone}')" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 transition">Block</button>
+                        </td>
+                    </tr>`;
+                });
+                
+                if(usersHTML === "") usersHTML = "<tr><td colspan='5' class='p-4 text-center text-slate-400'>No users found.</td></tr>";
+                document.getElementById("admin-user-list").innerHTML = usersHTML;
+
+                // 2. Fetch Tasks & Proofs
+                const tasksSnapshot = await getDocs(collection(db, "task_submissions"));
+                let pendingCount = 0;
+                let totalTasks = tasksSnapshot.size;
+                let tasksHTML = "";
+
+                tasksSnapshot.forEach((doc) => {
+                    const task = doc.data();
+                    if(task.status === "Pending Approval") {
+                        pendingCount++;
+                        tasksHTML += `
+                        <tr class="border-b border-slate-100">
+                            <td class="p-4 font-bold text-sm text-slate-800">+91 ${task.userPhone || 'Unknown'}</td>
+                            <td class="p-4 text-sm font-semibold text-slate-600">${task.gigName}</td>
+                            <td class="p-4">
+                                <a href="${task.proofLink}" target="_blank" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-100">View Proof ↗</a>
+                            </td>
+                            <td class="p-4 text-right flex justify-end gap-2">
+                                <button onclick="alert('Will approve and add funds in next DB update!')" class="bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-emerald-600">Approve</button>
+                                <button onclick="alert('Proof Rejected!')" class="bg-slate-200 text-slate-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-300">Reject</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+
+                document.getElementById("stat-total-tasks").innerText = totalTasks;
+                document.getElementById("stat-pending-proofs").innerText = pendingCount;
+                
+                // Update badge in sidebar
+                if(pendingCount > 0) {
+                    const badge = document.getElementById("nav-pending-badge");
+                    badge.innerText = pendingCount;
+                    badge.classList.remove("hidden");
+                }
+
+                if(tasksHTML === "") tasksHTML = "<tr><td colspan='4' class='p-4 text-center text-slate-400'>No pending proofs.</td></tr>";
+                document.getElementById("admin-tasks-list").innerHTML = tasksHTML;
+
+            } catch(e) {
+                console.error("Error fetching admin data:", e);
+                alert("Error connecting to Firebase to fetch data!");
             }
         }
 
-        window.processProof = function(action, amount) {
-            if(action === 'approve') {
-                alert(`Proof Approved! ₹${amount} added to user wallet.`);
-            } else {
-                alert("Proof Rejected. User notified.");
-            }
+        // Load data automatically when page opens
+        window.onload = () => {
+            window.loadRealData();
         }
-
-        // Fetch Live Users from Firebase Logic (Template ready for future real-time sync)
-        /*
-        async function fetchUsers() {
-            const querySnapshot = await getDocs(collection(db, "users"));
-            // Map through querySnapshot to dynamically build table rows here.
-        }
-        */
     </script>
 </body>
 </html>
