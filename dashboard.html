@@ -7,21 +7,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Bottom padding removed since nav is gone */
         body { 
             font-family: 'Inter', sans-serif; background-color: #F4F7F9; color: #0F172A; 
-            padding-bottom: 90px; -webkit-tap-highlight-color: transparent; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent; overflow-x: hidden;
         }
         .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04); }
         .tab-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
-        .nav-item { color: #94A3B8; transition: all 0.2s ease; }
-        .nav-item.active { color: #3B82F6; }
-        .nav-item.active svg { stroke-width: 2.5; }
         ::-webkit-scrollbar { display: none; }
         .modal-active { opacity: 1 !important; pointer-events: auto !important; }
         .sheet-active { transform: translateY(0) !important; }
         .full-page-active { transform: translateX(0) !important; } 
         
+        .ws-tab { color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .ws-tab.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 700; }
         .ws-content { display: none; }
         .ws-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -29,7 +29,7 @@
         #toast {
             visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; 
             text-align: center; border-radius: 12px; padding: 16px; position: fixed; 
-            z-index: 1000; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); 
+            z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); 
             opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px;
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -48,21 +48,18 @@
     <div class="relative z-10 p-5">
 
         <header id="main-header" class="flex justify-between items-center mb-6 pt-2 transition-all hidden">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Good Morning</p>
-                    <span class="bg-orange-100 text-orange-600 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">🔥 Live</span>
-                </div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-900"><span id="header-user-name">User</span> <span class="text-blue-500">.</span></h1>
-            </div>
-            <div class="w-12 h-12 rounded-full premium-card flex items-center justify-center p-1 relative">
-                <img id="header-avatar" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff&bold=true" alt="Profile" class="w-full h-full rounded-full object-cover">
+            <button onclick="window.switchTab('home')" class="flex items-center gap-2 text-slate-700 active:scale-95 transition bg-white py-2 px-4 rounded-full shadow-sm border border-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                <span class="font-black text-sm">Home</span>
+            </button>
+            <div class="w-10 h-10 rounded-full premium-card flex items-center justify-center p-1 relative">
+                <img id="header-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full rounded-full object-cover">
             </div>
         </header>
 
         <div id="view-home" class="tab-content active">
             <div class="flex justify-between items-center mb-8 pt-2">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 cursor-pointer active:scale-95 transition" onclick="window.switchTab('profile')">
                     <div class="w-12 h-12 rounded-full border-2 border-white shadow-md relative p-0.5 bg-white">
                         <img id="home-profile-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full rounded-full object-cover">
                         <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
@@ -75,9 +72,10 @@
                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">EarnproX Member</p>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm text-slate-600 active:scale-95 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                
+                <div class="flex gap-2 items-center">
+                    <button onclick="window.switchTab('wallet')" class="px-4 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shadow-md active:scale-95 transition">
+                        <span class="text-white font-black text-sm tracking-wide" id="home-top-balance">₹0</span>
                     </button>
                     <button class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm text-slate-600 relative active:scale-95 transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -89,11 +87,11 @@
             <div class="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-6">
                 <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Quick Actions</h3>
                 <div class="grid grid-cols-4 gap-2">
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('project', document.querySelectorAll('.nav-item')[1])">
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('project')">
                         <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-blue-100">🎯</div>
                         <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">All<br>Tasks</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('wallet', document.querySelectorAll('.nav-item')[3])">
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('wallet')">
                         <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-emerald-100">💸</div>
                         <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Bank<br>Transfer</span>
                     </div>
@@ -101,7 +99,7 @@
                         <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-purple-100">📜</div>
                         <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Balance &<br>History</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('refer', document.getElementById('nav-refer'))">
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('refer')">
                         <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-orange-100">🎁</div>
                         <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Refer &<br>Win</span>
                     </div>
@@ -109,19 +107,19 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[1.5rem] p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('project', document.querySelectorAll('.nav-item')[1])">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[1.5rem] p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('project')">
                     <p class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-1">Live Gigs</p>
                     <h4 class="font-black text-xl leading-tight mb-4">Complete<br>Tasks</h4>
                     <span class="bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">Earn Now ↗</span>
                 </div>
-                <div class="bg-gradient-to-br from-orange-400 to-rose-500 rounded-[1.5rem] p-5 text-white shadow-lg shadow-orange-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('refer', document.getElementById('nav-refer'))">
+                <div class="bg-gradient-to-br from-orange-400 to-rose-500 rounded-[1.5rem] p-5 text-white shadow-lg shadow-orange-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('refer')">
                     <p class="text-[10px] font-bold text-orange-200 uppercase tracking-widest mb-1">Guaranteed</p>
                     <h4 class="font-black text-xl leading-tight mb-4">Refer &<br>Get ₹5</h4>
                     <span class="bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">Invite ↗</span>
                 </div>
             </div>
             
-            <div class="bg-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl cursor-pointer" onclick="window.switchTab('wallet', document.querySelectorAll('.nav-item')[3])">
+            <div class="bg-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl cursor-pointer mb-8" onclick="window.switchTab('wallet')">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center text-xl">💳</div>
                     <div>
@@ -130,6 +128,12 @@
                     </div>
                 </div>
                 <button class="bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">Withdraw</button>
+            </div>
+
+            <div class="text-center mt-12 mb-8">
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight">You <span class="text-rose-500 text-3xl align-middle">💖</span> EarnproX</h3>
+                <p class="text-slate-500 text-sm mt-1 mb-5 font-medium">Your friends are going to love us too!</p>
+                <button onclick="window.switchTab('refer')" class="text-blue-600 font-black text-sm bg-blue-50 px-6 py-3 rounded-full border border-blue-100 shadow-sm active:scale-95 transition">Refer & Win ₹5 →</button>
             </div>
         </div>
 
@@ -274,54 +278,37 @@
         </div>
 
         <div id="view-profile" class="tab-content">
-            <div class="premium-card rounded-[2rem] p-6 mb-6 text-center">
-                <div class="w-20 h-20 rounded-full bg-blue-50 mx-auto mb-3 border-4 border-white shadow-lg overflow-hidden relative">
+            <div class="premium-card rounded-[2rem] p-6 mb-6 text-center mt-2">
+                <div class="w-24 h-24 rounded-full bg-blue-50 mx-auto mb-4 border-4 border-white shadow-xl overflow-hidden relative">
                     <img id="profile-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=User&backgroundColor=b6e3f4" alt="Avatar" class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-2xl font-black text-slate-800" id="profile-user-name">User</h2>
-                <p class="text-sm text-slate-500 mb-4" id="profile-user-phone">+91 0000000000</p>
+                <p class="text-sm text-slate-500 mb-4 font-medium" id="profile-user-phone">+91 0000000000</p>
             </div>
             
             <div class="premium-card rounded-2xl overflow-hidden mb-6">
                 <div class="px-5 py-4 flex items-center gap-3 border-b border-slate-100 bg-slate-50/50">
                     <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
-                    <h3 class="font-bold text-slate-800 text-lg">Account</h3>
+                    <h3 class="font-bold text-slate-800 text-lg">Account & Security</h3>
                 </div>
                 <div onclick="window.openSheet('kyc-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
                     <p class="text-sm font-medium text-slate-700">KYC & Bank Account</p><span class="text-slate-400 text-lg">›</span>
                 </div>
-                <div onclick="window.openSheet('privacy-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
-                    <p class="text-sm font-medium text-slate-700">Privacy Policy</p><span class="text-slate-400 text-lg">›</span>
+                <div onclick="window.openSheet('history-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 transition cursor-pointer">
+                    <p class="text-sm font-medium text-slate-700">Payment Ledger</p><span class="text-slate-400 text-lg">›</span>
+                </div>
+                <div class="flex flex-wrap gap-4 px-5 py-5 border-b border-slate-100 justify-center">
+                    <a href="privacy.html" class="text-xs font-bold text-slate-400 hover:text-blue-500">Privacy Policy</a>
+                    <a href="terms.html" class="text-xs font-bold text-slate-400 hover:text-blue-500">Terms</a>
+                    <a href="contact.html" class="text-xs font-bold text-slate-400 hover:text-blue-500">Support</a>
                 </div>
                 <div onclick="window.logoutUser()" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 transition cursor-pointer group">
-                    <p class="text-sm font-medium text-red-500 transition">Logout</p><span class="text-slate-400 text-lg group-hover:text-red-400 transition">›</span>
+                    <p class="text-sm font-black text-red-500 transition">Logout Account</p>
+                    <span class="text-slate-400 text-lg group-hover:text-red-500 transition">›</span>
                 </div>
             </div>
         </div>
 
-    </div>
-
-    <div class="fixed bottom-0 left-0 right-0 z-40">
-        <div class="bg-white border-t border-slate-200 flex justify-between items-end px-2 pb-2 pt-2 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] h-[65px]">
-            <button onclick="window.switchTab('home', this)" class="nav-item active flex-1 flex flex-col items-center gap-1 pb-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-semibold mt-0.5">Home</span>
-            </button>
-            <button onclick="window.switchTab('project', this)" class="nav-item flex-1 flex flex-col items-center gap-1 pb-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg><span class="text-[10px] font-semibold mt-0.5">Tasks</span>
-            </button>
-            <div class="flex-1 flex flex-col items-center justify-end relative">
-                <button id="nav-refer" onclick="window.switchTab('refer', this)" class="absolute -top-10 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white w-[64px] h-[64px] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(79,70,229,0.4)] border-4 border-[#F4F7F9] hover:scale-105 transition-transform active:scale-95 z-20">
-                    <span class="text-3xl">🤝</span>
-                </button>
-                <span class="nav-item text-[10px] font-bold pb-1 text-indigo-600">Network</span>
-            </div>
-            <button onclick="window.switchTab('wallet', this)" class="nav-item flex-1 flex flex-col items-center gap-1 pb-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg><span class="text-[10px] font-semibold mt-0.5">Vault</span>
-            </button>
-            <button onclick="window.switchTab('profile', this)" class="nav-item flex-1 flex flex-col items-center gap-1 pb-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px] font-semibold mt-0.5">Profile</span>
-            </button>
-        </div>
     </div>
 
     <div id="withdraw-page" class="fixed inset-0 z-[150] bg-[#F4F7F9] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
@@ -413,449 +400,7 @@
     </div>
     <div id="toast">Message Here</div>
 
-    <script>
-        window.currentBalance = 0;
-        window.savedUPI = "";
-        window.selectedGigData = null;
-        window.myReferCode = ""; 
-        
-        // 🔥 Flat ₹5 per referral
-        window.referBonusPerUser = 5; 
+    <script type="module" src="dashboard.js"></script>
 
-        window.showToast = function(message) {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.classList.add("show");
-            setTimeout(() => { toast.classList.remove("show"); }, 3000);
-        }
-
-        window.switchTab = function(tabId, btnElement) {
-            // Manage Bottom Nav Active State
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
-            
-            // Manage Top Header Visibility (Hidden on Home, visible on others)
-            const mainHeader = document.getElementById('main-header');
-            if(tabId === 'home') {
-                mainHeader.style.opacity = '0';
-                setTimeout(() => mainHeader.style.display = 'none', 200);
-            } else if(tabId === 'profile' || tabId === 'refer') {
-                mainHeader.style.opacity = '0';
-                setTimeout(() => mainHeader.style.display = 'none', 200);
-            } else {
-                mainHeader.style.display = 'flex';
-                setTimeout(() => mainHeader.style.opacity = '1', 50);
-            }
-
-            // Manage Tab Content
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            const targetView = document.getElementById('view-' + tabId);
-            if(targetView) { setTimeout(() => targetView.classList.add('active'), 50); }
-        }
-
-        window.switchWsTab = function(wsId, btnElement) {
-            // Style Tab Buttons
-            document.querySelectorAll('.ws-tab').forEach(tab => {
-                tab.classList.remove('bg-white', 'shadow-sm', 'text-blue-600');
-                tab.classList.add('text-slate-500');
-            });
-            if(btnElement) {
-                btnElement.classList.remove('text-slate-500');
-                btnElement.classList.add('bg-white', 'shadow-sm', 'text-blue-600');
-            }
-            
-            // Show Content
-            document.querySelectorAll('.ws-content').forEach(content => content.classList.remove('active'));
-            document.getElementById('ws-' + wsId).classList.add('active');
-        }
-
-        let currentOpenSheet = null;
-        window.openSheet = function(sheetId) {
-            if(currentOpenSheet) window.closeAllSheets();
-            const sheet = document.getElementById(sheetId);
-            if(!sheet) return;
-            document.getElementById('universal-overlay').classList.add('modal-active');
-            currentOpenSheet = sheet;
-            setTimeout(() => { sheet.classList.add('sheet-active'); }, 10);
-        }
-
-        window.closeAllSheets = function() {
-            if(currentOpenSheet) {
-                currentOpenSheet.classList.remove('sheet-active');
-                setTimeout(() => {
-                    document.getElementById('universal-overlay').classList.remove('modal-active');
-                    currentOpenSheet = null;
-                }, 300);
-            }
-        }
-
-        window.openFullPage = function(pageId) {
-            if(!window.savedUPI) { window.showToast("⚠️ Save UPI ID in Profile first!"); return; }
-            document.getElementById(pageId).classList.add('full-page-active');
-        }
-        window.closeFullPage = function(pageId) {
-            document.getElementById(pageId).classList.remove('full-page-active');
-            document.getElementById("withdraw-amount").value = "";
-        }
-
-        window.logoutUser = function() {
-            document.getElementById("loading-overlay").classList.add("active"); 
-            localStorage.removeItem("earnprox_user_phone");
-            setTimeout(() => { window.location.href = "index.html"; }, 1500);
-        }
-
-        window.copyReferLink = function() {
-            if(!window.myReferCode) return;
-            const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
-            navigator.clipboard.writeText(link).then(() => {
-                showToast("✅ Referral Link Copied!");
-            }).catch(err => { showToast("⚠️ Failed to copy!"); });
-        }
-
-        window.shareOnWhatsApp = function() {
-            if(!window.myReferCode) return;
-            const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
-            const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${window.myReferCode}* and get joining bonus!\n👇👇\n${link} 🚀`;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`, '_blank');
-        }
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
-          authDomain: "earnproxuc.firebaseapp.com",
-          projectId: "earnproxuc",
-          storageBucket: "earnproxuc.firebasestorage.app",
-          messagingSenderId: "411733884378",
-          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let userDocId = null;
-        const userPhone = localStorage.getItem("earnprox_user_phone");
-
-        const isToday = (dateObj) => {
-            if(!dateObj) return false;
-            const today = new Date();
-            const dateToCheck = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
-            return dateToCheck.getDate() === today.getDate() &&
-                   dateToCheck.getMonth() === today.getMonth() &&
-                   dateToCheck.getFullYear() === today.getFullYear();
-        };
-
-        // 🟢 1. LIVE USER DATA & BLOCK SYSTEM
-        if(userPhone) {
-            const q = query(collection(db, "users"), where("phone", "==", userPhone));
-            getDocs(q).then((querySnapshot) => {
-                if(!querySnapshot.empty) {
-                    userDocId = querySnapshot.docs[0].id;
-                    onSnapshot(doc(db, "users", userDocId), (docSnap) => {
-                        if(docSnap.exists()) {
-                            const userData = docSnap.data();
-                            
-                            if(userData.status === 'blocked') {
-                                document.body.innerHTML = '<div style="height:100vh;display:flex;align-items:center;justify-content:center;background:#0F172A;color:white;flex-direction:column;"><h1 style="font-size:3rem;margin-bottom:10px;">🚫</h1><h2 style="font-size:1.5rem;font-weight:bold;">Account Banned</h2><p style="color:#94A3B8;margin-top:10px;">Contact Admin for support.</p></div>';
-                                localStorage.removeItem("earnprox_user_phone");
-                                setTimeout(() => { window.location.href = "index.html"; }, 3000);
-                                return;
-                            }
-                            
-                            const n = userData.name || "User";
-                            const p = userData.phone || "0000000000";
-                            
-                            window.myReferCode = (n.substring(0,3) + p.substring(p.length - 4)).toUpperCase();
-                            document.getElementById("referral-code-text").innerText = window.myReferCode;
-
-                            document.getElementById("home-user-name").innerText = n.split(" ")[0];
-                            document.getElementById("header-user-name").innerText = n.split(" ")[0];
-                            document.getElementById("profile-user-name").innerText = n;
-                            document.getElementById("refer-page-name").innerText = n;
-                            
-                            const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${n}&backgroundColor=b6e3f4`;
-                            document.getElementById("home-profile-avatar").src = avatarUrl;
-                            document.getElementById("header-avatar").src = avatarUrl;
-                            document.getElementById("profile-avatar").src = avatarUrl;
-                            document.getElementById("refer-profile-img").src = avatarUrl;
-                            
-                            document.getElementById("profile-user-phone").innerText = "+91 " + p;
-
-                            window.currentBalance = userData.balance || 0;
-                            document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
-                            document.getElementById("withdraw-page-balance").innerText = `₹ ${window.currentBalance}`;
-                            document.getElementById("home-mini-balance").innerText = `₹ ${window.currentBalance}`;
-
-                            if(userData.upi && userData.upi !== "None" && userData.upi !== "") {
-                                window.savedUPI = userData.upi;
-                                document.getElementById("upi-display-text").innerText = userData.upi;
-                                document.getElementById("withdraw-page-upi").innerText = userData.upi;
-                                document.getElementById("upi-status-badge").innerText = "Verified ✅";
-                                document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
-                            }
-
-                            fetchReferrals();
-                        }
-                    });
-                }
-            });
-        }
-
-        // 🟢 2. REFERRAL SYSTEM
-        function fetchReferrals() {
-            if(!window.myReferCode) return;
-            
-            const refQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
-            onSnapshot(refQ, (snap) => {
-                let totalRef = 0;
-                let todayRef = 0;
-                let html = "";
-                
-                const docsArr = [];
-                snap.forEach(d => docsArr.push(d.data()));
-                docsArr.sort((a,b) => b.timestamp - a.timestamp);
-
-                docsArr.forEach(u => {
-                    totalRef++;
-                    if(isToday(u.timestamp)) todayRef++;
-                    
-                    const joinDate = u.timestamp ? new Date(u.timestamp.toDate ? u.timestamp.toDate() : u.timestamp).toLocaleDateString('en-GB') : "Recently";
-                    
-                    html += `
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                        <div class="w-1/2 flex items-center gap-2 overflow-hidden">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0">${u.name.charAt(0).toUpperCase()}</div>
-                            <p class="text-xs font-bold text-slate-800 truncate">${u.name}</p>
-                        </div>
-                        <div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div>
-                        <div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div>
-                    </div>`;
-                });
-
-                document.getElementById('total-refers-count').innerText = totalRef;
-                document.getElementById('today-refers-count').innerText = todayRef;
-                document.getElementById('total-refer-earnings').innerText = totalRef * window.referBonusPerUser;
-                
-                if(html) {
-                    document.getElementById('referral-list-container').innerHTML = html;
-                }
-            });
-        }
-
-        // 🟢 3. LIVE GIGS SYNC (Now showing in Workspace -> Explore tab)
-        onSnapshot(collection(db, "gigs"), (snap) => {
-            let html = "";
-            snap.forEach(doc => {
-                const g = doc.data();
-                const safeTitle = g.title.replace(/'/g, "");
-                const safeDesc = (g.link || "Complete this task as per instructions.").replace(/'/g, ""); 
-                
-                html += `
-                <div class="premium-card p-5 rounded-3xl relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100 text-xl">🚀</div>
-                            <div>
-                                <h4 class="font-bold text-sm text-slate-800">${safeTitle}</h4>
-                                <p class="text-[10px] text-slate-500 font-medium mt-0.5">Recommended</p>
-                            </div>
-                        </div>
-                        <p class="text-lg font-black text-emerald-500">₹${g.reward}</p>
-                    </div>
-                    <button onclick="window.openGigSheet('${safeTitle}', ${g.reward}, '${safeDesc}')" class="w-full bg-slate-50 hover:bg-blue-50 text-blue-600 font-bold py-3 rounded-xl text-sm transition border border-slate-200 mt-2 active:scale-95">View Details & Accept</button>
-                </div>`;
-            });
-            document.getElementById('gigs-container').innerHTML = html || "<p class='text-center text-slate-400 py-10 font-bold'>No active gigs right now.</p>";
-        });
-
-        // 🟢 4. ACCEPT GIG FLOW
-        window.openGigSheet = function(title, reward, desc) {
-            document.getElementById('sheet-gig-title').innerText = title;
-            document.getElementById('sheet-gig-reward').innerText = `₹${reward} Reward`;
-            document.getElementById('sheet-gig-desc').innerText = desc;
-            window.selectedGigData = { title, reward, desc };
-            window.openSheet('task-sheet');
-        }
-
-        window.acceptTask = function() {
-            if(!window.selectedGigData) return;
-            // Update Active Tab UI with selected gig
-            document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
-            document.getElementById('active-gig-reward').innerText = `₹${window.selectedGigData.reward}`;
-            document.getElementById('active-gig-desc').innerText = window.selectedGigData.desc;
-            
-            window.closeAllSheets();
-            setTimeout(() => {
-                // Switch to Workspace Tab -> In Progress Sub-tab
-                window.switchTab('project', document.querySelectorAll('.nav-item')[1]);
-                window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
-                window.showToast("✅ Gig Accepted! Upload proof now.");
-            }, 300);
-        }
-
-        // 🟢 5. SUBMIT GIG FLOW (IMGBB)
-        window.submitTaskProofReal = async function() {
-            const gigName = document.getElementById('active-gig-name').innerText;
-            if(gigName === "No Task Accepted") { window.showToast("⚠️ Accept a gig first!"); return; }
-
-            const fileInput = document.getElementById("proof-image");
-            const file = fileInput.files[0];
-            if(!file) { window.showToast("⚠️ Please select a screenshot proof!"); return; }
-
-            const btn = document.getElementById("submit-proof-btn");
-            btn.innerText = "Uploading Screenshot... ⏳";
-            btn.disabled = true;
-            btn.classList.add("opacity-50");
-
-            try {
-                const formData = new FormData();
-                formData.append("image", file);
-                const imgResponse = await fetch("https://api.imgbb.com/1/upload?key=7d2c13c8fedf546d91b46d36c1ef76d0", {
-                    method: "POST",
-                    body: formData
-                });
-                
-                const imgData = await imgResponse.json();
-                if(!imgData.success) throw new Error("Image upload failed");
-                const downloadURL = imgData.data.url; 
-
-                await addDoc(collection(db, "task_submissions"), {
-                    userPhone: userPhone || "Unknown",
-                    gigName: gigName,
-                    gigReward: window.selectedGigData.reward,
-                    proofLink: downloadURL, 
-                    status: "Pending Approval",
-                    timestamp: new Date()
-                });
-
-                fileInput.value = ""; 
-                document.getElementById('active-gig-name').innerText = "No Task Accepted";
-                document.getElementById('active-gig-reward').innerText = "₹0";
-                document.getElementById('active-gig-desc').innerText = "Browse the explore tab to accept a task.";
-                window.selectedGigData = null;
-
-                window.showToast("🚀 Proof Uploaded! Sent to Admin.");
-                setTimeout(() => { window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]); }, 1000);
-            } catch (e) {
-                console.error(e);
-                window.showToast("❌ Upload Failed. Check connection!");
-            } finally {
-                btn.innerText = "Submit Task For Review";
-                btn.disabled = false;
-                btn.classList.remove("opacity-50");
-            }
-        }
-
-        // 🟢 6. FULL TRANSACTION HISTORY (TASKS + WITHDRAWALS)
-        if(userPhone) {
-            let combinedLedger = [];
-
-            const renderLedger = () => {
-                let html = "";
-                combinedLedger.sort((a,b) => b.timestamp - a.timestamp);
-
-                combinedLedger.forEach(item => {
-                    if (item.type === 'withdrawal') {
-                        html += `
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold">↑</div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-800">Withdrawal to UPI</p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">Status: <span class="text-orange-500 font-bold">${item.data.status}</span></p>
-                                </div>
-                            </div>
-                            <p class="text-sm font-black text-slate-800">- ₹${item.data.amount}</p>
-                        </div>`;
-                    } else if (item.type === 'task') {
-                        html += `
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-bold">↓</div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-800">Task Reward</p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">Task: <span class="text-emerald-500 font-bold">${item.data.gigName}</span></p>
-                                </div>
-                            </div>
-                            <p class="text-sm font-black text-emerald-500">+ ₹${item.data.gigReward || 0}</p>
-                        </div>`;
-                    }
-                });
-
-                document.getElementById('history-container').innerHTML = html || `
-                    <div class="text-center py-10 opacity-60">
-                        <span class="text-5xl mb-3 block">📭</span>
-                        <p class="text-sm font-bold text-slate-800">No transactions yet</p>
-                    </div>`;
-            };
-
-            const histQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
-            onSnapshot(histQ, (snap) => {
-                combinedLedger = combinedLedger.filter(item => item.type !== 'withdrawal');
-                snap.forEach(d => combinedLedger.push({ type: 'withdrawal', timestamp: d.data().timestamp, data: d.data() }));
-                renderLedger();
-            });
-
-            const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed"));
-            onSnapshot(taskQ, (snap) => {
-                combinedLedger = combinedLedger.filter(item => item.type !== 'task');
-                snap.forEach(d => combinedLedger.push({ type: 'task', timestamp: d.data().timestamp, data: d.data() }));
-                renderLedger();
-            });
-        }
-
-        // 🟢 7. WITHDRAWAL & KYC
-        window.processWithdrawReal = async function() {
-            const amtBox = document.getElementById("withdraw-amount");
-            const amt = parseInt(amtBox.value);
-            const btn = document.getElementById("withdraw-btn");
-            
-            if(!amt || amt < 50) { window.showToast("⚠️ Minimum withdrawal is ₹50"); return; }
-            if(amt > window.currentBalance) { window.showToast("⚠️ Insufficient balance!"); return; }
-
-            btn.innerText = "Processing...";
-            btn.disabled = true;
-
-            if(userDocId) {
-                try {
-                    const newBal = window.currentBalance - amt;
-                    await updateDoc(doc(db, "users", userDocId), { balance: newBal });
-                    
-                    await addDoc(collection(db, "withdrawals"), {
-                        userPhone: userPhone,
-                        amount: amt,
-                        upi: window.savedUPI,
-                        status: "Pending",
-                        timestamp: new Date()
-                    });
-
-                    window.closeFullPage('withdraw-page');
-                    setTimeout(() => { window.showToast(`💸 ₹${amt} request sent to Admin!`); amtBox.value = ""; }, 400);
-                } catch(e) { 
-                    window.showToast("❌ Withdrawal Failed. Try again."); 
-                } finally {
-                    btn.innerText = "Proceed to Transfer";
-                    btn.disabled = false;
-                }
-            }
-        }
-
-        window.saveRealKYC = async function() {
-            const inputBox = document.getElementById("upi-input-box");
-            if(inputBox.value.includes("@")) {
-                if(userDocId) {
-                    window.showToast("⏳ Saving...");
-                    try {
-                        await updateDoc(doc(db, "users", userDocId), { upi: inputBox.value });
-                        window.closeAllSheets();
-                        window.showToast("🏦 UPI Linked!");
-                    } catch(e) {}
-                }
-            } else { window.showToast("⚠️ Enter a valid UPI ID"); }
-        }
-    </script>
 </body>
 </html>
