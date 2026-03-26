@@ -22,8 +22,6 @@
         .sheet-active { transform: translateY(0) !important; }
         .full-page-active { transform: translateX(0) !important; } 
         
-        .ws-tab { color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
-        .ws-tab.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 700; }
         .ws-content { display: none; }
         .ws-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -49,7 +47,7 @@
 
     <div class="relative z-10 p-5">
 
-        <header id="main-header" class="flex justify-between items-center mb-6 pt-2 transition-all">
+        <header id="main-header" class="flex justify-between items-center mb-6 pt-2 transition-all hidden">
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Good Morning</p>
@@ -63,45 +61,121 @@
         </header>
 
         <div id="view-home" class="tab-content active">
-            <div class="flex justify-between items-end mb-4">
-                <h3 class="text-xl font-bold tracking-tight text-slate-800">Live Gigs</h3>
+            <div class="flex justify-between items-center mb-8 pt-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-white shadow-md relative p-0.5 bg-white">
+                        <img id="home-profile-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full rounded-full object-cover">
+                        <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800 leading-tight flex items-center gap-1">
+                            <span id="home-user-name">User</span>
+                            <span class="text-blue-500 text-sm">✨</span>
+                        </h2>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">EarnproX Member</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm text-slate-600 active:scale-95 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm text-slate-600 relative active:scale-95 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                </div>
             </div>
-            <div id="gigs-container" class="space-y-4">
-                <p class="text-slate-400 font-bold text-center py-10">Fetching Gigs from Server...</p>
+
+            <div class="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-6">
+                <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Quick Actions</h3>
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('project', document.querySelectorAll('.nav-item')[1])">
+                        <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-blue-100">🎯</div>
+                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">All<br>Tasks</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('wallet', document.querySelectorAll('.nav-item')[3])">
+                        <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-emerald-100">💸</div>
+                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Bank<br>Transfer</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.openSheet('history-sheet')">
+                        <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-purple-100">📜</div>
+                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Balance &<br>History</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('refer', document.getElementById('nav-refer'))">
+                        <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-orange-100">🎁</div>
+                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Refer &<br>Win</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[1.5rem] p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('project', document.querySelectorAll('.nav-item')[1])">
+                    <p class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-1">Live Gigs</p>
+                    <h4 class="font-black text-xl leading-tight mb-4">Complete<br>Tasks</h4>
+                    <span class="bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">Earn Now ↗</span>
+                </div>
+                <div class="bg-gradient-to-br from-orange-400 to-rose-500 rounded-[1.5rem] p-5 text-white shadow-lg shadow-orange-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('refer', document.getElementById('nav-refer'))">
+                    <p class="text-[10px] font-bold text-orange-200 uppercase tracking-widest mb-1">Guaranteed</p>
+                    <h4 class="font-black text-xl leading-tight mb-4">Refer &<br>Get ₹5</h4>
+                    <span class="bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">Invite ↗</span>
+                </div>
+            </div>
+            
+            <div class="bg-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl cursor-pointer" onclick="window.switchTab('wallet', document.querySelectorAll('.nav-item')[3])">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center text-xl">💳</div>
+                    <div>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Available Balance</p>
+                        <h4 class="text-white font-black text-lg" id="home-mini-balance">₹0</h4>
+                    </div>
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">Withdraw</button>
             </div>
         </div>
 
         <div id="view-project" class="tab-content">
             <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Workspace</h2>
-            <div class="flex border-b border-slate-200 mb-5">
-                <button onclick="window.switchWsTab('active', this)" class="ws-tab active flex-1 pb-3 text-sm font-medium text-center">Active</button>
-                <button onclick="window.switchWsTab('review', this)" class="ws-tab flex-1 pb-3 text-sm font-medium text-center">In Review</button>
+            
+            <div class="flex bg-slate-200/50 p-1 rounded-xl mb-6 border border-slate-200">
+                <button onclick="window.switchWsTab('explore', this)" class="ws-tab bg-white shadow-sm text-blue-600 flex-1 py-2.5 text-xs font-black text-center rounded-lg transition">Explore</button>
+                <button onclick="window.switchWsTab('active', this)" class="ws-tab text-slate-500 flex-1 py-2.5 text-xs font-black text-center rounded-lg transition">In Progress</button>
+                <button onclick="window.switchWsTab('review', this)" class="ws-tab text-slate-500 flex-1 py-2.5 text-xs font-black text-center rounded-lg transition">Review</button>
             </div>
 
-            <div id="ws-active" class="ws-content active">
-                <div class="premium-card p-5 rounded-2xl mb-4 border-l-4 border-l-blue-500">
-                    <div class="flex justify-between items-start mb-3">
+            <div id="ws-explore" class="ws-content active">
+                <div id="gigs-container" class="space-y-4 pb-10">
+                    <p class="text-slate-400 font-bold text-center py-10">Fetching Gigs from Server...</p>
+                </div>
+            </div>
+
+            <div id="ws-active" class="ws-content">
+                <div class="premium-card p-5 rounded-3xl mb-4 border-t-4 border-t-blue-500 relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 text-7xl opacity-5">🚀</div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
                         <div>
-                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">To Do</span>
-                            <h4 id="active-gig-name" class="font-bold text-sm text-slate-800">No Task Accepted</h4>
+                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block border border-blue-100">Action Required</span>
+                            <h4 id="active-gig-name" class="font-black text-lg text-slate-800 leading-tight">No Task Accepted</h4>
+                            <p id="active-gig-desc" class="text-xs text-slate-500 mt-1 font-medium">Browse the explore tab to accept a task.</p>
                         </div>
-                        <p id="active-gig-reward" class="text-sm font-bold text-emerald-500">₹0</p>
+                        <p id="active-gig-reward" class="text-xl font-black text-emerald-500 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-100">₹0</p>
                     </div>
                     
-                    <label class="block text-xs font-bold text-slate-500 mb-2">Upload Screenshot Proof</label>
-                    <input type="file" id="proof-image" accept="image/*" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-4 relative z-10">
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Upload Screenshot Proof</label>
+                        <input type="file" id="proof-image" accept="image/*" class="w-full text-slate-800 text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                    </div>
                     
-                    <button id="submit-proof-btn" onclick="window.submitTaskProofReal()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-md shadow-blue-500/20 active:scale-95">Upload & Submit Task</button>
+                    <button id="submit-proof-btn" onclick="window.submitTaskProofReal()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl text-sm transition shadow-lg shadow-slate-900/20 active:scale-95 relative z-10">Submit Task For Review</button>
                 </div>
             </div>
 
             <div id="ws-review" class="ws-content">
-                <div class="premium-card p-5 rounded-2xl mb-4 border-l-4 border-l-orange-400 opacity-80">
-                    <div class="flex justify-between items-start">
+                <div class="premium-card p-6 rounded-3xl mb-4 border-t-4 border-t-orange-400 bg-orange-50/30">
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">⏳</div>
                         <div>
-                            <span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">Checking</span>
-                            <h4 class="font-bold text-sm text-slate-800">Waiting for Admin Approval</h4>
-                            <p class="text-xs text-slate-500 mt-1">We will notify you soon.</p>
+                            <h4 class="font-black text-lg text-slate-800">Pending Approval</h4>
+                            <p class="text-sm text-slate-600 mt-1 font-medium">Your submission has been sent to the admin. Verification usually takes 2-4 hours.</p>
                         </div>
                     </div>
                 </div>
@@ -233,7 +307,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-semibold mt-0.5">Home</span>
             </button>
             <button onclick="window.switchTab('project', this)" class="nav-item flex-1 flex flex-col items-center gap-1 pb-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg><span class="text-[10px] font-semibold mt-0.5">Workspace</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg><span class="text-[10px] font-semibold mt-0.5">Tasks</span>
             </button>
             <div class="flex-1 flex flex-col items-center justify-end relative">
                 <button id="nav-refer" onclick="window.switchTab('refer', this)" class="absolute -top-10 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white w-[64px] h-[64px] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(79,70,229,0.4)] border-4 border-[#F4F7F9] hover:scale-105 transition-transform active:scale-95 z-20">
@@ -289,10 +363,19 @@
                     <p id="sheet-gig-reward" class="text-sm text-emerald-500 font-black mt-1">₹0 Reward</p>
                 </div>
             </div>
-            <p id="sheet-gig-desc" class="text-sm text-slate-600 mb-4 border-l-2 border-blue-500 pl-3">Instructions will appear here.</p>
+            
+            <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Instructions</h4>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-4">
+                <p id="sheet-gig-desc" class="text-sm text-slate-600 leading-relaxed">Instructions will appear here.</p>
+            </div>
+            
+            <div class="flex items-start gap-2 bg-orange-50 p-3 rounded-xl border border-orange-100">
+                <span class="text-orange-500">⚠️</span>
+                <p class="text-[10px] font-bold text-orange-600 leading-tight">Clicking Accept will move this task to your "In Progress" tab where you can upload the screenshot proof.</p>
+            </div>
         </div>
         <div class="p-5 border-t border-slate-100 bg-white">
-            <button onclick="window.acceptTask()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Accept Task</button>
+            <button onclick="window.acceptTask()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg active:scale-95 transition">Accept & Start Task</button>
         </div>
     </div>
 
@@ -347,24 +430,41 @@
         }
 
         window.switchTab = function(tabId, btnElement) {
+            // Manage Bottom Nav Active State
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
+            
+            // Manage Top Header Visibility (Hidden on Home, visible on others)
             const mainHeader = document.getElementById('main-header');
-            if(tabId === 'profile' || tabId === 'refer') {
+            if(tabId === 'home') {
+                mainHeader.style.opacity = '0';
+                setTimeout(() => mainHeader.style.display = 'none', 200);
+            } else if(tabId === 'profile' || tabId === 'refer') {
                 mainHeader.style.opacity = '0';
                 setTimeout(() => mainHeader.style.display = 'none', 200);
             } else {
                 mainHeader.style.display = 'flex';
                 setTimeout(() => mainHeader.style.opacity = '1', 50);
             }
+
+            // Manage Tab Content
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             const targetView = document.getElementById('view-' + tabId);
             if(targetView) { setTimeout(() => targetView.classList.add('active'), 50); }
         }
 
         window.switchWsTab = function(wsId, btnElement) {
-            document.querySelectorAll('.ws-tab').forEach(tab => tab.classList.remove('active'));
-            btnElement.classList.add('active');
+            // Style Tab Buttons
+            document.querySelectorAll('.ws-tab').forEach(tab => {
+                tab.classList.remove('bg-white', 'shadow-sm', 'text-blue-600');
+                tab.classList.add('text-slate-500');
+            });
+            if(btnElement) {
+                btnElement.classList.remove('text-slate-500');
+                btnElement.classList.add('bg-white', 'shadow-sm', 'text-blue-600');
+            }
+            
+            // Show Content
             document.querySelectorAll('.ws-content').forEach(content => content.classList.remove('active'));
             document.getElementById('ws-' + wsId).classList.add('active');
         }
@@ -438,7 +538,6 @@
         let userDocId = null;
         const userPhone = localStorage.getItem("earnprox_user_phone");
 
-        // Helper to check if a date is today
         const isToday = (dateObj) => {
             if(!dateObj) return false;
             const today = new Date();
@@ -458,7 +557,6 @@
                         if(docSnap.exists()) {
                             const userData = docSnap.data();
                             
-                            // Block Check
                             if(userData.status === 'blocked') {
                                 document.body.innerHTML = '<div style="height:100vh;display:flex;align-items:center;justify-content:center;background:#0F172A;color:white;flex-direction:column;"><h1 style="font-size:3rem;margin-bottom:10px;">🚫</h1><h2 style="font-size:1.5rem;font-weight:bold;">Account Banned</h2><p style="color:#94A3B8;margin-top:10px;">Contact Admin for support.</p></div>';
                                 localStorage.removeItem("earnprox_user_phone");
@@ -472,11 +570,13 @@
                             window.myReferCode = (n.substring(0,3) + p.substring(p.length - 4)).toUpperCase();
                             document.getElementById("referral-code-text").innerText = window.myReferCode;
 
+                            document.getElementById("home-user-name").innerText = n.split(" ")[0];
                             document.getElementById("header-user-name").innerText = n.split(" ")[0];
                             document.getElementById("profile-user-name").innerText = n;
                             document.getElementById("refer-page-name").innerText = n;
                             
                             const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${n}&backgroundColor=b6e3f4`;
+                            document.getElementById("home-profile-avatar").src = avatarUrl;
                             document.getElementById("header-avatar").src = avatarUrl;
                             document.getElementById("profile-avatar").src = avatarUrl;
                             document.getElementById("refer-profile-img").src = avatarUrl;
@@ -486,6 +586,7 @@
                             window.currentBalance = userData.balance || 0;
                             document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
                             document.getElementById("withdraw-page-balance").innerText = `₹ ${window.currentBalance}`;
+                            document.getElementById("home-mini-balance").innerText = `₹ ${window.currentBalance}`;
 
                             if(userData.upi && userData.upi !== "None" && userData.upi !== "") {
                                 window.savedUPI = userData.upi;
@@ -502,7 +603,7 @@
             });
         }
 
-        // 🟢 NEW: REFERRAL SYSTEM FETCH
+        // 🟢 2. REFERRAL SYSTEM
         function fetchReferrals() {
             if(!window.myReferCode) return;
             
@@ -543,7 +644,7 @@
             });
         }
 
-        // 🟢 2. LIVE GIGS SYNC
+        // 🟢 3. LIVE GIGS SYNC (Now showing in Workspace -> Explore tab)
         onSnapshot(collection(db, "gigs"), (snap) => {
             let html = "";
             snap.forEach(doc => {
@@ -564,32 +665,38 @@
                         </div>
                         <p class="text-lg font-black text-emerald-500">₹${g.reward}</p>
                     </div>
-                    <button onclick="window.openGigSheet('${safeTitle}', ${g.reward}, '${safeDesc}')" class="w-full bg-slate-50 hover:bg-blue-50 text-blue-600 font-bold py-3 rounded-xl text-sm transition border border-slate-200 mt-2 active:scale-95">View Gig</button>
+                    <button onclick="window.openGigSheet('${safeTitle}', ${g.reward}, '${safeDesc}')" class="w-full bg-slate-50 hover:bg-blue-50 text-blue-600 font-bold py-3 rounded-xl text-sm transition border border-slate-200 mt-2 active:scale-95">View Details & Accept</button>
                 </div>`;
             });
             document.getElementById('gigs-container').innerHTML = html || "<p class='text-center text-slate-400 py-10 font-bold'>No active gigs right now.</p>";
         });
 
+        // 🟢 4. ACCEPT GIG FLOW
         window.openGigSheet = function(title, reward, desc) {
             document.getElementById('sheet-gig-title').innerText = title;
             document.getElementById('sheet-gig-reward').innerText = `₹${reward} Reward`;
             document.getElementById('sheet-gig-desc').innerText = desc;
-            window.selectedGigData = { title, reward };
+            window.selectedGigData = { title, reward, desc };
             window.openSheet('task-sheet');
         }
 
         window.acceptTask = function() {
             if(!window.selectedGigData) return;
+            // Update Active Tab UI with selected gig
             document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
             document.getElementById('active-gig-reward').innerText = `₹${window.selectedGigData.reward}`;
+            document.getElementById('active-gig-desc').innerText = window.selectedGigData.desc;
+            
             window.closeAllSheets();
             setTimeout(() => {
+                // Switch to Workspace Tab -> In Progress Sub-tab
                 window.switchTab('project', document.querySelectorAll('.nav-item')[1]);
-                window.showToast("✅ Gig Added to Workspace!");
+                window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
+                window.showToast("✅ Gig Accepted! Upload proof now.");
             }, 300);
         }
 
-        // 🟢 3. IMGBB UPLOAD & TASK SUBMIT
+        // 🟢 5. SUBMIT GIG FLOW (IMGBB)
         window.submitTaskProofReal = async function() {
             const gigName = document.getElementById('active-gig-name').innerText;
             if(gigName === "No Task Accepted") { window.showToast("⚠️ Accept a gig first!"); return; }
@@ -627,27 +734,27 @@
                 fileInput.value = ""; 
                 document.getElementById('active-gig-name').innerText = "No Task Accepted";
                 document.getElementById('active-gig-reward').innerText = "₹0";
+                document.getElementById('active-gig-desc').innerText = "Browse the explore tab to accept a task.";
                 window.selectedGigData = null;
 
                 window.showToast("🚀 Proof Uploaded! Sent to Admin.");
-                setTimeout(() => { window.switchWsTab('review', document.querySelectorAll('.ws-tab')[1]); }, 1000);
+                setTimeout(() => { window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]); }, 1000);
             } catch (e) {
                 console.error(e);
                 window.showToast("❌ Upload Failed. Check connection!");
             } finally {
-                btn.innerText = "Upload & Submit Task";
+                btn.innerText = "Submit Task For Review";
                 btn.disabled = false;
                 btn.classList.remove("opacity-50");
             }
         }
 
-        // 🟢 4. FULL TRANSACTION HISTORY (TASKS + WITHDRAWALS)
+        // 🟢 6. FULL TRANSACTION HISTORY (TASKS + WITHDRAWALS)
         if(userPhone) {
             let combinedLedger = [];
 
             const renderLedger = () => {
                 let html = "";
-                // Sort to show newest first
                 combinedLedger.sort((a,b) => b.timestamp - a.timestamp);
 
                 combinedLedger.forEach(item => {
@@ -685,7 +792,6 @@
                     </div>`;
             };
 
-            // Fetch Withdrawals
             const histQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
             onSnapshot(histQ, (snap) => {
                 combinedLedger = combinedLedger.filter(item => item.type !== 'withdrawal');
@@ -693,7 +799,6 @@
                 renderLedger();
             });
 
-            // Fetch Completed Tasks
             const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed"));
             onSnapshot(taskQ, (snap) => {
                 combinedLedger = combinedLedger.filter(item => item.type !== 'task');
@@ -702,7 +807,7 @@
             });
         }
 
-        // 🟢 5. WITHDRAWAL SYSTEM
+        // 🟢 7. WITHDRAWAL & KYC
         window.processWithdrawReal = async function() {
             const amtBox = document.getElementById("withdraw-amount");
             const amt = parseInt(amtBox.value);
