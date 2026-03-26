@@ -16,7 +16,7 @@ body {
 }
 
 /* Hover/Active Effect for Task Cards */
-#gigs-container .premium-card:active {
+#gigs-container .bg-white:active {
     transform: scale(0.98);
     border-color: #3b82f6;
 }
@@ -34,7 +34,7 @@ body {
     transform: translateY(0); 
 }
 
-/* Workspace Sub-Tabs (Zomato/Fiverr Style) */
+/* Workspace Sub-Tabs */
 .ws-tab { 
     color: #64748b; 
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -50,11 +50,6 @@ body {
 @keyframes slideIn { 
     from { opacity: 0; transform: translateX(20px); } 
     to { opacity: 1; transform: translateX(0); } 
-}
-
-@keyframes fadeIn { 
-    from { opacity: 0; } 
-    to { opacity: 1; } 
 }
 
 /* UI Overlays & Sheets */
@@ -100,15 +95,6 @@ body {
     transform: translateX(-50%) translateY(0); 
 }
 
-/* Full Screen Loader Overlay */
-#loading-overlay { 
-    display: none; 
-}
-#loading-overlay.active { 
-    display: flex; 
-}
-
-/* Profile Image Glow Effect */
-#home-profile-avatar {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
-}
+#loading-overlay { display: none; }
+#loading-overlay.active { display: flex; }
+#home-profile-avatar { box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
