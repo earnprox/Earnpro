@@ -4,6 +4,11 @@ import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs, up
 // ================= UI GLOBALS =================
 window.currentBalance = 0; window.savedUPI = ""; window.savedBankName = ""; window.userDocId = null; window.myReferCode = ""; window.referBonusPerUser = 5;
 
+// Data Holders
+window.liveGigs = {}; 
+window.mySubmissionsMap = {}; 
+window.mySubmissionsList = [];
+
 window.showToast = (m) => { const t = document.getElementById("toast"); if(t) { t.innerText = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3000); } };
 window.switchTab = (id) => { const h = document.getElementById('main-header'); if(id === 'home') { if(h) h.style.display = 'none'; } else { if(h) { h.style.display = 'flex'; h.style.opacity = '1'; } } document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); const target = document.getElementById('view-' + id); if(target) target.classList.add('active'); window.scrollTo(0,0); };
 window.switchWsTab = (id, btn) => { document.querySelectorAll('.ws-tab').forEach(t => { t.classList.remove('bg-white', 'shadow-sm', 'text-blue-600'); t.classList.add('text-slate-500'); }); if(btn) { btn.classList.remove('text-slate-500'); btn.classList.add('bg-white', 'shadow-sm', 'text-blue-600'); } document.querySelectorAll('.ws-content').forEach(c => c.classList.remove('active')); document.getElementById('ws-' + id).classList.add('active'); };
@@ -21,7 +26,6 @@ const app = initializeApp(firebaseConfig); const db = getFirestore(app); const u
 const isToday = (dateObj) => { if(!dateObj) return false; const today = new Date(); const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj); return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(); };
 const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
 
-// 🟢 1. MASTER SYNC ENGINE
 if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
         if(!snap.empty) {
@@ -51,20 +55,56 @@ if(userPhone) {
     });
 }
 
-// 🟢 2. SYNC STATS & HISTORY
+// 🟢 2. SYNC ENGINE (Handles Review Tab & Hide from Explore)
 async function syncStatsAndHistory() {
     if(!userPhone || !window.myReferCode) return;
+    
     const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone));
     const referQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
     const withQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
 
-    onSnapshot(taskQ, (snap) => { let taskTotal = 0; snap.forEach(d => { if(d.data().status === "Completed") taskTotal += (d.data().gigReward || 0); }); document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`; updateTotalEarning(); });
+    // A. TASK SUBMISSIONS (Filters Explore & Populates Review)
+    onSnapshot(taskQ, (snap) => { 
+        let taskTotal = 0; 
+        window.mySubmissionsMap = {};
+        window.mySubmissionsList = [];
+
+        snap.forEach(d => { 
+            const data = d.data();
+            window.mySubmissionsMap[data.gigName] = data; // Save to map to hide from Explore
+            window.mySubmissionsList.push(data); // Save for Review Tab
+            
+            if(data.status === "Approved" || data.status === "Completed") taskTotal += (data.gigReward || 0); 
+        }); 
+        
+        document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`; 
+        
+        renderExploreGigs(); // Re-render explore to hide submitted ones
+        renderReviewTab();   // Render review tab statuses
+        updateTotalEarning(); 
+    });
+
+    // B. REFERRALS
     onSnapshot(referQ, (snap) => {
         let totalCount = 0, todayCount = 0, referListHtml = ""; const docsArr = [];
         snap.forEach(d => docsArr.push(d.data())); docsArr.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
         docsArr.forEach(data => { totalCount++; if(isToday(data.timestamp)) todayCount++; const joinDate = data.timestamp ? new Date(getSafeTime(data.timestamp)).toLocaleDateString('en-GB') : "Recently"; const uName = data.name || "User"; referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div></div>`; });
-        document.getElementById('total-refers-count').innerText = totalCount; document.getElementById('today-refers-count').innerText = todayCount; document.getElementById('stat-refer-earn').innerText = `₹${totalCount * window.referBonusPerUser}`; document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet.</p>"; updateTotalEarning();
+        
+        document.getElementById('total-refers-count').innerText = totalCount; 
+        document.getElementById('today-refers-count').innerText = todayCount; 
+        
+        const referBonusEarned = totalCount * window.referBonusPerUser;
+        document.getElementById('stat-refer-earn').innerText = `₹${referBonusEarned}`; 
+        
+        // Fixed: Ensure Refer Tab Bonus shows correctly
+        const referBonusPageText = document.getElementById('total-refer-earnings');
+        if(referBonusPageText) referBonusPageText.innerText = referBonusEarned;
+
+        document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet.</p>"; 
+        updateTotalEarning();
     });
+
+    // C. WITHDRAWALS
     onSnapshot(withQ, (snap) => {
         let withTotal = 0; const allTransactions = [];
         snap.forEach(d => { const data = d.data(); withTotal += (data.amount || 0); allTransactions.push({ type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal to Bank', amt: data.amount, status: data.status }); });
@@ -78,11 +118,10 @@ function updateTotalEarning() {
     document.getElementById("stat-total-earn").innerText = `₹${t + r}`;
 }
 
-// 🟢 3. LEDGER RENDERER
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); let combined = [...withs];
-    const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed")));
-    taskSnap.forEach(d => combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Task: ${d.data().gigName}`, amt: d.data().gigReward, status: 'Completed' }));
+    const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)));
+    taskSnap.forEach(d => { if(d.data().status === 'Approved' || d.data().status === 'Completed') combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Task: ${d.data().gigName}`, amt: d.data().gigReward, status: 'Completed' }); });
     const referSnap = await getDocs(query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode)));
     referSnap.forEach(d => combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Refer Bonus (${d.data().name})`, amt: window.referBonusPerUser, status: 'Completed' }));
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
@@ -97,31 +136,19 @@ async function renderLedger(withs) {
     historyCont.innerHTML = html || "<div class='text-center py-10 opacity-60'><span class='text-5xl mb-3 block'>📭</span><p class='text-sm font-bold text-slate-800'>No transactions yet</p></div>";
 }
 
-// 🟢 4. ACTIONS (KYC, Withdraw)
-window.saveRealKYC = async function() {
-    const n = document.getElementById("bank-name-input").value.trim(); const u = document.getElementById("upi-input-box").value.trim();
-    if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI");
-    try { await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u }); window.showToast("✅ Details Locked!"); setTimeout(() => window.closeAllSheets(), 1000); } catch (e) { window.showToast("❌ Error saving."); }
-}
-
-window.processWithdrawReal = async function() {
-    const amt = parseInt(document.getElementById("withdraw-amount").value);
-    if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50"); if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance");
-    const btn = document.getElementById("withdraw-btn"); btn.disabled = true; btn.innerText = "Processing Securely...";
-    try { await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); window.showToast("🚀 Sent securely!"); window.closeFullPage('withdraw-page'); } catch(e) { window.showToast("❌ Failed"); } finally { btn.innerHTML = `Proceed Securely`; btn.disabled = false; }
-}
-
-// 🟢 5. GIG ENGINE (THE FIX)
-window.liveGigs = {}; // Database se aaya hua sara data idhar store hoga
-
-onSnapshot(collection(db, "gigs"), (snap) => {
+// 🟢 3. RENDER EXPLORE GIGS (Hides submitted & active tasks)
+window.renderExploreGigs = function() {
     let html = "";
-    window.liveGigs = {}; // Clear old memory
-    
-    snap.forEach(doc => {
-        const g = doc.data();
-        window.liveGigs[doc.id] = g; // Memory mein save kiya using Firebase ID
+    let tasksFound = false;
+
+    Object.values(window.liveGigs).forEach(g => {
+        // Condition 1: Hide if already submitted or in review/completed
+        if(window.mySubmissionsMap[g.title]) return;
         
+        // Condition 2: Hide if currently sitting in "In Progress" memory
+        if(window.selectedGigData && window.selectedGigData.title === g.title) return;
+
+        tasksFound = true;
         html += `<div class="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden mb-4">
             <div class="absolute -right-4 -top-2 opacity-[0.03] text-8xl pointer-events-none">🚀</div>
             <h4 class="font-black text-xl text-slate-800 mb-2">${g.title}</h4>
@@ -129,29 +156,63 @@ onSnapshot(collection(db, "gigs"), (snap) => {
                 <span class="text-emerald-500 font-bold text-sm">Reward: ₹${g.reward}</span>
                 <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded-md">Direct Pay</span>
             </div>
-            <button onclick="window.openGigSheet('${doc.id}', 'explore')" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition">View Task Details</button>
+            <button onclick="window.openGigSheet('${g.title}', 'explore')" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition">View Task Details</button>
         </div>`;
     });
-    document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No tasks available</p>";
+    document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No new tasks available. Check back later!</p>";
+}
+
+// 🟢 4. RENDER REVIEW TAB (Live Status)
+window.renderReviewTab = function() {
+    let html = "";
+    window.mySubmissionsList.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
+
+    window.mySubmissionsList.forEach(sub => {
+        let badgeColor = "bg-orange-50 text-orange-600 border-orange-100";
+        let icon = "⏳";
+        if(sub.status === "Approved" || sub.status === "Completed") { badgeColor = "bg-emerald-50 text-emerald-600 border-emerald-100"; icon = "✅"; }
+        if(sub.status === "Rejected") { badgeColor = "bg-rose-50 text-rose-600 border-rose-100"; icon = "❌"; }
+
+        html += `
+        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] mb-4">
+            <div class="flex justify-between items-start mb-3">
+                <h4 class="font-black text-lg text-slate-800 pr-2">${sub.gigName}</h4>
+                <span class="${badgeColor} text-[10px] font-black px-2 py-1 rounded-md border shrink-0">${icon} ${sub.status}</span>
+            </div>
+            <p class="text-xs font-bold text-emerald-500 bg-emerald-50 inline-block px-2 py-1 rounded border border-emerald-100">Reward: ₹${sub.gigReward}</p>
+        </div>`;
+    });
+
+    document.getElementById('review-container').innerHTML = html || `<div class="text-center py-20 text-slate-400 font-bold"><div class="text-5xl mb-4 opacity-50">📂</div>No tasks under review.</div>`;
+}
+
+// 🟢 5. FETCH GIGS FROM DB
+onSnapshot(collection(db, "gigs"), (snap) => {
+    window.liveGigs = {}; 
+    snap.forEach(doc => {
+        const g = doc.data();
+        window.liveGigs[g.title] = g; // Using title as unique key mapping
+    });
+    renderExploreGigs();
 });
 
-// 🔥 DYNAMIC SHEET HANDLER
-window.openGigSheet = (gigIdOrNull, mode) => {
+// 🟢 6. DYNAMIC SHEET HANDLER (Accept & Submit Modes)
+window.openGigSheet = (gigTitleOrNull, mode) => {
     let g;
     if(mode === 'explore') {
-        g = window.liveGigs[gigIdOrNull];
-        if(g) window.selectedGigData = g; // Set current task in memory
+        g = window.liveGigs[gigTitleOrNull];
+        if(g) window.selectedGigData = g; // Store active task in memory
     } else {
-        g = window.selectedGigData; // Fetch from memory for "In Progress"
+        g = window.selectedGigData; // Retrieve from memory for "In Progress"
     }
 
-    if(!g) return; // Fail safe
+    if(!g) return; 
 
     document.getElementById('sheet-gig-title').innerText = g.title;
     document.getElementById('sheet-gig-reward').innerText = `₹${g.reward} Reward`;
     document.getElementById('sheet-gig-desc').innerText = g.desc || g.link || "Follow the instructions provided.";
     
-    // Toggle UI based on mode
+    // Toggle UI Modes
     if(mode === 'explore') {
         document.getElementById('task-action-explore').classList.remove('hidden');
         document.getElementById('task-action-submit').classList.add('hidden');
@@ -162,14 +223,20 @@ window.openGigSheet = (gigIdOrNull, mode) => {
     window.openSheet('task-sheet');
 }
 
-// Function to handle the "Submit Proof" button in "In Progress" tab
+// Handle opening sheet from In Progress Tab
 window.openSubmitSheet = () => {
     window.openGigSheet(null, 'progress');
 }
 
-// Accept Flow
+// 🟢 7. ACCEPT TASK FLOW
 window.acceptTask = () => {
     if(!window.selectedGigData) return;
+    
+    // Auto-open link
+    const taskLink = window.selectedGigData.link;
+    if(taskLink && taskLink.startsWith('http')) {
+        window.open(taskLink, '_blank');
+    }
     
     // Update "In Progress" UI
     document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
@@ -177,19 +244,14 @@ window.acceptTask = () => {
     document.getElementById('active-task-card').classList.remove('hidden');
     document.getElementById('no-active-task').classList.add('hidden');
     
-    // Auto-open link if it exists and looks like a valid URL
-    const taskLink = window.selectedGigData.link;
-    if(taskLink && taskLink.startsWith('http')) {
-        window.open(taskLink, '_blank');
-    } else {
-        window.showToast("✅ Task Accepted! (No external link provided)");
-    }
-    
     window.closeAllSheets(); 
-    window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
+    renderExploreGigs(); // 🔥 Remove from Explore Tab dynamically!
+    
+    window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]); // Switch to In Progress
+    window.showToast("✅ Task Accepted & Link Opened!");
 }
 
-// Submit Flow
+// 🟢 8. SUBMIT PROOF FLOW
 window.submitTaskProofReal = async () => {
     const f = document.getElementById("proof-image").files[0];
     const remarkField = document.getElementById("proof-remark");
@@ -198,11 +260,12 @@ window.submitTaskProofReal = async () => {
     if(!f) return window.showToast("⚠️ Please select a screenshot proof!");
     
     const btn = document.getElementById("submit-proof-btn");
-    btn.disabled = true; btn.innerText = "Uploading...";
+    btn.disabled = true; btn.innerText = "Uploading Screenshot...";
     
     try {
         const formData = new FormData(); formData.append("image", f);
         const res = await fetch("https://api.imgbb.com/1/upload?key=7d2c13c8fedf546d91b46d36c1ef76d0", { method: "POST", body: formData }).then(r => r.json());
+        if(!res.success) throw new Error("ImgBB Failed");
         
         await addDoc(collection(db, "task_submissions"), { 
             userPhone, 
@@ -214,22 +277,35 @@ window.submitTaskProofReal = async () => {
             timestamp: new Date() 
         });
         
-        // Reset form
+        // Reset Progress UI
         document.getElementById("proof-image").value = "";
         if(remarkField) remarkField.value = "";
-        
         document.getElementById('active-task-card').classList.add('hidden');
         document.getElementById('no-active-task').classList.remove('hidden');
-        window.selectedGigData = null;
+        window.selectedGigData = null; // Clear from memory
 
         window.showToast("🚀 Successfully Submitted!"); 
         window.closeAllSheets();
-        window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]);
+        renderExploreGigs(); // Make sure explore is updated
+        window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]); // Jump to Review!
     } catch (e) { 
         window.showToast("❌ Upload Failed. Try again."); 
     }
     finally { 
-        btn.disabled = false; 
-        btn.innerText = "Submit For Verification"; 
+        btn.disabled = false; btn.innerText = "Submit For Verification"; 
     }
+}
+
+// ACTIONS (KYC, Withdraw)
+window.saveRealKYC = async function() {
+    const n = document.getElementById("bank-name-input").value.trim(); const u = document.getElementById("upi-input-box").value.trim();
+    if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI");
+    try { await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u }); window.showToast("✅ Details Locked!"); setTimeout(() => window.closeAllSheets(), 1000); } catch (e) { window.showToast("❌ Error saving."); }
+}
+
+window.processWithdrawReal = async function() {
+    const amt = parseInt(document.getElementById("withdraw-amount").value);
+    if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50"); if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance");
+    const btn = document.getElementById("withdraw-btn"); btn.disabled = true; btn.innerText = "Processing Securely...";
+    try { await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); window.showToast("🚀 Sent securely!"); window.closeFullPage('withdraw-page'); } catch(e) { window.showToast("❌ Failed"); } finally { btn.innerHTML = `Proceed Securely`; btn.disabled = false; }
 }
