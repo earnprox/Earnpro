@@ -71,7 +71,6 @@ window.openFullPage = function(pageId) {
     if(!window.savedUPI) { window.showToast("⚠️ Save UPI ID in Profile first!"); return; }
     document.getElementById(pageId).classList.add('full-page-active');
     
-    // Focus the giant input field automatically for a real app feel
     if(pageId === 'withdraw-page') {
         setTimeout(() => document.getElementById("withdraw-amount").focus(), 300);
     }
@@ -127,7 +126,7 @@ const isToday = (dateObj) => {
            dateToCheck.getFullYear() === today.getFullYear();
 };
 
-// 🟢 1. LIVE USER DATA 
+// 🟢 1. LIVE USER DATA & SECURITY LOCKS
 if(userPhone) {
     const q = query(collection(db, "users"), where("phone", "==", userPhone));
     getDocs(q).then((querySnapshot) => {
@@ -150,16 +149,13 @@ if(userPhone) {
                     window.myReferCode = (n.substring(0,3) + p.substring(p.length - 4)).toUpperCase();
                     document.getElementById("referral-code-text").innerText = window.myReferCode;
 
-                    // Text fields
                     document.getElementById("home-user-name").innerText = n.split(" ")[0];
                     document.getElementById("header-user-name").innerText = n.split(" ")[0];
                     document.getElementById("profile-user-name").innerText = n;
                     document.getElementById("refer-page-name").innerText = n;
                     
-                    // Set Withdraw page Avatar text (First letter of Name)
                     document.getElementById("withdraw-avatar-text").innerText = n.charAt(0).toUpperCase();
                     
-                    // Avatars
                     const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${n}&backgroundColor=b6e3f4`;
                     document.getElementById("home-profile-avatar").src = avatarUrl;
                     document.getElementById("header-avatar").src = avatarUrl;
@@ -168,20 +164,39 @@ if(userPhone) {
                     
                     document.getElementById("profile-user-phone").innerText = "+91 " + p;
 
-                    // Balances
                     window.currentBalance = userData.balance || 0;
                     document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
                     document.getElementById("withdraw-page-balance").innerText = `₹ ${window.currentBalance}`;
-                    
-                    // Top Right Home Balance
                     document.getElementById("home-top-balance").innerText = `₹ ${window.currentBalance}`;
 
+                    // 🔥 SECURITY LOCK: UPI VERIFIED & LOCKED FOREVER
                     if(userData.upi && userData.upi !== "None" && userData.upi !== "") {
                         window.savedUPI = userData.upi;
                         document.getElementById("upi-display-text").innerText = userData.upi;
-                        document.getElementById("withdraw-page-upi").innerText = userData.upi; // Paytm style receiver ID
+                        document.getElementById("withdraw-page-upi").innerText = userData.upi; 
                         document.getElementById("upi-status-badge").innerText = "Verified ✅";
                         document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+                        
+                        // Disable Input
+                        const upiBox = document.getElementById("upi-input-box");
+                        if(upiBox) {
+                            upiBox.value = userData.upi;
+                            upiBox.disabled = true;
+                            upiBox.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed");
+                        }
+
+                        // Disable Button
+                        const kycBtnDiv = document.querySelector("#kyc-sheet .border-t.bg-white");
+                        if(kycBtnDiv) {
+                            const btn = kycBtnDiv.querySelector("button");
+                            if(btn) {
+                                btn.innerText = "Verified & Locked 🔒";
+                                btn.disabled = true;
+                                btn.classList.replace("bg-[#1E293B]", "bg-emerald-500");
+                                btn.classList.remove("active:scale-95");
+                                btn.onclick = null; // Remove click action
+                            }
+                        }
                     }
 
                     fetchReferrals();
@@ -428,16 +443,19 @@ window.processWithdrawReal = async function() {
     }
 }
 
+// 🟢 7. KYC / UPI SAVING
 window.saveRealKYC = async function() {
     const inputBox = document.getElementById("upi-input-box");
     if(inputBox.value.includes("@")) {
         if(userDocId) {
-            window.showToast("⏳ Saving...");
+            window.showToast("⏳ Saving Securely...");
             try {
                 await updateDoc(doc(db, "users", userDocId), { upi: inputBox.value });
                 window.closeAllSheets();
-                window.showToast("🏦 UPI Linked!");
-            } catch(e) {}
+                window.showToast("🏦 UPI Linked & Locked!");
+            } catch(e) {
+                window.showToast("❌ Error saving UPI.");
+            }
         }
-    } else { window.showToast("⚠️ Enter a valid UPI ID"); }
+    } else { window.showToast("⚠️ Enter a valid UPI ID (e.g., name@ybl)"); }
 }
