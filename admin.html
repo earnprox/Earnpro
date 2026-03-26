@@ -2,118 +2,121 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnproX | Admin God Mode 4.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; padding-bottom: 80px; }
-        .nav-active { color: #2563EB !important; font-weight: 900; border-top: 4px solid #2563EB; background: #F1F5F9; }
-        @media (min-width: 768px) { 
-            body { padding-bottom: 0; padding-left: 280px; } 
-            .nav-active { border-top: none; border-right: 5px solid #2563EB; }
-        }
-        .view-section { display: none; opacity: 0; transform: translateY(10px); }
-        .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.3s ease; }
-        #auth-screen { display: flex; z-index: 9999; position: fixed; inset: 0; background: #0F172A; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F9FAFB; color: #111827; padding-bottom: 80px; }
+        @media (min-width: 768px) { body { padding-bottom: 0; padding-left: 280px; } }
+        
+        .nav-active { background: #EEF2FF; color: #4F46E5 !important; border-radius: 16px; font-weight: 800; }
+        @media (max-width: 767px) { .nav-active { background: transparent; border-top: 4px solid #4F46E5; border-radius: 0; } }
+
+        .view-section { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
+        .view-section.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        #auth-screen { display: flex; position: fixed; inset: 0; background: #0F172A; z-index: 9999; }
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
-        .modal { display: none; z-index: 10000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); }
-        .modal.active { display: flex; }
+        
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 10000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-    <div id="auth-screen" class="flex flex-col items-center justify-center p-6 text-center">
-        <div class="bg-white p-10 rounded-[3rem] w-full max-w-sm shadow-2xl">
-            <div class="w-20 h-20 bg-blue-600 rounded-3xl mb-6 mx-auto flex items-center justify-center text-white font-black text-3xl shadow-xl rotate-3 italic">X</div>
-            <h2 class="text-3xl font-black mb-2 text-slate-800 tracking-tight">Admin Pro</h2>
-            <p class="text-sm text-slate-500 mb-8 font-medium italic">"With great power comes great responsibility"</p>
-            <input type="password" id="admin-pass" placeholder="••••••••" class="w-full bg-slate-100 p-5 rounded-2xl mb-5 outline-none border-2 border-transparent focus:border-blue-500 font-black text-center tracking-widest text-xl">
-            <button onclick="window.doLogin()" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg shadow-blue-500/40 active:scale-95 transition text-lg">Unlock System 🔓</button>
+    <div id="auth-screen" class="flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-10 rounded-[2.5rem] w-full max-w-sm shadow-2xl text-center">
+            <div class="w-16 h-16 bg-indigo-600 rounded-2xl mb-6 mx-auto flex items-center justify-center text-white font-black text-2xl shadow-lg rotate-3 italic">X</div>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Command Center</h2>
+            <p class="text-sm text-slate-400 mb-8 font-medium italic">Authorized Access Only</p>
+            <input type="password" id="admin-pass" placeholder="Password" class="w-full bg-slate-100 p-4 rounded-2xl mb-4 outline-none border-2 border-transparent focus:border-indigo-500 font-black text-center tracking-[0.5em]">
+            <button onclick="window.doLogin()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 active:scale-95 transition">Verify ID 🔓</button>
         </div>
     </div>
 
     <div id="admin-app">
-        <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r hidden md:flex flex-col p-8 shadow-sm">
-            <h1 class="text-2xl font-black mb-12 tracking-tighter">EarnproX<span class="text-blue-600">.</span></h1>
-            <nav class="flex flex-col gap-3">
-                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left rounded-2xl font-bold flex items-center gap-3"><span>📊</span> Dashboard</button>
-                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left rounded-2xl font-bold flex items-center gap-3"><span>👥</span> All Users</button>
-                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left rounded-2xl font-bold flex items-center gap-3 relative">
-                    <span>🔍</span> Review Tasks 
-                    <span id="badge-count" class="absolute right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
+        <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r hidden md:flex flex-col p-8 z-50">
+            <h1 class="text-2xl font-black mb-12 tracking-tighter">EarnproX<span class="text-indigo-600">.</span>Admin</h1>
+            <nav class="flex flex-col gap-2">
+                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-4 text-left flex items-center gap-3 font-bold text-slate-500 transition">📊 Dashboard</button>
+                <button onclick="window.switchView('users', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 transition">👥 User Base</button>
+                <button onclick="window.switchView('reviews', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 transition relative">
+                    🔍 Review Proofs
+                    <span id="badge-count" class="absolute right-4 bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
                 </button>
-                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left rounded-2xl font-bold flex items-center gap-3"><span>🚀</span> Upload Gigs</button>
+                <button onclick="window.switchView('gigs', this)" class="nav-btn p-4 text-left flex items-center gap-3 font-bold text-slate-500 transition">🚀 Add Tasks</button>
             </nav>
-            <button onclick="window.doLogout()" class="mt-auto p-4 text-red-500 font-black hover:bg-red-50 rounded-2xl transition flex items-center gap-2"><span>🚪</span> Secure Logout</button>
+            <button onclick="window.doLogout()" class="mt-auto p-4 text-rose-500 font-bold hover:bg-rose-50 rounded-xl transition flex items-center gap-2">🚪 Logout</button>
         </aside>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-3 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-active"><span class="text-2xl">📊</span><span class="text-[10px] font-black uppercase mt-1">Dash</span></button>
-            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-2xl">👥</span><span class="text-[10px] font-black uppercase mt-1">Users</span></button>
-            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-2xl">🔍</span><span class="text-[10px] font-black uppercase mt-1">Review</span></button>
-            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-2xl">🚀</span><span class="text-[10px] font-black uppercase mt-1">Gigs</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-3 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
+            <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 nav-btn nav-active"><span class="text-xl">📊</span><span class="text-[10px] font-black uppercase mt-1">Dash</span></button>
+            <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">👥</span><span class="text-[10px] font-black uppercase mt-1">Users</span></button>
+            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">🔍</span><span class="text-[10px] font-black uppercase mt-1">Review</span></button>
+            <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 nav-btn"><span class="text-xl">🚀</span><span class="text-[10px] font-black uppercase mt-1">Gigs</span></button>
         </nav>
 
-        <main class="p-6 md:p-12 max-w-5xl mx-auto">
+        <main class="p-4 md:p-12 max-w-5xl mx-auto">
             
             <section id="view-dash" class="view-section active">
-                <h2 class="text-4xl font-black text-slate-900 mb-10 tracking-tight">System Stats</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Total Users</p><h3 id="stat-users" class="text-5xl font-black text-blue-600 mt-2">0</h3></div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Pending Review</p><h3 id="stat-pending" class="text-5xl font-black text-orange-500 mt-2">0</h3></div>
-                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-[2.5rem] font-black text-lg shadow-xl active:scale-95 transition">Refresh 🔄</button>
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Overview</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Users</p><h3 id="stat-users" class="text-4xl font-black text-indigo-600 mt-1">0</h3></div>
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending</p><h3 id="stat-pending" class="text-4xl font-black text-orange-500 mt-1">0</h3></div>
+                    <button onclick="location.reload()" class="bg-slate-900 text-white rounded-[2rem] font-bold shadow-lg flex items-center justify-center gap-2">🔄 Sync</button>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tight">Manage Users</h2>
-                <div id="user-list" class="grid gap-4">
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Manage Users</h2>
+                <div id="user-list" class="grid gap-3">
                     <p class="text-slate-400 text-center py-20 font-bold italic">Contacting Firebase Database...</p>
                 </div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tight">Review Proofs</h2>
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Task Approvals</h2>
                 <div id="review-list" class="grid gap-6">
-                    <p class="text-slate-400 text-center py-20 font-bold italic">All clean! No pending tasks.</p>
+                    <p class="text-slate-400 text-center py-20 font-bold italic">Everything is reviewed! ✨</p>
                 </div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tight">New Gig</h2>
-                <div class="bg-white p-10 rounded-[3rem] border shadow-sm max-w-lg space-y-6">
+                <h2 class="text-3xl font-extrabold mb-8 tracking-tight">Post New Task</h2>
+                <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm max-w-lg space-y-5">
                     <div class="bg-slate-50 p-4 rounded-2xl border">
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Task Title</label>
-                        <input type="text" id="gig-title" placeholder="e.g. Subscribe My Channel" class="w-full bg-transparent font-bold outline-none text-slate-800">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Title</label>
+                        <input type="text" id="gig-title" placeholder="Subscribe Channel" class="w-full bg-transparent font-bold outline-none">
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl border">
                         <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Reward (₹)</label>
-                        <input type="number" id="gig-reward" placeholder="50" class="w-full bg-transparent font-black text-3xl text-emerald-600 outline-none">
+                        <input type="number" id="gig-reward" placeholder="20" class="w-full bg-transparent font-black text-2xl text-emerald-600 outline-none">
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl border">
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Instructions</label>
-                        <textarea id="gig-desc" placeholder="Step 1: Open link..." class="w-full bg-transparent font-medium outline-none h-32"></textarea>
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Instruction Link</label>
+                        <input type="text" id="gig-link" placeholder="Drive or Youtube Link" class="w-full bg-transparent font-medium outline-none">
                     </div>
-                    <button onclick="window.addGigToDB()" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-2xl shadow-blue-500/30 text-xl active:scale-95 transition">Go Live 🚀</button>
+                    <button onclick="window.addGigToDB()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition text-lg">Push Live 🚀</button>
                 </div>
             </section>
+
         </main>
     </div>
 
-    <div id="modal-bal" class="modal flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 shadow-2xl text-center">
-            <h3 class="text-2xl font-black text-slate-900 mb-1">Adjust Wallet</h3>
-            <p id="target-user-name" class="text-sm text-slate-500 mb-8 font-bold"></p>
-            <div class="bg-blue-50 p-8 rounded-[2rem] border-2 border-blue-100 mb-8">
-                <label class="text-[10px] font-black text-blue-400 uppercase mb-2 block tracking-widest">Balance Amount (₹)</label>
-                <input type="number" id="target-new-bal" class="w-full bg-transparent text-6xl font-black text-blue-600 outline-none text-center" placeholder="0">
+    <div id="modal-bal" class="modal p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl text-center">
+            <h3 class="text-xl font-extrabold text-slate-900 mb-1">Adjust Wallet</h3>
+            <p id="target-user-name" class="text-xs text-slate-400 mb-6 font-bold"></p>
+            <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 mb-8">
+                <input type="number" id="target-new-bal" class="w-full bg-transparent text-5xl font-black text-indigo-600 outline-none text-center" placeholder="0">
             </div>
-            <div class="flex gap-4">
-                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-slate-900 text-white font-black py-5 rounded-2xl shadow-xl active:scale-95 transition">Save</button>
-                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-bold py-5 rounded-2xl">Cancel</button>
+            <div class="flex gap-3">
+                <button onclick="window.updateBalanceInDB()" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition">Save</button>
+                <button onclick="document.getElementById('modal-bal').classList.remove('active')" class="flex-1 bg-slate-100 text-slate-500 font-bold py-4 rounded-2xl">Cancel</button>
             </div>
         </div>
     </div>
@@ -122,7 +125,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
             authDomain: "earnproxuc.firebaseapp.com",
@@ -136,19 +138,17 @@
 
         let activeId = "";
 
-        // --- GLOBAL ADMIN FUNCTIONS ---
-        
+        // --- AUTH ---
         window.doLogin = () => {
-            const p = document.getElementById('admin-pass').value;
-            if(p === "admin123") {
-                localStorage.setItem("earn_admin", "true");
+            if(document.getElementById('admin-pass').value === "admin123") {
+                localStorage.setItem("admin_login_prox", "true");
                 document.body.classList.add('authenticated');
                 startSync();
-            } else { alert("Wrong password! ❌"); }
+            } else { alert("❌ Unauthorized!"); }
         };
+        window.doLogout = () => { localStorage.removeItem("admin_login_prox"); location.reload(); };
 
-        window.doLogout = () => { localStorage.removeItem("earn_admin"); location.reload(); };
-
+        // --- NAVIGATION ---
         window.switchView = (id, btn) => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             if(btn) btn.classList.add('nav-active');
@@ -156,69 +156,67 @@
             document.getElementById('view-' + id).classList.add('active');
         };
 
-        // --- REAL-TIME DATABASE SYNC ---
+        // --- REAL-TIME SYNC ---
         function startSync() {
-            // 1. Sync Users
+            // Users List Sync
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
-                let h = "";
+                let html = "";
                 snap.forEach(d => {
                     const u = d.data();
-                    h += `
-                    <div class="bg-white p-6 rounded-[2.5rem] border flex justify-between items-center shadow-sm">
+                    html += `
+                    <div class="bg-white p-5 rounded-[2rem] border card-shadow flex justify-between items-center">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center font-black text-blue-600 border italic text-xl">${u.name.charAt(0)}</div>
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black italic border border-indigo-100">${u.name.charAt(0)}</div>
                             <div>
-                                <p class="font-black text-slate-800">${u.name}</p>
-                                <p class="text-[10px] font-bold text-slate-400 tracking-widest">+91 ${u.phone}</p>
-                                <p class="text-[10px] text-blue-500 font-black mt-1 uppercase">UPI: ${u.upi || 'NOT SET'}</p>
+                                <p class="font-bold text-slate-800 text-sm">${u.name}</p>
+                                <p class="text-[10px] font-bold text-slate-400">+91 ${u.phone}</p>
+                                <p class="text-[10px] text-indigo-500 font-black mt-1 uppercase">UPI: ${u.upi || 'PENDING'}</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-black text-emerald-600 text-xl mb-3">₹${u.balance || 0}</p>
-                            <div class="flex gap-2">
-                                <button onclick="window.openModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest">Adjust</button>
-                                <button onclick="window.blockUser('${d.id}')" class="bg-red-50 text-red-500 text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest">Block</button>
+                            <p class="font-black text-emerald-600 text-lg">₹${u.balance || 0}</p>
+                            <div class="flex gap-1 mt-2">
+                                <button onclick="window.openModal('${d.id}', '${u.name}', ${u.balance || 0})" class="bg-slate-900 text-white text-[9px] font-black px-3 py-2 rounded-xl uppercase">Edit</button>
+                                <button onclick="window.blockUser('${d.id}')" class="bg-rose-50 text-rose-500 text-[9px] font-black px-3 py-2 rounded-xl uppercase">Block</button>
                             </div>
                         </div>
                     </div>`;
                 });
-                document.getElementById('user-list').innerHTML = h || "No users found.";
+                document.getElementById('user-list').innerHTML = html || "No users yet.";
             });
 
-            // 2. Sync Reviews
+            // Reviews Sync
             onSnapshot(collection(db, "task_submissions"), (snap) => {
-                let p = 0; let h = "";
+                let p = 0; let html = "";
                 snap.forEach(d => {
                     const t = d.data();
                     if(t.status === "Pending Approval") {
                         p++;
-                        h += `
-                        <div class="bg-white p-8 rounded-[3rem] border shadow-sm border-l-8 border-l-orange-400">
-                            <div class="flex justify-between items-start mb-6">
+                        html += `
+                        <div class="bg-white p-6 rounded-[2.5rem] border card-shadow border-l-8 border-l-orange-400">
+                            <div class="flex justify-between items-start mb-5">
                                 <div>
                                     <p class="text-[10px] font-black text-orange-400 mb-1 uppercase tracking-widest">${t.gigName}</p>
-                                    <h4 class="font-black text-xl text-slate-800">+91 ${t.userPhone}</h4>
+                                    <h4 class="font-black text-slate-800">+91 ${t.userPhone}</h4>
                                 </div>
-                                <a href="${t.proofLink}" target="_blank" class="bg-blue-50 text-blue-600 font-black text-[10px] px-4 py-2 rounded-full border border-blue-100 uppercase tracking-widest">Check Link ↗</a>
+                                <a href="${t.proofLink}" target="_blank" class="bg-indigo-50 text-indigo-600 font-black text-[9px] px-4 py-2 rounded-full border border-indigo-100 uppercase">Check ↗</a>
                             </div>
-                            <div class="flex gap-3">
-                                <button onclick="window.approve('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-95 transition">APPROVE & PAY</button>
-                                <button onclick="window.reject('${d.id}')" class="flex-1 bg-slate-100 text-slate-400 font-black py-5 rounded-2xl active:scale-95 transition">REJECT</button>
+                            <div class="flex gap-2">
+                                <button onclick="window.approve('${d.id}', '${t.userPhone}', 20)" class="flex-1 bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-95 transition">Approve</button>
+                                <button onclick="window.reject('${d.id}')" class="flex-1 bg-slate-50 text-slate-400 font-black py-4 rounded-2xl active:scale-95 transition">Reject</button>
                             </div>
                         </div>`;
                     }
                 });
                 document.getElementById('stat-pending').innerText = p;
-                document.getElementById('review-list').innerHTML = h || "All submissions reviewed! ✨";
-                
+                document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold'>No pending proofs.</p>";
                 const bc = document.getElementById('badge-count');
                 if(p > 0) { bc.innerText = p; bc.classList.remove('hidden'); } else { bc.classList.add('hidden'); }
             });
         }
 
-        // --- DATABASE ACTIONS ---
-
+        // --- ACTIONS ---
         window.openModal = (id, name, bal) => {
             activeId = id; document.getElementById('target-user-name').innerText = name;
             document.getElementById('target-new-bal').value = bal;
@@ -227,10 +225,9 @@
 
         window.updateBalanceInDB = async () => {
             const b = parseInt(document.getElementById('target-new-bal').value);
-            if(isNaN(b)) return alert("Invalid amount!");
             await updateDoc(doc(db, "users", activeId), { balance: b });
             document.getElementById('modal-bal').classList.remove('active');
-            alert("Success: User balance updated! 💸");
+            alert("Updated!");
         };
 
         window.approve = async (id, phone, reward) => {
@@ -241,29 +238,26 @@
                 const ud = uSnap.docs[0];
                 const nb = (ud.data().balance || 0) + reward;
                 await updateDoc(doc(db, "users", ud.id), { balance: nb });
-                alert("Approved: ₹"+reward+" sent! 💰");
+                alert("Paid ₹"+reward);
             }
         };
 
-        window.reject = async (id) => { if(confirm("Reject this submission?")) await deleteDoc(doc(db, "task_submissions", id)); };
+        window.reject = async (id) => { if(confirm("Reject?")) await deleteDoc(doc(db, "task_submissions", id)); };
 
         window.addGigToDB = async () => {
             const t = document.getElementById('gig-title').value;
             const r = parseInt(document.getElementById('gig-reward').value);
-            const d = document.getElementById('gig-desc').value;
-            if(!t || isNaN(r)) return alert("Fill title and reward!");
-            await addDoc(collection(db, "gigs"), { title: t, reward: r, desc: d, timestamp: new Date() });
-            alert("New Gig is LIVE! 🚀");
+            const l = document.getElementById('gig-link').value;
+            if(!t || !r) return alert("Fill data!");
+            await addDoc(collection(db, "gigs"), { title: t, reward: r, link: l, timestamp: new Date() });
+            alert("Gig is Live!");
             document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = "";
         };
 
-        window.blockUser = async (id) => { if(confirm("Block/Delete this user permanently?")) await deleteDoc(doc(db, "users", id)); };
+        window.blockUser = async (id) => { if(confirm("Delete user?")) await deleteDoc(doc(db, "users", id)); };
 
-        // Auto Boot
-        if(localStorage.getItem("earn_admin")) {
-            document.body.classList.add('authenticated');
-            startSync();
-        }
+        // SESSION CHECK
+        if(localStorage.getItem("admin_login_prox")) { document.body.classList.add('authenticated'); startSync(); }
     </script>
 </body>
 </html>
