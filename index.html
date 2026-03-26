@@ -107,7 +107,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 🔥 Aapke Database ki Keys
+        // 🔥 FIREBASE KEYS
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
           authDomain: "earnproxuc.firebaseapp.com",
@@ -123,9 +123,8 @@
         let isNewUser = true;
         let existingUserName = ""; 
 
-        // Auto-apply Refer Code
+        // Auto-apply Refer Code & Check Session
         window.onload = () => {
-            // Agar pehle se login hai, toh dashboard par bhej do
             if(localStorage.getItem("earnprox_user_phone")) {
                 window.location.href = "dashboard.html"; 
             }
@@ -168,11 +167,11 @@
             
             document.getElementById('display-number').innerText = "+91 " + phone;
             const btn = document.getElementById('send-otp-btn');
-            btn.innerText = "Checking User...";
+            btn.innerText = "Checking User... ⏳";
             btn.disabled = true;
 
             try {
-                // REAL FIREBASE CHECK: Kya ye number pehle se hai?
+                // REAL FIREBASE CHECK
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("phone", "==", phone));
                 const querySnapshot = await getDocs(q);
@@ -180,9 +179,9 @@
                 if (!querySnapshot.empty) {
                     // OLD USER
                     isNewUser = false;
-                    querySnapshot.forEach((doc) => { existingUserName = doc.data().name; });
+                    querySnapshot.forEach((doc) => { existingUserName = doc.data().name || "User"; });
                     document.getElementById('name-container').classList.add('hidden');
-                    window.showToast(`Welcome back, ${existingUserName}! OTP Sent.`);
+                    window.showToast(`Welcome back, ${existingUserName.split(" ")[0]}! OTP Sent.`);
                 } else {
                     // NEW USER
                     isNewUser = true;
@@ -217,14 +216,12 @@
 
         // VERIFY BYPASS OTP (1234) & SAVE TO DATABASE
         window.verifyAndLogin = async function() {
+            const btn = document.getElementById('verify-btn');
             const o1 = document.getElementById('otp1').value; const o2 = document.getElementById('otp2').value;
             const o3 = document.getElementById('otp3').value; const o4 = document.getElementById('otp4').value;
             const enteredOtp = o1 + o2 + o3 + o4;
             
-            if(enteredOtp.length < 4) {
-                window.showToast("⚠️ Please enter the complete 4-digit OTP.");
-                return;
-            }
+            if(enteredOtp.length < 4) { window.showToast("⚠️ Please enter the complete 4-digit OTP."); return; }
 
             // BYPASS LOGIC 🚨
             if(enteredOtp !== "1234") {
@@ -234,35 +231,44 @@
                 return;
             }
 
+            btn.innerText = "Verifying... ⏳";
+            btn.disabled = true;
+
             const phone = document.getElementById('mobile-input').value;
             let finalName = existingUserName;
 
             if(isNewUser) {
-                finalName = document.getElementById('name-input').value;
+                finalName = document.getElementById('name-input').value.trim();
                 if(finalName.length < 3) {
                     window.showToast("⚠️ Please enter your full name.");
+                    btn.innerText = "Verify & Save Data";
+                    btn.disabled = false;
                     return;
                 }
                 
-                window.showToast("⏳ Saving Account...");
+                window.showToast("⏳ Registering on Server...");
                 const referCode = document.getElementById('refer-input').value;
                 
                 try {
-                    // FIREBASE DATA SAVE (Sirf Naye User ka hoga)
+                    // 🔥 BUG FIX: Added Default Balance (0) and Empty UPI
                     await addDoc(collection(db, "users"), {
                         phone: phone,
                         name: finalName,
+                        balance: 0,           // Important for Dashboard sync
+                        upi: "",              // Important for Admin Panel
                         referCodeUsed: referCode ? referCode : "None",
                         timestamp: new Date()
                     });
                 } catch(e) {
-                    console.error("Save Error:", e);
+                    window.showToast("❌ Server Error! Try again.");
+                    btn.innerText = "Verify & Save Data";
+                    btn.disabled = false;
+                    return;
                 }
             }
 
-            // PHONE KI MEMORY MEIN LOGIN SAVE (Session)
+            // PHONE KI MEMORY MEIN LOGIN SAVE (Session Lock)
             localStorage.setItem("earnprox_user_phone", phone);
-            localStorage.setItem("earnprox_user_name", finalName);
 
             window.showToast("✅ Login Successful! Redirecting...");
             
