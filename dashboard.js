@@ -15,12 +15,12 @@ window.showToast = function(message) {
     setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
-window.switchTab = function(tabId, btnElement) {
-    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-    if(btnElement) btnElement.classList.add('active');
-    
+// 🔥 NAVIGATION SYSTEM (No bottom nav logic anymore)
+window.switchTab = function(tabId) {
     const mainHeader = document.getElementById('main-header');
-    if(tabId === 'home' || tabId === 'profile' || tabId === 'refer') {
+    
+    // Hide header on Home, show on other tabs for "Back" navigation
+    if(tabId === 'home') {
         mainHeader.style.opacity = '0';
         setTimeout(() => mainHeader.style.display = 'none', 200);
     } else {
@@ -31,6 +31,7 @@ window.switchTab = function(tabId, btnElement) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     const targetView = document.getElementById('view-' + tabId);
     if(targetView) { setTimeout(() => targetView.classList.add('active'), 50); }
+    window.scrollTo(0,0);
 }
 
 window.switchWsTab = function(wsId, btnElement) {
@@ -145,7 +146,6 @@ if(userPhone) {
                     document.getElementById("referral-code-text").innerText = window.myReferCode;
 
                     document.getElementById("home-user-name").innerText = n.split(" ")[0];
-                    document.getElementById("header-user-name").innerText = n.split(" ")[0];
                     document.getElementById("profile-user-name").innerText = n;
                     document.getElementById("refer-page-name").innerText = n;
                     
@@ -161,6 +161,9 @@ if(userPhone) {
                     document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
                     document.getElementById("withdraw-page-balance").innerText = `₹ ${window.currentBalance}`;
                     document.getElementById("home-mini-balance").innerText = `₹ ${window.currentBalance}`;
+                    
+                    // Top Right Home Balance
+                    document.getElementById("home-top-balance").innerText = `₹ ${window.currentBalance}`;
 
                     if(userData.upi && userData.upi !== "None" && userData.upi !== "") {
                         window.savedUPI = userData.upi;
@@ -261,7 +264,7 @@ window.acceptTask = function() {
     
     window.closeAllSheets();
     setTimeout(() => {
-        window.switchTab('project', document.querySelectorAll('.nav-item')[1]);
+        window.switchTab('project');
         window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
         window.showToast("✅ Gig Accepted! Upload proof now.");
     }, 300);
