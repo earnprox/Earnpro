@@ -219,36 +219,63 @@
                 <h2 class="text-4xl font-black tracking-tighter mb-4 relative z-10" id="main-balance-display">₹ 0<span class="text-xl text-slate-500 font-bold">.00</span></h2>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Earning</p>
-                    <h4 class="text-xl font-black text-slate-800 mt-1" id="stat-total-earn">₹0</h4>
+            <div class="premium-card rounded-[2rem] overflow-hidden mb-8">
+                <div class="flex justify-between items-center p-5 border-b border-slate-50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-xl text-indigo-600">💰</div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">Total Earning</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lifetime</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-black text-slate-800 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100" id="stat-total-earn">₹0</span>
                 </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Withdrawals</p>
-                    <h4 class="text-xl font-black text-rose-500 mt-1" id="stat-total-withdraw">₹0</h4>
+
+                <div class="flex justify-between items-center p-5 border-b border-slate-50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-rose-50 rounded-2xl flex items-center justify-center text-xl text-rose-500">📤</div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">Withdrawals</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">To Bank</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-black text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100" id="stat-total-withdraw">₹0</span>
                 </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Task Earning</p>
-                    <h4 class="text-lg font-bold text-slate-700 mt-1" id="stat-task-earn">₹0</h4>
+
+                <div class="flex justify-between items-center p-5 border-b border-slate-50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-xl text-blue-600">🎯</div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">Task Earning</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work Rewards</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100" id="stat-task-earn">₹0</span>
                 </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Refer Earning</p>
-                    <h4 class="text-lg font-bold text-slate-700 mt-1" id="stat-refer-earn">₹0</h4>
+
+                <div class="flex justify-between items-center p-5">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-orange-50 rounded-2xl flex items-center justify-center text-xl text-orange-600">🎁</div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">Refer Earning</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Network Bonus</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-black text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100" id="stat-refer-earn">₹0</span>
                 </div>
             </div>
 
-            <div class="premium-card rounded-2xl overflow-hidden mb-8">
+            <div class="premium-card rounded-2xl overflow-hidden mb-12">
                 <div onclick="window.openSheet('history-sheet')" class="flex justify-between items-center p-4 border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer">
                     <div class="flex items-center gap-3">
-                        <span class="bg-slate-100 p-2 rounded-lg text-slate-600">📊</span>
-                        <div><p class="text-sm font-semibold text-slate-800">Ledger & History</p><p class="text-xs text-slate-500 mt-0.5">Track your tasks & withdrawals</p></div>
+                        <span class="bg-slate-100 p-2 rounded-lg text-slate-600 text-lg">📜</span>
+                        <div><p class="text-sm font-semibold text-slate-800">Ledger & History</p><p class="text-xs text-slate-500 mt-0.5">Full Transaction Log</p></div>
                     </div>
                     <span class="text-slate-400 text-lg">›</span>
                 </div>
                 <div onclick="window.openSheet('kyc-sheet')" class="flex justify-between items-center p-4 hover:bg-slate-50 transition cursor-pointer">
                     <div class="flex items-center gap-3">
-                        <span class="bg-slate-100 p-2 rounded-lg text-slate-600">🏦</span>
+                        <span class="bg-slate-100 p-2 rounded-lg text-slate-600 text-lg">🏦</span>
                         <div><p class="text-sm font-semibold text-slate-800" id="upi-display-text">Payout Settings</p><p class="text-xs text-slate-500 mt-0.5" id="bank-display-text">Link your account</p></div>
                     </div>
                     <span class="text-[11px] font-bold text-red-500 border border-red-200 bg-red-50 px-2 py-1 rounded" id="upi-status-badge">Pending</span>
