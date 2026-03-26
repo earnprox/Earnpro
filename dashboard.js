@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs, updateDoc, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // ================= UI GLOBALS =================
 window.currentBalance = 0;
@@ -29,7 +29,6 @@ window.switchTab = function(tabId) {
             mainHeader.style.opacity = '1';
         }
     }
-
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     const target = document.getElementById('view-' + tabId);
     if(target) target.classList.add('active');
@@ -45,43 +44,28 @@ window.switchWsTab = function(wsId, btnElement) {
         btnElement.classList.remove('text-slate-500');
         btnElement.classList.add('bg-white', 'shadow-sm', 'text-blue-600');
     }
-    
     document.querySelectorAll('.ws-content').forEach(content => content.classList.remove('active'));
     document.getElementById('ws-' + wsId).classList.add('active');
 }
 
-let currentOpenSheet = null;
 window.openSheet = function(sheetId) {
-    if(currentOpenSheet) window.closeAllSheets();
-    const sheet = document.getElementById(sheetId);
-    if(!sheet) return;
     document.getElementById('universal-overlay').classList.add('modal-active');
-    currentOpenSheet = sheet;
-    setTimeout(() => { sheet.classList.add('sheet-active'); }, 10);
+    document.getElementById(sheetId).classList.add('sheet-active');
 }
 
 window.closeAllSheets = function() {
-    if(currentOpenSheet) {
-        currentOpenSheet.classList.remove('sheet-active');
-        setTimeout(() => {
-            document.getElementById('universal-overlay').classList.remove('modal-active');
-            currentOpenSheet = null;
-        }, 300);
-    }
+    document.querySelectorAll('.sheet-active').forEach(s => s.classList.remove('sheet-active'));
+    document.getElementById('universal-overlay').classList.remove('modal-active');
 }
 
 window.openFullPage = function(pageId) {
     if(!window.savedUPI) { window.showToast("⚠️ Link UPI in Payout Settings first!"); return; }
-    const page = document.getElementById(pageId);
-    if(page) page.classList.add('full-page-active');
-    if(pageId === 'withdraw-page') {
-        setTimeout(() => document.getElementById("withdraw-amount").focus(), 300);
-    }
+    document.getElementById(pageId).classList.add('full-page-active');
+    if(pageId === 'withdraw-page') setTimeout(() => document.getElementById("withdraw-amount").focus(), 300);
 }
 
 window.closeFullPage = function(pageId) {
-    const page = document.getElementById(pageId);
-    if(page) page.classList.remove('full-page-active');
+    document.getElementById(pageId).classList.remove('full-page-active');
 }
 
 window.logoutUser = function() {
@@ -93,7 +77,7 @@ window.logoutUser = function() {
 
 window.copyReferLink = function() {
     if(!window.myReferCode) return;
-    const link = `https://earnprox.vercel.app/index.html?ref=${window.myReferCode}`;
+    const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
     navigator.clipboard.writeText(link).then(() => {
         window.showToast("✅ Referral Link Copied!");
     }).catch(err => { window.showToast("⚠️ Failed to copy!"); });
@@ -101,8 +85,8 @@ window.copyReferLink = function() {
 
 window.shareOnWhatsApp = function() {
     if(!window.myReferCode) return;
-    const link = `https://earnprox.vercel.app/index.html?ref=${window.myReferCode}`;
-    const promoMessage = `🔥 Bro! I just found this app *EarnproX*. Complete tasks and earn cash to UPI! \n\nUse my invite code *${window.myReferCode}* and get joining bonus!\n👇👇\n${link} 🚀`;
+    const link = `https://earnprox.in/index.html?ref=${window.myReferCode}`;
+    const promoMessage = `🔥 Bro! I found this app *EarnproX*. Complete tasks and earn cash! \n\nUse code *${window.myReferCode}*\n👇👇\n${link} 🚀`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoMessage)}`, '_blank');
 }
 
@@ -119,17 +103,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const userPhone = localStorage.getItem("earnprox_user_phone");
 
-// UTILS
 const isToday = (dateObj) => {
     if(!dateObj) return false;
     const today = new Date();
-    const dateToCheck = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
-    return dateToCheck.getDate() === today.getDate() &&
-           dateToCheck.getMonth() === today.getMonth() &&
-           dateToCheck.getFullYear() === today.getFullYear();
+    const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
+    return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
 };
 
-// 🟢 1. LIVE USER DATA & BADGE SYNC (REAL-TIME)
+// 🟢 1. MASTER SYNC ENGINE (REAL-TIME DATA)
 if(userPhone) {
     const q = query(collection(db, "users"), where("phone", "==", userPhone));
     onSnapshot(q, (snapshot) => {
@@ -142,358 +123,215 @@ if(userPhone) {
             window.savedUPI = u.upi || "";
             window.savedBankName = u.bankName || "";
             const realName = u.name || "User";
-            window.myReferCode = (realName.substring(0,3) + userPhone.substring(6)).toUpperCase();
+            window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
 
-            // Home UI
-            const homeUserName = document.getElementById("home-user-name");
-            const homeTopBalance = document.getElementById("home-top-balance");
-            if(homeUserName) homeUserName.innerText = realName.split(" ")[0];
-            if(homeTopBalance) homeTopBalance.innerText = `₹ ${window.currentBalance}`;
-            
-            // Profile UI
-            const profileUserName = document.getElementById("profile-user-name");
-            const profileUserPhone = document.getElementById("profile-user-phone");
-            if(profileUserName) profileUserName.innerText = realName;
-            if(profileUserPhone) profileUserPhone.innerText = "+91 " + userPhone;
+            // Update UI
+            document.getElementById("home-user-name").innerText = realName.split(" ")[0];
+            document.getElementById("profile-user-name").innerText = realName;
+            document.getElementById("profile-user-phone").innerText = "+91 " + userPhone;
+            document.getElementById("home-top-balance").innerText = `₹${window.currentBalance}`;
+            document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
+            document.getElementById("withdraw-page-balance").innerText = `₹${window.currentBalance}`;
+            document.getElementById("refer-page-name").innerText = realName;
+            document.getElementById("referral-code-text").innerText = window.myReferCode;
+            document.getElementById("withdraw-display-name").innerText = window.savedBankName || "Bank Transfer";
+            document.getElementById("withdraw-display-upi").innerText = window.savedUPI || "Processing...";
+            document.getElementById("withdraw-avatar-text").innerText = (window.savedBankName || realName).charAt(0).toUpperCase();
 
-            // Vault UI
-            const mainBalanceDisplay = document.getElementById("main-balance-display");
-            const upiDisplayText = document.getElementById("upi-display-text");
-            const upiStatusBadge = document.getElementById("upi-status-badge");
-            
-            if(mainBalanceDisplay) mainBalanceDisplay.innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
-            if(upiDisplayText) upiDisplayText.innerText = window.savedUPI || "Payout Settings";
-            
-            if(window.savedUPI) {
-                if(upiStatusBadge) {
-                    upiStatusBadge.innerText = "Verified ✅";
-                    upiStatusBadge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
-                }
-                const bnameInput = document.getElementById("bank-name-input");
-                const upiInput = document.getElementById("upi-input-box");
-                if(bnameInput) { bnameInput.value = window.savedBankName; bnameInput.disabled = true; }
-                if(upiInput) { upiInput.value = window.savedUPI; upiInput.disabled = true; }
-                const kycBtn = document.querySelector("#kyc-sheet button");
-                if(kycBtn) { kycBtn.innerText = "Verified & Locked 🔒"; kycBtn.disabled = true; kycBtn.classList.add("bg-emerald-500"); }
-            }
-
-            // Withdraw Page UI
-            const withdrawPageBalance = document.getElementById("withdraw-page-balance");
-            const withdrawDisplayName = document.getElementById("withdraw-display-name");
-            const withdrawDisplayUpi = document.getElementById("withdraw-display-upi");
-            const withdrawAvatarText = document.getElementById("withdraw-avatar-text");
-            
-            if(withdrawPageBalance) withdrawPageBalance.innerText = `₹ ${window.currentBalance}`;
-            if(withdrawDisplayName) withdrawDisplayName.innerText = window.savedBankName || "Bank Transfer";
-            if(withdrawDisplayUpi) withdrawDisplayUpi.innerText = window.savedUPI || "Not Linked";
-            if(withdrawAvatarText) withdrawAvatarText.innerText = (window.savedBankName || realName).charAt(0).toUpperCase();
-
-            // Refer Page UI
-            const referPageName = document.getElementById("refer-page-name");
-            const referralCodeText = document.getElementById("referral-code-text");
-            if(referPageName) referPageName.innerText = realName;
-            if(referralCodeText) referralCodeText.innerText = window.myReferCode;
-
-            // Avatars
+            // Avatar Logic
             const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${realName}&backgroundColor=b6e3f4`;
             document.getElementById("home-profile-avatar").src = avatarUrl;
             document.getElementById("header-avatar").src = avatarUrl;
             document.getElementById("profile-avatar").src = avatarUrl;
             document.getElementById("refer-profile-img").src = avatarUrl;
 
-            // 🔥 Fetch refer list and stats
-            fetchReferralsAndCalculateStats();
-            // 🔥 Fetch transaction history (history)
-            fetchTransactionHistory();
+            // Payout settings lock
+            if(window.savedUPI) {
+                document.getElementById("upi-status-badge").innerText = "Verified ✅";
+                document.getElementById("upi-status-badge").className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+                document.getElementById("bank-display-text").innerText = window.savedBankName;
+                document.getElementById("upi-display-text").innerText = window.savedUPI;
+                
+                const bnameInput = document.getElementById("bank-name-input");
+                const upiInput = document.getElementById("upi-input-box");
+                const kycBtn = document.querySelector("#kyc-sheet button");
+                if(bnameInput) { bnameInput.value = window.savedBankName; bnameInput.disabled = true; }
+                if(upiInput) { upiInput.value = window.savedUPI; upiInput.disabled = true; }
+                if(kycBtn) { kycBtn.innerText = "Verified & Locked 🔒"; kycBtn.disabled = true; kycBtn.classList.add("bg-emerald-500"); }
+            }
+
+            // 🔥 Fetch Stats and History
+            syncStatsAndHistory();
         }
     });
 }
 
-// 🟢 2. SAVE KYC
-window.saveRealKYC = async function() {
-    const name = document.getElementById("bank-name-input").value.trim();
-    const upi = document.getElementById("upi-input-box").value.trim();
+// 🟢 2. SYNC STATS & HISTORY (The Ultimate Fix)
+async function syncStatsAndHistory() {
+    if(!userPhone || !window.myReferCode) return;
 
-    if(name.length < 3 || !upi.includes("@")) {
-        window.showToast("⚠️ Enter valid Banking Name & UPI ID");
-        return;
-    }
+    // Queries
+    const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone));
+    const referQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
+    const withQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
 
-    if(!window.userDocId) return;
+    // Listeners for Stats
+    onSnapshot(taskQ, (snap) => {
+        let taskTotal = 0;
+        snap.forEach(d => { if(d.data().status === "Completed") taskTotal += (d.data().gigReward || 0); });
+        document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`;
+        updateTotalEarning();
+    });
 
-    try {
-        await updateDoc(doc(db, "users", window.userDocId), {
-            bankName: name,
-            upi: upi
-        });
-        window.showToast("✅ Payout Details Locked!");
-        setTimeout(() => { window.closeAllSheets(); }, 1000);
-    } catch (e) { window.showToast("❌ Server Error."); }
-}
-
-// 🟢 3. WITHDRAWAL ACTION
-window.processWithdrawReal = async function() {
-    const amountBox = document.getElementById("withdraw-amount");
-    const amt = parseInt(amountBox.value);
-    
-    if(!amt || isNaN(amt)) { window.showToast("⚠️ Enter amount first!"); return; }
-    if(amt < 50) { window.showToast("⚠️ Minimum withdrawal is ₹50"); return; }
-    if(amt > window.currentBalance) { window.showToast("❌ Insufficient Balance!"); return; }
-
-    const btn = document.getElementById("withdraw-btn");
-    btn.innerText = "Processing Securely...";
-    btn.disabled = true;
-
-    try {
-        await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt });
-        await addDoc(collection(db, "withdrawals"), {
-            userPhone: userPhone,
-            userName: window.savedBankName,
-            amount: amt,
-            upi: window.savedUPI,
-            status: "Pending",
-            timestamp: new Date()
-        });
-        window.showToast("🚀 Request Sent Successfully!");
-        window.closeFullPage('withdraw-page');
-        amountBox.value = ""; 
-    } catch(e) { window.showToast("❌ Request Failed."); }
-    finally {
-        btn.innerText = "Proceed Securely";
-        btn.disabled = false;
-    }
-}
-
-// 🟢 4. REFERRALS & STATS (Fixed logic for real-time sync)
-async function fetchReferralsAndCalculateStats() {
-    if(!window.myReferCode) return;
-    
-    // Naya data fetch karne se pehle loaders show karein
-    document.getElementById('total-refer-earnings').innerText = "⏳";
-    document.getElementById('total-refers-count').innerText = "⏳";
-    document.getElementById('referral-list-container').innerHTML = "<p class='text-center py-6'>Updating...</p>";
-
-    // Refer list query
-    const refQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
-    onSnapshot(refQ, async (snap) => {
+    onSnapshot(referQ, (snap) => {
         let totalCount = 0;
         let todayCount = 0;
         let referListHtml = "";
-        
-        const docsArr = [];
         snap.forEach(d => {
-            docsArr.push({ id: d.id, ...d.data() });
-        });
-        
-        docsArr.sort((a,b) => b.timestamp - a.timestamp); // Naye joins sabse upar
-
-        docsArr.forEach(u => {
+            const data = d.data();
             totalCount++;
-            if(isToday(u.timestamp)) todayCount++;
-            
-            const joinDate = u.timestamp ? new Date(u.timestamp.toDate ? u.timestamp.toDate() : u.timestamp).toLocaleDateString('en-GB') : "Recently";
-            const uName = u.name || "New User";
-            
-            referListHtml += `
-            <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                <div class="w-1/2 flex items-center gap-2 overflow-hidden">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0">${uName.charAt(0).toUpperCase()}</div>
-                    <p class="text-xs font-bold text-slate-800 truncate">${uName}</p>
-                </div>
-                <div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div>
-                <div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div>
-            </div>`;
+            if(isToday(data.timestamp)) todayCount++;
+            referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black">${data.name.charAt(0)}</div><p class="text-xs font-bold text-slate-800">${data.name}</p></div>
+                <div class="text-right"><p class="text-xs font-black text-emerald-500">+₹5</p></div></div>`;
         });
-
-        // Update Refer Page UI
         document.getElementById('total-refers-count').innerText = totalCount;
         document.getElementById('today-refers-count').innerText = todayCount;
-        document.getElementById('total-refer-earnings').innerText = totalCount * window.referBonusPerUser;
+        document.getElementById('stat-refer-earn').innerText = `₹${totalCount * 5}`;
         document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10'>No referrals yet.</p>";
-
-        // 🔥 Ab Vault page ke stats calculate karein (Total/Task/Refer Earning)
-        calculateVaultStats();
-    });
-}
-
-// 🟢 5. VAULT STATS (Dynamic calculation from collections)
-async function calculateVaultStats() {
-    if(!window.myReferCode || !userPhone) return;
-
-    let taskEarnings = 0;
-    let referEarnings = 0;
-    let totalWithdrawals = 0;
-
-    // A. Task Earning calculate karein (Sirf Completed tasks)
-    const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed"));
-    const taskSnap = await getDocs(taskQ);
-    taskSnap.forEach(d => {
-        taskEarnings += (d.data().gigReward || 0);
+        updateTotalEarning();
     });
 
-    // B. Refer Earning calculate karein
-    const referCodeUsed = localStorage.getItem("earnprox_user_refer_code_used") || window.myReferCode; // Agar referrer hai
-    const referQ = query(collection(db, "users"), where("referCodeUsed", "==", referCodeUsed));
-    const referSnap = await getDocs(referQ);
-    referEarnings = referSnap.size * window.referBonusPerUser;
-
-    // C. Total Withdrawal calculate karein
-    const withQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
-    const withSnap = await getDocs(withQ);
-    withSnap.forEach(d => {
-        totalWithdrawals += (d.data().amount || 0);
-    });
-
-    // Update Vault Page UI
-    document.getElementById("stat-task-earn").innerText = `₹${taskEarnings}`;
-    document.getElementById("stat-refer-earn").innerText = `₹${referEarnings}`;
-    document.getElementById("stat-total-earn").innerText = `₹${taskEarnings + referEarnings}`;
-    document.getElementById("stat-total-withdraw").innerText = `₹${totalWithdrawals}`;
-}
-
-// 🟢 6. TRANSACTION HISTORY (History Fix)
-async function fetchTransactionHistory() {
-    if(!userPhone) return;
-    
-    document.getElementById('history-container').innerHTML = "<p class='text-center py-6'>⏳ Loading History...</p>";
-
-    const completedTasksQuery = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed"));
-    const approvedWithdrawalsQuery = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone), where("status", "==", "Approved"));
-    const pendingWithdrawalsQuery = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone), where("status", "==", "Pending"));
-    const referQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
-
-    try {
-        const [taskSnap, approvedSnap, pendingSnap, referSnap] = await Promise.all([
-            getDocs(completedTasksQuery),
-            getDocs(approvedWithdrawalsQuery),
-            getDocs(pendingWithdrawalsQuery),
-            getDocs(referQ)
-        ]);
-
+    onSnapshot(withQ, (snap) => {
+        let withTotal = 0;
         let historyHtml = "";
         const allTransactions = [];
 
-        // Completed Tasks add karein
-        taskSnap.forEach(d => {
+        snap.forEach(d => {
             const data = d.data();
+            withTotal += (data.amount || 0);
             allTransactions.push({
-                type: 'credit',
-                timestamp: data.timestamp,
-                description: 'Task Reward',
-                amount: data.gigReward,
-                icon: '↓',
-                iconBg: 'bg-emerald-50',
-                iconColor: 'text-emerald-500',
-                amountColor: 'text-emerald-500',
-                note: `Task: ${data.gigName}`
+                type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal', amt: data.amount, status: data.status
             });
         });
-
-        // approved Withdrawals add karein
-        approvedSnap.forEach(d => {
-            const data = d.data();
-            allTransactions.push({
-                type: 'debit',
-                timestamp: data.timestamp,
-                description: 'Withdrawal to UPI',
-                amount: data.amount,
-                icon: '↑',
-                iconBg: 'bg-rose-50',
-                iconColor: 'text-rose-500',
-                amountColor: 'text-slate-800',
-                note: `Status: Completed ✅`
-            });
-        });
-
-        // pending Withdrawals add karein
-        pendingSnap.forEach(d => {
-            const data = d.data();
-            allTransactions.push({
-                type: 'pending',
-                timestamp: data.timestamp,
-                description: 'Withdrawal to UPI',
-                amount: data.amount,
-                icon: '⏳',
-                iconBg: 'bg-orange-50',
-                iconColor: 'text-orange-500',
-                amountColor: 'text-slate-500',
-                note: `Status: Processing`
-            });
-        });
-
-        // Refer Bonus add karein (Har referral ek transaction hai)
-        referSnap.forEach(d => {
-            const data = d.data();
-            allTransactions.push({
-                type: 'credit',
-                timestamp: data.timestamp,
-                description: 'Refer Bonus',
-                amount: window.referBonusPerUser,
-                icon: '↓',
-                iconBg: 'bg-emerald-50',
-                iconColor: 'text-emerald-500',
-                amountColor: 'text-emerald-500',
-                note: `Friend joined: ${data.name}`
-            });
-        });
-
-        // Timestamp se sort karein (Sabse naya upar)
-        allTransactions.sort((a,b) => b.timestamp - a.timestamp);
-
-        allTransactions.forEach(item => {
-            historyHtml += `
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4 ${item.type === 'pending' ? 'opacity-70' : ''}">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full ${item.iconBg} ${item.iconColor} flex items-center justify-center font-bold text-xl shrink-0">${item.icon}</div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">${item.description}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">${item.note}</p>
-                    </div>
-                </div>
-                <p class="text-sm font-black ${item.amountColor}">${item.type === 'debit' ? '-' : '+'} ₹${item.amount}</p>
-            </div>`;
-        });
-
-        document.getElementById('history-container').innerHTML = historyHtml || `
-            <div class="text-center py-10 opacity-60">
-                <span class="text-5xl mb-3 block">📭</span>
-                <p class="text-sm font-bold text-slate-800">No transactions yet</p>
-            </div>`;
-            
-    } catch (e) {
-        console.error("Error loading history:", e);
-        document.getElementById('history-container').innerHTML = "<p class='text-center py-6 text-red-500'>❌ Failed to load history.</p>";
-    }
+        document.getElementById("stat-total-withdraw").innerText = `₹${withTotal}`;
+        
+        // Final Ledger Display
+        renderLedger(allTransactions);
+    });
 }
 
-// 🟢 7. LIVE GIGS SYNC
+function updateTotalEarning() {
+    const t = parseInt(document.getElementById("stat-task-earn").innerText.replace("₹","")) || 0;
+    const r = parseInt(document.getElementById("stat-refer-earn").innerText.replace("₹","")) || 0;
+    document.getElementById("stat-total-earn").innerText = `₹${t + r}`;
+}
+
+// 🟢 3. LEDGER RENDERER
+async function renderLedger(withs) {
+    const historyCont = document.getElementById('history-container');
+    let combined = [...withs];
+
+    // Get Tasks
+    const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone), where("status", "==", "Completed")));
+    taskSnap.forEach(d => {
+        combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: 'Task Reward', amt: d.data().gigReward, status: 'Completed' });
+    });
+
+    // Get Refers
+    const referSnap = await getDocs(query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode)));
+    referSnap.forEach(d => {
+        combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: 'Refer Bonus', amt: 5, status: 'Completed' });
+    });
+
+    combined.sort((a,b) => b.timestamp - a.timestamp);
+    
+    let html = "";
+    combined.forEach(item => {
+        const isDebit = item.type === 'debit';
+        html += `<div class="flex justify-between items-center border-b border-slate-50 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full ${isDebit ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'} flex items-center justify-center font-bold">${isDebit ? '↑' : '↓'}</div>
+                <div><p class="text-sm font-bold text-slate-800">${item.desc}</p><p class="text-[10px] text-slate-400 uppercase">${item.status}</p></div>
+            </div>
+            <p class="text-sm font-black ${isDebit ? 'text-slate-800' : 'text-emerald-500'}">${isDebit ? '-' : '+'} ₹${item.amt}</p>
+        </div>`;
+    });
+    historyCont.innerHTML = html || "<p class='text-center py-10 opacity-60'>No transactions yet</p>";
+}
+
+// 🟢 4. ACTIONS (KYC, Withdraw, Tasks)
+window.saveRealKYC = async function() {
+    const n = document.getElementById("bank-name-input").value.trim();
+    const u = document.getElementById("upi-input-box").value.trim();
+    if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid input");
+    try {
+        await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u });
+        window.showToast("✅ Details Locked!"); setTimeout(() => window.closeAllSheets(), 1000);
+    } catch (e) { window.showToast("❌ Error"); }
+}
+
+window.processWithdrawReal = async function() {
+    const amt = parseInt(document.getElementById("withdraw-amount").value);
+    if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50 required");
+    if(amt > window.currentBalance) return window.showToast("❌ Low Balance");
+
+    const btn = document.getElementById("withdraw-btn");
+    btn.disabled = true; btn.innerText = "Processing...";
+    try {
+        await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt });
+        await addDoc(collection(db, "withdrawals"), { userPhone, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() });
+        window.showToast("🚀 Sent!"); window.closeFullPage('withdraw-page');
+    } catch(e) { window.showToast("❌ Failed"); }
+    finally { btn.disabled = false; btn.innerText = "Proceed Securely"; }
+}
+
+// 🟢 5. GIG ENGINE
 onSnapshot(collection(db, "gigs"), (snap) => {
     let html = "";
     snap.forEach(doc => {
         const g = doc.data();
-        html += `<div class="premium-card p-5 rounded-3xl mb-4 border border-slate-100 shadow-sm relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 text-6xl opacity-10">🚀</div>
-            <h4 class="font-black text-slate-800 text-lg relative z-10 truncate">${g.title}</h4>
-            <p class="text-emerald-600 font-bold text-sm mt-1 relative z-10">Reward: ₹${g.reward}</p>
-            <button onclick="window.openGigSheet('${g.title}', ${g.reward}, '${g.link}')" class="w-full bg-slate-900 text-white font-black py-3 rounded-xl mt-4 text-sm active:scale-95 transition relative z-10">View Task Details</button>
+        html += `<div class="premium-card p-6 rounded-[2rem] border border-slate-100 mb-4 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 text-7xl opacity-5">🚀</div>
+            <h4 class="font-black text-slate-800 text-xl mb-1">${g.title}</h4>
+            <p class="text-emerald-600 font-bold mb-4">Reward: ₹${g.reward}</p>
+            <button onclick="window.openGigSheet('${g.title}', ${g.reward}, '${g.link}')" class="w-full bg-slate-900 text-white font-black py-3 rounded-2xl text-sm active:scale-95 transition">View Task</button>
         </div>`;
     });
-    document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 text-slate-400 font-bold'>No tasks available</p>";
+    document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10'>No tasks</p>";
 });
 
-window.openGigSheet = function(t, r, d) {
+window.openGigSheet = (t, r, d) => {
     document.getElementById('sheet-gig-title').innerText = t;
     document.getElementById('sheet-gig-reward').innerText = `₹${r} Reward`;
     document.getElementById('sheet-gig-desc').innerText = d;
-    window.selectedGigData = { title:t, reward:r, desc:d };
+    window.selectedGigData = { title: t, reward: r, link: d };
     window.openSheet('task-sheet');
 }
 
-window.acceptTask = function() {
+window.acceptTask = () => {
     if(!window.selectedGigData) return;
     document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
     document.getElementById('active-gig-reward').innerText = `₹${window.selectedGigData.reward}`;
+    document.getElementById('active-task-card').classList.remove('hidden');
+    document.getElementById('no-active-task').classList.add('hidden');
+    if(window.selectedGigData.link.startsWith('http')) window.open(window.selectedGigData.link, '_blank');
     window.closeAllSheets(); window.switchTab('project');
     window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
-    window.showToast("✅ Accepted!");
+}
+
+// IMGBB Upload
+window.submitTaskProofReal = async () => {
+    const file = document.getElementById("proof-image").files[0];
+    if(!file) return window.showToast("⚠️ Select proof first");
+    const btn = document.getElementById("submit-proof-btn");
+    btn.disabled = true; btn.innerText = "Uploading...";
+    try {
+        const formData = new FormData(); formData.append("image", file);
+        const res = await fetch("https://api.imgbb.com/1/upload?key=7d2c13c8fedf546d91b46d36c1ef76d0", { method: "POST", body: formData });
+        const imgData = await res.json();
+        await addDoc(collection(db, "task_submissions"), { userPhone, gigName: document.getElementById('active-gig-name').innerText, gigReward: parseInt(document.getElementById('active-gig-reward').innerText.replace("₹","")), proofLink: imgData.data.url, status: "Pending Approval", timestamp: new Date() });
+        window.showToast("🚀 Submitted!"); window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]);
+    } catch (e) { window.showToast("❌ Failed"); }
+    finally { btn.disabled = false; btn.innerText = "Submit Screenshot"; }
 }
