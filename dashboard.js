@@ -3,6 +3,9 @@ import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs, up
 
 // ================= UI GLOBALS =================
 window.currentBalance = 0; window.savedUPI = ""; window.savedBankName = ""; window.userDocId = null; window.myReferCode = ""; window.referBonusPerUser = 5;
+window.myReferrerCode = ""; // Jisne mujhe refer kiya
+window.referCommission = 0; // 5% task commission tracker
+window.referFlatBonus = 0;  // ₹5 joining bonus tracker
 
 // Data Holders
 window.liveGigs = {}; 
@@ -18,7 +21,7 @@ window.openFullPage = (id) => { if(!window.savedUPI) return window.showToast("�
 window.closeFullPage = (id) => { document.getElementById(id).classList.remove('full-page-active'); };
 window.logoutUser = () => { if(confirm("Are you sure?")) { localStorage.removeItem("earnprox_user_phone"); window.location.href="index.html"; } };
 window.copyReferLink = () => { if(!window.myReferCode) return; navigator.clipboard.writeText(`https://earnprox.in/index.html?ref=${window.myReferCode}`).then(()=>window.showToast("✅ Copied!")); };
-window.shareOnWhatsApp = () => { if(!window.myReferCode) return; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`🔥 Earn cash with EarnproX! Use my code *${window.myReferCode}*\n👇👇\nhttps://earnprox.in/index.html?ref=${window.myReferCode}`)}`, '_blank'); };
+window.shareOnWhatsApp = () => { if(!window.myReferCode) return; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`🔥 Earn cash with EarnproX! Complete tasks & get paid instantly!\n\nUse my code *${window.myReferCode}* to get joining bonus!\n👇👇\nhttps://earnprox.in/index.html?ref=${window.myReferCode}`)}`, '_blank'); };
 
 // ================= FIREBASE =================
 const firebaseConfig = { apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", authDomain: "earnproxuc.firebaseapp.com", projectId: "earnproxuc", storageBucket: "earnproxuc.firebasestorage.app", messagingSenderId: "411733884378", appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" };
@@ -31,6 +34,7 @@ if(userPhone) {
         if(!snap.empty) {
             const docSnap = snap.docs[0]; window.userDocId = docSnap.id; const u = docSnap.data();
             window.currentBalance = u.balance || 0; window.savedUPI = u.upi || ""; window.savedBankName = u.bankName || "";
+            window.myReferrerCode = u.referCodeUsed || ""; // 🔥 Fetch kisne refer kiya tha
             const realName = u.name || "User"; window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
 
             document.getElementById("home-user-name").innerText = realName.split(" ")[0]; document.getElementById("profile-user-name").innerText = realName;
@@ -55,15 +59,16 @@ if(userPhone) {
     });
 }
 
-// 🟢 2. SYNC ENGINE (Handles Review Tab & Hide from Explore)
+// 🟢 2. SYNC ENGINE (Calculates 5% Commission + Tasks)
 async function syncStatsAndHistory() {
     if(!userPhone || !window.myReferCode) return;
     
     const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone));
     const referQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
     const withQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
+    const referCommissionQ = query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode)); // 🔥 Query for 5% commission
 
-    // A. TASK SUBMISSIONS (Filters Explore & Populates Review)
+    // A. MY TASK SUBMISSIONS
     onSnapshot(taskQ, (snap) => { 
         let taskTotal = 0; 
         window.mySubmissionsMap = {};
@@ -71,40 +76,47 @@ async function syncStatsAndHistory() {
 
         snap.forEach(d => { 
             const data = d.data();
-            window.mySubmissionsMap[data.gigName] = data; // Save to map to hide from Explore
-            window.mySubmissionsList.push(data); // Save for Review Tab
-            
+            window.mySubmissionsMap[data.gigName] = data; 
+            window.mySubmissionsList.push(data); 
             if(data.status === "Approved" || data.status === "Completed") taskTotal += (data.gigReward || 0); 
         }); 
         
         document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`; 
-        
-        renderExploreGigs(); // Re-render explore to hide submitted ones
-        renderReviewTab();   // Render review tab statuses
-        updateTotalEarning(); 
+        renderExploreGigs(); renderReviewTab(); updateTotalEarning(); 
     });
 
-    // B. REFERRALS
+    // B. MY 5% COMMISSION EARNINGS
+    onSnapshot(referCommissionQ, (snap) => {
+        let commTotal = 0;
+        snap.forEach(d => {
+            const data = d.data();
+            if(data.status === "Approved" || data.status === "Completed") {
+                commTotal += (data.gigReward * 0.05); // Calculate 5%
+            }
+        });
+        window.referCommission = parseFloat(commTotal.toFixed(2));
+        updateReferUI();
+    });
+
+    // C. REFERRALS (Joining Bonus)
     onSnapshot(referQ, (snap) => {
         let totalCount = 0, todayCount = 0, referListHtml = ""; const docsArr = [];
         snap.forEach(d => docsArr.push(d.data())); docsArr.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-        docsArr.forEach(data => { totalCount++; if(isToday(data.timestamp)) todayCount++; const joinDate = data.timestamp ? new Date(getSafeTime(data.timestamp)).toLocaleDateString('en-GB') : "Recently"; const uName = data.name || "User"; referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div></div>`; });
+        docsArr.forEach(data => { 
+            totalCount++; if(isToday(data.timestamp)) todayCount++; 
+            const joinDate = data.timestamp ? new Date(getSafeTime(data.timestamp)).toLocaleDateString('en-GB') : "Recently"; 
+            const uName = data.name || "User"; 
+            referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div></div>`; 
+        });
         
         document.getElementById('total-refers-count').innerText = totalCount; 
         document.getElementById('today-refers-count').innerText = todayCount; 
-        
-        const referBonusEarned = totalCount * window.referBonusPerUser;
-        document.getElementById('stat-refer-earn').innerText = `₹${referBonusEarned}`; 
-        
-        // Fixed: Ensure Refer Tab Bonus shows correctly
-        const referBonusPageText = document.getElementById('total-refer-earnings');
-        if(referBonusPageText) referBonusPageText.innerText = referBonusEarned;
-
+        window.referFlatBonus = totalCount * window.referBonusPerUser;
         document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet.</p>"; 
-        updateTotalEarning();
+        updateReferUI();
     });
 
-    // C. WITHDRAWALS
+    // D. WITHDRAWALS
     onSnapshot(withQ, (snap) => {
         let withTotal = 0; const allTransactions = [];
         snap.forEach(d => { const data = d.data(); withTotal += (data.amount || 0); allTransactions.push({ type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal to Bank', amt: data.amount, status: data.status }); });
@@ -112,18 +124,40 @@ async function syncStatsAndHistory() {
     });
 }
 
+function updateReferUI() {
+    const totalReferEarning = window.referFlatBonus + window.referCommission;
+    document.getElementById('stat-refer-earn').innerText = `₹${totalReferEarning}`; 
+    const referBonusPageText = document.getElementById('total-refer-earnings');
+    if(referBonusPageText) referBonusPageText.innerText = totalReferEarning;
+    updateTotalEarning();
+}
+
 function updateTotalEarning() {
-    const t = parseInt(document.getElementById("stat-task-earn").innerText.replace("₹","")) || 0;
-    const r = parseInt(document.getElementById("stat-refer-earn").innerText.replace("₹","")) || 0;
-    document.getElementById("stat-total-earn").innerText = `₹${t + r}`;
+    const t = parseFloat(document.getElementById("stat-task-earn").innerText.replace("₹","")) || 0;
+    const r = parseFloat(document.getElementById("stat-refer-earn").innerText.replace("₹","")) || 0;
+    document.getElementById("stat-total-earn").innerText = `₹${(t + r).toFixed(2)}`;
 }
 
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); let combined = [...withs];
+    
+    // My Tasks
     const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)));
     taskSnap.forEach(d => { if(d.data().status === 'Approved' || d.data().status === 'Completed') combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Task: ${d.data().gigName}`, amt: d.data().gigReward, status: 'Completed' }); });
+    
+    // Joining Bonus
     const referSnap = await getDocs(query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode)));
     referSnap.forEach(d => combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Refer Bonus (${d.data().name})`, amt: window.referBonusPerUser, status: 'Completed' }));
+    
+    // 5% Commission
+    const commSnap = await getDocs(query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode)));
+    commSnap.forEach(d => { 
+        if(d.data().status === 'Approved' || d.data().status === 'Completed') {
+            const comm = d.data().gigReward * 0.05;
+            combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `5% Commission (${d.data().gigName})`, amt: parseFloat(comm.toFixed(2)), status: 'Completed' }); 
+        }
+    });
+
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
     
     let html = "";
@@ -136,18 +170,12 @@ async function renderLedger(withs) {
     historyCont.innerHTML = html || "<div class='text-center py-10 opacity-60'><span class='text-5xl mb-3 block'>📭</span><p class='text-sm font-bold text-slate-800'>No transactions yet</p></div>";
 }
 
-// 🟢 3. RENDER EXPLORE GIGS (Hides submitted & active tasks)
+// 🟢 3. RENDER EXPLORE GIGS
 window.renderExploreGigs = function() {
-    let html = "";
-    let tasksFound = false;
-
+    let html = ""; let tasksFound = false;
     Object.values(window.liveGigs).forEach(g => {
-        // Condition 1: Hide if already submitted or in review/completed
         if(window.mySubmissionsMap[g.title]) return;
-        
-        // Condition 2: Hide if currently sitting in "In Progress" memory
         if(window.selectedGigData && window.selectedGigData.title === g.title) return;
-
         tasksFound = true;
         html += `<div class="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm relative overflow-hidden mb-4">
             <div class="absolute -right-4 -top-2 opacity-[0.03] text-8xl pointer-events-none">🚀</div>
@@ -162,57 +190,36 @@ window.renderExploreGigs = function() {
     document.getElementById('gigs-container').innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No new tasks available. Check back later!</p>";
 }
 
-// 🟢 4. RENDER REVIEW TAB (Live Status)
+// 🟢 4. RENDER REVIEW TAB
 window.renderReviewTab = function() {
-    let html = "";
-    window.mySubmissionsList.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-
+    let html = ""; window.mySubmissionsList.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
     window.mySubmissionsList.forEach(sub => {
-        let badgeColor = "bg-orange-50 text-orange-600 border-orange-100";
-        let icon = "⏳";
+        let badgeColor = "bg-orange-50 text-orange-600 border-orange-100"; let icon = "⏳";
         if(sub.status === "Approved" || sub.status === "Completed") { badgeColor = "bg-emerald-50 text-emerald-600 border-emerald-100"; icon = "✅"; }
         if(sub.status === "Rejected") { badgeColor = "bg-rose-50 text-rose-600 border-rose-100"; icon = "❌"; }
-
-        html += `
-        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] mb-4">
-            <div class="flex justify-between items-start mb-3">
-                <h4 class="font-black text-lg text-slate-800 pr-2">${sub.gigName}</h4>
-                <span class="${badgeColor} text-[10px] font-black px-2 py-1 rounded-md border shrink-0">${icon} ${sub.status}</span>
-            </div>
-            <p class="text-xs font-bold text-emerald-500 bg-emerald-50 inline-block px-2 py-1 rounded border border-emerald-100">Reward: ₹${sub.gigReward}</p>
-        </div>`;
+        html += `<div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] mb-4"><div class="flex justify-between items-start mb-3"><h4 class="font-black text-lg text-slate-800 pr-2">${sub.gigName}</h4><span class="${badgeColor} text-[10px] font-black px-2 py-1 rounded-md border shrink-0">${icon} ${sub.status}</span></div><p class="text-xs font-bold text-emerald-500 bg-emerald-50 inline-block px-2 py-1 rounded border border-emerald-100">Reward: ₹${sub.gigReward}</p></div>`;
     });
-
     document.getElementById('review-container').innerHTML = html || `<div class="text-center py-20 text-slate-400 font-bold"><div class="text-5xl mb-4 opacity-50">📂</div>No tasks under review.</div>`;
 }
 
-// 🟢 5. FETCH GIGS FROM DB
+// FETCH GIGS
 onSnapshot(collection(db, "gigs"), (snap) => {
     window.liveGigs = {}; 
-    snap.forEach(doc => {
-        const g = doc.data();
-        window.liveGigs[g.title] = g; // Using title as unique key mapping
-    });
+    snap.forEach(doc => { const g = doc.data(); window.liveGigs[g.title] = g; });
     renderExploreGigs();
 });
 
-// 🟢 6. DYNAMIC SHEET HANDLER (Accept & Submit Modes)
+// DYNAMIC SHEET HANDLER
 window.openGigSheet = (gigTitleOrNull, mode) => {
     let g;
-    if(mode === 'explore') {
-        g = window.liveGigs[gigTitleOrNull];
-        if(g) window.selectedGigData = g; // Store active task in memory
-    } else {
-        g = window.selectedGigData; // Retrieve from memory for "In Progress"
-    }
-
+    if(mode === 'explore') { g = window.liveGigs[gigTitleOrNull]; if(g) window.selectedGigData = g; } 
+    else { g = window.selectedGigData; }
     if(!g) return; 
 
     document.getElementById('sheet-gig-title').innerText = g.title;
     document.getElementById('sheet-gig-reward').innerText = `₹${g.reward} Reward`;
     document.getElementById('sheet-gig-desc').innerText = g.desc || g.link || "Follow the instructions provided.";
     
-    // Toggle UI Modes
     if(mode === 'explore') {
         document.getElementById('task-action-explore').classList.remove('hidden');
         document.getElementById('task-action-submit').classList.add('hidden');
@@ -223,44 +230,30 @@ window.openGigSheet = (gigTitleOrNull, mode) => {
     window.openSheet('task-sheet');
 }
 
-// Handle opening sheet from In Progress Tab
-window.openSubmitSheet = () => {
-    window.openGigSheet(null, 'progress');
-}
+window.openSubmitSheet = () => { window.openGigSheet(null, 'progress'); }
 
-// 🟢 7. ACCEPT TASK FLOW
+// ACCEPT TASK
 window.acceptTask = () => {
     if(!window.selectedGigData) return;
+    if(window.selectedGigData.link && window.selectedGigData.link.startsWith('http')) window.open(window.selectedGigData.link, '_blank');
     
-    // Auto-open link
-    const taskLink = window.selectedGigData.link;
-    if(taskLink && taskLink.startsWith('http')) {
-        window.open(taskLink, '_blank');
-    }
-    
-    // Update "In Progress" UI
     document.getElementById('active-gig-name').innerText = window.selectedGigData.title;
     document.getElementById('active-gig-reward').innerText = `Reward: ₹${window.selectedGigData.reward}`;
     document.getElementById('active-task-card').classList.remove('hidden');
     document.getElementById('no-active-task').classList.add('hidden');
     
-    window.closeAllSheets(); 
-    renderExploreGigs(); // 🔥 Remove from Explore Tab dynamically!
-    
-    window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]); // Switch to In Progress
+    window.closeAllSheets(); renderExploreGigs(); window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]);
     window.showToast("✅ Task Accepted & Link Opened!");
 }
 
-// 🟢 8. SUBMIT PROOF FLOW
+// 🟢 SUBMIT PROOF (With Referrer tracking)
 window.submitTaskProofReal = async () => {
     const f = document.getElementById("proof-image").files[0];
     const remarkField = document.getElementById("proof-remark");
     const remark = remarkField ? remarkField.value : "No Remark";
 
     if(!f) return window.showToast("⚠️ Please select a screenshot proof!");
-    
-    const btn = document.getElementById("submit-proof-btn");
-    btn.disabled = true; btn.innerText = "Uploading Screenshot...";
+    const btn = document.getElementById("submit-proof-btn"); btn.disabled = true; btn.innerText = "Uploading Screenshot...";
     
     try {
         const formData = new FormData(); formData.append("image", f);
@@ -273,39 +266,19 @@ window.submitTaskProofReal = async () => {
             gigReward: window.selectedGigData.reward, 
             proofLink: res.data.url, 
             remark: remark,
+            referrerCode: window.myReferrerCode, // 🔥 Saving Referrer code for 5% commission!
             status: "Pending Approval", 
             timestamp: new Date() 
         });
         
-        // Reset Progress UI
-        document.getElementById("proof-image").value = "";
-        if(remarkField) remarkField.value = "";
-        document.getElementById('active-task-card').classList.add('hidden');
-        document.getElementById('no-active-task').classList.remove('hidden');
-        window.selectedGigData = null; // Clear from memory
-
-        window.showToast("🚀 Successfully Submitted!"); 
-        window.closeAllSheets();
-        renderExploreGigs(); // Make sure explore is updated
-        window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]); // Jump to Review!
-    } catch (e) { 
-        window.showToast("❌ Upload Failed. Try again."); 
-    }
-    finally { 
-        btn.disabled = false; btn.innerText = "Submit For Verification"; 
-    }
+        document.getElementById("proof-image").value = ""; if(remarkField) remarkField.value = "";
+        document.getElementById('active-task-card').classList.add('hidden'); document.getElementById('no-active-task').classList.remove('hidden');
+        window.selectedGigData = null; window.showToast("🚀 Successfully Submitted!"); 
+        window.closeAllSheets(); renderExploreGigs(); window.switchWsTab('review', document.querySelectorAll('.ws-tab')[2]);
+    } catch (e) { window.showToast("❌ Upload Failed. Try again."); }
+    finally { btn.disabled = false; btn.innerText = "Submit For Verification"; }
 }
 
-// ACTIONS (KYC, Withdraw)
-window.saveRealKYC = async function() {
-    const n = document.getElementById("bank-name-input").value.trim(); const u = document.getElementById("upi-input-box").value.trim();
-    if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI");
-    try { await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u }); window.showToast("✅ Details Locked!"); setTimeout(() => window.closeAllSheets(), 1000); } catch (e) { window.showToast("❌ Error saving."); }
-}
-
-window.processWithdrawReal = async function() {
-    const amt = parseInt(document.getElementById("withdraw-amount").value);
-    if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50"); if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance");
-    const btn = document.getElementById("withdraw-btn"); btn.disabled = true; btn.innerText = "Processing Securely...";
-    try { await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); window.showToast("🚀 Sent securely!"); window.closeFullPage('withdraw-page'); } catch(e) { window.showToast("❌ Failed"); } finally { btn.innerHTML = `Proceed Securely`; btn.disabled = false; }
-}
+// ACTIONS
+window.saveRealKYC = async function() { const n = document.getElementById("bank-name-input").value.trim(); const u = document.getElementById("upi-input-box").value.trim(); if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI"); try { await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u }); window.showToast("✅ Details Locked!"); setTimeout(() => window.closeAllSheets(), 1000); } catch (e) { window.showToast("❌ Error saving."); } }
+window.processWithdrawReal = async function() { const amt = parseInt(document.getElementById("withdraw-amount").value); if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50"); if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance"); const btn = document.getElementById("withdraw-btn"); btn.disabled = true; btn.innerText = "Processing Securely..."; try { await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); window.showToast("🚀 Sent securely!"); window.closeFullPage('withdraw-page'); } catch(e) { window.showToast("❌ Failed"); } finally { btn.innerHTML = `Proceed Securely`; btn.disabled = false; } }
