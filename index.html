@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="mb-8">
+            <div class="mb-8" id="refer-container">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Invite Code (Optional)</label>
                 <input type="text" id="refer-input" placeholder="Have a referral code?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition uppercase tracking-widest">
             </div>
@@ -68,7 +68,7 @@
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-3">
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter OTP</label>
-                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded">Test OTP: 1234</span>
+                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded border border-blue-100">Test OTP: 1234</span>
                 </div>
                 <div class="flex gap-3 justify-center">
                     <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event)">
@@ -79,7 +79,7 @@
             </div>
 
             <button onclick="window.verifyAndLogin()" id="verify-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
-                Verify & Save Data
+                Verify & Continue
             </button>
         </div>
     </div>
@@ -113,10 +113,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let isNewUser = true; let existingUserName = ""; 
+        // GLOBAL STATE
+        let isNewUser = true; 
+        let existingUserData = null; // Store fetched data
+        const REFER_BONUS_AMOUNT = 5; // Referrer ko kitna milega (₹5 fixed per user)
 
         window.onload = () => {
             if(localStorage.getItem("earnprox_user_phone")) window.location.href = "dashboard.html"; 
+            
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if(refCode) {
@@ -125,33 +129,75 @@
             }
         };
 
-        window.showToast = function(msg) { const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 3000); }
-        window.moveToNext = function(c, n, e) { if (c.value.length >= 1) document.getElementById(n).focus(); if (e && e.key === "Backspace" && c.value === "") { const pId = c.id.replace(/\d/, (num) => parseInt(num) - 1); if(document.getElementById(pId)) document.getElementById(pId).focus(); } }
-        window.checkBackspace = function(c, p, e) { if (e.key === "Backspace" && c.value === "") document.getElementById(p).focus(); }
+        window.showToast = function(msg) { 
+            const t = document.getElementById("toast"); 
+            t.innerText = msg; 
+            t.classList.add("show"); 
+            setTimeout(()=>t.classList.remove("show"), 3000); 
+        }
+        
+        window.moveToNext = function(c, n, e) { 
+            if (c.value.length >= 1 && document.getElementById(n)) document.getElementById(n).focus(); 
+            if (e && e.key === "Backspace" && c.value === "") { 
+                const pId = c.id.replace(/\d/, (num) => parseInt(num) - 1); 
+                if(document.getElementById(pId)) document.getElementById(pId).focus(); 
+            } 
+        }
+        window.checkBackspace = function(c, p, e) { 
+            if (e.key === "Backspace" && c.value === "") document.getElementById(p).focus(); 
+        }
 
+        // STEP 1: CHECK NUMBER & SEND OTP
         window.sendOTP = async function() {
-            const phone = document.getElementById('mobile-input').value;
-            if(phone.length !== 10) return window.showToast("⚠️ Enter valid 10-digit number.");
+            const phone = document.getElementById('mobile-input').value.trim();
+            if(phone.length !== 10) return window.showToast("⚠️ Enter a valid 10-digit number.");
             
             document.getElementById('display-number').innerText = "+91 " + phone;
-            const btn = document.getElementById('send-otp-btn'); btn.innerText = "Checking User... ⏳"; btn.disabled = true;
+            const btn = document.getElementById('send-otp-btn'); 
+            btn.innerText = "Checking User... ⏳"; 
+            btn.disabled = true;
 
             try {
+                // Check if number is in DB
                 const q = query(collection(db, "users"), where("phone", "==", phone));
                 const snap = await getDocs(q);
+                
                 if (!snap.empty) {
-                    isNewUser = false; snap.forEach((doc) => { existingUserName = doc.data().name || "User"; });
+                    // ACCOUNT EXISTS
+                    existingUserData = snap.docs[0].data();
+                    
+                    // Admin Block Check 🚨
+                    if(existingUserData.status === "blocked") {
+                        window.showToast("🚫 Account Suspended by Admin.");
+                        btn.innerHTML = `Get OTP <span class="text-xl">→</span>`; 
+                        btn.disabled = false;
+                        return; 
+                    }
+
+                    isNewUser = false; 
                     document.getElementById('name-container').classList.add('hidden');
-                    window.showToast(`Welcome back, ${existingUserName.split(" ")[0]}! OTP Sent.`);
+                    document.getElementById('refer-container').classList.add('hidden'); // Hide refer input
+                    window.showToast(`Welcome back, ${existingUserData.name.split(" ")[0]}! OTP Sent.`);
                 } else {
-                    isNewUser = true; document.getElementById('name-container').classList.remove('hidden');
+                    // NEW ACCOUNT
+                    isNewUser = true; 
+                    document.getElementById('name-container').classList.remove('hidden');
                     window.showToast("👋 New User! OTP Sent.");
                 }
-            } catch(e) { isNewUser = true; document.getElementById('name-container').classList.remove('hidden'); } 
-            finally { btn.innerHTML = `Get OTP <span class="text-xl">→</span>`; btn.disabled = false; }
 
-            document.getElementById('step-1').classList.remove('step-active'); document.getElementById('step-1').classList.add('step-out-left');
-            document.getElementById('step-2').classList.remove('step-in-right'); document.getElementById('step-2').classList.add('step-active');
+                // Move to OTP Screen
+                document.getElementById('step-1').classList.remove('step-active'); 
+                document.getElementById('step-1').classList.add('step-out-left');
+                document.getElementById('step-2').classList.remove('step-in-right'); 
+                document.getElementById('step-2').classList.add('step-active');
+
+            } catch(e) { 
+                window.showToast("❌ Server Error while checking. Try again.");
+                console.log(e);
+            } finally { 
+                btn.innerHTML = `Get OTP <span class="text-xl">→</span>`; 
+                btn.disabled = false; 
+            }
         }
 
         window.goBack = function() {
@@ -160,46 +206,74 @@
             for(let i=1; i<=4; i++) document.getElementById('otp'+i).value = "";
         }
 
+        // STEP 2: VERIFY OTP AND LOGIN / REGISTER
         window.verifyAndLogin = async function() {
             const btn = document.getElementById('verify-btn');
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
             if(enteredOtp.length < 4) return window.showToast("⚠️ Enter 4-digit OTP.");
+            
+            // Dummy OTP Verification (Production mein yahan Firebase Auth / Fast2SMS API aayegi)
             if(enteredOtp !== "1234") { window.showToast("❌ Invalid OTP! Use 1234."); return; }
 
-            btn.innerText = "Verifying... ⏳"; btn.disabled = true;
-            const phone = document.getElementById('mobile-input').value;
+            btn.innerText = "Verifying... ⏳"; 
+            btn.disabled = true;
+            
+            const phone = document.getElementById('mobile-input').value.trim();
             
             if(isNewUser) {
+                // === CREATE NEW ACCOUNT ===
                 const finalName = document.getElementById('name-input').value.trim();
-                if(finalName.length < 3) { window.showToast("⚠️ Enter full name."); btn.innerText = "Verify & Save Data"; btn.disabled = false; return; }
+                if(finalName.length < 3) { 
+                    window.showToast("⚠️ Enter your full name to proceed."); 
+                    btn.innerText = "Verify & Continue"; btn.disabled = false; 
+                    return; 
+                }
                 
-                // FORCE UPPERCASE FOR SAFETY
                 let referCode = document.getElementById('refer-input').value.trim().toUpperCase();
                 if(!referCode) referCode = "None";
+                
+                // Generate a unique refer code for this user (First 3 letters of name + Last 4 digits of phone)
                 const myOwnCode = (finalName.substring(0,3) + phone.substring(phone.length - 4)).toUpperCase();
 
                 try {
-                    // 1. SAVE NEW USER
+                    // 1. SAVE NEW USER IN DB
                     await addDoc(collection(db, "users"), {
-                        phone: phone, name: finalName, balance: 0, upi: "",
-                        ownReferCode: myOwnCode, referCodeUsed: referCode, timestamp: new Date()
+                        phone: phone, 
+                        name: finalName, 
+                        balance: 0, 
+                        upi: "",
+                        bankName: "",
+                        ownReferCode: myOwnCode, 
+                        referCodeUsed: referCode, 
+                        activeGig: null,
+                        status: "active",
+                        timestamp: new Date()
                     });
 
-                    // 2. 🔥 REWARD THE REFERRER (REAL MONEY SYSTEM)
+                    // 2. 🔥 REWARD THE REFERRER (Only if code is valid)
                     if(referCode !== "None") {
                         const refQ = query(collection(db, "users"), where("ownReferCode", "==", referCode));
                         const refSnap = await getDocs(refQ);
                         if(!refSnap.empty) {
                             const referrerDoc = refSnap.docs[0];
                             const oldBal = referrerDoc.data().balance || 0;
-                            await updateDoc(doc(db, "users", referrerDoc.id), { balance: oldBal + 10 });
+                            // Referrer ko instant wallet balance mil jayega
+                            await updateDoc(doc(db, "users", referrerDoc.id), { balance: oldBal + REFER_BONUS_AMOUNT });
                         }
                     }
-                } catch(e) { window.showToast("❌ Server Error!"); btn.innerText = "Verify & Save Data"; btn.disabled = false; return; }
+                    window.showToast("🎉 Account Created Successfully!");
+                } catch(e) { 
+                    window.showToast("❌ Server Error!"); 
+                    btn.innerText = "Verify & Continue"; btn.disabled = false; 
+                    return; 
+                }
+            } else {
+                // === EXISTING USER LOGIN ===
+                window.showToast("✅ Login Successful!");
             }
 
+            // Save session and redirect
             localStorage.setItem("earnprox_user_phone", phone);
-            window.showToast("✅ Login Successful!");
             setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
         }
     </script>
