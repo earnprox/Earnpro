@@ -21,6 +21,21 @@ window.mySubmissionsList = [];
 window.myActiveGig = null; 
 window.viewingGigData = null; 
 
+// ================= REFRESH STATE HANDLER (NEW) =================
+// Ye code yaad rakhega ki aap kis page par the jab refresh hua
+document.addEventListener("DOMContentLoaded", () => {
+    const savedTab = sessionStorage.getItem('lastActiveTab');
+    const savedFullPage = sessionStorage.getItem('lastActiveFullPage');
+
+    if(savedTab) {
+        window.switchTab(savedTab);
+    }
+    if(savedFullPage) {
+        const fp = document.getElementById(savedFullPage);
+        if(fp) fp.classList.add('full-page-active');
+    }
+});
+
 // ================= UI FUNCTIONS =================
 window.showToast = (m) => { 
     const t = document.getElementById("toast"); 
@@ -28,6 +43,7 @@ window.showToast = (m) => {
 };
 
 window.switchTab = (id) => { 
+    sessionStorage.setItem('lastActiveTab', id); // Memory me save
     const h = document.getElementById('main-header'); 
     if(id === 'home') { if(h) h.style.display = 'none'; } 
     else { if(h) { h.style.display = 'flex'; h.style.opacity = '1'; } } 
@@ -68,17 +84,20 @@ window.closeAllSheets = () => {
 
 window.openFullPage = (id) => { 
     if(!window.savedUPI) return window.showToast("⚠️ Link Payout Settings first!"); 
+    sessionStorage.setItem('lastActiveFullPage', id); // Memory me save
     document.getElementById(id).classList.add('full-page-active'); 
     if(id === 'withdraw-page') setTimeout(() => document.getElementById("withdraw-amount").focus(), 300); 
 };
 
 window.closeFullPage = (id) => { 
+    sessionStorage.removeItem('lastActiveFullPage'); // Memory se remove
     document.getElementById(id).classList.remove('full-page-active'); 
 };
 
 window.logoutUser = () => { 
     if(confirm("Are you sure?")) { 
         localStorage.removeItem("earnprox_user_phone"); 
+        sessionStorage.clear(); // Session bhi clear kar do logout par
         window.location.href="index.html"; 
     } 
 };
@@ -131,6 +150,7 @@ if(userPhone) {
             if(u.status === "blocked") {
                 alert("🚨 Your account has been suspended by the Admin.");
                 localStorage.removeItem("earnprox_user_phone");
+                sessionStorage.clear();
                 window.location.href="index.html";
                 return;
             }
