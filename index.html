@@ -17,9 +17,41 @@
         .otp-box:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
         #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px; }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        /* --- SPLASH SCREEN STYLES --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #F4F7F9; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .pulse-logo { animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+        @keyframes pulse { 0%, 100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.1) rotate(-6deg); } }
     </style>
+
+    <script>
+        // Check Auth Status IMMEDIATELY before rendering the page
+        const storedPhone = localStorage.getItem("earnprox_user_phone");
+        if (storedPhone) {
+            // User is logged in, redirect immediately (Splash screen stays visible)
+            window.location.replace("dashboard.html");
+        }
+    </script>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-blue-100">
+
+    <div id="splash-screen">
+        <div class="w-20 h-20 bg-blue-600 rounded-[1.5rem] mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(37,99,235,0.4)] pulse-logo">
+            <span class="text-4xl text-white font-black">X</span>
+        </div>
+        <h1 class="text-2xl font-black tracking-tight text-slate-900 mt-2">Earnpro<span class="text-blue-600">X</span></h1>
+        <div class="mt-8 flex gap-2 justify-center items-center">
+            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-bounce"></div>
+            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+        </div>
+    </div>
 
     <div class="text-center mb-8 mt-4">
         <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(37,99,235,0.3)] transform -rotate-6">
@@ -115,19 +147,26 @@
 
         // GLOBAL STATE
         let isNewUser = true; 
-        let existingUserData = null; // Store fetched data
-        const REFER_BONUS_AMOUNT = 5; // Referrer ko kitna milega (₹5 fixed per user)
+        let existingUserData = null; 
+        const REFER_BONUS_AMOUNT = 5; 
 
-        window.onload = () => {
-            if(localStorage.getItem("earnprox_user_phone")) window.location.href = "dashboard.html"; 
+        // --- NEW ONLOAD LOGIC FOR SPLASH SCREEN ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Agar pehle wali script ne redirect nahi kiya (मतलब naya user hai), toh loader hatao
+            if (!localStorage.getItem("earnprox_user_phone")) {
+                setTimeout(() => {
+                    document.getElementById('splash-screen').classList.add('hidden');
+                }, 600); // 0.6 sec ki animation lagayi hai professional feel ke liye
+            }
             
+            // Referral code URL se nikalne wala logic
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if(refCode) {
                 document.getElementById('refer-input').value = refCode.toUpperCase();
                 document.getElementById('refer-input').classList.add('border-emerald-300', 'bg-emerald-50', 'text-emerald-700');
             }
-        };
+        });
 
         window.showToast = function(msg) { 
             const t = document.getElementById("toast"); 
