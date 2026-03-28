@@ -452,7 +452,7 @@ window.openGigSheet = (gigTitleOrNull, mode) => {
 
 window.openSubmitSheet = () => { window.openGigSheet(null, 'progress'); }
 
-// ACCEPT TASK
+// ACCEPT TASK (UPDATED WITH DYNAMIC SUBID LOGIC)
 window.acceptTask = async () => {
     if(!window.viewingGigData) return; 
     if(window.myActiveGig) return window.showToast("⚠️ You already have an active task!");
@@ -462,7 +462,24 @@ window.acceptTask = async () => {
     
     try {
         await updateDoc(doc(db, "users", window.userDocId), { activeGig: window.viewingGigData });
-        if(window.viewingGigData.link && window.viewingGigData.link.startsWith('http')) window.open(window.viewingGigData.link, '_blank');
+        
+        let taskLink = window.viewingGigData.link;
+        if(taskLink && taskLink.startsWith('http')) {
+            // Check if admin put '{user_phone}' in the link, if so, replace it
+            if (taskLink.includes('{user_phone}')) {
+                taskLink = taskLink.replace('{user_phone}', userPhone);
+            } 
+            // Otherwise, safely append the subid parameter to the URL
+            else if (!taskLink.includes('subid=')) {
+                if (taskLink.includes('?')) {
+                    taskLink += `&subid=${userPhone}`; 
+                } else {
+                    taskLink += `?subid=${userPhone}`;
+                }
+            }
+            window.open(taskLink, '_blank');
+        }
+
         window.closeAllSheets(); 
         window.switchWsTab('active', document.querySelectorAll('.ws-tab')[1]); 
         window.showToast("✅ Task Accepted!");
