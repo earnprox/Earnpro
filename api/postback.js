@@ -1,22 +1,26 @@
 const admin = require('firebase-admin');
 
 module.exports = async (req, res) => {
-    // CORS bypass
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
-        // 1. Firebase Initialize (Inside Try-Catch taaki error pakad sakein)
+        // Vercel ko jo keys dikh rahi hain, unki list banate hain
+        const envKeys = Object.keys(process.env);
+        const hamariKeys = envKeys.filter(k => k.includes('FIREBASE') || k.includes('POSTBACK'));
+
+        // Agar key missing hai, toh screen par dikhao ki Vercel ke paas konsi keys hain
+        if (!process.env.FIREBASE_PRIVATE_KEY) {
+            return res.status(500).json({
+                error: "Key sach mein missing hai ya spelling galat hai!",
+                Vercel_Ko_Ye_Keys_Mili_Hain: hamariKeys
+            });
+        }
+
+        // Agar key mil gayi, toh aage ka normal process
+        let formattedKey = process.env.FIREBASE_PRIVATE_KEY;
+        formattedKey = formattedKey.replace(/\\n/g, '\n').replace(/"/g, '');
+
         if (!admin.apps.length) {
-            
-            // Check if environment variables exist
-            if (!process.env.FIREBASE_PRIVATE_KEY) {
-                throw new Error("Vercel mein FIREBASE_PRIVATE_KEY missing hai!");
-            }
-
-            // Key formatting fix (Vercel ke nakhre theek karne ke liye)
-            let formattedKey = process.env.FIREBASE_PRIVATE_KEY;
-            formattedKey = formattedKey.replace(/\\n/g, '\n').replace(/"/g, '');
-
             admin.initializeApp({
                 credential: admin.credential.cert({
                     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -27,20 +31,16 @@ module.exports = async (req, res) => {
         }
 
         const db = admin.firestore();
-
-        // 2. Variables lena
         const { userPhone, reward, secret } = req.query;
 
-        // Security Check
         if (secret !== process.env.POSTBACK_SECRET) {
-            return res.status(401).json({ error: "Access Denied! Secret key match nahi hui." });
+            return res.status(401).json({ error: "Secret key match nahi hui." });
         }
 
         if (!userPhone || !reward) {
-            return res.status(400).json({ error: "User Phone ya Reward URL mein missing hai." });
+            return res.status(400).json({ error: "URL mein userPhone ya reward nahi hai." });
         }
 
-        // 3. Database operation
         const usersRef = db.collection('users');
         const snapshot = await usersRef.where('phone', '==', userPhone).get();
 
@@ -52,12 +52,8 @@ module.exports = async (req, res) => {
         const currentBalance = userDoc.data().balance || 0;
         const numReward = parseInt(reward);
 
-        // Balance Update
-        await userDoc.ref.update({
-            balance: currentBalance + numReward
-        });
+        await userDoc.ref.update({ balance: currentBalance + numReward });
 
-        // Ledger Update
         await db.collection('task_submissions').add({
             userPhone: userPhone,
             gigName: "Auto-Verified Partner Task",
@@ -70,11 +66,9 @@ module.exports = async (req, res) => {
         return res.status(200).json({ success: true, message: `₹${numReward} added to user ${userPhone} successfully!` });
 
     } catch (error) {
-        // 🔥 Asli error yahan screen par dikhega!
         return res.status(500).json({ 
             error: "Server Crash Ho Gaya!", 
             asli_wajah: error.message 
         });
     }
 };
-
