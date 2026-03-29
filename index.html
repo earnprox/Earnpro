@@ -31,10 +31,12 @@
     </style>
 
     <script>
-        // 🔒 SECURE CHECK: Now we check for BOTH Phone and Secret Token
+        // 🔒 SECURE REDIRECT CHECK
         const storedPhone = localStorage.getItem("earnprox_user_phone");
         const storedToken = localStorage.getItem("earnprox_secure_token");
-        if (storedPhone && storedToken) window.location.replace("dashboard.html");
+        if (storedPhone && storedToken) {
+            window.location.replace("dashboard.html");
+        }
     </script>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-blue-100">
@@ -180,14 +182,27 @@
 
         const spinnerSVG = `<svg class="animate-spin h-6 w-6 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
-        // 🔒 Generate a random 32-character secret token
+        // 🔒 Generate Secure Token
         function generateSecureToken() {
-            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+            return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
         }
 
+        // 🟢 Splash Hide Logic
         window.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem("earnprox_secure_token")) {
-                setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden'); }, 600); 
+            setTimeout(() => { 
+                const splash = document.getElementById('splash-screen');
+                if(splash) splash.classList.add('hidden'); 
+            }, 800);
+            
+            // Referral Auto-fill
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if(refCode) {
+                const rInput = document.getElementById('refer-input');
+                if(rInput) {
+                    rInput.value = refCode.toUpperCase();
+                    rInput.classList.add('border-emerald-300', 'bg-emerald-50');
+                }
             }
         });
 
@@ -219,7 +234,6 @@
             document.getElementById(currentStepId).classList.add('step-in-right');
             document.getElementById('step-1').classList.remove('step-out-left'); 
             document.getElementById('step-1').classList.add('step-active');
-            
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => { if(input.id !== 'mobile-input') input.value = ''; });
         }
@@ -230,10 +244,8 @@
             
             const btn = document.getElementById('send-otp-btn'); 
             const originalHTML = btn.innerHTML; 
-            
             btn.innerHTML = `${spinnerSVG} Processing...`; 
             btn.disabled = true;
-            btn.classList.add('opacity-80', 'cursor-not-allowed');
 
             try {
                 const q = query(collection(db, "users"), where("phone", "==", phone));
@@ -242,27 +254,23 @@
                 if (!snap.empty) {
                     existingUserDocId = snap.docs[0].id;
                     existingUserData = snap.docs[0].data();
-                    
                     if(existingUserData.status === "blocked") {
                         window.showToast("🚫 Account Suspended.");
-                        btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        btn.innerHTML = originalHTML; btn.disabled = false;
                         return; 
                     }
-                    
                     isNewUser = false;
                     document.getElementById('display-number-pin').innerText = "+91 " + phone;
                     switchStep('step-1', 'step-pin');
-                    setTimeout(() => { btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed'); }, 500);
-                    
+                    btn.innerHTML = originalHTML; btn.disabled = false;
                 } else {
                     isNewUser = true;
                     document.getElementById('new-user-fields').style.display = 'block';
                     await triggerFirebaseOTP(phone, btn, originalHTML);
                 }
             } catch(error) { 
-                console.error("DB Check Error:", error);
                 window.showToast("❌ Server Error!");
-                btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                btn.innerHTML = originalHTML; btn.disabled = false;
             }
         }
 
@@ -272,8 +280,7 @@
 
             if (!window.recaptchaVerifier) {
                 window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    'size': 'invisible',
-                    'callback': (response) => { }
+                    'size': 'invisible'
                 });
             }
 
@@ -282,16 +289,13 @@
                 window.showToast("📲 OTP Sent!");
                 switchStep(fromStep, 'step-otp');
             } catch (error) {
-                console.error("Firebase Auth Error:", error);
-                window.showToast("❌ OTP Failed! Try again later.");
+                window.showToast("❌ OTP Failed! Try later.");
                 if(window.recaptchaVerifier) {
                     window.recaptchaVerifier.clear();
                     window.recaptchaVerifier = null;
                 }
             } finally {
-                if(btnElement && originalHTML) {
-                    setTimeout(() => { btnElement.innerHTML = originalHTML; btnElement.disabled = false; btnElement.classList.remove('opacity-80', 'cursor-not-allowed'); }, 500);
-                }
+                if(btnElement) { btnElement.innerHTML = originalHTML; btnElement.disabled = false; }
             }
         }
 
@@ -299,105 +303,77 @@
             isForgotPin = true;
             document.getElementById('new-user-fields').style.display = 'none'; 
             const phone = document.getElementById('mobile-input').value.trim();
-            
             const btn = document.getElementById('pin-login-btn');
             const originalHTML = btn.innerHTML;
-            
-            btn.innerHTML = `${spinnerSVG} Sending OTP...`; 
-            btn.disabled = true;
-            btn.classList.add('opacity-80', 'cursor-not-allowed');
-
+            btn.innerHTML = `${spinnerSVG} Sending OTP...`; btn.disabled = true;
             await triggerFirebaseOTP(phone, btn, originalHTML, 'step-pin');
         }
 
-        // 🔒 SECURE PIN LOGIN
         window.loginWithPIN = async function() {
             const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
             if(enteredPin.length < 4) return window.showToast("⚠️ Enter 4-digit PIN.");
-
             const btn = document.getElementById('pin-login-btn');
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = `${spinnerSVG} Verifying...`; btn.disabled = true; btn.classList.add('opacity-80', 'cursor-not-allowed');
+            btn.innerHTML = `${spinnerSVG} Verifying...`; btn.disabled = true;
 
             if(existingUserData.pin && existingUserData.pin === enteredPin) {
-                // Generate and save token to DB
                 const newToken = generateSecureToken();
-                try {
-                    await updateDoc(doc(db, "users", existingUserDocId), { sessionToken: newToken });
-                    window.showToast("✅ Login Successful!");
-                    localStorage.setItem("earnprox_user_phone", existingUserData.phone);
-                    localStorage.setItem("earnprox_secure_token", newToken); // Save securely in browser
-                    setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
-                } catch(e) {
-                    window.showToast("❌ Server Error");
-                    btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
-                }
+                await updateDoc(doc(db, "users", existingUserDocId), { sessionToken: newToken });
+                localStorage.setItem("earnprox_user_phone", existingUserData.phone);
+                localStorage.setItem("earnprox_secure_token", newToken);
+                window.location.href = "dashboard.html";
             } else {
                 window.showToast("❌ Incorrect PIN!");
-                btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                btn.innerHTML = originalHTML; btn.disabled = false;
             }
         }
 
-        // 🔒 SECURE OTP LOGIN & SETUP
         window.verifyOTPAndSave = async function() {
             const btn = document.getElementById('verify-btn');
             const originalHTML = btn.innerHTML;
-            
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
             const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
             
-            if(setupPin.length < 4) return window.showToast("⚠️ Set a 4-Digit PIN first.");
-            if(enteredOtp.length < 6) return window.showToast("⚠️ Enter full 6-digit OTP.");
+            if(setupPin.length < 4) return window.showToast("⚠️ Set 4-Digit PIN.");
+            if(enteredOtp.length < 6) return window.showToast("⚠️ Enter 6-digit OTP.");
 
-            btn.innerHTML = `${spinnerSVG} Verifying...`; 
-            btn.disabled = true; btn.classList.add('opacity-80', 'cursor-not-allowed');
+            btn.innerHTML = `${spinnerSVG} Saving...`; btn.disabled = true;
             const phone = document.getElementById('mobile-input').value.trim();
 
             try {
                 await window.confirmationResult.confirm(enteredOtp);
-                const newToken = generateSecureToken(); // Generate new secure token
+                const newToken = generateSecureToken();
 
                 if(isNewUser) {
                     const finalName = document.getElementById('name-input').value.trim();
-                    if(finalName.length < 3) { window.showToast("⚠️ Enter your full name."); btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed'); return; }
+                    if(finalName.length < 3) { window.showToast("⚠️ Enter Name."); btn.innerHTML = originalHTML; btn.disabled = false; return; }
                     
                     let referCode = document.getElementById('refer-input').value.trim().toUpperCase() || "None";
-                    const myOwnCode = (finalName.substring(0,3) + phone.substring(phone.length - 4)).toUpperCase();
+                    const myOwnCode = (finalName.substring(0,3) + phone.substring(6)).toUpperCase();
 
                     await addDoc(collection(db, "users"), {
-                        phone: phone, 
-                        name: finalName, 
-                        pin: setupPin, 
-                        sessionToken: newToken, // Save Token
-                        balance: 0, 
-                        ownReferCode: myOwnCode, 
-                        referCodeUsed: referCode, 
-                        status: "active",
-                        timestamp: new Date()
+                        phone: phone, name: finalName, pin: setupPin, sessionToken: newToken,
+                        balance: 0, ownReferCode: myOwnCode, referCodeUsed: referCode,
+                        status: "active", timestamp: new Date()
                     });
 
                     if(referCode !== "None") {
                         const refSnap = await getDocs(query(collection(db, "users"), where("ownReferCode", "==", referCode)));
                         if(!refSnap.empty) {
-                            const referrerDoc = refSnap.docs[0];
-                            await updateDoc(doc(db, "users", referrerDoc.id), { balance: (referrerDoc.data().balance || 0) + REFER_BONUS_AMOUNT });
+                            const rDoc = refSnap.docs[0];
+                            await updateDoc(doc(db, "users", rDoc.id), { balance: (rDoc.data().balance || 0) + REFER_BONUS_AMOUNT });
                         }
                     }
-                    window.showToast("🎉 Account Created!");
-                } 
-                else if (isForgotPin) {
+                } else if (isForgotPin) {
                     await updateDoc(doc(db, "users", existingUserDocId), { pin: setupPin, sessionToken: newToken });
-                    window.showToast("✅ PIN Reset Successful!");
                 }
 
                 localStorage.setItem("earnprox_user_phone", phone);
-                localStorage.setItem("earnprox_secure_token", newToken); // Save securely in browser
-                setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
-
+                localStorage.setItem("earnprox_secure_token", newToken);
+                window.location.href = "dashboard.html";
             } catch (error) {
-                console.error("Verification Error:", error);
                 window.showToast("❌ Invalid OTP!");
-                btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                btn.innerHTML = originalHTML; btn.disabled = false;
             }
         }
     </script>
