@@ -25,6 +25,8 @@
         #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .pulse-logo { animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
         @keyframes pulse { 0%, 100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.1) rotate(-6deg); } }
+        
+        /* 🔥 Smart Hidden Captcha Badge 🔥 */
         .grecaptcha-badge { visibility: hidden !important; opacity: 0 !important; }
     </style>
 
@@ -167,7 +169,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app); 
         
-        // GLOBAL STATE
         let isNewUser = true; 
         let isForgotPin = false;
         let existingUserData = null; 
@@ -210,14 +211,10 @@
             document.getElementById('step-1').classList.remove('step-out-left'); 
             document.getElementById('step-1').classList.add('step-active');
             
-            // Clear all inputs
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => { if(input.id !== 'mobile-input') input.value = ''; });
         }
 
-        // ==========================================
-        // 🚀 CHECK DB AND DECIDE ROUTE (PIN OR OTP)
-        // ==========================================
         window.checkUserAndProceed = async function() {
             const phone = document.getElementById('mobile-input').value.trim();
             if(phone.length !== 10) return window.showToast("⚠️ Enter a valid 10-digit number.");
@@ -230,7 +227,6 @@
                 const snap = await getDocs(q);
                 
                 if (!snap.empty) {
-                    // OLD USER -> GO TO PIN SCREEN (SAVES SMS COST!)
                     existingUserDocId = snap.docs[0].id;
                     existingUserData = snap.docs[0].data();
                     
@@ -245,7 +241,6 @@
                     switchStep('step-1', 'step-pin');
                     
                 } else {
-                    // NEW USER -> TRIGGER FIREBASE OTP
                     isNewUser = true;
                     document.getElementById('new-user-fields').style.display = 'block';
                     await triggerFirebaseOTP(phone);
@@ -258,9 +253,6 @@
             }
         }
 
-        // ==========================================
-        // 🚀 LOGIN VIA 4-DIGIT PIN (NO SMS)
-        // ==========================================
         window.loginWithPIN = function() {
             const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
             
@@ -275,12 +267,9 @@
             }
         }
 
-        // ==========================================
-        // 🚀 FORGOT PIN -> TRIGGERS OTP
-        // ==========================================
         window.triggerForgotPin = async function() {
             isForgotPin = true;
-            document.getElementById('new-user-fields').style.display = 'none'; // Hide name/referral inputs
+            document.getElementById('new-user-fields').style.display = 'none'; 
             const phone = document.getElementById('mobile-input').value.trim();
             
             const btn = document.getElementById('pin-login-btn');
@@ -292,7 +281,6 @@
             btn.innerText = originalText; btn.disabled = false;
         }
 
-        // Helper to send Firebase OTP
         async function triggerFirebaseOTP(phone, fromStep = 'step-1') {
             const fullPhoneNumber = "+91" + phone;
             document.getElementById('display-number-otp').innerText = fullPhoneNumber;
@@ -311,13 +299,15 @@
             } catch (error) {
                 console.error("Firebase Auth Error:", error);
                 window.showToast("❌ OTP Failed! Try again later.");
-                if(window.recaptchaVerifier) grecaptcha.reset();
+                
+                // 🔥 SMART ANTI-FREEZE LOGIC 🔥
+                if(window.recaptchaVerifier) {
+                    window.recaptchaVerifier.clear();
+                    window.recaptchaVerifier = null;
+                }
             }
         }
 
-        // ==========================================
-        // 🚀 VERIFY OTP & SAVE DATA (NEW USER / FORGOT PIN)
-        // ==========================================
         window.verifyOTPAndSave = async function() {
             const btn = document.getElementById('verify-btn');
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
@@ -330,11 +320,9 @@
             const phone = document.getElementById('mobile-input').value.trim();
 
             try {
-                // Verify Firebase OTP
                 await window.confirmationResult.confirm(enteredOtp);
 
                 if(isNewUser) {
-                    // --- SAVE NEW USER ---
                     const finalName = document.getElementById('name-input').value.trim();
                     if(finalName.length < 3) { window.showToast("⚠️ Enter your full name."); btn.innerText = "Complete Setup"; btn.disabled = false; return; }
                     
@@ -344,7 +332,7 @@
                     await addDoc(collection(db, "users"), {
                         phone: phone, 
                         name: finalName, 
-                        pin: setupPin, // Saving the PIN
+                        pin: setupPin, 
                         balance: 0, 
                         ownReferCode: myOwnCode, 
                         referCodeUsed: referCode, 
@@ -352,7 +340,6 @@
                         timestamp: new Date()
                     });
 
-                    // Bonus Logic
                     if(referCode !== "None") {
                         const refSnap = await getDocs(query(collection(db, "users"), where("ownReferCode", "==", referCode)));
                         if(!refSnap.empty) {
@@ -363,7 +350,6 @@
                     window.showToast("🎉 Account Created!");
                 } 
                 else if (isForgotPin) {
-                    // --- UPDATE PIN FOR OLD USER ---
                     await updateDoc(doc(db, "users", existingUserDocId), { pin: setupPin });
                     window.showToast("✅ PIN Reset Successful!");
                 }
