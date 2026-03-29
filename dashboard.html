@@ -54,24 +54,72 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-6">
-                <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Quick Actions</h3>
-                <div class="grid grid-cols-4 gap-2">
+            <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-6">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-[13px] font-black text-slate-800 tracking-wide">Quick Actions</h3>
+                    <span class="text-[9px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-sm uppercase tracking-wider border border-rose-100">Top Earners</span>
+                </div>
+                
+                <div class="grid grid-cols-4 gap-y-5 gap-x-2">
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('project')">
-                        <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-blue-100">🎯</div>
-                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">All<br>Tasks</span>
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            🎁
+                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">5</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Daily Task</span>
                     </div>
+
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('wallet')">
-                        <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-emerald-100">💸</div>
-                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Bank<br>Transfer</span>
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            🏦
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Withdraw</span>
                     </div>
+
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.openSheet('history-sheet')">
-                        <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-purple-100">📜</div>
-                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Balance &<br>History</span>
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            📜
+                            <span class="absolute -top-1.5 -right-2 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm z-10">NEW</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">History</span>
                     </div>
+
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('refer')">
-                        <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-2xl group-active:scale-90 transition border border-orange-100">🎁</div>
-                        <span class="text-[10px] font-bold text-slate-700 text-center leading-tight">Refer &<br>Win</span>
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            🚀
+                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">1</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Refer</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Surveys coming soon!')">
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            📊
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Survey</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Fetching hot deals...')">
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            🏷️
+                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">6</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Deals</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('No coupons right now')">
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
+                            🎟️
+                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">3</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Coupons</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('More features dropping soon!')">
+                        <div class="relative w-[3.25rem] h-[3.25rem] bg-blue-600 rounded-[14px] shadow-[0_4px_15px_rgba(37,99,235,0.35)] flex items-center justify-center text-white group-active:scale-95 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                        </div>
+                        <span class="text-[10px] font-bold text-blue-600 text-center leading-tight">Activity</span>
                     </div>
                 </div>
             </div>
