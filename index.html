@@ -31,8 +31,10 @@
     </style>
 
     <script>
+        // 🔒 SECURE CHECK: Now we check for BOTH Phone and Secret Token
         const storedPhone = localStorage.getItem("earnprox_user_phone");
-        if (storedPhone) window.location.replace("dashboard.html");
+        const storedToken = localStorage.getItem("earnprox_secure_token");
+        if (storedPhone && storedToken) window.location.replace("dashboard.html");
     </script>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-blue-100">
@@ -176,11 +178,15 @@
         const REFER_BONUS_AMOUNT = 5; 
         window.confirmationResult = null; 
 
-        // SVG Spinner HTML Helper
         const spinnerSVG = `<svg class="animate-spin h-6 w-6 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
+        // 🔒 Generate a random 32-character secret token
+        function generateSecureToken() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem("earnprox_user_phone")) {
+            if (!localStorage.getItem("earnprox_secure_token")) {
                 setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden'); }, 600); 
             }
         });
@@ -218,17 +224,13 @@
             inputs.forEach(input => { if(input.id !== 'mobile-input') input.value = ''; });
         }
 
-        // ==========================================
-        // 🚀 CHECK DB & PROCEED
-        // ==========================================
         window.checkUserAndProceed = async function() {
             const phone = document.getElementById('mobile-input').value.trim();
             if(phone.length !== 10) return window.showToast("⚠️ Enter a valid 10-digit number.");
             
             const btn = document.getElementById('send-otp-btn'); 
-            const originalHTML = btn.innerHTML; // Save original button state
+            const originalHTML = btn.innerHTML; 
             
-            // SHOW SPINNER IMMEDIATELY
             btn.innerHTML = `${spinnerSVG} Processing...`; 
             btn.disabled = true;
             btn.classList.add('opacity-80', 'cursor-not-allowed');
@@ -250,7 +252,6 @@
                     isNewUser = false;
                     document.getElementById('display-number-pin').innerText = "+91 " + phone;
                     switchStep('step-1', 'step-pin');
-                    // Reset button for next time (if they press back)
                     setTimeout(() => { btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed'); }, 500);
                     
                 } else {
@@ -265,9 +266,6 @@
             }
         }
 
-        // ==========================================
-        // 🚀 FIREBASE OTP SENDER LOGIC
-        // ==========================================
         async function triggerFirebaseOTP(phone, btnElement, originalHTML, fromStep = 'step-1') {
             const fullPhoneNumber = "+91" + phone;
             document.getElementById('display-number-otp').innerText = fullPhoneNumber;
@@ -291,7 +289,6 @@
                     window.recaptchaVerifier = null;
                 }
             } finally {
-                // Reset button state
                 if(btnElement && originalHTML) {
                     setTimeout(() => { btnElement.innerHTML = originalHTML; btnElement.disabled = false; btnElement.classList.remove('opacity-80', 'cursor-not-allowed'); }, 500);
                 }
@@ -313,10 +310,8 @@
             await triggerFirebaseOTP(phone, btn, originalHTML, 'step-pin');
         }
 
-        // ==========================================
-        // 🚀 LOGIN VIA PIN
-        // ==========================================
-        window.loginWithPIN = function() {
+        // 🔒 SECURE PIN LOGIN
+        window.loginWithPIN = async function() {
             const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
             if(enteredPin.length < 4) return window.showToast("⚠️ Enter 4-digit PIN.");
 
@@ -324,21 +319,26 @@
             const originalHTML = btn.innerHTML;
             btn.innerHTML = `${spinnerSVG} Verifying...`; btn.disabled = true; btn.classList.add('opacity-80', 'cursor-not-allowed');
 
-            setTimeout(() => {
-                if(existingUserData.pin && existingUserData.pin === enteredPin) {
+            if(existingUserData.pin && existingUserData.pin === enteredPin) {
+                // Generate and save token to DB
+                const newToken = generateSecureToken();
+                try {
+                    await updateDoc(doc(db, "users", existingUserDocId), { sessionToken: newToken });
                     window.showToast("✅ Login Successful!");
                     localStorage.setItem("earnprox_user_phone", existingUserData.phone);
-                    window.location.href = "dashboard.html";
-                } else {
-                    window.showToast("❌ Incorrect PIN!");
+                    localStorage.setItem("earnprox_secure_token", newToken); // Save securely in browser
+                    setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
+                } catch(e) {
+                    window.showToast("❌ Server Error");
                     btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
                 }
-            }, 800); // Fake delay to show spinner nicely
+            } else {
+                window.showToast("❌ Incorrect PIN!");
+                btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            }
         }
 
-        // ==========================================
-        // 🚀 VERIFY OTP & SAVE
-        // ==========================================
+        // 🔒 SECURE OTP LOGIN & SETUP
         window.verifyOTPAndSave = async function() {
             const btn = document.getElementById('verify-btn');
             const originalHTML = btn.innerHTML;
@@ -355,6 +355,7 @@
 
             try {
                 await window.confirmationResult.confirm(enteredOtp);
+                const newToken = generateSecureToken(); // Generate new secure token
 
                 if(isNewUser) {
                     const finalName = document.getElementById('name-input').value.trim();
@@ -367,6 +368,7 @@
                         phone: phone, 
                         name: finalName, 
                         pin: setupPin, 
+                        sessionToken: newToken, // Save Token
                         balance: 0, 
                         ownReferCode: myOwnCode, 
                         referCodeUsed: referCode, 
@@ -384,11 +386,12 @@
                     window.showToast("🎉 Account Created!");
                 } 
                 else if (isForgotPin) {
-                    await updateDoc(doc(db, "users", existingUserDocId), { pin: setupPin });
+                    await updateDoc(doc(db, "users", existingUserDocId), { pin: setupPin, sessionToken: newToken });
                     window.showToast("✅ PIN Reset Successful!");
                 }
 
                 localStorage.setItem("earnprox_user_phone", phone);
+                localStorage.setItem("earnprox_secure_token", newToken); // Save securely in browser
                 setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
 
             } catch (error) {
