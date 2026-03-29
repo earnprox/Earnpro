@@ -98,7 +98,7 @@
                 <button onclick="window.triggerForgotPin()" class="text-xs font-bold text-blue-600 hover:underline">Forgot PIN? Login via OTP</button>
             </div>
 
-            <button onclick="window.loginWithPIN()" id="pin-login-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
+            <button onclick="window.loginWithPIN()" id="pin-login-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
                 Secure Login
             </button>
         </div>
@@ -137,7 +137,7 @@
                 </div>
             </div>
 
-            <button onclick="window.verifyOTPAndSave()" id="verify-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto">
+            <button onclick="window.verifyOTPAndSave()" id="verify-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
                 Complete Setup
             </button>
         </div>
@@ -175,6 +175,9 @@
         let existingUserDocId = null;
         const REFER_BONUS_AMOUNT = 5; 
         window.confirmationResult = null; 
+
+        // SVG Spinner HTML Helper
+        const spinnerSVG = `<svg class="animate-spin h-6 w-6 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!localStorage.getItem("earnprox_user_phone")) {
@@ -215,12 +218,20 @@
             inputs.forEach(input => { if(input.id !== 'mobile-input') input.value = ''; });
         }
 
+        // ==========================================
+        // 🚀 CHECK DB & PROCEED
+        // ==========================================
         window.checkUserAndProceed = async function() {
             const phone = document.getElementById('mobile-input').value.trim();
             if(phone.length !== 10) return window.showToast("⚠️ Enter a valid 10-digit number.");
             
             const btn = document.getElementById('send-otp-btn'); 
-            btn.innerText = "Checking... ⏳"; btn.disabled = true;
+            const originalHTML = btn.innerHTML; // Save original button state
+            
+            // SHOW SPINNER IMMEDIATELY
+            btn.innerHTML = `${spinnerSVG} Processing...`; 
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
 
             try {
                 const q = query(collection(db, "users"), where("phone", "==", phone));
@@ -232,56 +243,32 @@
                     
                     if(existingUserData.status === "blocked") {
                         window.showToast("🚫 Account Suspended.");
-                        btn.innerHTML = `Continue <span class="text-xl">→</span>`; btn.disabled = false;
+                        btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
                         return; 
                     }
                     
                     isNewUser = false;
                     document.getElementById('display-number-pin').innerText = "+91 " + phone;
                     switchStep('step-1', 'step-pin');
+                    // Reset button for next time (if they press back)
+                    setTimeout(() => { btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed'); }, 500);
                     
                 } else {
                     isNewUser = true;
                     document.getElementById('new-user-fields').style.display = 'block';
-                    await triggerFirebaseOTP(phone);
+                    await triggerFirebaseOTP(phone, btn, originalHTML);
                 }
             } catch(error) { 
                 console.error("DB Check Error:", error);
                 window.showToast("❌ Server Error!");
-            } finally { 
-                btn.innerHTML = `Continue <span class="text-xl">→</span>`; btn.disabled = false; 
+                btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
             }
         }
 
-        window.loginWithPIN = function() {
-            const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
-            
-            if(enteredPin.length < 4) return window.showToast("⚠️ Enter 4-digit PIN.");
-
-            if(existingUserData.pin && existingUserData.pin === enteredPin) {
-                window.showToast("✅ Login Successful!");
-                localStorage.setItem("earnprox_user_phone", existingUserData.phone);
-                setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
-            } else {
-                window.showToast("❌ Incorrect PIN!");
-            }
-        }
-
-        window.triggerForgotPin = async function() {
-            isForgotPin = true;
-            document.getElementById('new-user-fields').style.display = 'none'; 
-            const phone = document.getElementById('mobile-input').value.trim();
-            
-            const btn = document.getElementById('pin-login-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "Sending OTP... ⏳"; btn.disabled = true;
-
-            await triggerFirebaseOTP(phone, 'step-pin');
-            
-            btn.innerText = originalText; btn.disabled = false;
-        }
-
-        async function triggerFirebaseOTP(phone, fromStep = 'step-1') {
+        // ==========================================
+        // 🚀 FIREBASE OTP SENDER LOGIC
+        // ==========================================
+        async function triggerFirebaseOTP(phone, btnElement, originalHTML, fromStep = 'step-1') {
             const fullPhoneNumber = "+91" + phone;
             document.getElementById('display-number-otp').innerText = fullPhoneNumber;
 
@@ -299,24 +286,71 @@
             } catch (error) {
                 console.error("Firebase Auth Error:", error);
                 window.showToast("❌ OTP Failed! Try again later.");
-                
-                // 🔥 SMART ANTI-FREEZE LOGIC 🔥
                 if(window.recaptchaVerifier) {
                     window.recaptchaVerifier.clear();
                     window.recaptchaVerifier = null;
                 }
+            } finally {
+                // Reset button state
+                if(btnElement && originalHTML) {
+                    setTimeout(() => { btnElement.innerHTML = originalHTML; btnElement.disabled = false; btnElement.classList.remove('opacity-80', 'cursor-not-allowed'); }, 500);
+                }
             }
         }
 
+        window.triggerForgotPin = async function() {
+            isForgotPin = true;
+            document.getElementById('new-user-fields').style.display = 'none'; 
+            const phone = document.getElementById('mobile-input').value.trim();
+            
+            const btn = document.getElementById('pin-login-btn');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = `${spinnerSVG} Sending OTP...`; 
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            await triggerFirebaseOTP(phone, btn, originalHTML, 'step-pin');
+        }
+
+        // ==========================================
+        // 🚀 LOGIN VIA PIN
+        // ==========================================
+        window.loginWithPIN = function() {
+            const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
+            if(enteredPin.length < 4) return window.showToast("⚠️ Enter 4-digit PIN.");
+
+            const btn = document.getElementById('pin-login-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `${spinnerSVG} Verifying...`; btn.disabled = true; btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            setTimeout(() => {
+                if(existingUserData.pin && existingUserData.pin === enteredPin) {
+                    window.showToast("✅ Login Successful!");
+                    localStorage.setItem("earnprox_user_phone", existingUserData.phone);
+                    window.location.href = "dashboard.html";
+                } else {
+                    window.showToast("❌ Incorrect PIN!");
+                    btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                }
+            }, 800); // Fake delay to show spinner nicely
+        }
+
+        // ==========================================
+        // 🚀 VERIFY OTP & SAVE
+        // ==========================================
         window.verifyOTPAndSave = async function() {
             const btn = document.getElementById('verify-btn');
+            const originalHTML = btn.innerHTML;
+            
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
             const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
             
             if(setupPin.length < 4) return window.showToast("⚠️ Set a 4-Digit PIN first.");
             if(enteredOtp.length < 6) return window.showToast("⚠️ Enter full 6-digit OTP.");
 
-            btn.innerText = "Verifying... ⏳"; btn.disabled = true;
+            btn.innerHTML = `${spinnerSVG} Verifying...`; 
+            btn.disabled = true; btn.classList.add('opacity-80', 'cursor-not-allowed');
             const phone = document.getElementById('mobile-input').value.trim();
 
             try {
@@ -324,7 +358,7 @@
 
                 if(isNewUser) {
                     const finalName = document.getElementById('name-input').value.trim();
-                    if(finalName.length < 3) { window.showToast("⚠️ Enter your full name."); btn.innerText = "Complete Setup"; btn.disabled = false; return; }
+                    if(finalName.length < 3) { window.showToast("⚠️ Enter your full name."); btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed'); return; }
                     
                     let referCode = document.getElementById('refer-input').value.trim().toUpperCase() || "None";
                     const myOwnCode = (finalName.substring(0,3) + phone.substring(phone.length - 4)).toUpperCase();
@@ -355,12 +389,12 @@
                 }
 
                 localStorage.setItem("earnprox_user_phone", phone);
-                setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
+                setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
 
             } catch (error) {
                 console.error("Verification Error:", error);
                 window.showToast("❌ Invalid OTP!");
-                btn.innerText = "Complete Setup"; btn.disabled = false; 
+                btn.innerHTML = originalHTML; btn.disabled = false; btn.classList.remove('opacity-80', 'cursor-not-allowed');
             }
         }
     </script>
