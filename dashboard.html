@@ -13,48 +13,54 @@
         }
     </script>
 </head>
-<body class="relative min-h-screen selection:bg-blue-100">
+<body class="relative min-h-screen selection:bg-blue-100 pb-20 bg-[#F8FAFC]">
 
     <div class="relative z-10 p-5">
 
-        <header id="main-header" class="flex justify-between items-center mb-6 pt-2 transition-all hidden">
-            <button onclick="window.switchTab('home')" class="flex items-center gap-2 text-slate-700 active:scale-95 transition bg-white py-2 px-4 rounded-full shadow-sm border border-slate-200">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                <span class="font-black text-sm">Home</span>
-            </button>
-            <div class="w-10 h-10 rounded-full premium-card flex items-center justify-center p-1 relative">
-                <img id="header-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full rounded-full object-cover">
-            </div>
-        </header>
-
         <div id="view-home" class="tab-content active">
-            <div class="flex justify-between items-center mb-8 pt-2">
-                <div class="flex items-center gap-3 cursor-pointer active:scale-95 transition" onclick="window.switchTab('profile')">
-                    <div class="w-12 h-12 rounded-full border-2 border-white shadow-md relative p-0.5 bg-white">
+            <div class="flex justify-between items-center mb-5 pt-2">
+                <div class="flex items-center cursor-pointer active:scale-95 transition" onclick="window.switchTab('profile')">
+                    <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm relative bg-white">
                         <img id="home-profile-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full rounded-full object-cover">
-                        <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-black text-slate-800 leading-tight flex items-center gap-1">
-                            <span id="home-user-name">User</span>
-                            <span class="text-blue-500 text-sm">✨</span>
-                        </h2>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">EarnproX Member</p>
+                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full"></div>
                     </div>
                 </div>
                 
                 <div class="flex gap-2 items-center">
-                    <button onclick="window.switchTab('wallet')" class="px-4 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shadow-md active:scale-95 transition">
-                        <span class="text-white font-black text-sm tracking-wide" id="home-top-balance">₹0</span>
+                    <button onclick="window.switchTab('wallet')" class="px-3 h-9 rounded-xl bg-[#1E293B] flex items-center justify-center shadow-md active:scale-95 transition gap-1.5">
+                        <span class="text-orange-400 text-[10px]">🪙</span>
+                        <span class="text-white font-black text-[11px] tracking-wide" id="home-top-balance">₹0</span>
                     </button>
-                    <button onclick="window.openSheet('notification-sheet')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm text-slate-600 relative active:scale-95 transition">
+                    <button onclick="window.openSheet('notification-sheet')" class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm text-slate-600 relative active:scale-95 transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span id="notification-badge" class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white hidden"></span>
+                        <span id="notification-badge" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white hidden"></span>
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-6">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-[1rem] p-5 shadow-lg shadow-blue-500/25 text-white relative overflow-hidden mb-6">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-blue-700/20 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="flex justify-between items-center relative z-10">
+                    <div>
+                        <h3 class="text-white/80 text-[9px] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                            EarnproX <span class="font-normal text-[8px]">ReferralCard</span>
+                        </h3>
+                        <h2 class="text-[17px] font-black leading-tight" id="home-card-user-name">User Name</h2>
+                    </div>
+                    
+                    <div class="flex flex-col items-end">
+                        <button onclick="window.copyReferLink()" class="bg-[#0F172A] hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 active:scale-95 transition-transform shadow-md">
+                            <span class="text-[11px] font-black tracking-widest" id="home-card-refer-code">CODE</span>
+                            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </button>
+                        <span class="text-[8px] text-white/70 font-bold mt-1.5 cursor-pointer uppercase tracking-wider" onclick="window.switchTab('refer')">Refer & Earn</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.04)] border border-slate-100 mb-6">
                 <div class="flex items-center justify-between mb-5">
                     <h3 class="text-[13px] font-black text-slate-800 tracking-wide">Quick Actions</h3>
                     <span class="text-[9px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-sm uppercase tracking-wider border border-rose-100">Top Earners</span>
@@ -63,77 +69,52 @@
                 <div class="grid grid-cols-4 gap-y-5 gap-x-2">
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('project')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
-                            🎁
-                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">5</span>
+                            🎁<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">5</span>
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Daily Task</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('wallet')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
                             🏦
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Withdraw</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.openSheet('history-sheet')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
-                            📜
-                            <span class="absolute -top-1.5 -right-2 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm z-10">NEW</span>
+                            📜<span class="absolute -top-1.5 -right-2 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm z-10">NEW</span>
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">History</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('refer')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
-                            🚀
-                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">1</span>
+                            🚀<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">1</span>
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Refer</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Surveys coming soon!')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
                             📊
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Survey</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Fetching hot deals...')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
-                            🏷️
-                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">6</span>
+                            🏷️<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">6</span>
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Deals</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('No coupons right now')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-white rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center justify-center text-3xl group-active:scale-95 transition-transform">
-                            🎟️
-                            <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">3</span>
+                            🎟️<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">3</span>
                         </div>
                         <span class="text-[10px] font-bold text-slate-600 text-center leading-tight">Coupons</span>
                     </div>
-
                     <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('More features dropping soon!')">
                         <div class="relative w-[3.25rem] h-[3.25rem] bg-blue-600 rounded-[14px] shadow-[0_4px_15px_rgba(37,99,235,0.35)] flex items-center justify-center text-white group-active:scale-95 transition-transform">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                         </div>
                         <span class="text-[10px] font-bold text-blue-600 text-center leading-tight">Activity</span>
                     </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[1.5rem] p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('project')">
-                    <p class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-1">Live Gigs</p>
-                    <h4 class="font-black text-xl leading-tight mb-4">Complete<br>Tasks</h4>
-                    <span class="bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">Earn Now ↗</span>
-                </div>
-                <div class="bg-gradient-to-br from-orange-400 to-rose-500 rounded-[1.5rem] p-5 text-white shadow-lg shadow-orange-500/30 cursor-pointer active:scale-95 transition" onclick="window.switchTab('refer')">
-                    <p class="text-[10px] font-bold text-orange-200 uppercase tracking-widest mb-1">Guaranteed</p>
-                    <h4 class="font-black text-xl leading-tight mb-4">Refer &<br>Earn %</h4>
-                    <span class="bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm">Invite ↗</span>
                 </div>
             </div>
 
@@ -148,7 +129,7 @@
                             </h3>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">3-Level Earning Graph</p>
                         </div>
-                        <button class="text-slate-400 hover:text-blue-600 active:rotate-180 transition-all duration-300 p-1 bg-slate-50 rounded-full">
+                        <button onclick="syncStatsAndHistory()" class="text-slate-400 hover:text-blue-600 active:rotate-180 transition-all duration-300 p-1 bg-slate-50 rounded-full">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </button>
                     </div>
@@ -199,15 +180,10 @@
                 </div>
             </div>
             
-            <div class="text-center mt-4 mb-8">
-                <h3 class="text-2xl font-black text-slate-800 tracking-tight">You <span class="text-rose-500 text-3xl align-middle">💖</span> EarnproX</h3>
-                <p class="text-slate-500 text-sm mt-1 mb-5 font-medium">Your friends are going to love us too!</p>
-                <button onclick="window.switchTab('refer')" class="text-blue-600 font-black text-sm bg-blue-50 px-6 py-3 rounded-full border border-blue-100 shadow-sm active:scale-95 transition">Refer & Win →</button>
-            </div>
         </div>
 
         <div id="view-project" class="tab-content">
-            <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Workspace</h2>
+            <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Tasks</h2>
             
             <div class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-6 border border-slate-200">
                 <button onclick="window.switchWsTab('explore', this)" class="ws-tab bg-white shadow-sm text-blue-600 flex-1 py-3 text-xs font-black text-center rounded-xl transition">Explore</button>
@@ -217,7 +193,7 @@
 
             <div id="ws-explore" class="ws-content active">
                 <div id="gigs-container" class="space-y-4 pb-10">
-                    <p class="text-slate-400 font-bold text-center py-10">Fetching Gigs from Server...</p>
+                    <p class="text-slate-400 font-bold text-center py-10">Fetching Tasks from Server...</p>
                 </div>
             </div>
 
@@ -407,6 +383,25 @@
         </div>
 
     </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 flex justify-between items-center px-8 py-3 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+        <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-blue-600 transition-colors" data-target="home">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="window.switchTab('project')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="project">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <span class="text-[10px] font-bold">Tasks</span>
+        </button>
+        <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="wallet">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            <span class="text-[10px] font-bold">Wallet</span>
+        </button>
+        <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="profile">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="text-[10px] font-bold">Settings</span>
+        </button>
+    </nav>
 
     <div id="withdraw-page" class="fixed inset-0 z-[150] bg-white transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
         <div class="px-5 py-4 flex items-center gap-4 border-b border-slate-100">
