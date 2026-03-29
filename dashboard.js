@@ -7,8 +7,13 @@ window.savedUPI = "";
 window.savedBankName = ""; 
 window.userDocId = null; 
 window.myReferCode = ""; 
-window.referBonusPerUser = 5;
+
+// 🔥 ₹5 Bonus OFF, Level Data Initialized
+window.referBonusPerUser = 0; 
 window.myReferrerCode = ""; 
+window.l1Codes = new Set();
+window.l2Codes = new Set();
+window.l3Codes = new Set();
 
 window.taskEarned = 0;
 window.referCommission = 0; 
@@ -21,15 +26,12 @@ window.mySubmissionsList = [];
 window.myActiveGig = null; 
 window.viewingGigData = null; 
 
-// ================= REFRESH STATE HANDLER (NEW) =================
-// Ye code yaad rakhega ki aap kis page par the jab refresh hua
+// ================= REFRESH STATE HANDLER =================
 document.addEventListener("DOMContentLoaded", () => {
     const savedTab = sessionStorage.getItem('lastActiveTab');
     const savedFullPage = sessionStorage.getItem('lastActiveFullPage');
 
-    if(savedTab) {
-        window.switchTab(savedTab);
-    }
+    if(savedTab) { window.switchTab(savedTab); }
     if(savedFullPage) {
         const fp = document.getElementById(savedFullPage);
         if(fp) fp.classList.add('full-page-active');
@@ -43,7 +45,7 @@ window.showToast = (m) => {
 };
 
 window.switchTab = (id) => { 
-    sessionStorage.setItem('lastActiveTab', id); // Memory me save
+    sessionStorage.setItem('lastActiveTab', id); 
     const h = document.getElementById('main-header'); 
     if(id === 'home') { if(h) h.style.display = 'none'; } 
     else { if(h) { h.style.display = 'flex'; h.style.opacity = '1'; } } 
@@ -69,8 +71,6 @@ window.switchWsTab = (id, btn) => {
 window.openSheet = (id) => { 
     document.getElementById('universal-overlay').classList.add('modal-active'); 
     document.getElementById(id).classList.add('sheet-active'); 
-    
-    // Notification Clear Badge Logic
     if(id === 'notification-sheet') {
         const badge = document.getElementById("notification-badge");
         if(badge) badge.classList.add("hidden");
@@ -84,20 +84,20 @@ window.closeAllSheets = () => {
 
 window.openFullPage = (id) => { 
     if(!window.savedUPI) return window.showToast("⚠️ Link Payout Settings first!"); 
-    sessionStorage.setItem('lastActiveFullPage', id); // Memory me save
+    sessionStorage.setItem('lastActiveFullPage', id);
     document.getElementById(id).classList.add('full-page-active'); 
     if(id === 'withdraw-page') setTimeout(() => document.getElementById("withdraw-amount").focus(), 300); 
 };
 
 window.closeFullPage = (id) => { 
-    sessionStorage.removeItem('lastActiveFullPage'); // Memory se remove
+    sessionStorage.removeItem('lastActiveFullPage');
     document.getElementById(id).classList.remove('full-page-active'); 
 };
 
 window.logoutUser = () => { 
     if(confirm("Are you sure?")) { 
         localStorage.removeItem("earnprox_user_phone"); 
-        sessionStorage.clear(); // Session bhi clear kar do logout par
+        sessionStorage.clear();
         window.location.href="index.html"; 
     } 
 };
@@ -146,7 +146,6 @@ if(userPhone) {
             window.userDocId = docSnap.id; 
             const u = docSnap.data();
             
-            // Check if user is blocked by Admin
             if(u.status === "blocked") {
                 alert("🚨 Your account has been suspended by the Admin.");
                 localStorage.removeItem("earnprox_user_phone");
@@ -180,7 +179,6 @@ if(userPhone) {
             }
             if(Object.keys(window.liveGigs).length > 0) renderExploreGigs();
 
-            // Set UI details safely
             if(document.getElementById("home-user-name")) document.getElementById("home-user-name").innerText = realName.split(" ")[0]; 
             if(document.getElementById("profile-user-name")) document.getElementById("profile-user-name").innerText = realName;
             if(document.getElementById("profile-user-phone")) document.getElementById("profile-user-phone").innerText = "+91 " + userPhone; 
@@ -212,7 +210,6 @@ if(userPhone) {
         }
     });
 
-    // 🔥 NOTIFICATION ENGINE
     onSnapshot(collection(db, "notifications"), (snap) => {
         let notifHtml = "";
         let newNotifs = false;
@@ -250,7 +247,7 @@ window.updateLiveBalance = function() {
     window.currentBalance = Math.floor(totalEarned - totalWithdrawn);
     if(window.currentBalance < 0) window.currentBalance = 0; 
 
-    if(document.getElementById("stat-total-earn")) document.getElementById("stat-total-earn").innerText = `₹${totalEarned.toFixed(0)}`;
+    if(document.getElementById("stat-total-earn")) document.getElementById("stat-total-earn").innerText = `₹${totalEarned.toFixed(2)}`;
     if(document.getElementById("home-top-balance")) document.getElementById("home-top-balance").innerText = `₹${window.currentBalance}`;
     if(document.getElementById("main-balance-display")) document.getElementById("main-balance-display").innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold">.00</span>`;
     if(document.getElementById("withdraw-page-balance")) document.getElementById("withdraw-page-balance").innerText = `₹${window.currentBalance}`;
@@ -260,70 +257,97 @@ window.updateLiveBalance = function() {
     }
 }
 
-// 🟢 3. STATS & COMMISSION ENGINE
+// 🟢 3. NEW 3-LEVEL STATS & COMMISSION ENGINE
 async function syncStatsAndHistory() {
     if(!userPhone || !window.myReferCode) return;
     
-    const taskQ = query(collection(db, "task_submissions"), where("userPhone", "==", userPhone));
-    const referQ = query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode));
-    const withQ = query(collection(db, "withdrawals"), where("userPhone", "==", userPhone));
-    const referCommissionQ = query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode));
+    // 3.1 Fetch ALL Users to map 3-Level Network
+    onSnapshot(collection(db, "users"), (snap) => {
+        let l1Count = 0, todayCount = 0, referListHtml = "";
+        window.l1Codes.clear(); window.l2Codes.clear(); window.l3Codes.clear();
+        
+        const allUsers = [];
+        snap.forEach(d => allUsers.push(d.data()));
 
-    onSnapshot(taskQ, (snap) => { 
+        // Map Level 1
+        allUsers.forEach(u => {
+            const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
+            if(u.referCodeUsed === window.myReferCode) {
+                window.l1Codes.add(uCode);
+                l1Count++;
+                if(isToday(u.timestamp)) todayCount++;
+                const joinDate = u.timestamp ? new Date(getSafeTime(u.timestamp)).toLocaleDateString('en-GB') : "Recently"; 
+                const uName = u.name || "User"; 
+                referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded border border-blue-100">Level 1</div></div>`; 
+            }
+        });
+
+        // Map Level 2
+        allUsers.forEach(u => {
+            const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
+            if(window.l1Codes.has(u.referCodeUsed)) window.l2Codes.add(uCode);
+        });
+
+        // Map Level 3
+        allUsers.forEach(u => {
+            const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
+            if(window.l2Codes.has(u.referCodeUsed)) window.l3Codes.add(uCode);
+        });
+
+        if(document.getElementById('total-refers-count')) document.getElementById('total-refers-count').innerText = l1Count; 
+        if(document.getElementById('today-refers-count')) document.getElementById('today-refers-count').innerText = todayCount; 
+        if(document.getElementById('graph-active-members')) document.getElementById('graph-active-members').innerText = window.l1Codes.size + window.l2Codes.size + window.l3Codes.size;
+        if(document.getElementById('referral-list-container')) document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet. Share your link!</p>"; 
+        
+        window.referFlatBonus = 0; // Flat ₹5 OFF
+        updateReferUI();
+        window.updateLiveBalance();
+    });
+
+    // 3.2 Listen to ALL Task Submissions to calculate my tasks + 3-Level commissions
+    onSnapshot(collection(db, "task_submissions"), (snap) => {
         let taskTotal = 0; 
+        let commTotal = 0;
         window.mySubmissionsMap = {}; 
         window.mySubmissionsList = [];
+
         snap.forEach(d => { 
             const data = d.data();
-            window.mySubmissionsMap[data.gigName] = data; 
-            window.mySubmissionsList.push(data); 
+            
+            // Log My Tasks
+            if(data.userPhone === userPhone) {
+                window.mySubmissionsMap[data.gigName] = data; 
+                window.mySubmissionsList.push(data); 
+                if(data.status === "Approved" || data.status === "Completed") {
+                    taskTotal += (data.gigReward || 0); 
+                }
+            }
+
+            // Calculate 3-Level Network Commissions (10%, 6%, 3%)
             if(data.status === "Approved" || data.status === "Completed") {
-                taskTotal += (data.gigReward || 0); 
+                if(data.referrerCode === window.myReferCode) {
+                    commTotal += (data.gigReward * 0.10); // L1
+                } else if(window.l1Codes.has(data.referrerCode)) {
+                    commTotal += (data.gigReward * 0.06); // L2
+                } else if(window.l2Codes.has(data.referrerCode)) {
+                    commTotal += (data.gigReward * 0.03); // L3
+                }
             }
         }); 
+        
         window.taskEarned = taskTotal;
+        window.referCommission = parseFloat(commTotal.toFixed(2));
+        
         if(document.getElementById("stat-task-earn")) document.getElementById("stat-task-earn").innerText = `₹${taskTotal}`; 
+        
         renderExploreGigs(); 
         renderReviewTab(); 
+        updateReferUI();
         window.updateLiveBalance(); 
     });
 
-    onSnapshot(referCommissionQ, (snap) => {
-        let commTotal = 0;
-        snap.forEach(d => {
-            const data = d.data();
-            if(data.status === "Approved" || data.status === "Completed") {
-                commTotal += (data.gigReward * 0.05);
-            }
-        });
-        window.referCommission = parseFloat(commTotal.toFixed(2));
-        updateReferUI(); 
-        window.updateLiveBalance();
-    });
-
-    onSnapshot(referQ, (snap) => {
-        let totalCount = 0, todayCount = 0, referListHtml = ""; 
-        const docsArr = [];
-        snap.forEach(d => docsArr.push(d.data())); 
-        docsArr.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-        
-        docsArr.forEach(data => { 
-            totalCount++; 
-            if(isToday(data.timestamp)) todayCount++; 
-            const joinDate = data.timestamp ? new Date(getSafeTime(data.timestamp)).toLocaleDateString('en-GB') : "Recently"; 
-            const uName = data.name || "User"; 
-            referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-xs font-black text-emerald-500">+₹${window.referBonusPerUser}</div></div>`; 
-        });
-        
-        if(document.getElementById('total-refers-count')) document.getElementById('total-refers-count').innerText = totalCount; 
-        if(document.getElementById('today-refers-count')) document.getElementById('today-refers-count').innerText = todayCount; 
-        window.referFlatBonus = totalCount * window.referBonusPerUser;
-        if(document.getElementById('referral-list-container')) document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet.</p>"; 
-        updateReferUI(); 
-        window.updateLiveBalance();
-    });
-
-    onSnapshot(withQ, (snap) => {
+    // 3.3 Withdrawals Data
+    onSnapshot(query(collection(db, "withdrawals"), where("userPhone", "==", userPhone)), (snap) => {
         let withTotal = 0; 
         const allTransactions = [];
         snap.forEach(d => { 
@@ -342,36 +366,38 @@ async function syncStatsAndHistory() {
 
 function updateReferUI() {
     const totalReferEarning = window.referFlatBonus + window.referCommission;
-    if(document.getElementById('stat-refer-earn')) document.getElementById('stat-refer-earn').innerText = `₹${totalReferEarning.toFixed(0)}`; 
+    if(document.getElementById('stat-refer-earn')) document.getElementById('stat-refer-earn').innerText = `₹${totalReferEarning.toFixed(2)}`; 
     const referBonusPageText = document.getElementById('total-refer-earnings');
-    if(referBonusPageText) referBonusPageText.innerText = totalReferEarning.toFixed(0);
+    if(referBonusPageText) referBonusPageText.innerText = totalReferEarning.toFixed(2);
+    if(document.getElementById('graph-network-income')) document.getElementById('graph-network-income').innerText = `₹${totalReferEarning.toFixed(2)}`;
 }
 
-// 🟢 4. LEDGER FIX
+// 🟢 4. ADVANCED 3-LEVEL LEDGER FIX
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); 
     if(!historyCont) return;
 
     let combined = [...withs];
     
-    const taskSnap = await getDocs(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)));
+    const taskSnap = await getDocs(collection(db, "task_submissions"));
     taskSnap.forEach(d => { 
-        if(d.data().status === 'Approved' || d.data().status === 'Completed') {
-            combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Task: ${d.data().gigName}`, amt: d.data().gigReward, status: 'Completed' }); 
+        const data = d.data();
+        
+        // My Task Income
+        if(data.userPhone === userPhone && (data.status === 'Approved' || data.status === 'Completed')) {
+            combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Task: ${data.gigName}`, amt: data.gigReward, status: 'Completed' }); 
         }
-    });
-
-    const referSnap = await getDocs(query(collection(db, "users"), where("referCodeUsed", "==", window.myReferCode)));
-    referSnap.forEach(d => {
-        combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `Refer Bonus (${d.data().name})`, amt: window.referBonusPerUser, status: 'Completed' });
-    });
-
-    const commSnap = await getDocs(query(collection(db, "task_submissions"), where("referrerCode", "==", window.myReferCode)));
-    commSnap.forEach(d => { 
-        if(d.data().status === 'Approved' || d.data().status === 'Completed') { 
-            const comm = d.data().gigReward * 0.05; 
-            combined.push({ type: 'credit', timestamp: d.data().timestamp, desc: `5% Comm. (${d.data().gigName})`, amt: parseFloat(comm.toFixed(2)), status: 'Completed' }); 
-        } 
+        
+        // Commission Income
+        if(data.status === 'Approved' || data.status === 'Completed') {
+            if(data.referrerCode === window.myReferCode) {
+                combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L1 Comm. (10%)`, amt: parseFloat((data.gigReward * 0.10).toFixed(2)), status: 'Completed' }); 
+            } else if(window.l1Codes.has(data.referrerCode)) {
+                combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L2 Comm. (6%)`, amt: parseFloat((data.gigReward * 0.06).toFixed(2)), status: 'Completed' }); 
+            } else if(window.l2Codes.has(data.referrerCode)) {
+                combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L3 Comm. (3%)`, amt: parseFloat((data.gigReward * 0.03).toFixed(2)), status: 'Completed' }); 
+            }
+        }
     });
 
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
@@ -472,7 +498,7 @@ window.openGigSheet = (gigTitleOrNull, mode) => {
 
 window.openSubmitSheet = () => { window.openGigSheet(null, 'progress'); }
 
-// ACCEPT TASK (UPDATED WITH DYNAMIC SUBID LOGIC)
+// ACCEPT TASK
 window.acceptTask = async () => {
     if(!window.viewingGigData) return; 
     if(window.myActiveGig) return window.showToast("⚠️ You already have an active task!");
@@ -485,12 +511,9 @@ window.acceptTask = async () => {
         
         let taskLink = window.viewingGigData.link;
         if(taskLink && taskLink.startsWith('http')) {
-            // Check if admin put '{user_phone}' in the link, if so, replace it
             if (taskLink.includes('{user_phone}')) {
                 taskLink = taskLink.replace('{user_phone}', userPhone);
-            } 
-            // Otherwise, safely append the subid parameter to the URL
-            else if (!taskLink.includes('subid=')) {
+            } else if (!taskLink.includes('subid=')) {
                 if (taskLink.includes('?')) {
                     taskLink += `&subid=${userPhone}`; 
                 } else {
