@@ -26,7 +26,7 @@ window.mySubmissionsList = [];
 window.myActiveGig = null; 
 window.viewingGigData = null; 
 
-// ================= REFRESH STATE HANDLER =================
+// ================= REFRESH STATE HANDLER & CACHE =================
 document.addEventListener("DOMContentLoaded", () => {
     const savedTab = sessionStorage.getItem('lastActiveTab');
     const savedFullPage = sessionStorage.getItem('lastActiveFullPage');
@@ -35,6 +35,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if(savedFullPage) {
         const fp = document.getElementById(savedFullPage);
         if(fp) fp.classList.add('full-page-active');
+    }
+
+    // 🔥 FIX: INSTANT CACHE LOAD (Flash issue solved)
+    const cachedName = localStorage.getItem("epx_cached_name");
+    const cachedBal = localStorage.getItem("epx_cached_bal");
+
+    if(cachedName) {
+        const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+        setText("home-card-user-name", cachedName);
+        setText("profile-user-name", cachedName);
+        setText("refer-page-name", cachedName);
+        if(document.getElementById("home-user-name")) document.getElementById("home-user-name").innerText = cachedName.split(" ")[0];
+    }
+    
+    if(cachedBal) {
+        const mainBal = document.getElementById("main-balance-display");
+        if(document.getElementById("home-top-balance")) document.getElementById("home-top-balance").innerText = `₹${cachedBal}`;
+        if(mainBal) mainBal.innerHTML = `₹ ${cachedBal}<span class="text-xl text-slate-500 font-bold drop-shadow-none">.00</span>`;
+        if(document.getElementById("withdraw-page-balance")) document.getElementById("withdraw-page-balance").innerText = `₹${cachedBal}`;
     }
 });
 
@@ -179,8 +198,16 @@ const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).get
 if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
         if(!snap.empty) {
-            const overlay = document.getElementById("loading-overlay");
-            if(overlay) overlay.classList.add("hidden"); // Use hidden class instead of remove active
+            
+            // 🔥 HIDE THE ANIMATED LOGO LOADER SMOOTHLY
+            const appLoader = document.getElementById("app-loader");
+            if(appLoader) {
+                appLoader.style.opacity = "0"; 
+                appLoader.style.pointerEvents = "none";
+                setTimeout(() => {
+                    appLoader.style.display = "none";
+                }, 500); 
+            }
 
             const docSnap = snap.docs[0]; 
             window.userDocId = docSnap.id; 
@@ -199,6 +226,9 @@ if(userPhone) {
             window.myReferrerCode = u.referCodeUsed || ""; 
             const realName = u.name || "User"; 
             window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
+
+            // 🔥 CACHE THE NAME FOR NEXT RELOAD
+            localStorage.setItem("epx_cached_name", realName);
 
             window.myActiveGig = u.activeGig || null;
             if(window.myActiveGig) {
@@ -300,6 +330,9 @@ window.updateLiveBalance = function() {
     window.currentBalance = Math.floor(totalEarned - totalWithdrawn);
     if(window.currentBalance < 0) window.currentBalance = 0; 
 
+    // 🔥 CACHE THE BALANCE FOR NEXT RELOAD
+    localStorage.setItem("epx_cached_bal", window.currentBalance);
+
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
     setText("stat-total-earn", `₹${totalEarned.toFixed(2)}`);
@@ -308,11 +341,6 @@ window.updateLiveBalance = function() {
     
     const mainBal = document.getElementById("main-balance-display");
     if(mainBal) mainBal.innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold drop-shadow-none">.00</span>`;
-    
-    if(window.userDocId) {
-        // Only update if balance changed significantly to save writes
-        // updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance }).catch(e => console.log(e));
-    }
 }
 
 // 🟢 3. NEW 3-LEVEL STATS & COMMISSION ENGINE
