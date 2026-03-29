@@ -294,11 +294,30 @@ async function syncStatsAndHistory() {
             if(window.l2Codes.has(u.referCodeUsed)) window.l3Codes.add(uCode);
         });
 
+        const l1Size = window.l1Codes.size;
+        const l2Size = window.l2Codes.size;
+        const l3Size = window.l3Codes.size;
+
         if(document.getElementById('total-refers-count')) document.getElementById('total-refers-count').innerText = l1Count; 
         if(document.getElementById('today-refers-count')) document.getElementById('today-refers-count').innerText = todayCount; 
-        if(document.getElementById('graph-active-members')) document.getElementById('graph-active-members').innerText = window.l1Codes.size + window.l2Codes.size + window.l3Codes.size;
+        if(document.getElementById('graph-active-members')) document.getElementById('graph-active-members').innerText = l1Size + l2Size + l3Size;
         if(document.getElementById('referral-list-container')) document.getElementById('referral-list-container').innerHTML = referListHtml || "<p class='text-center py-10 text-slate-400 font-bold'>No referrals yet. Share your link!</p>"; 
         
+        // --- 🔥 DYNAMIC GRAPH BADGES & BARS LOGIC 🔥 ---
+        if(document.getElementById('badge-l1')) document.getElementById('badge-l1').innerText = l1Size;
+        if(document.getElementById('badge-l2')) document.getElementById('badge-l2').innerText = l2Size;
+        if(document.getElementById('badge-l3')) document.getElementById('badge-l3').innerText = l3Size;
+        
+        // Calculate Bar Height based on members
+        let maxLvl = Math.max(1, l1Size, l2Size, l3Size); 
+        let h1 = Math.max(5, (l1Size / maxLvl) * 80) + "%"; 
+        let h2 = Math.max(5, (l2Size / maxLvl) * 80) + "%";
+        let h3 = Math.max(5, (l3Size / maxLvl) * 80) + "%";
+        
+        if(document.getElementById('bar-l1')) document.getElementById('bar-l1').style.height = h1;
+        if(document.getElementById('bar-l2')) document.getElementById('bar-l2').style.height = h2;
+        if(document.getElementById('bar-l3')) document.getElementById('bar-l3').style.height = h3;
+
         window.referFlatBonus = 0; // Flat ₹5 OFF
         updateReferUI();
         window.updateLiveBalance();
