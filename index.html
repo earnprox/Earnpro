@@ -13,8 +13,12 @@
         .step-out-left { transform: translateX(-120%); opacity: 0; pointer-events: none; }
         .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; }
         .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; }
-        .otp-box { width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
+        
+        /* 6 OTP Boxes Responsive Design */
+        .otp-box { width: 42px; height: 55px; text-align: center; font-size: 22px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
         .otp-box:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        @media (max-width: 380px) { .otp-box { width: 36px; height: 50px; font-size: 18px; } }
+        
         #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px; }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
         
@@ -34,7 +38,6 @@
         // Check Auth Status IMMEDIATELY before rendering the page
         const storedPhone = localStorage.getItem("earnprox_user_phone");
         if (storedPhone) {
-            // User is logged in, redirect immediately (Splash screen stays visible)
             window.location.replace("dashboard.html");
         }
     </script>
@@ -80,6 +83,8 @@
                 <input type="text" id="refer-input" placeholder="Have a referral code?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition uppercase tracking-widest">
             </div>
 
+            <div id="recaptcha-container"></div>
+
             <button onclick="window.sendOTP()" id="send-otp-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
                 Get OTP <span class="text-xl">→</span>
             </button>
@@ -100,13 +105,15 @@
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-3">
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter OTP</label>
-                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded border border-blue-100">Test OTP: 1234</span>
+                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded border border-blue-100">Waiting for SMS...</span>
                 </div>
-                <div class="flex gap-3 justify-center">
+                <div class="flex gap-2 justify-center">
                     <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event)">
                     <input type="tel" maxlength="1" class="otp-box" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event)">
                     <input type="tel" maxlength="1" class="otp-box" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event)">
-                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="window.checkBackspace(this, 'otp3', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp4" onkeyup="window.moveToNext(this, 'otp5', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp5" onkeyup="window.moveToNext(this, 'otp6', event)">
+                    <input type="tel" maxlength="1" class="otp-box" id="otp6" onkeyup="window.checkBackspace(this, 'otp5', event)">
                 </div>
             </div>
 
@@ -133,6 +140,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // NEW FIREBASE AUTH IMPORTS
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
@@ -142,24 +151,22 @@
           messagingSenderId: "411733884378",
           appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
         };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
+        const auth = getAuth(app); // Initialize Auth
+        
         // GLOBAL STATE
         let isNewUser = true; 
         let existingUserData = null; 
         const REFER_BONUS_AMOUNT = 5; 
+        window.confirmationResult = null; // Store Firebase Auth Result here
 
-        // --- NEW ONLOAD LOGIC FOR SPLASH SCREEN ---
+        // Splash Screen Logic
         window.addEventListener('DOMContentLoaded', () => {
-            // Agar pehle wali script ne redirect nahi kiya (मतलब naya user hai), toh loader hatao
             if (!localStorage.getItem("earnprox_user_phone")) {
-                setTimeout(() => {
-                    document.getElementById('splash-screen').classList.add('hidden');
-                }, 600); // 0.6 sec ki animation lagayi hai professional feel ke liye
+                setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden'); }, 600); 
             }
-            
-            // Referral code URL se nikalne wala logic
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if(refCode) {
@@ -169,9 +176,7 @@
         });
 
         window.showToast = function(msg) { 
-            const t = document.getElementById("toast"); 
-            t.innerText = msg; 
-            t.classList.add("show"); 
+            const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
             setTimeout(()=>t.classList.remove("show"), 3000); 
         }
         
@@ -186,53 +191,69 @@
             if (e.key === "Backspace" && c.value === "") document.getElementById(p).focus(); 
         }
 
-        // STEP 1: CHECK NUMBER & SEND OTP
+        // ==========================================
+        // 🚀 STEP 1: CHECK DB & SEND REAL FIREBASE OTP
+        // ==========================================
         window.sendOTP = async function() {
             const phone = document.getElementById('mobile-input').value.trim();
             if(phone.length !== 10) return window.showToast("⚠️ Enter a valid 10-digit number.");
             
-            document.getElementById('display-number').innerText = "+91 " + phone;
+            const fullPhoneNumber = "+91" + phone;
+            document.getElementById('display-number').innerText = fullPhoneNumber;
+            
             const btn = document.getElementById('send-otp-btn'); 
-            btn.innerText = "Checking User... ⏳"; 
+            btn.innerText = "Sending OTP... ⏳"; 
             btn.disabled = true;
 
             try {
-                // Check if number is in DB
+                // 1. Check Database first
                 const q = query(collection(db, "users"), where("phone", "==", phone));
                 const snap = await getDocs(q);
                 
                 if (!snap.empty) {
-                    // ACCOUNT EXISTS
                     existingUserData = snap.docs[0].data();
-                    
-                    // Admin Block Check 🚨
                     if(existingUserData.status === "blocked") {
                         window.showToast("🚫 Account Suspended by Admin.");
                         btn.innerHTML = `Get OTP <span class="text-xl">→</span>`; 
                         btn.disabled = false;
                         return; 
                     }
-
                     isNewUser = false; 
                     document.getElementById('name-container').classList.add('hidden');
-                    document.getElementById('refer-container').classList.add('hidden'); // Hide refer input
-                    window.showToast(`Welcome back, ${existingUserData.name.split(" ")[0]}! OTP Sent.`);
+                    document.getElementById('refer-container').classList.add('hidden'); 
                 } else {
-                    // NEW ACCOUNT
                     isNewUser = true; 
                     document.getElementById('name-container').classList.remove('hidden');
-                    window.showToast("👋 New User! OTP Sent.");
                 }
 
-                // Move to OTP Screen
+                // 2. Setup Invisible Recaptcha (Only once)
+                if (!window.recaptchaVerifier) {
+                    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                        'size': 'invisible',
+                        'callback': (response) => { /* reCAPTCHA solved */ }
+                    });
+                }
+
+                // 3. Send SMS via Firebase
+                const appVerifier = window.recaptchaVerifier;
+                window.confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
+
+                // 4. Move to Next UI Step
+                window.showToast("📲 OTP Sent Successfully!");
                 document.getElementById('step-1').classList.remove('step-active'); 
                 document.getElementById('step-1').classList.add('step-out-left');
                 document.getElementById('step-2').classList.remove('step-in-right'); 
                 document.getElementById('step-2').classList.add('step-active');
 
-            } catch(e) { 
-                window.showToast("❌ Server Error while checking. Try again.");
-                console.log(e);
+            } catch(error) { 
+                console.error("Firebase Auth Error:", error);
+                window.showToast("❌ OTP Failed! Too many requests or invalid number.");
+                // Reset recaptcha if failed so user can try again
+                if(window.recaptchaVerifier) {
+                    window.recaptchaVerifier.render().then(function(widgetId) {
+                        grecaptcha.reset(widgetId);
+                    });
+                }
             } finally { 
                 btn.innerHTML = `Get OTP <span class="text-xl">→</span>`; 
                 btn.disabled = false; 
@@ -242,40 +263,43 @@
         window.goBack = function() {
             document.getElementById('step-2').classList.remove('step-active'); document.getElementById('step-2').classList.add('step-in-right');
             document.getElementById('step-1').classList.remove('step-out-left'); document.getElementById('step-1').classList.add('step-active');
-            for(let i=1; i<=4; i++) document.getElementById('otp'+i).value = "";
+            for(let i=1; i<=6; i++) document.getElementById('otp'+i).value = ""; 
         }
 
-        // STEP 2: VERIFY OTP AND LOGIN / REGISTER
+        // ==========================================
+        // 🚀 STEP 2: VERIFY REAL FIREBASE OTP & LOGIN
+        // ==========================================
         window.verifyAndLogin = async function() {
             const btn = document.getElementById('verify-btn');
-            const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
-            if(enteredOtp.length < 4) return window.showToast("⚠️ Enter 4-digit OTP.");
+            const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
             
-            // Dummy OTP Verification (Production mein yahan Firebase Auth / Fast2SMS API aayegi)
-            if(enteredOtp !== "1234") { window.showToast("❌ Invalid OTP! Use 1234."); return; }
+            if(enteredOtp.length < 6) return window.showToast("⚠️ Enter full 6-digit OTP.");
 
             btn.innerText = "Verifying... ⏳"; 
             btn.disabled = true;
-            
             const phone = document.getElementById('mobile-input').value.trim();
-            
-            if(isNewUser) {
-                // === CREATE NEW ACCOUNT ===
-                const finalName = document.getElementById('name-input').value.trim();
-                if(finalName.length < 3) { 
-                    window.showToast("⚠️ Enter your full name to proceed."); 
-                    btn.innerText = "Verify & Continue"; btn.disabled = false; 
-                    return; 
-                }
-                
-                let referCode = document.getElementById('refer-input').value.trim().toUpperCase();
-                if(!referCode) referCode = "None";
-                
-                // Generate a unique refer code for this user (First 3 letters of name + Last 4 digits of phone)
-                const myOwnCode = (finalName.substring(0,3) + phone.substring(phone.length - 4)).toUpperCase();
 
-                try {
-                    // 1. SAVE NEW USER IN DB
+            try {
+                // 1. Verify OTP with Firebase
+                await window.confirmationResult.confirm(enteredOtp);
+                
+                // --- If Code Reaches Here, OTP was Correct! ---
+
+                if(isNewUser) {
+                    // NEW USER DB SETUP
+                    const finalName = document.getElementById('name-input').value.trim();
+                    if(finalName.length < 3) { 
+                        window.showToast("⚠️ Enter your full name to proceed."); 
+                        btn.innerText = "Verify & Continue"; btn.disabled = false; 
+                        return; 
+                    }
+                    
+                    let referCode = document.getElementById('refer-input').value.trim().toUpperCase();
+                    if(!referCode) referCode = "None";
+                    
+                    const myOwnCode = (finalName.substring(0,3) + phone.substring(phone.length - 4)).toUpperCase();
+
+                    // DB Save
                     await addDoc(collection(db, "users"), {
                         phone: phone, 
                         name: finalName, 
@@ -289,31 +313,33 @@
                         timestamp: new Date()
                     });
 
-                    // 2. 🔥 REWARD THE REFERRER (Only if code is valid)
+                    // Refer Bonus Logic
                     if(referCode !== "None") {
                         const refQ = query(collection(db, "users"), where("ownReferCode", "==", referCode));
                         const refSnap = await getDocs(refQ);
                         if(!refSnap.empty) {
                             const referrerDoc = refSnap.docs[0];
                             const oldBal = referrerDoc.data().balance || 0;
-                            // Referrer ko instant wallet balance mil jayega
                             await updateDoc(doc(db, "users", referrerDoc.id), { balance: oldBal + REFER_BONUS_AMOUNT });
                         }
                     }
                     window.showToast("🎉 Account Created Successfully!");
-                } catch(e) { 
-                    window.showToast("❌ Server Error!"); 
-                    btn.innerText = "Verify & Continue"; btn.disabled = false; 
-                    return; 
+                } else {
+                    // EXISTING USER
+                    window.showToast("✅ Login Successful!");
                 }
-            } else {
-                // === EXISTING USER LOGIN ===
-                window.showToast("✅ Login Successful!");
-            }
 
-            // Save session and redirect
-            localStorage.setItem("earnprox_user_phone", phone);
-            setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
+                // 2. Save Session and Redirect
+                localStorage.setItem("earnprox_user_phone", phone);
+                setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
+
+            } catch (error) {
+                // OTP WAS WRONG OR EXPIRED
+                console.error("OTP Verification Error:", error);
+                window.showToast("❌ Invalid OTP! Please check and try again.");
+                btn.innerText = "Verify & Continue"; 
+                btn.disabled = false; 
+            }
         }
     </script>
 </body>
