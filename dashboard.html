@@ -202,7 +202,10 @@
 
             <div id="ws-explore" class="ws-content active">
                 <div id="gigs-container" class="space-y-4 pb-10">
-                    <p class="text-slate-400 font-bold text-center py-10">Fetching Tasks from Server...</p>
+                    <div class="text-center py-20 opacity-50 animate-pulse">
+                        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+                        <p class="font-bold text-slate-500">Loading your workspace...</p>
+                    </div>
                 </div>
             </div>
 
@@ -224,7 +227,9 @@
 
             <div id="ws-review" class="ws-content">
                 <div id="review-container" class="space-y-4 pb-10">
-                    <p class="text-slate-400 font-bold text-center py-10">Loading your submissions...</p>
+                    <div class="text-center py-20 opacity-50 animate-pulse">
+                        <p class="font-bold text-slate-500">Loading your submissions...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -536,10 +541,24 @@
         </div>
     </div>
 
-    <div id="loading-overlay" class="fixed inset-0 z-[999] bg-white flex flex-col items-center justify-center">
-        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <h2 class="text-xl font-black text-slate-800">Please wait...</h2>
+    <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center transition-all duration-500 ease-in-out">
+        <div class="relative flex flex-col items-center justify-center">
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur-[40px] opacity-20 animate-pulse"></div>
+            
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 relative z-10 tracking-tighter mb-4 animate-bounce" style="animation-duration: 2s;">
+                EarnproX
+            </h1>
+            
+            <div class="w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden relative z-10">
+                <div class="w-1/2 h-full bg-blue-600 rounded-full absolute left-0 top-0 animate-[slide_1.5s_ease-in-out_infinite_alternate]"></div>
+            </div>
+            
+            <p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase mt-3 relative z-10">
+                Securing connection...
+            </p>
+        </div>
     </div>
+
     <div id="toast">Message Here</div>
 
     <script type="module" src="dashboard.js"></script>
