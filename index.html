@@ -32,6 +32,9 @@
         #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .pulse-logo { animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
         @keyframes pulse { 0%, 100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.1) rotate(-6deg); } }
+
+        /* 🔥 MAGIC: HIDE GOOGLE RECAPTCHA BADGE 🔥 */
+        .grecaptcha-badge { visibility: hidden !important; opacity: 0 !important; }
     </style>
 
     <script>
@@ -83,9 +86,7 @@
                 <input type="text" id="refer-input" placeholder="Have a referral code?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-4 outline-none focus:border-blue-500 transition uppercase tracking-widest">
             </div>
 
-            <div id="recaptcha-container"></div>
-
-            <button onclick="window.sendOTP()" id="send-otp-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
+            <div id="recaptcha-container"></div> <button onclick="window.sendOTP()" id="send-otp-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2">
                 Get OTP <span class="text-xl">→</span>
             </button>
         </div>
@@ -104,8 +105,7 @@
 
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter OTP</label>
-                    <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded border border-blue-100">Waiting for SMS...</span>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Enter 6-Digit OTP</label>
                 </div>
                 <div class="flex gap-2 justify-center">
                     <input type="tel" maxlength="1" class="otp-box" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event)">
@@ -123,24 +123,24 @@
         </div>
     </div>
 
-    <div class="text-center mt-8 mb-4 w-full max-w-md">
+    <div class="text-center mt-6 mb-4 w-full max-w-md">
         <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-bold text-slate-400">
             <a href="privacy.html" class="hover:text-blue-600 transition">Privacy Policy</a>
             <span>•</span>
             <a href="terms.html" class="hover:text-blue-600 transition">Terms & Conditions</a>
             <span>•</span>
-            <a href="refund.html" class="hover:text-blue-600 transition">Refund Policy</a>
-            <span>•</span>
             <a href="contact.html" class="hover:text-blue-600 transition">Contact Us</a>
         </div>
-        <p class="text-[10px] text-slate-300 mt-3">&copy; 2026 EarnproX. All rights reserved.</p>
+        <p class="text-[9px] text-slate-300 mt-4 leading-tight">
+            Protected by reCAPTCHA and subject to the Google <a href="https://policies.google.com/privacy" class="underline">Privacy Policy</a> and <a href="https://policies.google.com/terms" class="underline">Terms</a>. <br> &copy; 2026 EarnproX. All rights reserved.
+        </p>
     </div>
+    
     <div id="toast">Message Here</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        // NEW FIREBASE AUTH IMPORTS
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -154,15 +154,14 @@
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app); // Initialize Auth
+        const auth = getAuth(app); 
         
         // GLOBAL STATE
         let isNewUser = true; 
         let existingUserData = null; 
         const REFER_BONUS_AMOUNT = 5; 
-        window.confirmationResult = null; // Store Firebase Auth Result here
+        window.confirmationResult = null; 
 
-        // Splash Screen Logic
         window.addEventListener('DOMContentLoaded', () => {
             if (!localStorage.getItem("earnprox_user_phone")) {
                 setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden'); }, 600); 
@@ -192,7 +191,7 @@
         }
 
         // ==========================================
-        // 🚀 STEP 1: CHECK DB & SEND REAL FIREBASE OTP
+        // 🚀 SEND REAL FIREBASE OTP
         // ==========================================
         window.sendOTP = async function() {
             const phone = document.getElementById('mobile-input').value.trim();
@@ -206,7 +205,6 @@
             btn.disabled = true;
 
             try {
-                // 1. Check Database first
                 const q = query(collection(db, "users"), where("phone", "==", phone));
                 const snap = await getDocs(q);
                 
@@ -226,19 +224,16 @@
                     document.getElementById('name-container').classList.remove('hidden');
                 }
 
-                // 2. Setup Invisible Recaptcha (Only once)
                 if (!window.recaptchaVerifier) {
                     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                         'size': 'invisible',
-                        'callback': (response) => { /* reCAPTCHA solved */ }
+                        'callback': (response) => { }
                     });
                 }
 
-                // 3. Send SMS via Firebase
                 const appVerifier = window.recaptchaVerifier;
                 window.confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
 
-                // 4. Move to Next UI Step
                 window.showToast("📲 OTP Sent Successfully!");
                 document.getElementById('step-1').classList.remove('step-active'); 
                 document.getElementById('step-1').classList.add('step-out-left');
@@ -247,8 +242,7 @@
 
             } catch(error) { 
                 console.error("Firebase Auth Error:", error);
-                window.showToast("❌ OTP Failed! Too many requests or invalid number.");
-                // Reset recaptcha if failed so user can try again
+                window.showToast("❌ OTP Failed! Check network or try again later.");
                 if(window.recaptchaVerifier) {
                     window.recaptchaVerifier.render().then(function(widgetId) {
                         grecaptcha.reset(widgetId);
@@ -267,7 +261,7 @@
         }
 
         // ==========================================
-        // 🚀 STEP 2: VERIFY REAL FIREBASE OTP & LOGIN
+        // 🚀 VERIFY OTP & LOGIN
         // ==========================================
         window.verifyAndLogin = async function() {
             const btn = document.getElementById('verify-btn');
@@ -280,13 +274,9 @@
             const phone = document.getElementById('mobile-input').value.trim();
 
             try {
-                // 1. Verify OTP with Firebase
                 await window.confirmationResult.confirm(enteredOtp);
-                
-                // --- If Code Reaches Here, OTP was Correct! ---
 
                 if(isNewUser) {
-                    // NEW USER DB SETUP
                     const finalName = document.getElementById('name-input').value.trim();
                     if(finalName.length < 3) { 
                         window.showToast("⚠️ Enter your full name to proceed."); 
@@ -299,7 +289,6 @@
                     
                     const myOwnCode = (finalName.substring(0,3) + phone.substring(phone.length - 4)).toUpperCase();
 
-                    // DB Save
                     await addDoc(collection(db, "users"), {
                         phone: phone, 
                         name: finalName, 
@@ -313,7 +302,6 @@
                         timestamp: new Date()
                     });
 
-                    // Refer Bonus Logic
                     if(referCode !== "None") {
                         const refQ = query(collection(db, "users"), where("ownReferCode", "==", referCode));
                         const refSnap = await getDocs(refQ);
@@ -325,16 +313,13 @@
                     }
                     window.showToast("🎉 Account Created Successfully!");
                 } else {
-                    // EXISTING USER
                     window.showToast("✅ Login Successful!");
                 }
 
-                // 2. Save Session and Redirect
                 localStorage.setItem("earnprox_user_phone", phone);
                 setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
 
             } catch (error) {
-                // OTP WAS WRONG OR EXPIRED
                 console.error("OTP Verification Error:", error);
                 window.showToast("❌ Invalid OTP! Please check and try again.");
                 btn.innerText = "Verify & Continue"; 
