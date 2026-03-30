@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +9,7 @@
     <link rel="stylesheet" href="dashboard.css">
     <script>
         if (!localStorage.getItem("earnprox_user_phone")) {
-            window.location.href = "index.html";
+            window.location.href = "login.html";
         }
     </script>
 </head>
@@ -72,59 +71,64 @@
 
             <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.04)] border border-slate-100 mb-6">
                 <div class="flex items-center justify-between mb-5">
-                    <h3 class="text-[13px] font-black text-slate-800 tracking-wide">Quick Actions</h3>
-                    <span class="text-[9px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-sm uppercase tracking-wider border border-rose-100">Top Earners</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[13px] font-bold text-slate-800">Earn upto:</span>
+                        <span class="flex items-center gap-1 text-[13px] font-black text-slate-800">
+                            <span class="w-4 h-4 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-[9px]">🪙</span>
+                            33137.50
+                        </span>
+                        <span class="text-[13px] font-bold text-slate-800">Today</span>
+                    </div>
+                    <button class="text-[13px] font-bold text-blue-600 hover:text-blue-700">View All</button>
                 </div>
                 
-                <div class="grid grid-cols-4 gap-y-5 gap-x-2">
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('project')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-rose-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-rose-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            🎁<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">5</span>
+                <div class="flex overflow-x-auto gap-4 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.switchTab('project')">
+                        <div class="w-[60px] h-[60px] bg-white rounded-2xl border-2 border-red-500 flex items-center justify-center">
+                            <div class="text-3xl">🎁</div>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-rose-500">Daily Task</span>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight w-full">Daily Task<br>For Active</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('wallet')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-blue-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-blue-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            🏦
+
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('App Install')">
+                        <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center">
+                            <div class="w-8 h-10 bg-[#0057FF] rounded-lg flex items-center justify-center text-white relative">
+                                <svg class="w-5 h-5 absolute top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                <div class="w-1.5 h-1.5 bg-white rounded-full absolute bottom-1.5"></div>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-blue-500">Withdraw</span>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">App Install</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.openSheet('history-sheet')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-emerald-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-emerald-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            📜<span class="absolute -top-1.5 -right-2 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm z-10">NEW</span>
+
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Recharge')">
+                        <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center">
+                            <div class="text-3xl font-black text-[#C100B6]">₹</div>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-emerald-500">History</span>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Recharge</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.switchTab('refer')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-purple-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-purple-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            🚀<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">1</span>
+
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Follower')">
+                        <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center relative">
+                            <div class="bg-[#FF424D] text-white text-[9px] font-black px-2 py-1.5 rounded-md relative z-10">
+                                FOLLOW
+                            </div>
+                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#FF424D] rotate-45 z-0"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-purple-500">Refer</span>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Follower</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Surveys coming soon!')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-amber-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-amber-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            📊
+
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] opacity-80 cursor-not-allowed pt-2">
+                        <div class="w-[60px] h-[60px] bg-[#E2E8F0] rounded-[1.25rem] border border-slate-200 flex items-center justify-center relative">
+                            <span class="absolute -top-3 bg-[#E2E8F0] text-slate-500 text-[7px] font-black px-1.5 py-0.5 rounded-full z-10 whitespace-nowrap tracking-wider shadow-sm">COMING SOON</span>
+                            
+                            <div class="w-8 h-9 bg-[#A0AEC0] flex items-center justify-center text-white" style="clip-path: polygon(50% 100%, 100% 80%, 100% 0, 0 0, 0 80%);">
+                                <svg class="w-4 h-4 text-white pb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-amber-500">Survey</span>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Reviews</span>
                     </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Fetching hot deals...')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-pink-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-pink-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            🏷️<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">6</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-pink-500">Deals</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('No coupons right now')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-orange-50 rounded-[14px] shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-orange-100 flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 ease-in-out">
-                            🎟️<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">3</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center leading-tight transition-all duration-200 group-hover:text-orange-500">Coupons</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('More features dropping soon!')">
-                        <div class="relative w-[3.25rem] h-[3.25rem] bg-blue-600 rounded-[14px] shadow-[0_4px_15px_rgba(37,99,235,0.35)] flex items-center justify-center text-white group-active:scale-95 transition-all duration-200 ease-in-out">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                        </div>
-                        <span class="text-[10px] font-bold text-blue-600 text-center leading-tight transition-all duration-200">Activity</span>
-                    </div>
+
                 </div>
             </div>
 
@@ -207,7 +211,7 @@
                 
                 <div class="relative z-10 mt-10 text-center px-4">
                     <h3 class="text-[26px] font-bold text-slate-900 flex items-center justify-center gap-2 mb-2">
-                        EarnproX <span class="text-rose-500 text-3xl">❤️</span>
+                        You <span class="text-rose-500 text-3xl">❤️</span> EarnproX
                     </h3>
                     <p class="text-slate-600 text-[16px] mb-6 font-medium leading-snug">
                         Your friends are going to<br>love us too!
@@ -419,7 +423,7 @@
                     <a href="terms.html" class="text-xs font-bold text-slate-400 hover:text-blue-500 transition-all duration-200">Terms</a>
                     <a href="contact.html" class="text-xs font-bold text-slate-400 hover:text-blue-500 transition-all duration-200">Support</a>
                 </div>
-                <div onclick="window.logoutUser()" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
+                <div onclick="localStorage.removeItem('earnprox_user_phone'); window.location.href='login.html'" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
                     <p class="text-sm font-black text-red-500 transition-all duration-200">Logout Account</p>
                     <span class="text-slate-400 text-lg group-hover:text-red-500 transition-all duration-200">›</span>
                 </div>
@@ -594,4 +598,3 @@
 
 </body>
 </html>
- 
