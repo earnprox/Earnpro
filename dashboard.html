@@ -38,24 +38,26 @@
                 </div>
             </div>
 
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-[1rem] p-5 shadow-lg shadow-blue-500/25 text-white relative overflow-hidden mb-6">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-blue-700/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="relative bg-gradient-to-br from-[#0B132B] via-[#111A3A] to-[#0A1128] rounded-[1.5rem] p-6 shadow-[0_20px_40px_-15px_rgba(11,19,43,0.7)] border border-[#1E294A] overflow-hidden mb-6 group">
+                <div class="absolute -right-16 -top-16 w-48 h-48 bg-blue-500/20 rounded-full blur-[40px] pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
+                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-purple-500/20 rounded-full blur-[30px] pointer-events-none"></div>
+                
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none"></div>
                 
                 <div class="flex justify-between items-center relative z-10">
                     <div>
-                        <h3 class="text-white/80 text-[9px] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                            EarnproX <span class="font-normal text-[8px]">ReferralCard</span>
+                        <h3 class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 text-[9px] font-black uppercase tracking-[0.25em] mb-1.5 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]"></span> Exclusive Member
                         </h3>
-                        <h2 class="text-[17px] font-black leading-tight" id="home-card-user-name">User Name</h2>
+                        <h2 class="text-[22px] font-black tracking-tight text-white drop-shadow-md" id="home-card-user-name">User Name</h2>
                     </div>
                     
                     <div class="flex flex-col items-end">
-                        <button onclick="window.copyReferLink()" class="bg-[#0F172A] hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 active:scale-95 transition-all duration-200 ease-in-out shadow-md">
-                            <span class="text-[11px] font-black tracking-widest" id="home-card-refer-code">CODE</span>
-                            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <button onclick="window.copyReferLink()" class="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white px-4 py-2 rounded-xl flex items-center gap-2 active:scale-95 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)]">
+                            <span class="text-[12px] font-black tracking-widest drop-shadow-sm" id="home-card-refer-code">CODE</span>
+                            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
-                        <span class="text-[8px] text-white/70 font-bold mt-1.5 cursor-pointer uppercase tracking-wider transition-all duration-200 hover:text-white" onclick="window.switchTab('refer')">Refer & Earn</span>
+                        <span class="text-[9px] text-white/50 font-bold mt-2 cursor-pointer uppercase tracking-[0.15em] transition-all duration-300 hover:text-amber-400" onclick="window.switchTab('refer')">Tap to Invite →</span>
                     </div>
                 </div>
             </div>
@@ -118,64 +120,74 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] border border-blue-100 mb-8 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="bg-white rounded-[1.5rem] p-6 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-100/80 mb-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-500"></div>
 
                 <div class="relative z-10">
-                    <div class="flex justify-between items-start mb-5">
+                    <div class="flex justify-between items-start mb-6 pt-1">
                         <div>
-                            <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <span class="text-blue-500 text-2xl">📊</span> My Network
+                            <h3 class="text-xl font-black text-slate-800 flex items-center gap-2 tracking-tight">
+                                <span class="bg-slate-100 p-1.5 rounded-lg text-xl shadow-inner border border-slate-200/50">📊</span> Network Intel
                             </h3>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">3-Level Earning Graph</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Live Commission Sync</p>
                         </div>
-                        <button onclick="syncStatsAndHistory()" class="text-slate-400 hover:text-blue-600 active:rotate-180 transition-all duration-300 p-1 bg-slate-50 rounded-full">
+                        <button onclick="syncStatsAndHistory()" class="text-slate-400 hover:text-blue-600 active:rotate-180 transition-all duration-500 p-2 bg-slate-50 hover:bg-blue-50 hover:shadow-sm rounded-full border border-transparent hover:border-blue-100">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </button>
                     </div>
 
-                    <div class="flex justify-between items-end mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div class="flex justify-between items-center mb-8 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
                         <div>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Active Members</p>
-                            <h4 class="text-2xl font-black text-slate-800 leading-none" id="graph-active-members">0</h4>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.15em] mb-1">Active Army</p>
+                            <h4 class="text-3xl font-black text-slate-800 leading-none" id="graph-active-members">0</h4>
                         </div>
+                        <div class="w-px h-10 bg-slate-200"></div>
                         <div class="text-right">
-                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Network Income</p>
-                            <h4 class="text-2xl font-black text-emerald-500 leading-none" id="graph-network-income">₹0</h4>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.15em] mb-1">Total Yield</p>
+                            <h4 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-400 leading-none drop-shadow-sm" id="graph-network-income">₹0</h4>
                         </div>
                     </div>
 
-                    <div class="h-44 flex items-end justify-around gap-2 px-2 mb-5 border-b-2 border-slate-100 pb-2 relative">
+                    <div class="h-48 flex items-end justify-around gap-4 px-2 mb-4 relative">
                         <div class="absolute bottom-0 left-0 right-0 h-1 bg-slate-100 rounded-full"></div>
 
-                        <div class="flex flex-col items-center justify-end w-full h-full group cursor-pointer relative z-10">
-                            <span id="badge-l1" class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 mb-1 transition-all duration-300">0</span>
-                            <div id="bar-l1" class="w-full max-w-[35px] bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-sm relative overflow-hidden transition-all duration-1000 ease-out group-hover:shadow-md group-hover:brightness-110" style="height: 5%;">
-                                <div class="absolute inset-0 bg-white/20 w-full h-full transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <div class="flex flex-col items-center w-full h-full relative z-10 group justify-end">
+                            <span id="badge-l1" class="text-[11px] font-black text-white bg-slate-800 px-3 py-1 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.2)] mb-2 transform transition-all duration-300 group-hover:-translate-y-1">0</span>
+                            <div class="w-full max-w-[44px] h-full bg-slate-50 border border-slate-100 rounded-t-2xl relative overflow-hidden flex items-end shadow-inner">
+                                <div id="bar-l1" class="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-2xl shadow-[0_0_20px_rgba(59,130,246,0.3)] relative overflow-hidden transition-all duration-1000 ease-out" style="height: 5%;">
+                                    <div class="absolute inset-0 bg-white/20 w-full h-full transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                                </div>
                             </div>
-                            <span class="text-[10px] font-black text-slate-600 mt-2 text-center leading-tight">Lvl 1<br><span class="text-blue-500">(10%)</span></span>
                         </div>
 
-                        <div class="flex flex-col items-center justify-end w-full h-full group cursor-pointer relative z-10">
-                            <span id="badge-l2" class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mb-1 transition-all duration-300">0</span>
-                            <div id="bar-l2" class="w-full max-w-[35px] bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg shadow-sm relative overflow-hidden transition-all duration-1000 ease-out group-hover:shadow-md group-hover:brightness-110" style="height: 5%;">
-                                <div class="absolute inset-0 bg-white/20 w-full h-full transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <div class="flex flex-col items-center w-full h-full relative z-10 group justify-end">
+                            <span id="badge-l2" class="text-[11px] font-black text-white bg-slate-800 px-3 py-1 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.2)] mb-2 transform transition-all duration-300 group-hover:-translate-y-1">0</span>
+                            <div class="w-full max-w-[44px] h-full bg-slate-50 border border-slate-100 rounded-t-2xl relative overflow-hidden flex items-end shadow-inner">
+                                <div id="bar-l2" class="w-full bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] relative overflow-hidden transition-all duration-1000 ease-out" style="height: 5%;">
+                                    <div class="absolute inset-0 bg-white/20 w-full h-full transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                                </div>
                             </div>
-                            <span class="text-[10px] font-black text-slate-600 mt-2 text-center leading-tight">Lvl 2<br><span class="text-emerald-500">(6%)</span></span>
                         </div>
 
-                        <div class="flex flex-col items-center justify-end w-full h-full group cursor-pointer relative z-10">
-                            <span id="badge-l3" class="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 mb-1 transition-all duration-300">0</span>
-                            <div id="bar-l3" class="w-full max-w-[35px] bg-gradient-to-t from-purple-500 to-purple-400 rounded-t-lg shadow-sm relative overflow-hidden transition-all duration-1000 ease-out group-hover:shadow-md group-hover:brightness-110" style="height: 5%;">
-                                <div class="absolute inset-0 bg-white/20 w-full h-full transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <div class="flex flex-col items-center w-full h-full relative z-10 group justify-end">
+                            <span id="badge-l3" class="text-[11px] font-black text-white bg-slate-800 px-3 py-1 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.2)] mb-2 transform transition-all duration-300 group-hover:-translate-y-1">0</span>
+                            <div class="w-full max-w-[44px] h-full bg-slate-50 border border-slate-100 rounded-t-2xl relative overflow-hidden flex items-end shadow-inner">
+                                <div id="bar-l3" class="w-full bg-gradient-to-t from-purple-500 to-purple-400 rounded-t-2xl shadow-[0_0_20px_rgba(168,85,247,0.3)] relative overflow-hidden transition-all duration-1000 ease-out" style="height: 5%;">
+                                    <div class="absolute inset-0 bg-white/20 w-full h-full transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                                </div>
                             </div>
-                            <span class="text-[10px] font-black text-slate-600 mt-2 text-center leading-tight">Lvl 3<br><span class="text-purple-500">(3%)</span></span>
                         </div>
                     </div>
 
-                    <button onclick="window.switchTab('refer')" class="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-black py-4 rounded-2xl text-sm active:scale-95 transition-all duration-200 ease-in-out shadow-lg shadow-slate-900/20 flex justify-center items-center gap-2">
-                        Build Your Network 
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    <div class="flex justify-around items-center px-2 mb-6">
+                        <div class="text-center w-full"><span class="text-[10px] font-black text-slate-800 block uppercase tracking-wider">Level 1</span><span class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full mt-1 inline-block border border-blue-100">10%</span></div>
+                        <div class="text-center w-full"><span class="text-[10px] font-black text-slate-800 block uppercase tracking-wider">Level 2</span><span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-1 inline-block border border-emerald-100">6%</span></div>
+                        <div class="text-center w-full"><span class="text-[10px] font-black text-slate-800 block uppercase tracking-wider">Level 3</span><span class="text-[9px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full mt-1 inline-block border border-purple-100">3%</span></div>
+                    </div>
+
+                    <button onclick="window.switchTab('refer')" class="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-black py-4 rounded-xl text-sm active:scale-95 transition-all duration-300 shadow-[0_10px_20px_-10px_rgba(15,23,42,0.6)] flex justify-center items-center gap-2">
+                        Expand Your Empire 
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </button>
                 </div>
             </div>
