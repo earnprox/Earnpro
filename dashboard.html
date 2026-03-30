@@ -38,26 +38,33 @@
                 </div>
             </div>
 
-            <div class="relative bg-gradient-to-br from-[#0B132B] via-[#111A3A] to-[#0A1128] rounded-[1.5rem] p-6 shadow-[0_20px_40px_-15px_rgba(11,19,43,0.7)] border border-[#1E294A] overflow-hidden mb-6 group">
-                <div class="absolute -right-16 -top-16 w-48 h-48 bg-blue-500/20 rounded-full blur-[40px] pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
-                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-purple-500/20 rounded-full blur-[30px] pointer-events-none"></div>
+            <div class="relative bg-gradient-to-br from-rose-400 to-pink-500 rounded-[1.5rem] p-6 shadow-lg shadow-pink-500/30 overflow-hidden mb-6 group">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-[20px] pointer-events-none"></div>
+                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-rose-600/30 rounded-full blur-[20px] pointer-events-none"></div>
                 
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none"></div>
-                
-                <div class="flex justify-between items-center relative z-10">
-                    <div>
-                        <h3 class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 text-[9px] font-black uppercase tracking-[0.25em] mb-1.5 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]"></span> Exclusive Member
-                        </h3>
-                        <h2 class="text-[22px] font-black tracking-tight text-white drop-shadow-md" id="home-card-user-name">User Name</h2>
+                <div class="flex flex-col relative z-10">
+                    <div class="flex justify-between items-start w-full mb-4">
+                        <div>
+                            <h3 class="text-white/90 text-[10px] font-bold uppercase tracking-wider mb-0.5">
+                                EarnproX Referral
+                            </h3>
+                            <h2 class="text-[20px] font-black tracking-tight text-white leading-none" id="home-card-user-name">User Name</h2>
+                        </div>
+                        
+                        <span class="text-[10px] font-bold bg-white/20 text-white px-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300" onclick="window.switchTab('refer')">
+                            Refer & Earn
+                        </span>
                     </div>
-                    
-                    <div class="flex flex-col items-end">
-                        <button onclick="window.copyReferLink()" class="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white px-4 py-2 rounded-xl flex items-center gap-2 active:scale-95 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.2)]">
-                            <span class="text-[12px] font-black tracking-widest drop-shadow-sm" id="home-card-refer-code">CODE</span>
-                            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 flex items-center gap-3">
+                            <span class="text-white/70 text-[10px] uppercase font-bold tracking-widest">Code</span>
+                            <span class="text-white font-black text-[16px] tracking-wide" id="home-card-refer-code">CODE</span>
+                        </div>
+                        
+                        <button onclick="window.copyReferLink()" class="w-10 h-10 bg-white text-pink-500 rounded-full flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all duration-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
-                        <span class="text-[9px] text-white/50 font-bold mt-2 cursor-pointer uppercase tracking-[0.15em] transition-all duration-300 hover:text-amber-400" onclick="window.switchTab('refer')">Tap to Invite →</span>
                     </div>
                 </div>
             </div>
