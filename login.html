@@ -14,8 +14,9 @@
         .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; visibility: hidden; }
         .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; visibility: visible; }
         
+        /* Updated Focus Colors to Pink (#EC4899) */
         .otp-box, .pin-box { width: 42px; height: 55px; text-align: center; font-size: 22px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
-        .otp-box:focus, .pin-box:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .otp-box:focus, .pin-box:focus { border-color: #EC4899; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15); }
         @media (max-width: 380px) { .otp-box, .pin-box { width: 36px; height: 50px; font-size: 18px; } }
         
         #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px; }
@@ -39,29 +40,31 @@
         }
     </script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-blue-100">
+<body class="min-h-screen flex flex-col items-center justify-center p-5 selection:bg-pink-200 selection:text-pink-900 relative overflow-hidden">
+
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-500 rounded-full blur-[120px] opacity-10 pointer-events-none -z-10"></div>
 
     <div id="splash-screen">
-        <div class="w-20 h-20 bg-blue-600 rounded-[1.5rem] mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(37,99,235,0.4)] pulse-logo">
+        <div class="w-20 h-20 bg-pink-600 rounded-[1.5rem] mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(219,39,119,0.4)] pulse-logo">
             <span class="text-4xl text-white font-black">X</span>
         </div>
-        <h1 class="text-2xl font-black tracking-tight text-slate-900 mt-2">Earnpro<span class="text-blue-600">X</span></h1>
+        <h1 class="text-2xl font-black tracking-tight text-slate-900 mt-2">Earnpro<span class="text-pink-600">X</span></h1>
         <div class="mt-8 flex gap-2 justify-center items-center">
-            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-bounce"></div>
-            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            <div class="w-2.5 h-2.5 bg-pink-600 rounded-full animate-bounce"></div>
+            <div class="w-2.5 h-2.5 bg-pink-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-2.5 h-2.5 bg-pink-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
         </div>
     </div>
 
-    <div class="text-center mb-8 mt-4">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(37,99,235,0.3)] transform -rotate-6">
+    <div class="text-center mb-8 mt-4 relative z-10">
+        <div class="w-16 h-16 bg-pink-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(219,39,119,0.3)] transform -rotate-6">
             <span class="text-3xl text-white font-black">X</span>
         </div>
-        <h1 class="text-3xl font-black tracking-tight text-slate-900">Earnpro<span class="text-blue-600">X</span></h1>
+        <h1 class="text-3xl font-black tracking-tight text-slate-900">Earnpro<span class="text-pink-600">X</span></h1>
         <p class="text-sm text-slate-500 font-medium mt-1">Complete micro-tasks, earn real money.</p>
     </div>
 
-    <div class="premium-card rounded-[2rem] p-6 w-full max-w-md relative overflow-hidden min-h-[420px] flex flex-col justify-start">
+    <div class="premium-card rounded-[2rem] p-6 w-full max-w-md relative overflow-hidden min-h-[420px] flex flex-col justify-start z-10">
         
         <div id="step-1" class="form-step step-active">
             <h2 class="text-2xl font-black text-slate-800 mb-2">Let's get started</h2>
@@ -69,7 +72,7 @@
             
             <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Mobile Number</label>
-                <div class="relative flex items-center bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-1 focus-within:border-blue-500 transition">
+                <div class="relative flex items-center bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-1 focus-within:border-pink-500 focus-within:ring-4 focus-within:ring-pink-500/10 transition duration-300">
                     <span class="text-slate-500 font-bold mr-2 border-r border-slate-300 pr-2">+91</span>
                     <input type="tel" id="mobile-input" maxlength="10" placeholder="98765 43210" class="w-full text-lg font-bold text-slate-800 bg-transparent outline-none py-3 tracking-wider">
                 </div>
@@ -77,7 +80,7 @@
 
             <div id="recaptcha-container"></div>
 
-            <button onclick="window.checkUserAndProceed()" id="send-otp-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2 mt-auto">
+            <button onclick="window.checkUserAndProceed()" id="send-otp-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(219,39,119,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2 mt-auto">
                 Continue <span class="text-xl">→</span>
             </button>
         </div>
@@ -99,7 +102,7 @@
             </div>
 
             <div class="text-center mb-8">
-                <button onclick="window.triggerForgotPin()" class="text-xs font-bold text-blue-600 hover:underline">Forgot PIN? Login via OTP</button>
+                <button onclick="window.triggerForgotPin()" class="text-xs font-bold text-pink-600 hover:underline">Forgot PIN? Login via OTP</button>
             </div>
 
             <button onclick="window.loginWithPIN()" id="pin-login-btn" class="w-full bg-[#1E293B] hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
@@ -115,17 +118,17 @@
             <p class="text-sm text-slate-500 mb-6">OTP sent to <b id="display-number-otp" class="text-slate-800"></b></p>
             
             <div id="new-user-fields" class="mb-4">
-                <input type="text" id="name-input" placeholder="What's your full name?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition mb-3">
-                <input type="text" id="refer-input" placeholder="Invite Code (Optional)" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition uppercase tracking-widest">
+                <input type="text" id="name-input" placeholder="What's your full name?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-pink-500 transition mb-3">
+                <input type="text" id="refer-input" placeholder="Invite Code (Optional)" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-pink-500 transition uppercase tracking-widest">
             </div>
 
             <div class="mb-4">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Set a 4-Digit PIN</label>
                 <div class="flex gap-3 justify-center">
-                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-blue-200" id="s-pin1" onkeyup="window.moveToNext(this, 's-pin2', event)">
-                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-blue-200" id="s-pin2" onkeyup="window.moveToNext(this, 's-pin3', event)">
-                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-blue-200" id="s-pin3" onkeyup="window.moveToNext(this, 's-pin4', event)">
-                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-blue-200" id="s-pin4" onkeyup="window.checkBackspace(this, 's-pin3', event)">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-pink-200" id="s-pin1" onkeyup="window.moveToNext(this, 's-pin2', event)">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-pink-200" id="s-pin2" onkeyup="window.moveToNext(this, 's-pin3', event)">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-pink-200" id="s-pin3" onkeyup="window.moveToNext(this, 's-pin4', event)">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-pink-200" id="s-pin4" onkeyup="window.checkBackspace(this, 's-pin3', event)">
                 </div>
             </div>
 
@@ -147,9 +150,9 @@
         </div>
     </div>
 
-    <div class="text-center mt-6 mb-4 w-full max-w-md">
-        <p class="text-[9px] text-slate-300 mt-4 leading-tight">
-            Protected by reCAPTCHA and subject to the Google <a href="https://policies.google.com/privacy" class="underline">Privacy Policy</a> and <a href="https://policies.google.com/terms" class="underline">Terms</a>. <br> &copy; 2026 EarnproX. All rights reserved.
+    <div class="text-center mt-6 mb-4 w-full max-w-md relative z-10">
+        <p class="text-[9px] text-slate-400 mt-4 leading-tight font-medium">
+            Protected by reCAPTCHA and subject to the Google <a href="https://policies.google.com/privacy" class="underline hover:text-pink-500">Privacy Policy</a> and <a href="https://policies.google.com/terms" class="underline hover:text-pink-500">Terms</a>. <br> &copy; 2026 EarnproX. All rights reserved.
         </p>
     </div>
     
