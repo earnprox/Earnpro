@@ -13,7 +13,7 @@
         }
     </script>
 </head>
-<body class="relative min-h-screen selection:bg-pink-100 pb-20 bg-[#F8FAFC]">
+<body class="relative min-h-screen selection:bg-blue-100 pb-20 bg-[#F8FAFC]">
 
     <div class="relative z-10 p-5">
 
@@ -45,16 +45,23 @@
                 <div class="flex flex-col relative z-10">
                     <div class="flex justify-between items-start w-full mb-4">
                         <div>
-                            <h3 class="text-white/90 text-[10px] font-bold uppercase tracking-wider mb-0.5">EarnproX Referral</h3>
+                            <h3 class="text-white/90 text-[10px] font-bold uppercase tracking-wider mb-0.5">
+                                EarnproX Referral
+                            </h3>
                             <h2 class="text-[20px] font-black tracking-tight text-white leading-none" id="home-card-user-name">User Name</h2>
                         </div>
-                        <span class="text-[10px] font-bold bg-white/20 text-white px-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300" onclick="window.switchTab('refer')">Refer & Earn</span>
+                        
+                        <span class="text-[10px] font-bold bg-white/20 text-white px-3 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300" onclick="window.switchTab('refer')">
+                            Refer & Earn
+                        </span>
                     </div>
+
                     <div class="flex items-center justify-between mt-2">
                         <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 flex items-center gap-3">
                             <span class="text-white/70 text-[10px] uppercase font-bold tracking-widest">Code</span>
                             <span class="text-white font-black text-[16px] tracking-wide" id="home-card-refer-code">CODE</span>
                         </div>
+                        
                         <button onclick="window.copyReferLink()" class="w-10 h-10 bg-white text-pink-500 rounded-full flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all duration-300">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
@@ -67,7 +74,8 @@
                     <div class="flex items-center gap-1.5">
                         <span class="text-[13px] font-bold text-slate-800">Earn upto:</span>
                         <span class="flex items-center gap-1 text-[13px] font-black text-slate-800">
-                            <span class="w-4 h-4 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-[9px]">🪙</span>33137.50
+                            <span class="w-4 h-4 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-[9px]">🪙</span>
+                            33137.50
                         </span>
                         <span class="text-[13px] font-bold text-slate-800">Today</span>
                     </div>
@@ -75,10 +83,12 @@
                 </div>
                 
                 <div class="flex overflow-x-auto gap-4 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    
                     <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.switchTab('project')">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border-2 border-red-500 flex items-center justify-center text-3xl">🎁</div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight w-full">Daily Task<br>For Active</span>
                     </div>
+
                     <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('App Install')">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center">
                             <div class="w-8 h-10 bg-[#0057FF] rounded-lg flex items-center justify-center text-white relative">
@@ -88,10 +98,12 @@
                         </div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">App Install</span>
                     </div>
+
                     <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Recharge')">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center text-3xl font-black text-[#C100B6]">₹</div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Recharge</span>
                     </div>
+
                     <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Follower')">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center relative">
                             <div class="bg-[#FF424D] text-white text-[9px] font-black px-2 py-1.5 rounded-md relative z-10">FOLLOW</div>
@@ -99,16 +111,17 @@
                         </div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Follower</span>
                     </div>
+
                 </div>
             </div>
 
             <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-2 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-[6px] bg-gradient-to-r from-pink-500 via-rose-400 to-orange-400"></div>
+                <div class="absolute top-0 left-0 w-full h-[6px] bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400"></div>
                 
                 <div class="flex justify-between items-center mb-6 pt-2">
                     <div class="flex items-center gap-3">
-                        <div class="bg-pink-50 p-2.5 rounded-xl border border-pink-100">
-                            <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">
+                            <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="18" y="3" width="4" height="18" rx="1"></rect>
                                 <rect x="10" y="8" width="4" height="13" rx="1"></rect>
                                 <rect x="2" y="13" width="4" height="8" rx="1"></rect>
@@ -119,7 +132,7 @@
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-0.5">3-Level Earning Graph</p>
                         </div>
                     </div>
-                    <button onclick="syncStatsAndHistory()" class="text-slate-400 hover:text-pink-500 active:rotate-180 transition-all duration-500 p-2 bg-slate-50 rounded-full">
+                    <button onclick="syncStatsAndHistory()" class="text-slate-400 hover:text-emerald-500 active:rotate-180 transition-all duration-500 p-2 bg-slate-50 rounded-full">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </button>
                 </div>
@@ -131,7 +144,7 @@
                     </div>
                     <div class="w-1/2 pl-4 text-right">
                         <p class="text-[10px] text-slate-400 font-black uppercase tracking-wider mb-2">Network Income</p>
-                        <h4 class="text-3xl font-black text-pink-500" id="graph-network-income">₹0.00</h4>
+                        <h4 class="text-3xl font-black text-emerald-500" id="graph-network-income">₹0.00</h4>
                     </div>
                 </div>
 
@@ -139,23 +152,23 @@
                     <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-50"></div>
 
                     <div class="flex flex-col items-center w-full h-full justify-end relative z-10">
-                        <span id="badge-l1" class="text-[12px] font-black text-pink-500 mb-2 bg-pink-50 px-2.5 py-0.5 rounded-md">0</span>
+                        <span id="badge-l1" class="text-[12px] font-black text-emerald-600 mb-2 bg-emerald-50 px-2.5 py-0.5 rounded-md">0</span>
                         <div class="w-full max-w-[36px] h-full bg-slate-50 rounded-t-xl overflow-hidden flex items-end">
-                            <div id="bar-l1" class="w-full bg-pink-500 rounded-t-xl transition-all duration-1000" style="height: 5%;"></div>
+                            <div id="bar-l1" class="w-full bg-emerald-600 rounded-t-xl transition-all duration-1000" style="height: 5%;"></div>
                         </div>
                     </div>
                     
                     <div class="flex flex-col items-center w-full h-full justify-end relative z-10">
-                        <span id="badge-l2" class="text-[12px] font-black text-rose-400 mb-2 bg-rose-50 px-2.5 py-0.5 rounded-md">0</span>
+                        <span id="badge-l2" class="text-[12px] font-black text-emerald-500 mb-2 bg-emerald-50 px-2.5 py-0.5 rounded-md">0</span>
                         <div class="w-full max-w-[36px] h-full bg-slate-50 rounded-t-xl overflow-hidden flex items-end">
-                            <div id="bar-l2" class="w-full bg-rose-400 rounded-t-xl transition-all duration-1000" style="height: 5%;"></div>
+                            <div id="bar-l2" class="w-full bg-emerald-500 rounded-t-xl transition-all duration-1000" style="height: 5%;"></div>
                         </div>
                     </div>
                     
                     <div class="flex flex-col items-center w-full h-full justify-end relative z-10">
-                        <span id="badge-l3" class="text-[12px] font-black text-orange-400 mb-2 bg-orange-50 px-2.5 py-0.5 rounded-md">0</span>
+                        <span id="badge-l3" class="text-[12px] font-black text-emerald-400 mb-2 bg-emerald-50 px-2.5 py-0.5 rounded-md">0</span>
                         <div class="w-full max-w-[36px] h-full bg-slate-50 rounded-t-xl overflow-hidden flex items-end">
-                            <div id="bar-l3" class="w-full bg-orange-400 rounded-t-xl transition-all duration-1000" style="height: 5%;"></div>
+                            <div id="bar-l3" class="w-full bg-emerald-400 rounded-t-xl transition-all duration-1000" style="height: 5%;"></div>
                         </div>
                     </div>
                 </div>
@@ -163,15 +176,15 @@
                 <div class="flex justify-around items-center px-4 mb-6">
                     <div class="text-center w-full">
                         <span class="text-[11px] font-black text-slate-800 block mb-1 uppercase tracking-widest">Lvl 1</span>
-                        <span class="text-[10px] font-bold text-pink-500 block">(10%)</span>
+                        <span class="text-[10px] font-bold text-emerald-600 block">(10%)</span>
                     </div>
                     <div class="text-center w-full">
                         <span class="text-[11px] font-black text-slate-800 block mb-1 uppercase tracking-widest">Lvl 2</span>
-                        <span class="text-[10px] font-bold text-rose-400 block">(6%)</span>
+                        <span class="text-[10px] font-bold text-emerald-500 block">(6%)</span>
                     </div>
                     <div class="text-center w-full">
                         <span class="text-[11px] font-black text-slate-800 block mb-1 uppercase tracking-widest">Lvl 3</span>
-                        <span class="text-[10px] font-bold text-orange-400 block">(3%)</span>
+                        <span class="text-[10px] font-bold text-emerald-400 block">(3%)</span>
                     </div>
                 </div>
 
@@ -363,7 +376,7 @@
             <span class="text-[10px] font-bold">Balance & History</span>
         </button>
         <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600 transition-colors" data-target="profile">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             <span class="text-[10px] font-bold">Settings</span>
         </button>
     </nav>
@@ -491,24 +504,18 @@
         </div>
     </div>
 
-    <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center transition-all duration-500 ease-in-out">
-        <div class="relative flex flex-col items-center justify-center">
+    <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center transition-all duration-500">
+        <div class="relative flex flex-col items-center">
             <div class="absolute inset-0 bg-pink-500 rounded-full blur-[40px] opacity-20 animate-pulse"></div>
-            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-400 relative z-10 tracking-tighter mb-4 animate-bounce" style="animation-duration: 2s;">
-                EarnproX
-            </h1>
-            <div class="w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden relative z-10">
-                <div class="w-1/2 h-full bg-pink-600 rounded-full absolute left-0 top-0 animate-[slide_1.5s_ease-in-out_infinite_alternate]"></div>
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-400 relative z-10 animate-bounce">EarnproX</h1>
+            <div class="w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden mt-4 relative z-10">
+                <div class="w-1/2 h-full bg-pink-600 rounded-full animate-[slide_1.5s_ease-in-out_infinite_alternate]"></div>
             </div>
-            <p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase mt-3 relative z-10">
-                Securing connection...
-            </p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] mt-3 relative z-10">Securing connection...</p>
         </div>
     </div>
 
     <div id="toast">Message Here</div>
-
     <script type="module" src="dashboard.js"></script>
-
 </body>
 </html>
