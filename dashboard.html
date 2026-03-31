@@ -165,7 +165,7 @@
                     <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-50"></div>
 
                     <div class="flex flex-col items-center w-full h-full relative z-10 justify-end group">
-                        <span id="badge-l1" class="text-[12px] font-black text-blue-500 mb-2 bg-blue-50/50 px-2.5 py-0.5 rounded-md">0</span>
+                        <span id="badge-l1" class="text-[12px] font-black text-blue-50 mb-2 bg-blue-50/50 px-2.5 py-0.5 rounded-md">0</span>
                         <div class="w-full max-w-[36px] h-full bg-slate-50 rounded-t-xl relative overflow-hidden flex items-end">
                             <div id="bar-l1" class="w-full bg-[#3B82F6] rounded-t-xl transition-all duration-1000 ease-out" style="height: 5%;"></div>
                         </div>
@@ -437,14 +437,17 @@
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span class="text-[10px] font-bold">Home</span>
         </button>
-        <button onclick="window.switchTab('project')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="project">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-            <span class="text-[10px] font-bold">Tasks</span>
+        
+        <button onclick="window.switchTab('refer')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="refer">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <span class="text-[10px] font-bold">My Refer</span>
         </button>
+        
         <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="wallet">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-            <span class="text-[10px] font-bold">Wallet</span>
+            <span class="text-[10px] font-bold">Balance & History</span>
         </button>
+
         <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors" data-target="profile">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             <span class="text-[10px] font-bold">Settings</span>
