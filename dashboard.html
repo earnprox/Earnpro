@@ -71,7 +71,7 @@
                         </span>
                         <span class="text-[13px] font-bold text-slate-800">Today</span>
                     </div>
-                    <button onclick="window.switchTab('refer')" class="text-[13px] font-bold text-pink-600 hover:text-pink-700">View All</button>
+                    <button onclick="window.switchTab('project')" class="text-[13px] font-bold text-pink-600 hover:text-pink-700">View All</button>
                 </div>
                 
                 <div class="flex overflow-x-auto gap-4 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -87,7 +87,17 @@
                         </div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">App Install</span>
                     </div>
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Recharge')">
+                        <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center text-3xl font-black text-[#C100B6]">₹</div>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Recharge</span>
                     </div>
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Follower')">
+                        <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center">
+                            <div class="bg-[#FF424D] text-white text-[9px] font-black px-2 py-1 rounded-md">FOLLOW</div>
+                        </div>
+                        <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Follower</span>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-2 relative overflow-hidden">
@@ -139,8 +149,52 @@
                     </div>
                 </div>
 
+                <div class="flex justify-around items-center px-4 mb-6">
+                    <div class="text-center w-full">
+                        <span class="text-[11px] font-black text-slate-800 block mb-1 uppercase tracking-widest">Lvl 1</span>
+                        <span class="text-[10px] font-bold text-pink-500 block">(10%)</span>
+                    </div>
+                    <div class="text-center w-full">
+                        <span class="text-[11px] font-black text-slate-800 block mb-1 uppercase tracking-widest">Lvl 2</span>
+                        <span class="text-[10px] font-bold text-rose-500 block">(6%)</span>
+                    </div>
+                    <div class="text-center w-full">
+                        <span class="text-[11px] font-black text-slate-800 block mb-1 uppercase tracking-widest">Lvl 3</span>
+                        <span class="text-[10px] font-bold text-orange-500 block">(3%)</span>
+                    </div>
+                </div>
+
                 <button onclick="window.switchTab('refer')" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-xl text-[15px] active:scale-95 transition-all duration-300 shadow-lg shadow-pink-500/20 mt-2">Build Your Network +</button>
             </div>
+        </div>
+
+        <div id="view-project" class="tab-content">
+            <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Tasks</h2>
+            <div class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-6 border border-slate-200">
+                <button onclick="window.switchWsTab('explore', this)" class="ws-tab bg-white shadow-sm text-pink-600 flex-1 py-3 text-xs font-black text-center rounded-xl transition-all duration-200 ease-in-out">Explore</button>
+                <button onclick="window.switchWsTab('active', this)" class="ws-tab text-slate-500 flex-1 py-3 text-xs font-black text-center rounded-xl transition-all duration-200 ease-in-out">In Progress</button>
+                <button onclick="window.switchWsTab('review', this)" class="ws-tab text-slate-500 flex-1 py-3 text-xs font-black text-center rounded-xl transition-all duration-200 ease-in-out">Review</button>
+            </div>
+            <div id="ws-explore" class="ws-content active">
+                <div id="gigs-container" class="space-y-4 pb-10">
+                    <div class="text-center py-20 opacity-50 animate-pulse">
+                        <div class="w-12 h-12 border-4 border-slate-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+                        <p class="font-bold text-slate-500">Loading your workspace...</p>
+                    </div>
+                </div>
+            </div>
+            <div id="ws-active" class="ws-content">
+                <div id="active-task-card" class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-100 hidden">
+                    <h4 id="active-gig-name" class="font-black text-2xl text-slate-800 mb-2">Task Name</h4>
+                    <div class="flex items-center gap-2 mb-6">
+                        <span id="active-gig-reward" class="text-emerald-500 font-bold text-sm">Reward: ₹0</span>
+                        <span class="bg-orange-50 text-orange-600 text-[10px] font-black px-2 py-1 rounded-md border border-orange-100">In Progress</span>
+                    </div>
+                    <button onclick="window.openSubmitSheet()" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition-all duration-200 ease-in-out">Submit Proof</button>
+                </div>
+                <div id="no-active-task" class="text-center py-20"><p class="text-slate-400 font-bold text-sm">No tasks in progress.</p></div>
+            </div>
+            <div id="ws-review" class="ws-content"><div id="review-container" class="space-y-4 pb-10"></div></div>
         </div>
 
         <div id="view-refer" class="tab-content relative -mx-5 -mt-5">
@@ -154,19 +208,44 @@
                     </button>
                 </div>
             </div>
+            <div class="px-5 pt-6 pb-4">
+                <div class="mb-6 border-b border-slate-200 pb-5">
+                    <h2 class="text-3xl font-black tracking-tight mb-3 text-slate-800">3-Level Network</h2>
+                    <div class="flex items-end gap-2 mt-2">
+                        <h1 class="text-5xl font-black text-pink-600 leading-none" id="total-refers-count">0</h1>
+                        <p class="text-xs font-bold text-slate-500 mb-1 leading-tight">Total registered members</p>
+                    </div>
+                </div>
+                <div id="referral-list-container" class="space-y-3 pb-10"></div>
             </div>
+        </div>
 
         <div id="view-wallet" class="tab-content">
             <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Vault</h2>
             <div class="premium-card rounded-3xl p-6 mb-6 bg-gradient-to-br from-pink-500 to-rose-500 border-none text-white shadow-xl shadow-pink-500/30 relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/20 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-rose-600/40 rounded-full blur-2xl"></div>
                 <div class="flex justify-between items-start mb-6 relative z-10">
                     <p class="text-xs font-semibold text-white/90 uppercase tracking-wider">Withdrawable Balance</p>
                     <button onclick="window.openFullPage('withdraw-page')" class="bg-white text-pink-600 font-black py-1.5 px-4 rounded-lg shadow-sm transition-all text-xs active:scale-95">Withdraw</button>
                 </div>
                 <h2 class="text-4xl font-black tracking-tighter mb-4 relative z-10" id="main-balance-display">₹ 0<span class="text-xl text-white/80 font-bold">.00</span></h2>
             </div>
+            <div class="premium-card rounded-2xl overflow-hidden mb-12">
+                <div onclick="window.openSheet('history-sheet')" class="flex justify-between items-center p-4 border-b border-slate-100 hover:bg-slate-50 transition-all cursor-pointer">
+                    <div class="flex items-center gap-3"><span class="bg-slate-100 p-2 rounded-lg text-lg">📜</span><div><p class="text-sm font-semibold text-slate-800">Ledger & History</p></div></div>
+                    <span class="text-slate-400 text-lg">›</span>
+                </div>
             </div>
+        </div>
+
+        <div id="view-profile" class="tab-content">
+            <div class="premium-card rounded-[2rem] p-6 mb-6 text-center mt-2">
+                <div class="w-24 h-24 rounded-full bg-pink-50 mx-auto mb-4 border-4 border-white shadow-xl overflow-hidden"><img id="profile-avatar" src="" class="w-full h-full object-cover"></div>
+                <h2 class="text-2xl font-black text-slate-800" id="profile-user-name">User</h2>
+            </div>
+            <div onclick="localStorage.removeItem('earnprox_user_phone'); window.location.href='login.html'" class="p-5 text-center"><p class="text-sm font-black text-red-500">Logout Account</p></div>
+        </div>
 
     </div>
 
