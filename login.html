@@ -14,7 +14,6 @@
         .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; visibility: hidden; }
         .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; visibility: visible; }
         
-        /* Updated Focus Colors to Pink (#EC4899) */
         .otp-box, .pin-box { width: 42px; height: 55px; text-align: center; font-size: 22px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F8FAFC; outline: none; transition: all 0.2s; }
         .otp-box:focus, .pin-box:focus { border-color: #EC4899; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15); }
         @media (max-width: 380px) { .otp-box, .pin-box { width: 36px; height: 50px; font-size: 18px; } }
@@ -26,9 +25,6 @@
         #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .pulse-logo { animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
         @keyframes pulse { 0%, 100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.1) rotate(-6deg); } }
-        
-        /* 🔥 Smart Hidden Captcha Badge 🔥 */
-        .grecaptcha-badge { visibility: hidden !important; opacity: 0 !important; }
     </style>
 
     <script>
@@ -46,7 +42,7 @@
 
     <div id="splash-screen">
         <div class="w-20 h-20 bg-pink-600 rounded-[1.5rem] mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(219,39,119,0.4)] pulse-logo">
-            <span class="text-4xl text-white font-black">X</span>
+            <span class="text-4xl text-white font-black">E</span>
         </div>
         <h1 class="text-2xl font-black tracking-tight text-slate-900 mt-2">Earnpro<span class="text-pink-600">X</span></h1>
         <div class="mt-8 flex gap-2 justify-center items-center">
@@ -58,7 +54,7 @@
 
     <div class="text-center mb-8 mt-4 relative z-10">
         <div class="w-16 h-16 bg-pink-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-[0_10px_20px_rgba(219,39,119,0.3)] transform -rotate-6">
-            <span class="text-3xl text-white font-black">X</span>
+            <span class="text-3xl text-white font-black">E</span>
         </div>
         <h1 class="text-3xl font-black tracking-tight text-slate-900">Earnpro<span class="text-pink-600">X</span></h1>
         <p class="text-sm text-slate-500 font-medium mt-1">Complete micro-tasks, earn real money.</p>
@@ -77,8 +73,6 @@
                     <input type="tel" id="mobile-input" maxlength="10" placeholder="98765 43210" class="w-full text-lg font-bold text-slate-800 bg-transparent outline-none py-3 tracking-wider">
                 </div>
             </div>
-
-            <div id="recaptcha-container"></div>
 
             <button onclick="window.checkUserAndProceed()" id="send-otp-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-black py-4 rounded-xl shadow-[0_10px_20px_rgba(219,39,119,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2 mt-auto">
                 Continue <span class="text-xl">→</span>
@@ -152,16 +146,16 @@
 
     <div class="text-center mt-6 mb-4 w-full max-w-md relative z-10">
         <p class="text-[9px] text-slate-400 mt-4 leading-tight font-medium">
-            Protected by reCAPTCHA and subject to the Google <a href="https://policies.google.com/privacy" class="underline hover:text-pink-500">Privacy Policy</a> and <a href="https://policies.google.com/terms" class="underline hover:text-pink-500">Terms</a>. <br> &copy; 2026 EarnproX. All rights reserved.
+            &copy; 2026 EarnproX. All rights reserved.
         </p>
     </div>
     
     <div id="toast">Message Here</div>
 
     <script type="module">
+        // सिर्फ Firestore को इम्पोर्ट कर रहे हैं
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
@@ -174,30 +168,26 @@
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app); 
         
         let isNewUser = true; 
         let isForgotPin = false;
         let existingUserData = null; 
         let existingUserDocId = null;
         const REFER_BONUS_AMOUNT = 5; 
-        window.confirmationResult = null; 
+        window.currentOtpSessionId = null; // 2factor API का Session ID सेव करने के लिए
 
         const spinnerSVG = `<svg class="animate-spin h-6 w-6 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
-        // 🔒 Generate Secure Token
         function generateSecureToken() {
             return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
         }
 
-        // 🟢 Splash Hide Logic
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { 
                 const splash = document.getElementById('splash-screen');
                 if(splash) splash.classList.add('hidden'); 
             }, 800);
             
-            // Referral Auto-fill
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if(refCode) {
@@ -251,6 +241,7 @@
             btn.disabled = true;
 
             try {
+                // चेक कर रहे हैं कि यूज़र डेटाबेस में है या नहीं
                 const q = query(collection(db, "users"), where("phone", "==", phone));
                 const snap = await getDocs(q);
                 
@@ -269,34 +260,38 @@
                 } else {
                     isNewUser = true;
                     document.getElementById('new-user-fields').style.display = 'block';
-                    await triggerFirebaseOTP(phone, btn, originalHTML);
+                    await trigger2FactorOTP(phone, btn, originalHTML); // नया Vercel API कॉल
                 }
             } catch(error) { 
+                console.error(error);
                 window.showToast("❌ Server Error!");
                 btn.innerHTML = originalHTML; btn.disabled = false;
             }
         }
 
-        async function triggerFirebaseOTP(phone, btnElement, originalHTML, fromStep = 'step-1') {
-            const fullPhoneNumber = "+91" + phone;
-            document.getElementById('display-number-otp').innerText = fullPhoneNumber;
-
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    'size': 'invisible'
-                });
-            }
+        // नया Vercel (2factor.in) OTP फंक्शन
+        async function trigger2FactorOTP(phone, btnElement, originalHTML, fromStep = 'step-1') {
+            document.getElementById('display-number-otp').innerText = "+91 " + phone;
 
             try {
-                window.confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, window.recaptchaVerifier);
-                window.showToast("📲 OTP Sent!");
-                switchStep(fromStep, 'step-otp');
-            } catch (error) {
-                window.showToast("❌ OTP Failed! Try later.");
-                if(window.recaptchaVerifier) {
-                    window.recaptchaVerifier.clear();
-                    window.recaptchaVerifier = null;
+                const response = await fetch('/api/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: phone })
+                });
+                
+                const data = await response.json();
+
+                if (response.ok && data.sessionId) {
+                    window.currentOtpSessionId = data.sessionId;
+                    window.showToast("📲 OTP Sent Successfully!");
+                    switchStep(fromStep, 'step-otp');
+                } else {
+                    window.showToast("❌ " + (data.error || "Failed to send OTP"));
                 }
+            } catch (error) {
+                console.error("OTP Error:", error);
+                window.showToast("❌ Network Error! Try later.");
             } finally {
                 if(btnElement) { btnElement.innerHTML = originalHTML; btnElement.disabled = false; }
             }
@@ -309,7 +304,7 @@
             const btn = document.getElementById('pin-login-btn');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = `${spinnerSVG} Sending OTP...`; btn.disabled = true;
-            await triggerFirebaseOTP(phone, btn, originalHTML, 'step-pin');
+            await trigger2FactorOTP(phone, btn, originalHTML, 'step-pin');
         }
 
         window.loginWithPIN = async function() {
@@ -340,11 +335,29 @@
             if(setupPin.length < 4) return window.showToast("⚠️ Set 4-Digit PIN.");
             if(enteredOtp.length < 6) return window.showToast("⚠️ Enter 6-digit OTP.");
 
-            btn.innerHTML = `${spinnerSVG} Saving...`; btn.disabled = true;
+            btn.innerHTML = `${spinnerSVG} Verifying...`; btn.disabled = true;
             const phone = document.getElementById('mobile-input').value.trim();
 
             try {
-                await window.confirmationResult.confirm(enteredOtp);
+                // Vercel (2factor.in) OTP वेरिफिकेशन API को कॉल कर रहे हैं
+                const response = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        sessionId: window.currentOtpSessionId, 
+                        otpEntered: enteredOtp 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    window.showToast("❌ " + (data.error || "Invalid OTP!"));
+                    btn.innerHTML = originalHTML; btn.disabled = false;
+                    return; // अगर OTP गलत है, तो यहीं रोक दें
+                }
+
+                // अगर OTP सही है, तो Firestore में डेटा सेव करें
                 const newToken = generateSecureToken();
 
                 if(isNewUser) {
@@ -374,8 +387,10 @@
                 localStorage.setItem("earnprox_user_phone", phone);
                 localStorage.setItem("earnprox_secure_token", newToken);
                 window.location.href = "dashboard.html";
+                
             } catch (error) {
-                window.showToast("❌ Invalid OTP!");
+                console.error(error);
+                window.showToast("❌ Server Error!");
                 btn.innerHTML = originalHTML; btn.disabled = false;
             }
         }
