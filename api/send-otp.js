@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const url = `https://2factor.in/API/V1/${API_KEY}/SMS/${phoneNumber}/AUTOGEN`;
+        const url = `https://2factor.in/API/V1/${API_KEY}/SMS/${phoneNumber}/AUTOGEN/OTP1`;
         const response = await fetch(url);
         const data = await response.json();
 
