@@ -99,11 +99,10 @@
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">App Install</span>
                     </div>
 
-                                        <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.location.href='recharge.html'">
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.location.href='recharge.html'">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center text-3xl font-black text-[#C100B6] active:scale-95 transition-transform">₹</div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight">Recharge</span>
                     </div>
-
 
                     <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.showToast('Follower')">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border border-slate-200 flex items-center justify-center relative">
@@ -116,7 +115,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-2 relative overflow-hidden">
+            <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-4 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-[6px] bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400"></div>
                 
                 <div class="flex justify-between items-center mb-6 pt-2">
@@ -193,6 +192,21 @@
                     Build Your Network +
                 </button>
             </div>
+
+            <!-- START: ADMIN DYNAMIC BANNER SECTION -->
+            <div class="mb-4 rounded-[1.5rem] overflow-hidden shadow-[0_4px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100 relative active:scale-95 transition-transform duration-200 cursor-pointer bg-slate-50" onclick="window.showToast('Promo clicked!')">
+                <!-- Image tag with ID for admin to replace -->
+                <img id="admin-dynamic-banner" src="https://img.freepik.com/free-vector/special-offer-modern-sale-banner-template_1017-20667.jpg?w=1000" alt="Promo Banner" class="w-full h-[130px] object-cover">
+                
+                <!-- Bottom Dots (Decorative/UI matching) -->
+                <div class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/60"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/60"></span>
+                    <span class="w-2 h-1.5 rounded-full bg-slate-800 transition-all"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/60"></span>
+                </div>
+            </div>
+            <!-- END: ADMIN DYNAMIC BANNER SECTION -->
 
             <div class="bg-[#F8FAFC] -mx-5 pb-12 pt-6 flex flex-col items-center relative border-t border-slate-200/50 mt-4 overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-20 bg-white" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
