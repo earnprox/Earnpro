@@ -79,12 +79,12 @@
                         </span>
                         <span class="text-[13px] font-bold text-slate-800">Today</span>
                     </div>
-                    <button onclick="window.switchTab('project')" class="text-[13px] font-bold text-pink-600 hover:text-pink-700 transition-colors">View All</button>
+                    <button onclick="window.location.href='task.html'" class="text-[13px] font-bold text-pink-600 hover:text-pink-700 transition-colors">View All</button>
                 </div>
                 
                 <div class="flex overflow-x-auto gap-4 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     
-                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.switchTab('project')">
+                    <div class="flex flex-col items-center gap-2 min-w-[70px] cursor-pointer" onclick="window.location.href='task.html'">
                         <div class="w-[60px] h-[60px] bg-white rounded-2xl border-2 border-red-500 flex items-center justify-center text-3xl">🎁</div>
                         <span class="text-[9px] font-bold text-slate-600 text-center uppercase leading-tight w-full">Daily Task<br>For Active</span>
                     </div>
@@ -216,35 +216,6 @@
                 </div>
             </div>
             
-        </div>
-
-        <div id="view-project" class="tab-content">
-            <h2 class="text-3xl font-black tracking-tight mb-4 text-slate-800">Tasks</h2>
-            <div class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-6 border border-slate-200">
-                <button onclick="window.switchWsTab('explore', this)" class="ws-tab bg-white shadow-sm text-pink-600 flex-1 py-3 text-xs font-black text-center rounded-xl transition-all duration-200 ease-in-out">Explore</button>
-                <button onclick="window.switchWsTab('active', this)" class="ws-tab text-slate-500 flex-1 py-3 text-xs font-black text-center rounded-xl transition-all duration-200 ease-in-out">In Progress</button>
-                <button onclick="window.switchWsTab('review', this)" class="ws-tab text-slate-500 flex-1 py-3 text-xs font-black text-center rounded-xl transition-all duration-200 ease-in-out">Review</button>
-            </div>
-            <div id="ws-explore" class="ws-content active">
-                <div id="gigs-container" class="space-y-4 pb-10">
-                    <div class="text-center py-20 opacity-50 animate-pulse">
-                        <div class="w-12 h-12 border-4 border-slate-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p class="font-bold text-slate-500">Loading your workspace...</p>
-                    </div>
-                </div>
-            </div>
-            <div id="ws-active" class="ws-content">
-                <div id="active-task-card" class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-100 hidden">
-                    <h4 id="active-gig-name" class="font-black text-2xl text-slate-800 mb-2">Task Name</h4>
-                    <div class="flex items-center gap-2 mb-6">
-                        <span id="active-gig-reward" class="text-emerald-500 font-bold text-sm">Reward: ₹0</span>
-                        <span class="bg-orange-50 text-orange-600 text-[10px] font-black px-2 py-1 rounded-md border border-orange-100">In Progress</span>
-                    </div>
-                    <button onclick="window.openSubmitSheet()" class="w-full bg-[#0F172A] text-white font-bold py-3.5 rounded-2xl text-sm active:scale-95 transition-all duration-200 ease-in-out">Submit Proof</button>
-                </div>
-                <div id="no-active-task" class="text-center py-20"><p class="text-slate-400 font-bold text-sm">No tasks in progress.</p></div>
-            </div>
-            <div id="ws-review" class="ws-content"><div id="review-container" class="space-y-4 pb-10"></div></div>
         </div>
 
         <div id="view-refer" class="tab-content relative -mx-5 -mt-5">
@@ -383,7 +354,7 @@
         </button>
         <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600 transition-colors" data-target="wallet">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-            <span class="text-[10px] font-bold">Balance & History</span>
+            <span class="text-[10px] font-bold">Wallet</span>
         </button>
         <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600 transition-colors" data-target="profile">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -533,4 +504,3 @@
     <script type="module" src="dashboard.js"></script>
 </body>
 </html>
-
