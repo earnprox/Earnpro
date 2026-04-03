@@ -196,6 +196,7 @@
             font-size: 13px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(255, 117, 140, 0.3);
+            transition: all 0.3s;
         }
 
         .action-btn.completed {
@@ -204,17 +205,20 @@
             box-shadow: none;
             cursor: not-allowed;
         }
-
+        
+        /* Toast Notification */
+        #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s; font-weight: 600; font-size: 14px; }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <header class="header">
-            <button class="back-btn" onclick="goBack()">&#8592;</button>
+            <button class="back-btn" onclick="window.location.href='dashboard.html'">&#8592;</button>
             <h1 class="header-title">Daily Active Tasks</h1>
             <div class="balance-badge">
-                <span class="coin">&#128176;</span> <span id="userBalance">₹30</span>
+                <span class="coin">&#128176;</span> <span id="userBalance">₹0.00</span>
             </div>
         </header>
 
@@ -226,79 +230,183 @@
                 </div>
                 <div class="status-text">
                     <span id="taskCountText">0/3 Tasks Completed</span>
-                    <span>Reward: ₹5.00</span>
+                    <span>Bonus: ₹5.00</span>
                 </div>
             </div>
 
             <h2 class="section-title">Today's Tasks</h2>
 
             <div class="task-card">
-                <div class="task-icon">&#127873;</div> <div class="task-details">
+                <div class="task-icon">&#127873;</div> 
+                <div class="task-details">
                     <div class="task-title">Daily Check-in</div>
                     <div class="task-reward">Reward: <span>₹1.00</span></div>
                 </div>
-                <button class="action-btn" onclick="completeTask(this, 1)">Claim</button>
+                <button class="action-btn" id="btn-task-1" onclick="window.completeTask(this, 1, 'task1')">Claim</button>
             </div>
 
             <div class="task-card">
-                <div class="task-icon">&#128241;</div> <div class="task-details">
+                <div class="task-icon">&#128241;</div> 
+                <div class="task-details">
                     <div class="task-title">Share with 1 Friend</div>
                     <div class="task-reward">Reward: <span>₹2.00</span></div>
                 </div>
-                <button class="action-btn" onclick="completeTask(this, 2)">Share</button>
+                <button class="action-btn" id="btn-task-2" onclick="window.completeTask(this, 2, 'task2')">Share</button>
             </div>
 
             <div class="task-card">
-                <div class="task-icon">&#128065;</div> <div class="task-details">
+                <div class="task-icon">&#128065;</div> 
+                <div class="task-details">
                     <div class="task-title">View Sponsered Post</div>
                     <div class="task-reward">Reward: <span>₹2.00</span></div>
                 </div>
-                <button class="action-btn" onclick="completeTask(this, 2)">View</button>
+                <button class="action-btn" id="btn-task-3" onclick="window.completeTask(this, 2, 'task3')">View</button>
             </div>
 
         </div>
     </div>
+    
+    <div id="toast">Message Here</div>
 
-    <script>
-        // Variables setup
-        let totalTasks = 3;
-        let completedTasks = 0;
-        let balance = 30.00;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        function completeTask(buttonElement, rewardAmount) {
-            // Agar pehle se complete hai toh kuch mat karo
-            if (buttonElement.classList.contains('completed')) return;
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
+            authDomain: "earnproxuc.firebaseapp.com",
+            projectId: "earnproxuc",
+            storageBucket: "earnproxuc.firebasestorage.app",
+            messagingSenderId: "411733884378",
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-            // Button update karo
-            buttonElement.innerText = "Completed";
-            buttonElement.classList.add('completed');
+        // Security Check
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        if (!userPhone) {
+            window.location.href = "login.html";
+        }
 
-            // Balance update karo
-            balance += rewardAmount;
-            document.getElementById('userBalance').innerText = '₹' + balance.toFixed(2);
+        let userDocId = null;
+        let currentBalance = 0;
+        let completedTasksCount = 0;
+        const totalTasks = 3;
+        
+        // Get Today's Date String (YYYY-MM-DD)
+        const todayStr = new Date().toISOString().split('T')[0];
 
-            // Progress bar update karo
-            completedTasks++;
-            let progressPercentage = (completedTasks / totalTasks) * 100;
-            document.getElementById('progressBar').style.width = progressPercentage + '%';
-            document.getElementById('taskCountText').innerText = `${completedTasks}/${totalTasks} Tasks Completed`;
+        window.showToast = function(msg) { 
+            const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
+            setTimeout(()=>t.classList.remove("show"), 3000); 
+        }
 
-            // Agar saare task ho gaye
-            if(completedTasks === totalTasks) {
-                setTimeout(() => {
-                    alert("Congratulations! You are ACTIVE for today. Bonus ₹5.00 added.");
-                    // Bonus add
-                    balance += 5.00;
-                    document.getElementById('userBalance').innerText = '₹' + balance.toFixed(2);
-                }, 300);
+        // 1. Fetch User Data & Today's Status on Load
+        async function fetchUserData() {
+            try {
+                // Get User Balance
+                const q = query(collection(db, "users"), where("phone", "==", userPhone));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    userDocId = snap.docs[0].id;
+                    const data = snap.docs[0].data();
+                    currentBalance = data.balance || 0;
+                    document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
+                } else {
+                    window.location.href = "login.html"; return;
+                }
+
+                // Get Today's Task Status
+                const trackerRef = doc(db, "dailyTasks", `${userPhone}_${todayStr}`);
+                const trackerSnap = await getDoc(trackerRef);
+                
+                if (trackerSnap.exists()) {
+                    const tasks = trackerSnap.data();
+                    if(tasks.task1) markButtonCompleted('btn-task-1', 'Claimed');
+                    if(tasks.task2) markButtonCompleted('btn-task-2', 'Shared');
+                    if(tasks.task3) markButtonCompleted('btn-task-3', 'Viewed');
+                    
+                    if(tasks.bonusClaimed) {
+                         completedTasksCount = 3;
+                    }
+                } else {
+                    // Create tracker document for today if it doesn't exist
+                    await setDoc(trackerRef, { task1: false, task2: false, task3: false, bonusClaimed: false });
+                }
+                
+                updateUIProgress();
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                window.showToast("Connection Error!");
             }
         }
 
-        function goBack() {
-            // Ye function back button ke liye hai (dashboard pe wapas jaane ke liye)
-            alert("This will navigate back to Dashboard (dashboard.html)");
-            // window.location.href = 'dashboard.html';
+        // 2. Helper to style buttons
+        function markButtonCompleted(btnId, text) {
+            const btn = document.getElementById(btnId);
+            if(btn && !btn.classList.contains('completed')) {
+                btn.innerText = text;
+                btn.classList.add('completed');
+                completedTasksCount++;
+            }
         }
+
+        // 3. Helper to update Progress Bar
+        function updateUIProgress() {
+            let progressPercentage = (completedTasksCount / totalTasks) * 100;
+            document.getElementById('progressBar').style.width = progressPercentage + '%';
+            document.getElementById('taskCountText').innerText = `${completedTasksCount}/${totalTasks} Tasks Completed`;
+        }
+
+        // 4. Complete Task Function (Called when user clicks)
+        window.completeTask = async function(buttonElement, rewardAmount, taskId) {
+            if (buttonElement.classList.contains('completed')) return;
+            
+            buttonElement.innerText = "Processing...";
+            
+            try {
+                // Update Balance in DB
+                currentBalance += rewardAmount;
+                await updateDoc(doc(db, "users", userDocId), { balance: currentBalance });
+                document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
+                
+                // Save Task Status in DB for Today
+                const trackerRef = doc(db, "dailyTasks", `${userPhone}_${todayStr}`);
+                await updateDoc(trackerRef, { [taskId]: true });
+
+                // Update UI
+                if(taskId === 'task1') markButtonCompleted(buttonElement.id, 'Claimed');
+                if(taskId === 'task2') markButtonCompleted(buttonElement.id, 'Shared');
+                if(taskId === 'task3') markButtonCompleted(buttonElement.id, 'Viewed');
+                
+                updateUIProgress();
+                window.showToast(`+ ₹${rewardAmount.toFixed(2)} Added!`);
+
+                // Check for Bonus
+                if(completedTasksCount === totalTasks) {
+                    setTimeout(async () => {
+                        currentBalance += 5.00;
+                        await updateDoc(doc(db, "users", userDocId), { balance: currentBalance });
+                        await updateDoc(trackerRef, { bonusClaimed: true });
+                        document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
+                        alert("🎉 Congratulations! You are ACTIVE for today. Bonus ₹5.00 added to your wallet.");
+                    }, 500);
+                }
+
+            } catch (error) {
+                console.error("Task Error:", error);
+                window.showToast("Failed to complete task. Try again.");
+                buttonElement.innerText = "Try Again";
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener("DOMContentLoaded", fetchUserData);
+
     </script>
 
 </body>
