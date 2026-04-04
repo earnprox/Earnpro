@@ -702,4 +702,43 @@ window.saveRealKYC = async function() {
     const u = uInput.value.trim(); 
     if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI"); 
     
-    try {
+    try { 
+        await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u }); 
+        window.showToast("✅ Details Locked!"); 
+        setTimeout(() => window.closeAllSheets(), 1000); 
+    } catch (e) { 
+        window.showToast("❌ Error saving."); 
+    } 
+}
+
+window.processWithdrawReal = async function() { 
+    const amtInput = document.getElementById("withdraw-amount");
+    if(!amtInput) return;
+    
+    const amt = parseInt(amtInput.value); 
+    if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50"); 
+    if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance"); 
+    
+    const btn = document.getElementById("withdraw-btn"); 
+    if(btn) { 
+        btn.disabled = true; 
+        btn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`; 
+        btn.classList.add("opacity-80", "cursor-not-allowed");
+    }
+    
+    try { 
+        await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); 
+        await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); 
+        window.showToast("🚀 Sent securely!"); 
+        window.closeFullPage('withdraw-page'); 
+        amtInput.value = ""; // Clear input after success
+    } catch(e) { 
+        window.showToast("❌ Failed"); 
+    } finally { 
+        if(btn) { 
+            btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Proceed Securely`; 
+            btn.disabled = false; 
+            btn.classList.remove("opacity-80", "cursor-not-allowed");
+        }
+    } 
+}
