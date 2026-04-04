@@ -14,9 +14,10 @@ window.l1Codes = new Set();
 window.l2Codes = new Set();
 window.l3Codes = new Set();
 
+// 🔥 WALLET GLOBALS 🔥
 window.taskEarned = 0;
-window.referCommission = 0; 
-window.referFlatBonus = 0;  
+window.referEarned = 0; 
+window.totalEarned = 0;  
 window.withTotal = 0;
 
 window.liveGigs = {}; 
@@ -90,22 +91,22 @@ window.switchTab = (id) => {
     document.querySelectorAll('.nav-btn').forEach(btn => {
         if(btn.dataset.target === id) {
             btn.classList.remove('text-slate-400');
-            btn.classList.add('text-blue-600'); // Note: You might want to change this to yellow/emerald based on your theme
+            btn.classList.add('text-pink-600'); 
         } else {
             btn.classList.add('text-slate-400');
-            btn.classList.remove('text-blue-600');
+            btn.classList.remove('text-pink-600');
         }
     });
 };
 
 window.switchWsTab = (id, btn) => { 
     document.querySelectorAll('.ws-tab').forEach(t => { 
-        t.classList.remove('bg-white', 'shadow-sm', 'text-blue-600'); 
+        t.classList.remove('bg-white', 'shadow-sm', 'text-pink-600'); 
         t.classList.add('text-slate-500'); 
     }); 
     if(btn) { 
         btn.classList.remove('text-slate-500'); 
-        btn.classList.add('bg-white', 'shadow-sm', 'text-blue-600'); 
+        btn.classList.add('bg-white', 'shadow-sm', 'text-pink-600'); 
     } 
     document.querySelectorAll('.ws-content').forEach(c => c.classList.remove('active')); 
     const targetContent = document.getElementById('ws-' + id);
@@ -151,18 +152,13 @@ window.logoutUser = () => {
     if(confirm("Are you sure you want to log out?")) { 
         localStorage.removeItem("earnprox_user_phone"); 
         sessionStorage.clear();
-        window.location.href="index.html"; 
+        window.location.href="login.html"; 
     } 
 };
 
 window.copyReferLink = () => { 
     if(!window.myReferCode) return window.showToast("⚠️ Code not ready"); 
     navigator.clipboard.writeText(`https://earnprox.in/index.html?ref=${window.myReferCode}`).then(()=>window.showToast("✅ Code Copied!")); 
-};
-
-window.shareOnWhatsApp = () => { 
-    if(!window.myReferCode) return window.showToast("⚠️ Link not ready"); 
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`🔥 Earn cash with EarnproX! Complete tasks & get paid instantly!\n\nUse my code *${window.myReferCode}* to get joining bonus!\n👇👇\nhttps://earnprox.in/index.html?ref=${window.myReferCode}`)}`, '_blank'); 
 };
 
 // ================= FIREBASE SETUP =================
@@ -188,111 +184,113 @@ const isToday = (dateObj) => {
 
 const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
 
-// 🟢 1. MASTER SYNC ENGINE
+// 🟢 1. MASTER SYNC ENGINE & SECURITY CHECK
 if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
-        if(!snap.empty) {
-            
-            const appLoader = document.getElementById("app-loader");
-            if(appLoader) {
-                appLoader.style.opacity = "0"; 
-                appLoader.style.pointerEvents = "none";
-                setTimeout(() => {
-                    appLoader.style.display = "none";
-                }, 500); 
-            }
-
-            const docSnap = snap.docs[0]; 
-            window.userDocId = docSnap.id; 
-            const u = docSnap.data();
-            
-            if(u.status === "blocked") {
-                alert("🚨 Your account has been suspended by the Admin.");
-                localStorage.removeItem("earnprox_user_phone");
-                sessionStorage.clear();
-                window.location.href="index.html";
-                return;
-            }
-
-            // 🚀 FIX: DIRECT BALANCE READ FROM DB 🚀
-            window.currentBalance = u.balance || 0;
-            localStorage.setItem("epx_cached_bal", window.currentBalance);
-            
-            const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-
-            // Update All Balance Displays instantly
-            setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
-            setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
-            const mainBal = document.getElementById("main-balance-display");
-            if(mainBal) mainBal.innerHTML = `₹ ${window.currentBalance.toFixed(2)}<span class="text-xl text-slate-500 font-bold drop-shadow-none"></span>`;
-
-            // Setup other User Info
-            window.savedUPI = u.upi || ""; 
-            window.savedBankName = u.bankName || ""; 
-            window.myReferrerCode = u.referCodeUsed || ""; 
-            const realName = u.name || "User"; 
-            window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
-
-            localStorage.setItem("epx_cached_name", realName);
-
-            window.myActiveGig = u.activeGig || null;
-            if(window.myActiveGig) {
-                const gigNameObj = document.getElementById('active-gig-name');
-                if(gigNameObj) gigNameObj.innerText = window.myActiveGig.title;
-                const gigRewardObj = document.getElementById('active-gig-reward');
-                if(gigRewardObj) gigRewardObj.innerText = `Reward: ₹${window.myActiveGig.reward}`;
-                
-                const activeCard = document.getElementById('active-task-card');
-                if(activeCard) activeCard.classList.remove('hidden');
-                const noTask = document.getElementById('no-active-task');
-                if(noTask) noTask.classList.add('hidden');
-            } else {
-                const activeCard = document.getElementById('active-task-card');
-                if(activeCard) activeCard.classList.add('hidden');
-                const noTask = document.getElementById('no-active-task');
-                if(noTask) noTask.classList.remove('hidden');
-            }
-            if(Object.keys(window.liveGigs).length > 0) renderExploreGigs();
-
-            setText("home-user-name", realName.split(" ")[0]); 
-            setText("profile-user-name", realName);
-            setText("profile-user-phone", "+91 " + userPhone); 
-            setText("refer-page-name", realName);
-            setText("referral-code-text", window.myReferCode); 
-            setText("withdraw-display-name", window.savedBankName || "Bank Transfer");
-            setText("withdraw-display-upi", window.savedUPI || "Processing..."); 
-            setText("withdraw-avatar-text", (window.savedBankName || realName).charAt(0).toUpperCase());
-            setText("home-card-user-name", realName);
-            setText("home-card-refer-code", window.myReferCode);
-
-            const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${realName}&backgroundColor=b6e3f4`;
-            const setImg = (id) => { const el = document.getElementById(id); if(el) el.src = avatarUrl; };
-            setImg("home-profile-avatar"); setImg("header-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
-
-            if(window.savedUPI) {
-                const badge = document.getElementById("upi-status-badge");
-                if(badge) {
-                    badge.innerText = "Verified ✅"; 
-                    badge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
-                }
-                setText("bank-display-text", window.savedBankName); 
-                setText("upi-display-text", window.savedUPI);
-                
-                const bNameInput = document.getElementById("bank-name-input");
-                if(bNameInput) { bNameInput.value = window.savedBankName; bNameInput.disabled = true; }
-                const upiInput = document.getElementById("upi-input-box");
-                if(upiInput) { upiInput.value = window.savedUPI; upiInput.disabled = true; }
-                
-                const kycBtn = document.querySelector("#kyc-sheet button"); 
-                if(kycBtn) { 
-                    kycBtn.innerText = "Verified & Locked 🔒"; 
-                    kycBtn.disabled = true; 
-                    kycBtn.classList.remove("bg-[#1E293B]", "hover:bg-slate-800");
-                    kycBtn.classList.add("bg-emerald-500", "opacity-80", "cursor-not-allowed"); 
-                }
-            }
-            syncStatsAndHistory();
+        if(snap.empty) {
+            // 🚨 SECURITY FIX: Invalid Number in LocalStorage -> Force Logout
+            localStorage.removeItem("earnprox_user_phone");
+            window.location.href = "login.html";
+            return;
         }
+            
+        const appLoader = document.getElementById("app-loader");
+        if(appLoader) {
+            appLoader.style.opacity = "0"; 
+            appLoader.style.pointerEvents = "none";
+            setTimeout(() => { appLoader.style.display = "none"; }, 500); 
+        }
+
+        const docSnap = snap.docs[0]; 
+        window.userDocId = docSnap.id; 
+        const u = docSnap.data();
+        
+        if(u.status === "blocked") {
+            alert("🚨 Your account has been suspended by the Admin.");
+            localStorage.removeItem("earnprox_user_phone");
+            sessionStorage.clear();
+            window.location.href="login.html";
+            return;
+        }
+
+        // 🚀 FIX: DIRECTLY READ ALL EARNINGS FROM DATABASE 🚀
+        window.currentBalance = u.balance || 0;
+        window.taskEarned = u.taskEarning || 0;
+        window.totalEarned = u.totalEarning || 0;
+        window.referEarned = u.referEarning || 0;
+        window.withTotal = u.totalWithdraw || 0;
+
+        localStorage.setItem("epx_cached_bal", window.currentBalance);
+        
+        const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+
+        // 🚀 UPDATE WALLET STATS UI 🚀
+        setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
+        setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
+        
+        const mainBal = document.getElementById("main-balance-display");
+        if(mainBal) mainBal.innerHTML = `₹ ${window.currentBalance.toFixed(2)}<span class="text-xl text-white/80 font-bold drop-shadow-none"></span>`;
+
+        setText("stat-total-earn", `₹${window.totalEarned.toFixed(2)}`);
+        setText("stat-task-earn", `₹${window.taskEarned.toFixed(2)}`);
+        setText("stat-refer-earn", `₹${window.referEarned.toFixed(2)}`);
+        setText("stat-total-withdraw", `₹${window.withTotal.toFixed(2)}`);
+        setText("graph-network-income", `₹${window.referEarned.toFixed(2)}`);
+
+        // Setup other User Info
+        window.savedUPI = u.upi || ""; 
+        window.savedBankName = u.bankName || ""; 
+        window.myReferrerCode = u.referCodeUsed || ""; 
+        const realName = u.name || "User"; 
+        window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
+
+        localStorage.setItem("epx_cached_name", realName);
+
+        window.myActiveGig = u.activeGig || null;
+        if(window.myActiveGig) {
+            setText('active-gig-name', window.myActiveGig.title);
+            setText('active-gig-reward', `Reward: ₹${window.myActiveGig.reward}`);
+            const activeCard = document.getElementById('active-task-card');
+            if(activeCard) activeCard.classList.remove('hidden');
+            const noTask = document.getElementById('no-active-task');
+            if(noTask) noTask.classList.add('hidden');
+        } else {
+            const activeCard = document.getElementById('active-task-card');
+            if(activeCard) activeCard.classList.add('hidden');
+            const noTask = document.getElementById('no-active-task');
+            if(noTask) noTask.classList.remove('hidden');
+        }
+        if(Object.keys(window.liveGigs).length > 0) renderExploreGigs();
+
+        setText("home-user-name", realName.split(" ")[0]); 
+        setText("profile-user-name", realName);
+        setText("refer-page-name", realName);
+        setText("referral-code-text", window.myReferCode); 
+        setText("withdraw-display-name", window.savedBankName || "Bank Transfer");
+        setText("withdraw-display-upi", window.savedUPI || "Processing..."); 
+        setText("withdraw-avatar-text", (window.savedBankName || realName).charAt(0).toUpperCase());
+        setText("home-card-user-name", realName);
+        setText("home-card-refer-code", window.myReferCode);
+
+        const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${realName}&backgroundColor=b6e3f4`;
+        const setImg = (id) => { const el = document.getElementById(id); if(el) el.src = avatarUrl; };
+        setImg("home-profile-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
+
+        if(window.savedUPI) {
+            const bNameInput = document.getElementById("bank-name-input");
+            if(bNameInput) { bNameInput.value = window.savedBankName; bNameInput.disabled = true; }
+            const upiInput = document.getElementById("upi-input-box");
+            if(upiInput) { upiInput.value = window.savedUPI; upiInput.disabled = true; }
+            
+            const kycBtn = document.querySelector("#kyc-sheet button"); 
+            if(kycBtn) { 
+                kycBtn.innerText = "Verified & Locked 🔒"; 
+                kycBtn.disabled = true; 
+                kycBtn.classList.remove("bg-[#1E293B]", "hover:bg-slate-800");
+                kycBtn.classList.add("bg-emerald-500", "opacity-80", "cursor-not-allowed"); 
+            }
+        }
+        syncStatsAndHistory();
     });
 
     onSnapshot(collection(db, "notifications"), (snap) => {
@@ -324,18 +322,11 @@ if(userPhone) {
     });
 }
 
-// 🟢 2. LIVE STATS CALCULATOR (Removed currentBalance math from here)
-window.updateLiveStats = function() {
-    const totalEarned = (window.taskEarned || 0) + (window.referFlatBonus || 0) + (window.referCommission || 0);
-    const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-    setText("stat-total-earn", `₹${totalEarned.toFixed(2)}`);
-}
 
-// 🟢 3. NEW 3-LEVEL STATS & COMMISSION ENGINE
+// 🟢 2. NETWORK ENGINE (Still fetching users for count, but tasks are secured)
 async function syncStatsAndHistory() {
     if(!userPhone || !window.myReferCode) return;
     
-    // 3.1 Fetch ALL Users to map 3-Level Network
     onSnapshot(collection(db, "users"), (snap) => {
         let l1Count = 0, todayCount = 0, referListHtml = "";
         window.l1Codes.clear(); window.l2Codes.clear(); window.l3Codes.clear();
@@ -343,26 +334,22 @@ async function syncStatsAndHistory() {
         const allUsers = [];
         snap.forEach(d => allUsers.push(d.data()));
 
-        // Map Level 1
         allUsers.forEach(u => {
             const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
             if(u.referCodeUsed === window.myReferCode) {
                 window.l1Codes.add(uCode);
                 l1Count++;
-                if(isToday(u.timestamp)) todayCount++;
                 const joinDate = u.timestamp ? new Date(getSafeTime(u.timestamp)).toLocaleDateString('en-GB') : "Recently"; 
                 const uName = u.name || "User"; 
                 referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded border border-blue-100">Level 1</div></div>`; 
             }
         });
 
-        // Map Level 2
         allUsers.forEach(u => {
             const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
             if(window.l1Codes.has(u.referCodeUsed)) window.l2Codes.add(uCode);
         });
 
-        // Map Level 3
         allUsers.forEach(u => {
             const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
             if(window.l2Codes.has(u.referCodeUsed)) window.l3Codes.add(uCode);
@@ -375,13 +362,11 @@ async function syncStatsAndHistory() {
         const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
         setText('total-refers-count', l1Count); 
-        setText('today-refers-count', todayCount); 
         setText('graph-active-members', l1Size + l2Size + l3Size);
         
         const referCont = document.getElementById('referral-list-container');
         if(referCont) referCont.innerHTML = referListHtml || `<div class="text-4xl mb-3 text-center mt-6">🌱</div><p class="text-center text-slate-400 font-bold text-sm">No referrals yet.<br>Share your link & watch your network grow!</p>`; 
         
-        // --- 🔥 DYNAMIC GRAPH BADGES & BARS LOGIC 🔥 ---
         setText('badge-l1', l1Size);
         setText('badge-l2', l2Size);
         setText('badge-l3', l3Size);
@@ -395,122 +380,62 @@ async function syncStatsAndHistory() {
         setHeight('bar-l1', h1);
         setHeight('bar-l2', h2);
         setHeight('bar-l3', h3);
-
-        window.referFlatBonus = 0; 
-        updateReferUI();
-        window.updateLiveStats();
     });
 
-    // 3.2 Listen to ALL Task Submissions to calculate my tasks + 3-Level commissions
-    onSnapshot(collection(db, "task_submissions"), (snap) => {
-        let taskTotal = 0; 
-        let commTotal = 0;
+    // 🚨 SECURITY FIX: ONLY DOWNLOAD MY OWN TASKS 🚨
+    onSnapshot(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)), (snap) => {
         window.mySubmissionsMap = {}; 
         window.mySubmissionsList = [];
 
         snap.forEach(d => { 
             const data = d.data();
-            
-            if(data.userPhone === userPhone) {
-                window.mySubmissionsMap[data.gigName] = data; 
-                window.mySubmissionsList.push(data); 
-                if(data.status === "Approved" || data.status === "Completed") {
-                    taskTotal += (data.gigReward || 0); 
-                }
-            }
-
-            if(data.status === "Approved" || data.status === "Completed") {
-                if(data.referrerCode === window.myReferCode) {
-                    commTotal += (data.gigReward * 0.10); 
-                } else if(window.l1Codes.has(data.referrerCode)) {
-                    commTotal += (data.gigReward * 0.06); 
-                } else if(window.l2Codes.has(data.referrerCode)) {
-                    commTotal += (data.gigReward * 0.03); 
-                }
-            }
+            window.mySubmissionsMap[data.gigName] = data; 
+            window.mySubmissionsList.push(data); 
         }); 
-        
-        window.taskEarned = taskTotal;
-        window.referCommission = parseFloat(commTotal.toFixed(2));
-        
-        const statTask = document.getElementById("stat-task-earn");
-        if(statTask) statTask.innerText = `₹${taskTotal.toFixed(2)}`; 
         
         renderExploreGigs(); 
         renderReviewTab(); 
-        updateReferUI();
-        window.updateLiveStats(); 
     });
 
-    // 3.3 Withdrawals Data
+    // 3.3 Fetch Withdrawals for Ledger
     onSnapshot(query(collection(db, "withdrawals"), where("userPhone", "==", userPhone)), (snap) => {
-        let withTotal = 0; 
         const allTransactions = [];
         snap.forEach(d => { 
             const data = d.data(); 
-            if(data.status !== "Rejected") {
-                withTotal += (data.amount || 0); 
-            }
             allTransactions.push({ type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal to Bank', amt: data.amount, status: data.status }); 
         });
-        window.withTotal = withTotal;
-        const statWith = document.getElementById("stat-total-withdraw");
-        if(statWith) statWith.innerText = `₹${withTotal.toFixed(2)}`; 
         renderLedger(allTransactions); 
-        window.updateLiveStats();
     });
 }
 
-function updateReferUI() {
-    const totalReferEarning = window.referFlatBonus + window.referCommission;
-    const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-    
-    setText('stat-refer-earn', `₹${totalReferEarning.toFixed(2)}`); 
-    if(document.getElementById('total-refer-earnings')) setText('total-refer-earnings', totalReferEarning.toFixed(2));
-    setText('graph-network-income', `₹${totalReferEarning.toFixed(2)}`);
-}
-
-// 🟢 4. ADVANCED 3-LEVEL LEDGER FIX
+// 🟢 4. ADVANCED LEDGER (MY TASKS & WITHDRAWALS ONLY)
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); 
     if(!historyCont) return;
 
     let combined = [...withs];
     
+    // Add Approved tasks to ledger
+    window.mySubmissionsList.forEach(data => {
+        if(data.status === 'Approved' || data.status === 'Completed') {
+            combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Task: ${data.gigName}`, amt: data.gigReward, status: 'Completed' }); 
+        }
+    });
+
     try {
-        const taskSnap = await getDocs(collection(db, "task_submissions"));
-        taskSnap.forEach(d => { 
-            const data = d.data();
-            
-            if(data.userPhone === userPhone && (data.status === 'Approved' || data.status === 'Completed')) {
-                combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Task: ${data.gigName}`, amt: data.gigReward, status: 'Completed' }); 
-            }
-            
-            if(data.status === 'Approved' || data.status === 'Completed') {
-                if(data.referrerCode === window.myReferCode) {
-                    combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L1 Comm. (10%)`, amt: parseFloat((data.gigReward * 0.10).toFixed(2)), status: 'Completed' }); 
-                } else if(window.l1Codes.has(data.referrerCode)) {
-                    combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L2 Comm. (6%)`, amt: parseFloat((data.gigReward * 0.06).toFixed(2)), status: 'Completed' }); 
-                } else if(window.l2Codes.has(data.referrerCode)) {
-                    combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L3 Comm. (3%)`, amt: parseFloat((data.gigReward * 0.03).toFixed(2)), status: 'Completed' }); 
-                }
-            }
-        });
-        
-        // Add Recharges to Ledger
+        // Fetch Recharges from transactions securely
         const rechargeSnap = await getDocs(query(collection(db, "transactions"), where("phone", "==", userPhone)));
         rechargeSnap.forEach(d => {
             const data = d.data();
             if(data.type === "recharge") {
                 combined.push({ type: 'debit', timestamp: data.timestamp, desc: `Recharge: ${data.targetNumber}`, amt: data.amount, status: data.status }); 
                 if(data.cashbackEarned > 0) {
-                     combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Cashback (Recharge)`, amt: data.cashbackEarned, status: 'Completed' }); 
+                     combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Cashback`, amt: data.cashbackEarned, status: 'Completed' }); 
                 }
             }
         });
-
     } catch(e) {
-        console.error("Ledger fetch error:", e);
+        console.error("Ledger recharge fetch error:", e);
     }
 
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
@@ -727,11 +652,15 @@ window.processWithdrawReal = async function() {
     }
     
     try { 
-        await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); 
+        const newTotalWithdraw = window.withTotal + amt;
+        await updateDoc(doc(db, "users", window.userDocId), { 
+            balance: window.currentBalance - amt,
+            totalWithdraw: newTotalWithdraw 
+        }); 
         await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); 
         window.showToast("🚀 Sent securely!"); 
         window.closeFullPage('withdraw-page'); 
-        amtInput.value = ""; // Clear input after success
+        amtInput.value = ""; 
     } catch(e) { 
         window.showToast("❌ Failed"); 
     } finally { 
