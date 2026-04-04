@@ -8,7 +8,6 @@ window.savedBankName = "";
 window.userDocId = null; 
 window.myReferCode = ""; 
 
-// 🔥 ₹5 Bonus OFF, Level Data Initialized
 window.referBonusPerUser = 0; 
 window.myReferrerCode = ""; 
 window.l1Codes = new Set();
@@ -37,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if(fp) fp.classList.add('full-page-active');
     }
 
-    // 🔥 FIX: INSTANT CACHE LOAD (Flash issue solved)
     const cachedName = localStorage.getItem("epx_cached_name");
     const cachedBal = localStorage.getItem("epx_cached_bal");
 
@@ -63,7 +61,6 @@ window.showToast = (m) => {
     if(t) { 
         t.innerText = m; 
         t.classList.add("show"); 
-        // Force reflow for animation restart if clicked multiple times
         void t.offsetWidth; 
         setTimeout(() => t.classList.remove("show"), 3000); 
     } 
@@ -75,7 +72,6 @@ window.switchTab = (id) => {
     if(id === 'home') { if(h) h.style.display = 'none'; } 
     else { if(h) { h.style.display = 'flex'; h.style.opacity = '1'; } } 
     
-    // Smooth opacity transition for tabs
     document.querySelectorAll('.tab-content').forEach(t => {
         t.style.opacity = '0';
         setTimeout(() => t.classList.remove('active'), 150);
@@ -85,18 +81,16 @@ window.switchTab = (id) => {
         const target = document.getElementById('view-' + id); 
         if(target) {
             target.classList.add('active'); 
-            // Trigger reflow
             void target.offsetWidth;
             target.style.opacity = '1';
         }
         window.scrollTo({ top: 0, behavior: 'smooth' }); 
     }, 150);
 
-    // Update Nav Active State
     document.querySelectorAll('.nav-btn').forEach(btn => {
         if(btn.dataset.target === id) {
             btn.classList.remove('text-slate-400');
-            btn.classList.add('text-blue-600');
+            btn.classList.add('text-blue-600'); // Note: You might want to change this to yellow/emerald based on your theme
         } else {
             btn.classList.add('text-slate-400');
             btn.classList.remove('text-blue-600');
@@ -199,7 +193,6 @@ if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
         if(!snap.empty) {
             
-            // 🔥 HIDE THE ANIMATED LOGO LOADER SMOOTHLY
             const appLoader = document.getElementById("app-loader");
             if(appLoader) {
                 appLoader.style.opacity = "0"; 
@@ -221,13 +214,25 @@ if(userPhone) {
                 return;
             }
 
+            // 🚀 FIX: DIRECT BALANCE READ FROM DB 🚀
+            window.currentBalance = u.balance || 0;
+            localStorage.setItem("epx_cached_bal", window.currentBalance);
+            
+            const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+
+            // Update All Balance Displays instantly
+            setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
+            setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
+            const mainBal = document.getElementById("main-balance-display");
+            if(mainBal) mainBal.innerHTML = `₹ ${window.currentBalance.toFixed(2)}<span class="text-xl text-slate-500 font-bold drop-shadow-none"></span>`;
+
+            // Setup other User Info
             window.savedUPI = u.upi || ""; 
             window.savedBankName = u.bankName || ""; 
             window.myReferrerCode = u.referCodeUsed || ""; 
             const realName = u.name || "User"; 
             window.myReferCode = (realName.substring(0,3) + userPhone.substring(userPhone.length - 4)).toUpperCase();
 
-            // 🔥 CACHE THE NAME FOR NEXT RELOAD
             localStorage.setItem("epx_cached_name", realName);
 
             window.myActiveGig = u.activeGig || null;
@@ -249,9 +254,6 @@ if(userPhone) {
             }
             if(Object.keys(window.liveGigs).length > 0) renderExploreGigs();
 
-            // Safe DOM Updates
-            const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-            
             setText("home-user-name", realName.split(" ")[0]); 
             setText("profile-user-name", realName);
             setText("profile-user-phone", "+91 " + userPhone); 
@@ -322,25 +324,11 @@ if(userPhone) {
     });
 }
 
-// 🟢 2. LIVE BALANCE CALCULATOR
-window.updateLiveBalance = function() {
+// 🟢 2. LIVE STATS CALCULATOR (Removed currentBalance math from here)
+window.updateLiveStats = function() {
     const totalEarned = (window.taskEarned || 0) + (window.referFlatBonus || 0) + (window.referCommission || 0);
-    const totalWithdrawn = window.withTotal || 0;
-    
-    window.currentBalance = Math.floor(totalEarned - totalWithdrawn);
-    if(window.currentBalance < 0) window.currentBalance = 0; 
-
-    // 🔥 CACHE THE BALANCE FOR NEXT RELOAD
-    localStorage.setItem("epx_cached_bal", window.currentBalance);
-
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-
     setText("stat-total-earn", `₹${totalEarned.toFixed(2)}`);
-    setText("home-top-balance", `₹${window.currentBalance}`);
-    setText("withdraw-page-balance", `₹${window.currentBalance}`);
-    
-    const mainBal = document.getElementById("main-balance-display");
-    if(mainBal) mainBal.innerHTML = `₹ ${window.currentBalance}<span class="text-xl text-slate-500 font-bold drop-shadow-none">.00</span>`;
 }
 
 // 🟢 3. NEW 3-LEVEL STATS & COMMISSION ENGINE
@@ -398,7 +386,6 @@ async function syncStatsAndHistory() {
         setText('badge-l2', l2Size);
         setText('badge-l3', l3Size);
         
-        // Calculate Bar Height based on members
         let maxLvl = Math.max(1, l1Size, l2Size, l3Size); 
         let h1 = Math.max(5, (l1Size / maxLvl) * 80) + "%"; 
         let h2 = Math.max(5, (l2Size / maxLvl) * 80) + "%";
@@ -409,9 +396,9 @@ async function syncStatsAndHistory() {
         setHeight('bar-l2', h2);
         setHeight('bar-l3', h3);
 
-        window.referFlatBonus = 0; // Flat ₹5 OFF
+        window.referFlatBonus = 0; 
         updateReferUI();
-        window.updateLiveBalance();
+        window.updateLiveStats();
     });
 
     // 3.2 Listen to ALL Task Submissions to calculate my tasks + 3-Level commissions
@@ -424,7 +411,6 @@ async function syncStatsAndHistory() {
         snap.forEach(d => { 
             const data = d.data();
             
-            // Log My Tasks
             if(data.userPhone === userPhone) {
                 window.mySubmissionsMap[data.gigName] = data; 
                 window.mySubmissionsList.push(data); 
@@ -433,14 +419,13 @@ async function syncStatsAndHistory() {
                 }
             }
 
-            // Calculate 3-Level Network Commissions (10%, 6%, 3%)
             if(data.status === "Approved" || data.status === "Completed") {
                 if(data.referrerCode === window.myReferCode) {
-                    commTotal += (data.gigReward * 0.10); // L1
+                    commTotal += (data.gigReward * 0.10); 
                 } else if(window.l1Codes.has(data.referrerCode)) {
-                    commTotal += (data.gigReward * 0.06); // L2
+                    commTotal += (data.gigReward * 0.06); 
                 } else if(window.l2Codes.has(data.referrerCode)) {
-                    commTotal += (data.gigReward * 0.03); // L3
+                    commTotal += (data.gigReward * 0.03); 
                 }
             }
         }); 
@@ -449,12 +434,12 @@ async function syncStatsAndHistory() {
         window.referCommission = parseFloat(commTotal.toFixed(2));
         
         const statTask = document.getElementById("stat-task-earn");
-        if(statTask) statTask.innerText = `₹${taskTotal}`; 
+        if(statTask) statTask.innerText = `₹${taskTotal.toFixed(2)}`; 
         
         renderExploreGigs(); 
         renderReviewTab(); 
         updateReferUI();
-        window.updateLiveBalance(); 
+        window.updateLiveStats(); 
     });
 
     // 3.3 Withdrawals Data
@@ -470,9 +455,9 @@ async function syncStatsAndHistory() {
         });
         window.withTotal = withTotal;
         const statWith = document.getElementById("stat-total-withdraw");
-        if(statWith) statWith.innerText = `₹${withTotal}`; 
+        if(statWith) statWith.innerText = `₹${withTotal.toFixed(2)}`; 
         renderLedger(allTransactions); 
-        window.updateLiveBalance();
+        window.updateLiveStats();
     });
 }
 
@@ -481,7 +466,7 @@ function updateReferUI() {
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
     
     setText('stat-refer-earn', `₹${totalReferEarning.toFixed(2)}`); 
-    setText('total-refer-earnings', totalReferEarning.toFixed(2));
+    if(document.getElementById('total-refer-earnings')) setText('total-refer-earnings', totalReferEarning.toFixed(2));
     setText('graph-network-income', `₹${totalReferEarning.toFixed(2)}`);
 }
 
@@ -497,12 +482,10 @@ async function renderLedger(withs) {
         taskSnap.forEach(d => { 
             const data = d.data();
             
-            // My Task Income
             if(data.userPhone === userPhone && (data.status === 'Approved' || data.status === 'Completed')) {
                 combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Task: ${data.gigName}`, amt: data.gigReward, status: 'Completed' }); 
             }
             
-            // Commission Income
             if(data.status === 'Approved' || data.status === 'Completed') {
                 if(data.referrerCode === window.myReferCode) {
                     combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L1 Comm. (10%)`, amt: parseFloat((data.gigReward * 0.10).toFixed(2)), status: 'Completed' }); 
@@ -513,6 +496,19 @@ async function renderLedger(withs) {
                 }
             }
         });
+        
+        // Add Recharges to Ledger
+        const rechargeSnap = await getDocs(query(collection(db, "transactions"), where("phone", "==", userPhone)));
+        rechargeSnap.forEach(d => {
+            const data = d.data();
+            if(data.type === "recharge") {
+                combined.push({ type: 'debit', timestamp: data.timestamp, desc: `Recharge: ${data.targetNumber}`, amt: data.amount, status: data.status }); 
+                if(data.cashbackEarned > 0) {
+                     combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Cashback (Recharge)`, amt: data.cashbackEarned, status: 'Completed' }); 
+                }
+            }
+        });
+
     } catch(e) {
         console.error("Ledger fetch error:", e);
     }
@@ -540,7 +536,7 @@ async function renderLedger(withs) {
                 <div class="w-10 h-10 rounded-full ${iconBg} ${iconColor} flex items-center justify-center font-bold shrink-0 text-xl">${icon}</div>
                 <div><p class="text-sm font-bold text-slate-800">${item.desc}</p><p class="text-[10px] text-slate-400 uppercase font-bold">${item.status}</p></div>
             </div>
-            <p class="text-sm font-black ${amtColor}">${isDebit ? '-' : '+'} ₹${item.amt}</p>
+            <p class="text-sm font-black ${amtColor}">${isDebit ? '-' : '+'} ₹${parseFloat(item.amt).toFixed(2)}</p>
         </div>`;
     });
     
@@ -706,43 +702,4 @@ window.saveRealKYC = async function() {
     const u = uInput.value.trim(); 
     if(n.length < 3 || !u.includes("@")) return window.showToast("⚠️ Invalid Name or UPI"); 
     
-    try { 
-        await updateDoc(doc(db, "users", window.userDocId), { bankName: n, upi: u }); 
-        window.showToast("✅ Details Locked!"); 
-        setTimeout(() => window.closeAllSheets(), 1000); 
-    } catch (e) { 
-        window.showToast("❌ Error saving."); 
-    } 
-}
-
-window.processWithdrawReal = async function() { 
-    const amtInput = document.getElementById("withdraw-amount");
-    if(!amtInput) return;
-    
-    const amt = parseInt(amtInput.value); 
-    if(!amt || amt < 50) return window.showToast("⚠️ Min ₹50"); 
-    if(amt > window.currentBalance) return window.showToast("❌ Insufficient Balance"); 
-    
-    const btn = document.getElementById("withdraw-btn"); 
-    if(btn) { 
-        btn.disabled = true; 
-        btn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`; 
-        btn.classList.add("opacity-80", "cursor-not-allowed");
-    }
-    
-    try { 
-        await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); 
-        await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); 
-        window.showToast("🚀 Sent securely!"); 
-        window.closeFullPage('withdraw-page'); 
-        amtInput.value = ""; // Clear input after success
-    } catch(e) { 
-        window.showToast("❌ Failed"); 
-    } finally { 
-        if(btn) { 
-            btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Proceed Securely`; 
-            btn.disabled = false; 
-            btn.classList.remove("opacity-80", "cursor-not-allowed");
-        }
-    } 
-}
+    try {
