@@ -14,10 +14,9 @@ window.l1Codes = new Set();
 window.l2Codes = new Set();
 window.l3Codes = new Set();
 
-// 🔥 WALLET GLOBALS 🔥
 window.taskEarned = 0;
-window.referEarned = 0; 
-window.totalEarned = 0;  
+window.referCommission = 0; 
+window.referFlatBonus = 0;  
 window.withTotal = 0;
 
 window.liveGigs = {}; 
@@ -91,7 +90,7 @@ window.switchTab = (id) => {
     document.querySelectorAll('.nav-btn').forEach(btn => {
         if(btn.dataset.target === id) {
             btn.classList.remove('text-slate-400');
-            btn.classList.add('text-pink-600'); 
+            btn.classList.add('text-pink-600');
         } else {
             btn.classList.add('text-slate-400');
             btn.classList.remove('text-pink-600');
@@ -161,6 +160,11 @@ window.copyReferLink = () => {
     navigator.clipboard.writeText(`https://earnprox.in/index.html?ref=${window.myReferCode}`).then(()=>window.showToast("✅ Code Copied!")); 
 };
 
+window.shareOnWhatsApp = () => { 
+    if(!window.myReferCode) return window.showToast("⚠️ Link not ready"); 
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`🔥 Earn cash with EarnproX! Complete tasks & get paid instantly!\n\nUse my code *${window.myReferCode}* to get joining bonus!\n👇👇\nhttps://earnprox.in/index.html?ref=${window.myReferCode}`)}`, '_blank'); 
+};
+
 // ================= FIREBASE SETUP =================
 const firebaseConfig = { 
     apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
@@ -184,11 +188,10 @@ const isToday = (dateObj) => {
 
 const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
 
-// 🟢 1. MASTER SYNC ENGINE & SECURITY CHECK
+// 🟢 1. MASTER SYNC ENGINE
 if(userPhone) {
     onSnapshot(query(collection(db, "users"), where("phone", "==", userPhone)), (snap) => {
         if(snap.empty) {
-            // 🚨 SECURITY FIX: Invalid Number in LocalStorage -> Force Logout
             localStorage.removeItem("earnprox_user_phone");
             window.location.href = "login.html";
             return;
@@ -213,31 +216,18 @@ if(userPhone) {
             return;
         }
 
-        // 🚀 FIX: DIRECTLY READ ALL EARNINGS FROM DATABASE 🚀
+        // 🔥 READ REAL WALLET BALANCE DIRECTLY FROM DB 🔥
         window.currentBalance = u.balance || 0;
-        window.taskEarned = u.taskEarning || 0;
-        window.totalEarned = u.totalEarning || 0;
-        window.referEarned = u.referEarning || 0;
-        window.withTotal = u.totalWithdraw || 0;
-
         localStorage.setItem("epx_cached_bal", window.currentBalance);
         
         const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
-        // 🚀 UPDATE WALLET STATS UI 🚀
+        // Update UI Balance
         setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
         setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
-        
         const mainBal = document.getElementById("main-balance-display");
         if(mainBal) mainBal.innerHTML = `₹ ${window.currentBalance.toFixed(2)}<span class="text-xl text-white/80 font-bold drop-shadow-none"></span>`;
 
-        setText("stat-total-earn", `₹${window.totalEarned.toFixed(2)}`);
-        setText("stat-task-earn", `₹${window.taskEarned.toFixed(2)}`);
-        setText("stat-refer-earn", `₹${window.referEarned.toFixed(2)}`);
-        setText("stat-total-withdraw", `₹${window.withTotal.toFixed(2)}`);
-        setText("graph-network-income", `₹${window.referEarned.toFixed(2)}`);
-
-        // Setup other User Info
         window.savedUPI = u.upi || ""; 
         window.savedBankName = u.bankName || ""; 
         window.myReferrerCode = u.referCodeUsed || ""; 
@@ -248,8 +238,11 @@ if(userPhone) {
 
         window.myActiveGig = u.activeGig || null;
         if(window.myActiveGig) {
-            setText('active-gig-name', window.myActiveGig.title);
-            setText('active-gig-reward', `Reward: ₹${window.myActiveGig.reward}`);
+            const gigNameObj = document.getElementById('active-gig-name');
+            if(gigNameObj) gigNameObj.innerText = window.myActiveGig.title;
+            const gigRewardObj = document.getElementById('active-gig-reward');
+            if(gigRewardObj) gigRewardObj.innerText = `Reward: ₹${window.myActiveGig.reward}`;
+            
             const activeCard = document.getElementById('active-task-card');
             if(activeCard) activeCard.classList.remove('hidden');
             const noTask = document.getElementById('no-active-task');
@@ -264,6 +257,7 @@ if(userPhone) {
 
         setText("home-user-name", realName.split(" ")[0]); 
         setText("profile-user-name", realName);
+        setText("profile-user-phone", "+91 " + userPhone); 
         setText("refer-page-name", realName);
         setText("referral-code-text", window.myReferCode); 
         setText("withdraw-display-name", window.savedBankName || "Bank Transfer");
@@ -274,9 +268,17 @@ if(userPhone) {
 
         const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${realName}&backgroundColor=b6e3f4`;
         const setImg = (id) => { const el = document.getElementById(id); if(el) el.src = avatarUrl; };
-        setImg("home-profile-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
+        setImg("home-profile-avatar"); setImg("header-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
 
         if(window.savedUPI) {
+            const badge = document.getElementById("upi-status-badge");
+            if(badge) {
+                badge.innerText = "Verified ✅"; 
+                badge.className = "text-[11px] font-bold text-emerald-600 border border-emerald-200 bg-emerald-50 px-2 py-1 rounded";
+            }
+            setText("bank-display-text", window.savedBankName); 
+            setText("upi-display-text", window.savedUPI);
+            
             const bNameInput = document.getElementById("bank-name-input");
             if(bNameInput) { bNameInput.value = window.savedBankName; bNameInput.disabled = true; }
             const upiInput = document.getElementById("upi-input-box");
@@ -322,11 +324,21 @@ if(userPhone) {
     });
 }
 
+// 🟢 2. LIVE STATS CALCULATOR (Restored Old Logic)
+window.updateLiveStats = function() {
+    const totalEarned = (window.taskEarned || 0) + (window.referFlatBonus || 0) + (window.referCommission || 0);
+    const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+    
+    setText("stat-total-earn", `₹${totalEarned.toFixed(2)}`);
+    setText("stat-task-earn", `₹${(window.taskEarned || 0).toFixed(2)}`);
+    setText("stat-total-withdraw", `₹${(window.withTotal || 0).toFixed(2)}`);
+}
 
-// 🟢 2. NETWORK ENGINE (Still fetching users for count, but tasks are secured)
+// 🟢 3. NEW 3-LEVEL STATS & COMMISSION ENGINE
 async function syncStatsAndHistory() {
     if(!userPhone || !window.myReferCode) return;
     
+    // 3.1 Fetch ALL Users to map 3-Level Network
     onSnapshot(collection(db, "users"), (snap) => {
         let l1Count = 0, todayCount = 0, referListHtml = "";
         window.l1Codes.clear(); window.l2Codes.clear(); window.l3Codes.clear();
@@ -334,22 +346,26 @@ async function syncStatsAndHistory() {
         const allUsers = [];
         snap.forEach(d => allUsers.push(d.data()));
 
+        // Map Level 1
         allUsers.forEach(u => {
             const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
             if(u.referCodeUsed === window.myReferCode) {
                 window.l1Codes.add(uCode);
                 l1Count++;
+                if(isToday(u.timestamp)) todayCount++;
                 const joinDate = u.timestamp ? new Date(getSafeTime(u.timestamp)).toLocaleDateString('en-GB') : "Recently"; 
                 const uName = u.name || "User"; 
                 referListHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200"><div class="w-1/2 flex items-center gap-2 overflow-hidden"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">${uName.charAt(0).toUpperCase()}</div><p class="text-xs font-bold text-slate-800 truncate">${uName}</p></div><div class="w-1/4 text-center text-[10px] font-bold text-slate-400">${joinDate}</div><div class="w-1/4 text-right text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded border border-blue-100">Level 1</div></div>`; 
             }
         });
 
+        // Map Level 2
         allUsers.forEach(u => {
             const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
             if(window.l1Codes.has(u.referCodeUsed)) window.l2Codes.add(uCode);
         });
 
+        // Map Level 3
         allUsers.forEach(u => {
             const uCode = (u.name || "User").substring(0,3).toUpperCase() + (u.phone || "").substring((u.phone||"").length - 4);
             if(window.l2Codes.has(u.referCodeUsed)) window.l3Codes.add(uCode);
@@ -362,15 +378,18 @@ async function syncStatsAndHistory() {
         const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
         setText('total-refers-count', l1Count); 
+        setText('today-refers-count', todayCount); 
         setText('graph-active-members', l1Size + l2Size + l3Size);
         
         const referCont = document.getElementById('referral-list-container');
         if(referCont) referCont.innerHTML = referListHtml || `<div class="text-4xl mb-3 text-center mt-6">🌱</div><p class="text-center text-slate-400 font-bold text-sm">No referrals yet.<br>Share your link & watch your network grow!</p>`; 
         
+        // --- 🔥 DYNAMIC GRAPH BADGES & BARS LOGIC 🔥 ---
         setText('badge-l1', l1Size);
         setText('badge-l2', l2Size);
         setText('badge-l3', l3Size);
         
+        // Calculate Bar Height based on members
         let maxLvl = Math.max(1, l1Size, l2Size, l3Size); 
         let h1 = Math.max(5, (l1Size / maxLvl) * 80) + "%"; 
         let h2 = Math.max(5, (l2Size / maxLvl) * 80) + "%";
@@ -380,62 +399,126 @@ async function syncStatsAndHistory() {
         setHeight('bar-l1', h1);
         setHeight('bar-l2', h2);
         setHeight('bar-l3', h3);
+
+        window.referFlatBonus = 0; // Flat ₹5 OFF
+        updateReferUI();
+        window.updateLiveStats();
     });
 
-    // 🚨 SECURITY FIX: ONLY DOWNLOAD MY OWN TASKS 🚨
-    onSnapshot(query(collection(db, "task_submissions"), where("userPhone", "==", userPhone)), (snap) => {
+    // 3.2 Listen to ALL Task Submissions to calculate my tasks + 3-Level commissions (RESTORED)
+    onSnapshot(collection(db, "task_submissions"), (snap) => {
+        let taskTotal = 0; 
+        let commTotal = 0;
         window.mySubmissionsMap = {}; 
         window.mySubmissionsList = [];
 
         snap.forEach(d => { 
             const data = d.data();
-            window.mySubmissionsMap[data.gigName] = data; 
-            window.mySubmissionsList.push(data); 
+            
+            // Log My Tasks
+            if(data.userPhone === userPhone) {
+                window.mySubmissionsMap[data.gigName] = data; 
+                window.mySubmissionsList.push(data); 
+                if(data.status === "Approved" || data.status === "Completed") {
+                    taskTotal += (data.gigReward || 0); 
+                }
+            }
+
+            // Calculate 3-Level Network Commissions (10%, 6%, 3%)
+            if(data.status === "Approved" || data.status === "Completed") {
+                if(data.referrerCode === window.myReferCode) {
+                    commTotal += (data.gigReward * 0.10); // L1
+                } else if(window.l1Codes.has(data.referrerCode)) {
+                    commTotal += (data.gigReward * 0.06); // L2
+                } else if(window.l2Codes.has(data.referrerCode)) {
+                    commTotal += (data.gigReward * 0.03); // L3
+                }
+            }
         }); 
+        
+        window.taskEarned = taskTotal;
+        window.referCommission = parseFloat(commTotal.toFixed(2));
+        
+        const statTask = document.getElementById("stat-task-earn");
+        if(statTask) statTask.innerText = `₹${taskTotal.toFixed(2)}`; 
         
         renderExploreGigs(); 
         renderReviewTab(); 
+        updateReferUI();
+        window.updateLiveStats(); 
     });
 
-    // 3.3 Fetch Withdrawals for Ledger
+    // 3.3 Withdrawals Data (RESTORED)
     onSnapshot(query(collection(db, "withdrawals"), where("userPhone", "==", userPhone)), (snap) => {
+        let withTotal = 0; 
         const allTransactions = [];
         snap.forEach(d => { 
             const data = d.data(); 
+            if(data.status !== "Rejected") {
+                withTotal += (data.amount || 0); 
+            }
             allTransactions.push({ type: 'debit', timestamp: data.timestamp, desc: 'Withdrawal to Bank', amt: data.amount, status: data.status }); 
         });
+        window.withTotal = withTotal;
+        const statWith = document.getElementById("stat-total-withdraw");
+        if(statWith) statWith.innerText = `₹${withTotal.toFixed(2)}`; 
         renderLedger(allTransactions); 
+        window.updateLiveStats();
     });
 }
 
-// 🟢 4. ADVANCED LEDGER (MY TASKS & WITHDRAWALS ONLY)
+function updateReferUI() {
+    const totalReferEarning = window.referFlatBonus + window.referCommission;
+    const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+    
+    setText('stat-refer-earn', `₹${totalReferEarning.toFixed(2)}`); 
+    if(document.getElementById('total-refer-earnings')) setText('total-refer-earnings', totalReferEarning.toFixed(2));
+    setText('graph-network-income', `₹${totalReferEarning.toFixed(2)}`);
+}
+
+// 🟢 4. ADVANCED 3-LEVEL LEDGER FIX
 async function renderLedger(withs) {
     const historyCont = document.getElementById('history-container'); 
     if(!historyCont) return;
 
     let combined = [...withs];
     
-    // Add Approved tasks to ledger
-    window.mySubmissionsList.forEach(data => {
-        if(data.status === 'Approved' || data.status === 'Completed') {
-            combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Task: ${data.gigName}`, amt: data.gigReward, status: 'Completed' }); 
-        }
-    });
-
     try {
-        // Fetch Recharges from transactions securely
+        const taskSnap = await getDocs(collection(db, "task_submissions"));
+        taskSnap.forEach(d => { 
+            const data = d.data();
+            
+            // My Task Income
+            if(data.userPhone === userPhone && (data.status === 'Approved' || data.status === 'Completed')) {
+                combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Task: ${data.gigName}`, amt: data.gigReward, status: 'Completed' }); 
+            }
+            
+            // Commission Income
+            if(data.status === 'Approved' || data.status === 'Completed') {
+                if(data.referrerCode === window.myReferCode) {
+                    combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L1 Comm. (10%)`, amt: parseFloat((data.gigReward * 0.10).toFixed(2)), status: 'Completed' }); 
+                } else if(window.l1Codes.has(data.referrerCode)) {
+                    combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L2 Comm. (6%)`, amt: parseFloat((data.gigReward * 0.06).toFixed(2)), status: 'Completed' }); 
+                } else if(window.l2Codes.has(data.referrerCode)) {
+                    combined.push({ type: 'credit', timestamp: data.timestamp, desc: `L3 Comm. (3%)`, amt: parseFloat((data.gigReward * 0.03).toFixed(2)), status: 'Completed' }); 
+                }
+            }
+        });
+        
+        // Add Recharges to Ledger
         const rechargeSnap = await getDocs(query(collection(db, "transactions"), where("phone", "==", userPhone)));
         rechargeSnap.forEach(d => {
             const data = d.data();
             if(data.type === "recharge") {
                 combined.push({ type: 'debit', timestamp: data.timestamp, desc: `Recharge: ${data.targetNumber}`, amt: data.amount, status: data.status }); 
                 if(data.cashbackEarned > 0) {
-                     combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Cashback`, amt: data.cashbackEarned, status: 'Completed' }); 
+                     combined.push({ type: 'credit', timestamp: data.timestamp, desc: `Cashback (Recharge)`, amt: data.cashbackEarned, status: 'Completed' }); 
                 }
             }
         });
+
     } catch(e) {
-        console.error("Ledger recharge fetch error:", e);
+        console.error("Ledger fetch error:", e);
     }
 
     combined.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
@@ -652,11 +735,7 @@ window.processWithdrawReal = async function() {
     }
     
     try { 
-        const newTotalWithdraw = window.withTotal + amt;
-        await updateDoc(doc(db, "users", window.userDocId), { 
-            balance: window.currentBalance - amt,
-            totalWithdraw: newTotalWithdraw 
-        }); 
+        await updateDoc(doc(db, "users", window.userDocId), { balance: window.currentBalance - amt }); 
         await addDoc(collection(db, "withdrawals"), { userPhone, userName: window.savedBankName, amount: amt, upi: window.savedUPI, status: "Pending", timestamp: new Date() }); 
         window.showToast("🚀 Sent securely!"); 
         window.closeFullPage('withdraw-page'); 
