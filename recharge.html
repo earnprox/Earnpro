@@ -18,41 +18,47 @@
         /* Modal Animation Setup */
         .modal-slide-up { transform: translateY(0%); }
         .modal-slide-down { transform: translateY(100%); }
+        /* Toast Notification */
+        #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s; font-weight: 600; font-size: 14px; }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body class="bg-[#F8FAFC] min-h-screen selection:bg-blue-100 pb-10">
 
-    <!-- Top Header -->
-    <div class="px-5 py-4 flex items-center gap-4 bg-white border-b border-slate-100 shadow-[0_2px_15px_-5px_rgba(0,0,0,0.05)] sticky top-0 z-40">
-        <button onclick="window.location.href='dashboard.html'" class="text-slate-800 p-2 active:scale-90 transition-all duration-200 bg-slate-50 rounded-full hover:bg-slate-100">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-        </button>
-        <div>
-            <h2 class="text-[18px] font-black text-slate-800 leading-tight tracking-tight">Recharge & Pay Bills</h2>
-            <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> 100% Secure
-            </p>
+    <div class="px-5 py-4 flex items-center justify-between bg-white border-b border-slate-100 shadow-[0_2px_15px_-5px_rgba(0,0,0,0.05)] sticky top-0 z-40">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='dashboard.html'" class="text-slate-800 p-2 active:scale-90 transition-all duration-200 bg-slate-50 rounded-full hover:bg-slate-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <div>
+                <h2 class="text-[18px] font-black text-slate-800 leading-tight tracking-tight">Recharge</h2>
+                <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> 100% Secure
+                </p>
+            </div>
+        </div>
+        <div class="bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-inner">
+            <span class="text-[11px] font-bold text-slate-500">Wallet:</span>
+            <span class="text-[13px] font-black text-slate-800" id="walletBalanceDisplay">₹0</span>
         </div>
     </div>
 
     <div class="max-w-md mx-auto pt-5">
         
-        <!-- Banner -->
         <div class="mx-5 mb-6 rounded-[1.5rem] bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] p-6 text-white shadow-lg shadow-indigo-500/30 relative overflow-hidden group cursor-pointer">
             <div class="absolute -right-5 -top-5 w-32 h-32 bg-white/20 rounded-full blur-[20px] pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
             <div class="relative z-10">
                 <h3 class="text-[20px] font-black mb-1.5 leading-tight flex items-center gap-2 drop-shadow-sm">
                     Get 5% Cashback 💸
                 </h3>
-                <p class="text-[13px] font-medium text-indigo-100 mb-5">On your first mobile or DTH recharge!</p>
+                <p class="text-[13px] font-medium text-indigo-100 mb-5">On your mobile or DTH recharge!</p>
                 <button class="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white text-[12px] font-bold px-6 py-2.5 rounded-full transition-all active:scale-95 shadow-sm">
-                    View Offers
+                    Auto Applied
                 </button>
             </div>
             <div class="absolute bottom-0 right-0 opacity-20 text-6xl transform translate-x-4 translate-y-4">🎁</div>
         </div>
 
-        <!-- Categories -->
         <div class="bg-white rounded-[1.5rem] p-5 mx-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.03)] border border-slate-100 mb-6">
             <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-5 px-1">Categories</h3>
             <div class="grid grid-cols-4 gap-y-6 gap-x-2">
@@ -60,36 +66,32 @@
                     <div class="w-[3.5rem] h-[3.5rem] bg-blue-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-blue-100/50 shadow-sm">📱</div>
                     <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-blue-600 transition-colors">Mobile</span>
                 </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="alert('DTH coming soon!')">
+                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('DTH coming soon!')">
                     <div class="w-[3.5rem] h-[3.5rem] bg-orange-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-orange-100/50 shadow-sm">📡</div>
                     <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-orange-600 transition-colors">DTH</span>
                 </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="alert('Electricity coming soon!')">
+                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Electricity coming soon!')">
                     <div class="w-[3.5rem] h-[3.5rem] bg-amber-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-amber-100/50 shadow-sm">💡</div>
                     <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-amber-600 transition-colors">Electricity</span>
                 </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="alert('FASTag coming soon!')">
+                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('FASTag coming soon!')">
                     <div class="w-[3.5rem] h-[3.5rem] bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-emerald-100/50 shadow-sm">🚘</div>
                     <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-emerald-600 transition-colors">FASTag</span>
                 </div>
             </div>
         </div>
 
-        <!-- Recharge Form -->
         <div class="bg-white rounded-[1.5rem] p-6 mx-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.04)] border border-slate-100 mb-8 relative overflow-hidden">
             <h3 class="text-[16px] font-black text-slate-800 tracking-tight mb-5 flex items-center gap-2">
                 <span class="bg-blue-50 p-2 rounded-xl text-blue-600 shadow-inner">⚡</span> Quick Recharge
             </h3>
             
-            <!-- Mobile Number Input -->
             <div class="relative mb-4">
                 <input type="number" id="mobileInput" placeholder="Enter Mobile Number" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[16px] font-bold rounded-xl px-5 py-4 pl-12 outline-none focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)] transition-all duration-200 hide-arrows tracking-wider" maxlength="10">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">📞</span>
             </div>
 
-            <!-- Operator Select -->
             <div class="relative mb-4">
-                <!-- Note: The 'value' is for your API, the inner text is used to fetch from plans.json -->
                 <select id="operatorSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-bold rounded-xl px-5 py-4 pl-12 outline-none focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)] transition-all duration-200 appearance-none">
                     <option value="" disabled selected>Select Operator</option>
                     <option value="1">Airtel</option>
@@ -100,58 +102,26 @@
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">🏢</span>
             </div>
 
-            <!-- Amount Input (With Browse Plans Button) -->
             <div class="relative mb-6">
-                <!-- Added pr-32 so text doesn't go under the button -->
                 <input type="number" id="amountInput" placeholder="Enter Amount" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[16px] font-bold rounded-xl px-5 py-4 pl-12 pr-32 outline-none focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)] transition-all duration-200 hide-arrows tracking-wider">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">₹</span>
                 
-                <!-- BROWSE PLANS BUTTON -->
                 <button onclick="openPlansModal()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100 active:scale-95 transition-all shadow-sm">
                     Browse Plans
                 </button>
             </div>
             
-            <button id="payBtn" onclick="processRecharge()" class="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-black py-4 rounded-xl text-[15px] active:scale-95 transition-all duration-300 shadow-[0_10px_20px_-10px_rgba(15,23,42,0.6)] flex justify-center items-center gap-2">
+            <button id="payBtn" onclick="window.processRechargeWithWallet()" class="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-black py-4 rounded-xl text-[15px] active:scale-95 transition-all duration-300 shadow-[0_10px_20px_-10px_rgba(15,23,42,0.6)] flex justify-center items-center gap-2">
                 Process Recharge <span class="text-xl leading-none">→</span>
             </button>
         </div>
 
-        <!-- Recent Recharges (Static for design) -->
-        <div class="mx-5 mb-6">
-            <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2">Recent Recharges</h3>
-            <div class="space-y-3">
-                <div class="bg-white p-4 rounded-[1.25rem] border border-slate-100 shadow-[0_2px_10px_-5px_rgba(0,0,0,0.05)] flex justify-between items-center cursor-pointer hover:shadow-md transition-all duration-200 active:scale-[0.98] group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center font-black text-rose-600 text-[15px] border border-rose-100 shadow-inner group-hover:scale-110 transition-transform duration-300">AK</div>
-                        <div>
-                            <h4 class="text-[15px] font-black text-slate-800 leading-tight">Akash Kumar</h4>
-                            <p class="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Airtel • 9876543210
-                            </p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <h4 class="text-[16px] font-black text-slate-800">₹299</h4>
-                        <p class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded mt-1 border border-emerald-100 inline-block uppercase tracking-wider">Success</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-
-    <!-- ========================================== -->
-    <!-- PLANS BOTTOM SHEET MODAL -->
-    <!-- ========================================== -->
     <div id="plansModal" class="fixed inset-0 z-[100] hidden">
-        <!-- Backdrop -->
         <div id="modalBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closePlansModal()"></div>
         
-        <!-- Sliding Content -->
         <div id="plansSheet" class="absolute bottom-0 left-0 right-0 bg-[#F8FAFC] rounded-t-[2rem] h-[85vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.1)] modal-slide-down transition-transform duration-300 ease-out">
-            
-            <!-- Modal Header -->
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-white rounded-t-[2rem] z-10 shrink-0">
                 <div>
                     <h3 class="text-[18px] font-black text-slate-800" id="modalOperatorTitle">Browse Plans</h3>
@@ -161,63 +131,137 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-
-            <!-- Modal Body (Dynamic Plans) -->
             <div id="plansContainer" class="p-5 overflow-y-auto space-y-4 pb-10 flex-1">
-                <!-- Loading State -->
                 <div class="text-center text-slate-500 font-bold text-sm py-10 animate-pulse">Loading Plans...</div>
             </div>
         </div>
     </div>
 
+    <div id="toast">Message Here</div>
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT LOGIC -->
-    <!-- ========================================== -->
-    <script>
-        // 1. Transaction API Calling Logic
-        async function processRecharge() {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
+            authDomain: "earnproxuc.firebaseapp.com",
+            projectId: "earnproxuc",
+            storageBucket: "earnproxuc.firebasestorage.app",
+            messagingSenderId: "411733884378",
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global Variables
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        if (!userPhone) window.location.href = "login.html";
+
+        let userDocId = null;
+        let walletBalance = 0;
+
+        window.showToast = function(msg) { 
+            const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
+            setTimeout(()=>t.classList.remove("show"), 3000); 
+        }
+
+        // 1. Fetch User Balance on Load
+        async function fetchUserBalance() {
+            try {
+                const q = query(collection(db, "users"), where("phone", "==", userPhone));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    userDocId = snap.docs[0].id;
+                    walletBalance = snap.docs[0].data().balance || 0;
+                    document.getElementById('walletBalanceDisplay').innerText = '₹' + walletBalance.toFixed(2);
+                } else {
+                    window.location.href = "login.html";
+                }
+            } catch (error) {
+                console.error("Error fetching wallet:", error);
+                window.showToast("Failed to sync wallet.");
+            }
+        }
+        document.addEventListener("DOMContentLoaded", fetchUserBalance);
+
+        // 2. Recharge Process with Wallet Deduction
+        window.processRechargeWithWallet = async function() {
             const mobile = document.getElementById('mobileInput').value;
             const operator = document.getElementById('operatorSelect').value;
-            const amount = document.getElementById('amountInput').value;
+            const amountStr = document.getElementById('amountInput').value;
+            const amount = parseFloat(amountStr);
             const btn = document.getElementById('payBtn');
 
-            if(!mobile || !operator || !amount) {
-                alert("Please fill all details (Mobile, Operator, Amount)");
-                return;
-            }
-            if(mobile.length !== 10) {
-                alert("Please enter a valid 10-digit mobile number");
-                return;
+            if(!mobile || !operator || !amount) return window.showToast("⚠️ Fill all details");
+            if(mobile.length !== 10) return window.showToast("⚠️ Invalid mobile number");
+            if(amount < 10) return window.showToast("⚠️ Minimum amount is ₹10");
+
+            // CHECK WALLET BALANCE
+            if (walletBalance < amount) {
+                return window.showToast("❌ Insufficient Wallet Balance! (₹" + walletBalance.toFixed(2) + ")");
             }
 
             const originalText = btn.innerHTML;
-            btn.innerHTML = 'Processing... <span class="animate-spin text-xl">⏳</span>';
+            btn.innerHTML = 'Connecting to Bank... <span class="animate-spin text-xl">⏳</span>';
             btn.disabled = true;
             btn.classList.add('opacity-80');
 
             try {
+                // CALLING YOUR VERCEL API
                 const response = await fetch('/api/recharge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         mobileNumber: mobile,
                         operatorCode: operator,
-                        amount: amount
+                        amount: amountStr
                     })
                 });
 
                 const data = await response.json();
-                console.log("SKV API Response:", data);
+                console.log("API Response:", data);
                 
+                // IF RECHARGE IS SUCCESSFUL (STATUS 1 or 2 as per your setup)
                 if(data.STATUS == "2" || data.STATUS == "1") {
-                    alert("Recharge Successful! Ref ID: " + data.RPID);
+                    
+                    // 1. Deduct Balance + Give 5% Cashback
+                    const cashback = amount * 0.05;
+                    const finalDeduction = amount - cashback;
+                    walletBalance = walletBalance - finalDeduction;
+                    
+                    // Update Firebase User Document
+                    await updateDoc(doc(db, "users", userDocId), { 
+                        balance: walletBalance 
+                    });
+                    
+                    // Update UI Balance
+                    document.getElementById('walletBalanceDisplay').innerText = '₹' + walletBalance.toFixed(2);
+
+                    // 2. Save Ledger History (Optional but recommended)
+                    await addDoc(collection(db, "transactions"), {
+                        phone: userPhone,
+                        type: "recharge",
+                        amount: amount,
+                        targetNumber: mobile,
+                        cashbackEarned: cashback,
+                        refId: data.RPID || "N/A",
+                        status: "success",
+                        timestamp: new Date()
+                    });
+
+                    alert(`✅ Recharge Successful!\nRef ID: ${data.RPID}\nCashback Earned: ₹${cashback.toFixed(2)}`);
+                    document.getElementById('amountInput').value = '';
+                    document.getElementById('mobileInput').value = '';
+
                 } else {
-                    alert("Recharge Failed: " + (data.MSG || "Unknown Error"));
+                    window.showToast("❌ Failed: " + (data.MSG || "API Error"));
                 }
             } catch(error) {
                 console.error("API Error:", error);
-                alert("Server error occurred! Please check Vercel logs.");
+                window.showToast("❌ Server Error!");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -225,37 +269,29 @@
             }
         }
 
-
-        // 2. Fetch JSON & Modal Logic
-        async function openPlansModal() {
+        // 3. Modal and Plans Logic (Same as yours, moved to window scope)
+        window.openPlansModal = function() {
             const opSelect = document.getElementById('operatorSelect');
-            if(opSelect.selectedIndex === 0) {
-                alert("Bhai, pehle Operator select karo! 😅");
-                return;
-            }
+            if(opSelect.selectedIndex === 0) return window.showToast("⚠️ Select Operator first!");
 
-            // Get selected operator text (e.g., "Airtel", "Jio")
             const operatorName = opSelect.options[opSelect.selectedIndex].text;
             document.getElementById('modalOperatorTitle').innerText = operatorName + " Plans";
             
-            // Show modal and start animations
             const modal = document.getElementById('plansModal');
             const backdrop = document.getElementById('modalBackdrop');
             const sheet = document.getElementById('plansSheet');
             
             modal.classList.remove('hidden');
-            // Small timeout to allow CSS to process display:block before translating
             setTimeout(() => {
                 backdrop.classList.remove('opacity-0');
                 sheet.classList.remove('modal-slide-down');
                 sheet.classList.add('modal-slide-up');
             }, 10);
 
-            // Fetch Plans Data
             fetchAndRenderPlans(operatorName);
         }
 
-        function closePlansModal() {
+        window.closePlansModal = function() {
             const backdrop = document.getElementById('modalBackdrop');
             const sheet = document.getElementById('plansSheet');
             
@@ -263,10 +299,14 @@
             sheet.classList.remove('modal-slide-up');
             sheet.classList.add('modal-slide-down');
 
-            // Hide modal completely after animation ends
             setTimeout(() => {
                 document.getElementById('plansModal').classList.add('hidden');
             }, 300); 
+        }
+
+        window.selectPlan = function(price) {
+            document.getElementById('amountInput').value = price;
+            window.closePlansModal();
         }
 
         async function fetchAndRenderPlans(operatorName) {
@@ -274,11 +314,8 @@
             container.innerHTML = '<div class="text-center text-slate-500 font-bold text-sm py-10 animate-pulse">Fetching best offers... 🎁</div>';
 
             try {
-                // IMPORTANT: Fetching your plans.json file from the server
                 const response = await fetch('/plans.json');
                 const data = await response.json();
-                
-                // Get plans for the specific operator
                 const plansList = data[operatorName];
 
                 if(!plansList || plansList.length === 0) {
@@ -286,16 +323,13 @@
                     return;
                 }
 
-                container.innerHTML = ''; // Clear loading message
+                container.innerHTML = ''; 
                 
-                // Create HTML for each plan
                 plansList.forEach(plan => {
                     const card = document.createElement('div');
                     card.className = "bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-blue-500 active:bg-blue-50 cursor-pointer transition-all duration-200 shadow-sm relative overflow-hidden group";
-                    // Pass the price back to the main input on click
-                    card.onclick = () => selectPlan(plan.price);
+                    card.onclick = () => window.selectPlan(plan.price);
                     
-                    // Show Type Badge (Yearly, Unlimited, etc.)
                     const badge = plan.type ? `<span class="absolute top-0 right-0 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-bl-xl shadow-sm">${plan.type}</span>` : '';
 
                     card.innerHTML = `
@@ -325,12 +359,6 @@
                 console.error("JSON Error:", error);
                 container.innerHTML = '<div class="text-center text-red-500 font-bold text-sm py-10">Network error! Could not fetch plans.</div>';
             }
-        }
-
-        // Fills the amount and closes popup
-        function selectPlan(price) {
-            document.getElementById('amountInput').value = price;
-            closePlansModal();
         }
     </script>
 </body>
