@@ -1,7 +1,7 @@
 const { db } = require('./_firebase');
 const crypto = require('crypto');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
     
     const { phone, pinHash } = req.body;
@@ -24,4 +24,4 @@ export default async function handler(req, res) {
         console.error("Login error:", e);
         return res.status(500).json({ error: 'Server error' });
     }
-}
+};
