@@ -1,40 +1,40 @@
-// api/send-otp.js
 module.exports = async function handler(req, res) {
-    // 1. केवल POST मेथड अलाउ करें
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-    // 🔥 FIX: Frontend 'phone' भेज रहा है, इसलिए दोनों को चेक करें
     const phone = req.body.phone || req.body.phoneNumber;
     const API_KEY = process.env.TWO_FACTOR_API_KEY;
 
-    // 2. वैलिडेशन
-    if (!phone || phone.length !== 10) {
-        return res.status(400).json({ error: 'Valid 10-digit phone number is required' });
+    // 1. अगर Vercel में Key सेव नहीं हुई है, तो स्क्रीन पर बता देगा
+    if (!API_KEY) {
+        return res.status(500).json({ error: 'Vercel ENV Missing: API Key not found' });
+    }
+
+    // 2. अगर Frontend से नंबर नहीं आ रहा है, तो बता देगा
+    if (!phone) {
+        return res.status(400).json({ error: 'Phone number not received from frontend' });
     }
 
     try {
-        // 3. 2Factor.in API Call
-        // AUTOGEN3 का मतलब है 6-digit OTP (जो हमने UI में सेट किया है)
         const url = `https://2factor.in/API/V1/${API_KEY}/SMS/${phone}/AUTOGEN3/OTP1`;
-        
         const response = await fetch(url);
-        const data = await response.json();
+        
+        // पहले text में पढ़ रहे हैं ताकि 2Factor कोई अजीब एरर दे तो क्रैश न हो
+        const textData = await response.text(); 
+        
+        let data;
+        try {
+            data = JSON.parse(textData);
+        } catch (e) {
+            return res.status(500).json({ error: '2Factor API Format Error' });
+        }
 
         if (data.Status === 'Success') {
-            // 4. Success Response
-            return res.status(200).json({
-                message: 'OTP sent successfully!',
-                sessionId: data.Details // यह ID वेरिफिकेशन के लिए बहुत जरूरी है
-            });
+            return res.status(200).json({ sessionId: data.Details });
         } else {
-            // 2Factor की तरफ से एरर (जैसे बैलेंस खत्म होना या गलत API Key)
-            console.error("2Factor Error:", data.Details);
-            return res.status(400).json({ error: data.Details || 'Failed to send OTP' });
+            // 🔥 3. अगर 2Factor ने रिजेक्ट किया (जैसे बैलेंस खत्म, या गलत Key), तो असली कारण स्क्रीन पर दिखाएगा!
+            return res.status(400).json({ error: `2Factor Error: ${data.Details}` });
         }
     } catch (error) {
-        console.error("System Error:", error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: `Fetch Error: ${error.message}` });
     }
 };
