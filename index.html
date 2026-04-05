@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth scroll-pt-20 md:scroll-pt-24">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -361,14 +361,38 @@
         </div>
     </footer>
 
-    <!-- Mobile Menu Script -->
+    <!-- Optimized Mobile Menu Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
-            
-            mobileMenuBtn.addEventListener('click', function() {
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+
+            // Toggle menu on button click
+            mobileMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Stop click from propagating to document immediately
                 mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close menu when a link inside it is clicked
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Close menu when Escape key is pressed
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    mobileMenu.classList.add('hidden');
+                }
             });
         });
     </script>
