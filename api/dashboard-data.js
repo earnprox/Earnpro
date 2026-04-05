@@ -47,7 +47,7 @@ module.exports = async function handler(req, res) {
             }
         }
 
-        // 🔥 FIX: Live Task & Referral Earning Calculation
+        // 🔥 Live Task & Referral Earning Calculation
         let taskEarn = 0;
         let referEarn = 0;
 
@@ -81,10 +81,10 @@ module.exports = async function handler(req, res) {
                 upi: userData.upi || ""
             },
             stats: {
-                totalEarn: taskEarn + referEarn, // कुल कमाई
+                totalEarn: taskEarn + referEarn,
                 totalWithdraw: userData.totalWithdraw || 0,
                 taskEarn: taskEarn,
-                referEarn: referEarn // अब यहाँ रियल नेटवर्क इनकम दिखेगी
+                referEarn: referEarn 
             },
             network: {
                 l1: l1Count,
