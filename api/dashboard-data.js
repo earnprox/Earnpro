@@ -1,55 +1,43 @@
 const { db } = require('./_firebase');
 
 module.exports = async function handler(req, res) {
-    // सिर्फ POST रिक्वेस्ट अलाउ करेंगे (Security Layer 1)
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
     const { phone, token } = req.body;
-
     if (!phone || !token) return res.status(400).json({ error: 'Missing Credentials' });
 
     try {
-        // 1. यूज़र को ढूँढो (Security Layer 2)
         const userSnap = await db.collection('users').where('phone', '==', phone).get();
         if (userSnap.empty) return res.status(404).json({ error: 'User not found' });
 
         const userDoc = userSnap.docs[0];
         const userData = userDoc.data();
 
-        // 2. टोकन मैच करो (Security Layer 3 - Anti Hacker Check)
         if (userData.sessionToken !== token) {
             return res.status(401).json({ error: 'Invalid Session. Please login again.' });
         }
 
-        // 3. 3-Level Network Calculation (Smart Query - No Full DB Download)
         const myCode = userData.ownReferCode;
         let l1Count = 0, l2Count = 0, l3Count = 0;
-        let l1Codes = [];
+        let l1Codes = [], l2Codes = [];
 
         if (myCode) {
-            // Level 1 ढूँढो
+            // Level 1
             const l1Snap = await db.collection('users').where('referCodeUsed', '==', myCode).get();
             l1Count = l1Snap.size;
-            l1Snap.forEach(doc => {
-                const d = doc.data();
-                if (d.ownReferCode) l1Codes.push(d.ownReferCode);
-            });
+            l1Snap.forEach(doc => { if (doc.data().ownReferCode) l1Codes.push(doc.data().ownReferCode); });
 
-            // Level 2 ढूँढो (Firestore में एक बार में 10 ही चेक कर सकते हैं, इसलिए chunk बनाया है)
-            let l2Codes = [];
+            // Level 2
             if (l1Codes.length > 0) {
                 for (let i = 0; i < l1Codes.length; i += 10) {
                     const chunk = l1Codes.slice(i, i + 10);
                     const l2Snap = await db.collection('users').where('referCodeUsed', 'in', chunk).get();
                     l2Count += l2Snap.size;
-                    l2Snap.forEach(doc => {
-                        const d = doc.data();
-                        if (d.ownReferCode) l2Codes.push(d.ownReferCode);
-                    });
+                    l2Snap.forEach(doc => { if (doc.data().ownReferCode) l2Codes.push(doc.data().ownReferCode); });
                 }
             }
 
-            // Level 3 ढूँढो
+            // Level 3
             if (l2Codes.length > 0) {
                 for (let i = 0; i < l2Codes.length; i += 10) {
                     const chunk = l2Codes.slice(i, i + 10);
@@ -59,7 +47,27 @@ module.exports = async function handler(req, res) {
             }
         }
 
-        // 4. Secure Data Packing (सिर्फ वही भेजो जो UI को चाहिए, PIN या सीक्रेट्स नहीं)
+        // 🔥 FIX: Live Task & Referral Earning Calculation
+        let taskEarn = 0;
+        let referEarn = 0;
+
+        try {
+            const tasksSnap = await db.collection('task_submissions').where('status', 'in', ['Approved', 'Completed']).get();
+            tasksSnap.forEach(doc => {
+                const t = doc.data();
+                // खुद की कमाई
+                if (t.userPhone === phone) taskEarn += (t.gigReward || 0);
+                
+                // नेटवर्क कमीशन (10%, 6%, 3%)
+                if (t.referrerCode === myCode) referEarn += (t.gigReward * 0.10);
+                else if (l1Codes.includes(t.referrerCode)) referEarn += (t.gigReward * 0.06);
+                else if (l2Codes.includes(t.referrerCode)) referEarn += (t.gigReward * 0.03);
+            });
+        } catch (err) {
+            console.error("Task fetch error:", err);
+        }
+
+        // 4. Secure Data Packing
         const responseData = {
             user: {
                 name: userData.name || "User",
@@ -73,10 +81,10 @@ module.exports = async function handler(req, res) {
                 upi: userData.upi || ""
             },
             stats: {
-                totalEarn: userData.totalEarn || 0,
+                totalEarn: taskEarn + referEarn, // कुल कमाई
                 totalWithdraw: userData.totalWithdraw || 0,
-                taskEarn: userData.taskEarn || 0,
-                referEarn: userData.referEarn || 0
+                taskEarn: taskEarn,
+                referEarn: referEarn // अब यहाँ रियल नेटवर्क इनकम दिखेगी
             },
             network: {
                 l1: l1Count,
