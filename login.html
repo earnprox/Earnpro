@@ -130,14 +130,12 @@
             </div>
 
             <div class="mb-4 border-t-2 border-slate-100 pt-4 relative">
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">Enter 6-Digit SMS OTP</label>
-                <div class="flex gap-1 sm:gap-2 justify-center" id="otp-container">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">Enter 4-Digit SMS OTP</label>
+                <div class="flex gap-2 sm:gap-3 justify-center" id="otp-container">
                     <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event, 'setup')">
                     <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event, 'setup')">
                     <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event, 'setup')">
-                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp4" onkeyup="window.moveToNext(this, 'otp5', event, 'setup')">
-                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp5" onkeyup="window.moveToNext(this, 'otp6', event, 'setup')">
-                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp6" onkeyup="window.moveToNext(this, null, event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp4" onkeyup="window.moveToNext(this, null, event, 'setup')">
                 </div>
                 
                 <p id="otp-timer-container" class="text-center text-xs font-bold text-slate-400 mt-4 hidden">
@@ -177,13 +175,14 @@
                 setTimeout(() => document.getElementById('mobile-input').focus(), 300);
             }, 1200); 
 
+            // 🔥 FIX: 4-Digit Paste Logic 🔥
             document.getElementById("otp-container").addEventListener("paste", (e) => {
                 e.preventDefault();
                 let paste = (e.clipboardData || window.clipboardData).getData('text').trim();
-                if(/^\d{6}$/.test(paste)){
+                if(/^\d{4}$/.test(paste)){
                     paste.split('').forEach((num, i)=>{
                         const otpBox = document.getElementById(`otp${i+1}`);
-                        if(otpBox) { otpBox.value = num; window.moveToNext(otpBox, i < 5 ? `otp${i+2}` : null, {key: ''}, 'setup'); }
+                        if(otpBox) { otpBox.value = num; window.moveToNext(otpBox, i < 3 ? `otp${i+2}` : null, {key: ''}, 'setup'); }
                     });
                 }
             });
@@ -225,9 +224,10 @@
                 const fullLoginPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
                 if(fullLoginPin.length === 4) window.loginWithPIN();
             } else if (type === 'setup' && current.value.length === 1) {
+                // 🔥 FIX: 4-Digit Auto-Submit Check 🔥
                 const fullSetupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
-                const fullOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
-                if(fullSetupPin.length === 4 && fullOtp.length === 6) window.verifyOTPAndSave();
+                const fullOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
+                if(fullSetupPin.length === 4 && fullOtp.length === 4) window.verifyOTPAndSave();
             }
         }
 
@@ -249,7 +249,6 @@
             else window.showToast("❌ " + (data.error || "Server Error. Please try again."));
         }
 
-        // 🟢 API: Check User Status
         window.checkUserAndProceed = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
@@ -280,7 +279,6 @@
             } catch(error) { window.showToast("❌ Network Error!"); showLoader(false); } 
         }
 
-        // 🟢 API: Request OTP
         async function trigger2FactorOTP(phone, fromStep) {
             document.getElementById('display-number-otp').innerText = "+91 " + phone;
             try {
@@ -311,7 +309,6 @@
             showLoader(true); await trigger2FactorOTP(document.getElementById('mobile-input').value.trim(), 'step-pin');
         }
 
-        // 🟢 API: Login with PIN
         window.loginWithPIN = async function() {
             triggerHaptic();
             const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
@@ -341,11 +338,12 @@
             } catch (e) { window.showToast("❌ Connection Error."); showLoader(false); } 
         }
 
-        // 🟢 API: Complete Setup
         window.verifyOTPAndSave = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
-            const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
+            
+            // 🔥 FIX: Check only 4 values 🔥
+            const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
             const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
             
             let finalName = "", referCode = "None";
@@ -357,7 +355,7 @@
             }
 
             if(setupPin.length < 4) return window.showToast("⚠️ Set a complete 4-Digit PIN.");
-            if(enteredOtp.length < 6) return window.showToast("⚠️ Enter the complete 6-digit OTP.");
+            if(enteredOtp.length < 4) return window.showToast("⚠️ Enter the complete 4-digit OTP.");
 
             showLoader(true);
             try {
