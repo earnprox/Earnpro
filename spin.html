@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | Spin & Win</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        const userToken = sessionStorage.getItem("earnprox_secure_token");
+        if (!userPhone || !userToken) {
+            window.location.replace("login.html");
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* 🎡 Wheel Styling */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(236, 72, 153, 0.3), inset 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); /* Smooth Spin Animation */
+            background: conic-gradient(
+                #F43F5E 0deg 60deg,   /* ₹1 */
+                #F59E0B 60deg 120deg, /* ₹2 */
+                #3B82F6 120deg 180deg,/* ₹3 */
+                #64748B 180deg 240deg,/* Better Luck */
+                #10B981 240deg 300deg,/* ₹5 */
+                #8B5CF6 300deg 360deg /* ₹10 Jackpot */
+            );
+        }
+
+        /* Lines inside the wheel */
+        .wheel-lines {
+            position: absolute; inset: 0; border-radius: 50%;
+            background: 
+                linear-gradient(0deg, transparent 49.5%, rgba(255,255,255,0.3) 49.5%, rgba(255,255,255,0.3) 50.5%, transparent 50.5%),
+                linear-gradient(60deg, transparent 49.5%, rgba(255,255,255,0.3) 49.5%, rgba(255,255,255,0.3) 50.5%, transparent 50.5%),
+                linear-gradient(120deg, transparent 49.5%, rgba(255,255,255,0.3) 49.5%, rgba(255,255,255,0.3) 50.5%, transparent 50.5%);
+        }
+
+        /* Text placements on the wheel slices */
+        .slice-text {
+            position: absolute;
+            width: 50%; height: 20px;
+            top: 50%; left: 50%;
+            transform-origin: 0% 50%;
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-right: 25px;
+            font-weight: 900; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            font-size: 18px;
+        }
+
+        .t-1 { transform: translateY(-50%) rotate(30deg); }   /* ₹1 */
+        .t-2 { transform: translateY(-50%) rotate(90deg); }   /* ₹2 */
+        .t-3 { transform: translateY(-50%) rotate(150deg); }  /* ₹3 */
+        .t-4 { transform: translateY(-50%) rotate(210deg); font-size: 14px;} /* Oops! */
+        .t-5 { transform: translateY(-50%) rotate(270deg); }  /* ₹5 */
+        .t-6 { transform: translateY(-50%) rotate(330deg); color: #FFD700;} /* ₹10 */
+
+        /* Center Dot */
+        .wheel-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px;
+            background: #0F172A;
+            border: 4px solid white;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* The Pointer Triangle at the top */
+        .pointer {
+            position: absolute;
+            top: -20px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid white;
+            z-index: 20;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col relative overflow-hidden selection:bg-pink-500/30">
+
+    <div class="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-pink-600/20 via-slate-900 to-black"></div>
+
+    <div class="relative z-10 flex items-center justify-between p-6">
+        <button onclick="window.location.href='dashboard.html'" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md active:scale-90 transition-transform">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <h1 class="text-lg font-black tracking-widest uppercase">Daily Spin</h1>
+        <div class="w-10 h-10"></div> </div>
+
+    <div class="relative z-10 flex-1 flex flex-col items-center justify-center p-6 pb-20">
+        
+        <div class="mb-10 text-center">
+            <h2 class="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-yellow-400">Spin & Win Daily!</h2>
+            <p class="text-slate-400 text-sm font-bold">Watch 1 Ad to unlock your spin. Win up to ₹10 instantly.</p>
+        </div>
+
+        <div class="relative mb-12">
+            <div class="pointer"></div>
+            <div class="wheel-center"></div>
+            
+            <div id="wheel" class="wheel-container">
+                <div class="wheel-lines"></div>
+                <div class="slice-text t-1">₹1</div>
+                <div class="slice-text t-2">₹2</div>
+                <div class="slice-text t-3">₹3</div>
+                <div class="slice-text t-4">Oops!</div>
+                <div class="slice-text t-5">₹5</div>
+                <div class="slice-text t-6">₹10</div>
+            </div>
+        </div>
+
+        <button id="spin-btn" onclick="startAdAndSpin()" class="w-full max-w-[280px] bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-900 font-black py-4.5 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] text-lg active:scale-95 transition-all flex items-center justify-center gap-2 group">
+            <svg class="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+            Watch Ad to Spin
+        </button>
+
+    </div>
+
+    <div id="ad-overlay" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-slate-800 border-t-pink-500 rounded-full animate-spin mx-auto mb-6"></div>
+            <h3 class="text-xl font-black text-white mb-2">Video Ad Playing...</h3>
+            <p class="text-slate-400 text-sm font-bold">Please wait <span id="ad-timer" class="text-pink-500">3</span>s</p>
+        </div>
+    </div>
+
+    <div id="result-overlay" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-5">
+        <div class="bg-white rounded-[2rem] p-8 w-full max-w-[320px] text-center shadow-2xl transform scale-90 transition-transform duration-300" id="result-card">
+            <div id="result-icon" class="text-6xl mb-4">🎉</div>
+            <h3 id="result-title" class="text-2xl font-black text-slate-900 mb-2">Congratulations!</h3>
+            <p id="result-msg" class="text-slate-500 font-bold mb-6">You won ₹5 in your vault.</p>
+            <button onclick="window.location.href='dashboard.html'" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl active:scale-95 transition-transform">Go to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        let isSpinning = false;
+
+        // Backend Se Prize aayega toh kis angle pe rokna hai?
+        // Mapping: Index 0 = ₹1, 1 = ₹2, 2 = ₹3, 3 = Loss, 4 = ₹5, 5 = ₹10
+        const prizeMap = {
+            1: { index: 0, title: "Small Win!", icon: "👍" },
+            2: { index: 1, title: "Nice Job!", icon: "✌️" },
+            3: { index: 2, title: "Great Win!", icon: "🎉" },
+            0: { index: 3, title: "Better Luck!", icon: "😢", msg: "Oops! You missed it today." },
+            5: { index: 4, title: "Awesome!", icon: "🔥" },
+            10:{ index: 5, title: "JACKPOT!", icon: "🎰" }
+        };
+
+        async function startAdAndSpin() {
+            if(isSpinning) return;
+            isSpinning = true;
+            
+            // 1. Show Fake Ad (3 seconds) - Real App me yahan AdMob Network load hoga
+            const adOverlay = document.getElementById("ad-overlay");
+            adOverlay.classList.remove("pointer-events-none", "opacity-0");
+            
+            let timeLeft = 3;
+            const timerEl = document.getElementById("ad-timer");
+            timerEl.innerText = timeLeft;
+            
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(countdown);
+                    adOverlay.classList.add("pointer-events-none", "opacity-0");
+                    executeRealSpin(); // Call API After Ad
+                }
+            }, 1000);
+        }
+
+        async function executeRealSpin() {
+            const spinBtn = document.getElementById("spin-btn");
+            spinBtn.innerHTML = "Processing...";
+            spinBtn.classList.add("opacity-50");
+
+            try {
+                // 2. Call Secure Backend API
+                const response = await fetch('/api/spin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: userPhone, token: userToken })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const rewardAmt = data.reward;
+                    spinTheWheel(rewardAmt);
+                } else {
+                    alert(data.error); // E.g., "Already spinned today"
+                    window.location.href = "dashboard.html";
+                }
+            } catch (error) {
+                alert("Network Error! Try again.");
+                isSpinning = false;
+                spinBtn.innerHTML = "Watch Ad to Spin";
+                spinBtn.classList.remove("opacity-50");
+            }
+        }
+
+        function spinTheWheel(rewardAmt) {
+            const wheel = document.getElementById("wheel");
+            const prizeInfo = prizeMap[rewardAmt];
+            
+            // Calculation: 6 segments = 60 degrees each.
+            // Formula to land on correct slice (with 5 full rotations extra for effect)
+            // Extra random degree added so pointer doesn't land exactly on the line
+            const sliceDegree = 60;
+            const randomOffset = Math.floor(Math.random() * 40) + 10; // 10 to 50
+            
+            // 360 - (index * 60) aligns the slice to the top pointer
+            const targetDegree = (5 * 360) + (360 - (prizeInfo.index * sliceDegree)) - sliceDegree/2 + randomOffset;
+
+            // Start Rotation CSS Animation
+            wheel.style.transform = `rotate(${targetDegree}deg)`;
+
+            // Wait 4 Seconds for wheel to stop, then show popup
+            setTimeout(() => {
+                showResult(rewardAmt, prizeInfo);
+            }, 4200);
+        }
+
+        function showResult(amt, info) {
+            const overlay = document.getElementById("result-overlay");
+            const card = document.getElementById("result-card");
+            
+            document.getElementById("result-icon").innerText = info.icon;
+            document.getElementById("result-title").innerText = info.title;
+            
+            if(amt > 0) {
+                document.getElementById("result-msg").innerText = `You won ₹${amt} in your vault!`;
+            } else {
+                document.getElementById("result-msg").innerText = info.msg;
+            }
+
+            overlay.classList.remove("pointer-events-none", "opacity-0");
+            setTimeout(() => card.classList.remove("scale-90"), 50);
+        }
+    </script>
+</body>
+</html>
