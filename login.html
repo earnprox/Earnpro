@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,48 +13,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; overflow-x: hidden; }
-        
         .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05); }
-        
-        /* Step Transitions */
         .form-step { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: absolute; top: 0; left: 0; padding: 24px; visibility: hidden; }
         .step-out-left { transform: translateX(-120%); opacity: 0; pointer-events: none; visibility: hidden; }
         .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; visibility: hidden; }
         .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; visibility: visible; }
         
-        /* Input Boxes */
-        .otp-box, .pin-box { 
-            width: 45px; height: 55px; text-align: center; font-size: 24px; font-weight: 800; 
-            border-radius: 12px; border: 2px solid #E2E8F0; background: #F1F5F9; outline: none; transition: all 0.2s; color: #0F172A;
-        }
+        .otp-box, .pin-box { width: 45px; height: 55px; text-align: center; font-size: 24px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F1F5F9; outline: none; transition: all 0.2s; color: #0F172A; }
         .otp-box:focus, .pin-box:focus { border-color: #FACC15; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.15); }
+        @media (max-width: 380px) { .otp-box { width: 38px; height: 50px; font-size: 20px; } .pin-box { width: 40px; height: 50px; font-size: 20px; } }
         
-        @media (max-width: 380px) { 
-            .otp-box { width: 38px; height: 50px; font-size: 20px; }
-            .pin-box { width: 40px; height: 50px; font-size: 20px; }
-        }
-        
-        /* Toast Notification */
-        #toast { 
-            visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 99px; padding: 12px 24px; 
-            position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); opacity: 0; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-        }
+        #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 99px; padding: 12px 24px; position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
-        
-        /* Overlay Loader */
-        #global-loader { 
-            position: fixed; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px);
-            z-index: 9998; display: none; flex-direction: column; align-items: center; justify-content: center; 
-        }
-
-        /* Splash Screen */
+        #global-loader { position: fixed; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); z-index: 9998; display: none; flex-direction: column; align-items: center; justify-content: center; }
         #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #F8FAFC; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; }
         #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .pulse-logo { animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
-
     <script>
         const storedPhone = localStorage.getItem("earnprox_user_phone");
         const storedToken = sessionStorage.getItem("earnprox_secure_token");
@@ -65,16 +41,11 @@
 
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] bg-yellow-400 rounded-full blur-[100px] sm:blur-[120px] opacity-15 pointer-events-none -z-10"></div>
 
-    <!-- Global Loader -->
     <div id="global-loader">
-        <svg class="animate-spin h-10 w-10 text-yellow-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <svg class="animate-spin h-10 w-10 text-yellow-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <p class="text-sm font-bold text-slate-700 animate-pulse">Securing Connection...</p>
     </div>
 
-    <!-- Splash Screen -->
     <div id="splash-screen">
         <div class="relative w-56 h-16 mx-auto overflow-hidden pulse-logo mb-3">
             <img src="logo.png" alt="EarnproX Logo" onerror="this.style.display='none'; document.getElementById('splash-text').classList.remove('hidden');" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[250%] max-w-none">
@@ -87,7 +58,6 @@
         </div>
     </div>
 
-    <!-- Logo & Tagline -->
     <div class="text-center mb-8 mt-2 relative z-10">
         <a href="index.html" class="block relative w-48 h-12 mx-auto overflow-hidden mb-2 transition-transform active:scale-95">
             <img src="logo.png" alt="EarnproX Logo" onerror="this.style.display='none'; document.getElementById('header-text').classList.remove('hidden');" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[250%] max-w-none drop-shadow-sm">
@@ -96,14 +66,11 @@
         <p class="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Complete digital tasks securely.</p>
     </div>
 
-    <!-- Main Card -->
     <div class="premium-card rounded-[2rem] p-6 sm:p-8 w-full max-w-md relative overflow-hidden min-h-[460px] flex flex-col justify-start z-10 border-t-4 border-t-yellow-400">
         
-        <!-- STEP 1: MOBILE NUMBER -->
         <div id="step-1" class="form-step step-active">
             <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Let's get started</h2>
             <p class="text-sm text-slate-500 mb-8 font-medium">Enter your mobile number to securely login or create an account.</p>
-            
             <div class="mb-6">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Mobile Number</label>
                 <div class="relative flex items-center bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-1 focus-within:border-yellow-400 focus-within:ring-4 focus-within:ring-yellow-400/20 transition duration-300 shadow-sm">
@@ -111,22 +78,18 @@
                     <input type="tel" inputmode="numeric" pattern="[0-9]*" id="mobile-input" maxlength="10" placeholder="98765 43210" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onkeyup="if(this.value.length === 10) window.checkUserAndProceed()" class="w-full text-xl font-black text-slate-800 bg-transparent outline-none py-3 tracking-wider placeholder:font-semibold placeholder:text-slate-300">
                 </div>
             </div>
-
             <button onclick="window.checkUserAndProceed()" id="send-otp-btn" class="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black py-4 rounded-xl shadow-[0_8px_20px_rgba(250,204,21,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2 mt-auto focus:outline-none focus:ring-4 focus:ring-yellow-400/50">
                 Continue <span class="text-xl">→</span>
             </button>
-            <p class="text-[10px] text-center text-slate-400 mt-4 font-medium">By continuing, you agree to our Terms & Privacy Policy.</p>
         </div>
 
-        <!-- STEP 2: PIN LOGIN -->
         <div id="step-pin" class="form-step step-in-right">
             <button onclick="window.goBack('step-pin', 'step-1')" class="text-slate-400 hover:text-slate-800 mb-6 transition flex items-center gap-1 -ml-2 p-2 rounded-lg hover:bg-slate-50 focus:outline-none">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span class="text-xs font-bold uppercase tracking-wider">Back</span>
             </button>
             <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Welcome Back!</h2>
-            <p class="text-sm text-slate-500 mb-8 font-medium">Enter your 4-digit security PIN for <b id="display-number-pin" class="text-slate-800 tracking-wider"></b></p>
-            
+            <p class="text-sm text-slate-500 mb-8 font-medium">Enter your 4-digit PIN for <b id="display-number-pin" class="text-slate-800 tracking-wider"></b></p>
             <div class="mb-6">
                 <div class="flex gap-3 justify-center">
                     <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" id="l-pin1" onkeyup="window.moveToNext(this, 'l-pin2', event, 'login')">
@@ -135,19 +98,16 @@
                     <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" id="l-pin4" onkeyup="window.moveToNext(this, null, event, 'login')">
                 </div>
             </div>
-
             <div class="text-center mb-8">
-                <button id="forgot-pin-btn" onclick="window.triggerForgotPin()" class="text-xs font-bold text-yellow-600 hover:text-yellow-700 hover:underline focus:outline-none transition-colors">Forgot PIN? Login via OTP</button>
+                <button onclick="window.triggerForgotPin()" class="text-xs font-bold text-yellow-600 hover:underline">Forgot PIN? Login via OTP</button>
             </div>
-
-            <button onclick="window.loginWithPIN()" id="pin-login-btn" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2 focus:outline-none focus:ring-4 focus:ring-slate-900/30">
+            <button onclick="window.loginWithPIN()" id="pin-login-btn" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
                 Secure Login
             </button>
         </div>
 
-        <!-- STEP 3: OTP & SETUP -->
         <div id="step-otp" class="form-step step-in-right">
-            <button id="back-btn-otp" onclick="window.goBack('step-otp', 'step-1')" class="text-slate-400 hover:text-slate-800 mb-4 transition flex items-center gap-1 -ml-2 p-2 rounded-lg hover:bg-slate-50 focus:outline-none">
+            <button onclick="window.goBack('step-otp', 'step-1')" class="text-slate-400 hover:text-slate-800 mb-4 transition flex items-center gap-1 -ml-2 p-2 rounded-lg hover:bg-slate-50">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span class="text-xs font-bold uppercase tracking-wider">Back</span>
             </button>
@@ -155,29 +115,29 @@
             <p class="text-xs sm:text-sm text-slate-500 mb-4 font-medium">OTP sent to <b id="display-number-otp" class="text-slate-800 tracking-wider"></b></p>
             
             <div id="new-user-fields" class="mb-4">
-                <input type="text" id="name-input" placeholder="What's your full name?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-yellow-400 focus:bg-white focus:ring-4 focus:ring-yellow-400/20 transition mb-3">
-                <input type="text" id="refer-input" placeholder="Invite Code (Optional)" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-400/20 transition uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal">
+                <input type="text" id="name-input" placeholder="What's your full name?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-yellow-400 transition mb-3">
+                <input type="text" id="refer-input" placeholder="Invite Code (Optional)" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-emerald-400 transition uppercase tracking-widest">
             </div>
 
             <div class="mb-4">
                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center" id="pin-setup-label">Set a New 4-Digit PIN</label>
                 <div class="flex gap-3 justify-center">
-                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box !border-yellow-300 focus:!border-yellow-500" id="s-pin1" onkeyup="window.moveToNext(this, 's-pin2', event, 'setup')">
-                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box !border-yellow-300 focus:!border-yellow-500" id="s-pin2" onkeyup="window.moveToNext(this, 's-pin3', event, 'setup')">
-                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box !border-yellow-300 focus:!border-yellow-500" id="s-pin3" onkeyup="window.moveToNext(this, 's-pin4', event, 'setup')">
-                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box !border-yellow-300 focus:!border-yellow-500" id="s-pin4" onkeyup="window.moveToNext(this, 'otp1', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin1" onkeyup="window.moveToNext(this, 's-pin2', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin2" onkeyup="window.moveToNext(this, 's-pin3', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin3" onkeyup="window.moveToNext(this, 's-pin4', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin4" onkeyup="window.moveToNext(this, 'otp1', event, 'setup')">
                 </div>
             </div>
 
             <div class="mb-4 border-t-2 border-slate-100 pt-4 relative">
                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">Enter 6-Digit SMS OTP</label>
                 <div class="flex gap-1 sm:gap-2 justify-center" id="otp-container">
-                    <input type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event, 'setup')">
-                    <input type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event, 'setup')">
-                    <input type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event, 'setup')">
-                    <input type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp4" onkeyup="window.moveToNext(this, 'otp5', event, 'setup')">
-                    <input type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp5" onkeyup="window.moveToNext(this, 'otp6', event, 'setup')">
-                    <input type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp6" onkeyup="window.moveToNext(this, null, event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp4" onkeyup="window.moveToNext(this, 'otp5', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp5" onkeyup="window.moveToNext(this, 'otp6', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp6" onkeyup="window.moveToNext(this, null, event, 'setup')">
                 </div>
                 
                 <p id="otp-timer-container" class="text-center text-xs font-bold text-slate-400 mt-4 hidden">
@@ -188,55 +148,23 @@
                 </button>
             </div>
 
-            <button onclick="window.verifyOTPAndSave()" id="verify-btn" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2 focus:outline-none focus:ring-4 focus:ring-slate-900/30">
+            <button onclick="window.verifyOTPAndSave()" id="verify-btn" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
                 Complete Setup
             </button>
         </div>
     </div>
-
-    <!-- Footer Note -->
-    <div class="text-center mt-8 mb-4 w-full max-w-md relative z-10 flex items-center justify-center gap-2 text-slate-400">
-        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-        <span class="text-xs font-bold uppercase tracking-widest">End-to-End Encrypted</span>
-    </div>
     
     <div id="toast">Message Here</div>
 
-    <!-- Firebase Script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
-          authDomain: "earnproxuc.firebaseapp.com",
-          projectId: "earnproxuc",
-          storageBucket: "earnproxuc.firebasestorage.app",
-          messagingSenderId: "411733884378",
-          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
+    <!-- 🔥 100% VERCEL API DRIVEN LOGIC (NO FIREBASE SDK HERE) 🔥 -->
+    <script>
         let isNewUser = true; 
         let isForgotPin = false;
-        let existingUserData = null; 
-        let existingUserDocId = null;
-        let otpInterval = null;
-        const REFER_BONUS_AMOUNT = 5; 
         window.currentOtpSessionId = null; 
+        let otpInterval = null;
 
-        const spinnerSVG = `<svg class="animate-spin h-6 w-6 inline-block text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+        function triggerHaptic() { if ("vibrate" in navigator) navigator.vibrate(50); }
 
-        // 🔐 Haptic Feedback Helper
-        function triggerHaptic() {
-            if ("vibrate" in navigator) {
-                navigator.vibrate(50);
-            }
-        }
-
-        // 🔐 Client-side Hashing
         async function hashPin(pin) {
             const msgBuffer = new TextEncoder().encode(pin);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -249,87 +177,51 @@
                 if(splash) splash.classList.add('hidden'); 
                 setTimeout(() => document.getElementById('mobile-input').focus(), 300);
             }, 1200); 
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            if(refCode) {
-                const rInput = document.getElementById('refer-input');
-                if(rInput) {
-                    rInput.value = refCode.toUpperCase();
-                    rInput.classList.add('border-emerald-400', 'bg-emerald-50');
-                }
-            }
 
-            // OTP Paste Event
             document.getElementById("otp-container").addEventListener("paste", (e) => {
                 e.preventDefault();
                 let paste = (e.clipboardData || window.clipboardData).getData('text').trim();
                 if(/^\d{6}$/.test(paste)){
                     paste.split('').forEach((num, i)=>{
                         const otpBox = document.getElementById(`otp${i+1}`);
-                        if(otpBox) {
-                            otpBox.value = num;
-                            window.moveToNext(otpBox, i < 5 ? `otp${i+2}` : null, {key: ''}, 'setup');
-                        }
+                        if(otpBox) { otpBox.value = num; window.moveToNext(otpBox, i < 5 ? `otp${i+2}` : null, {key: ''}, 'setup'); }
                     });
-                } else {
-                    window.showToast("⚠️ Invalid OTP format copied.");
                 }
             });
         });
 
-        function showLoader(show) {
-            document.getElementById('global-loader').style.display = show ? 'flex' : 'none';
-        }
-
+        function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
         window.showToast = function(msg) { 
-            const t = document.getElementById("toast"); 
-            t.innerText = msg; t.classList.add("show"); 
-            triggerHaptic();
-            setTimeout(()=>t.classList.remove("show"), 3500); 
+            const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
+            triggerHaptic(); setTimeout(()=>t.classList.remove("show"), 3500); 
         }
         
         function startOtpTimer() {
             let timer = 30;
-            const timerContainer = document.getElementById('otp-timer-container');
-            const resendBtn = document.getElementById('resend-otp-btn');
-            const countSpan = document.getElementById('otp-timer-count');
-            
-            resendBtn.classList.add('hidden');
-            resendBtn.disabled = true; 
-            timerContainer.classList.remove('hidden');
-            countSpan.innerText = timer;
+            document.getElementById('resend-otp-btn').classList.add('hidden');
+            document.getElementById('otp-timer-container').classList.remove('hidden');
+            document.getElementById('otp-timer-count').innerText = timer;
             
             clearInterval(otpInterval);
             otpInterval = setInterval(() => {
-                timer--;
-                countSpan.innerText = timer;
+                timer--; document.getElementById('otp-timer-count').innerText = timer;
                 if(timer <= 0) {
                     clearInterval(otpInterval);
-                    timerContainer.classList.add('hidden');
-                    resendBtn.classList.remove('hidden');
-                    resendBtn.disabled = false;
+                    document.getElementById('otp-timer-container').classList.add('hidden');
+                    document.getElementById('resend-otp-btn').classList.remove('hidden');
                 }
             }, 1000);
         }
 
         window.moveToNext = function(current, nextId, event, type) { 
             current.value = current.value.replace(/[^0-9]/g, '');
-
-            if (current.value.length === 1 && nextId && document.getElementById(nextId)) {
-                document.getElementById(nextId).focus(); 
-            } 
-            
+            if (current.value.length === 1 && nextId && document.getElementById(nextId)) document.getElementById(nextId).focus(); 
             if (event.key === "Backspace" && current.value === "") { 
                 const prevId = current.id.replace(/\d+$/, (num) => parseInt(num) - 1); 
                 const prevElem = document.getElementById(prevId);
-                if (current.id === "otp1" && document.getElementById('s-pin4')) {
-                    document.getElementById('s-pin4').focus();
-                } else if(prevElem) {
-                    prevElem.focus(); 
-                } 
+                if (current.id === "otp1" && document.getElementById('s-pin4')) document.getElementById('s-pin4').focus();
+                else if(prevElem) prevElem.focus(); 
             } 
-
             if(type === 'login' && current.value.length === 1) {
                 const fullLoginPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
                 if(fullLoginPin.length === 4) window.loginWithPIN();
@@ -341,119 +233,86 @@
         }
 
         function switchStep(fromId, toId) {
-            document.getElementById(fromId).classList.remove('step-active'); 
-            document.getElementById(fromId).classList.add('step-out-left');
-            document.getElementById(toId).classList.remove('step-in-right'); 
-            document.getElementById(toId).classList.add('step-active');
+            document.getElementById(fromId).classList.remove('step-active'); document.getElementById(fromId).classList.add('step-out-left');
+            document.getElementById(toId).classList.remove('step-in-right'); document.getElementById(toId).classList.add('step-active');
         }
 
         window.goBack = function(currentStepId, targetStepId) {
             triggerHaptic();
-            document.getElementById(currentStepId).classList.remove('step-active'); 
-            document.getElementById(currentStepId).classList.add('step-in-right');
-            document.getElementById(targetStepId).classList.remove('step-out-left'); 
-            document.getElementById(targetStepId).classList.add('step-active');
-            
+            document.getElementById(currentStepId).classList.remove('step-active'); document.getElementById(currentStepId).classList.add('step-in-right');
+            document.getElementById(targetStepId).classList.remove('step-out-left'); document.getElementById(targetStepId).classList.add('step-active');
             if(targetStepId === 'step-1') isForgotPin = false; 
-            const inputs = document.querySelectorAll(`#${currentStepId} input`);
-            inputs.forEach(input => input.value = '');
+            document.querySelectorAll(`#${currentStepId} input`).forEach(input => input.value = '');
         }
 
-        // 🟢 RESTORED: Frontend Firebase Call for UI Flow Testing
+        function handleApiError(response, data) {
+            if(response.status === 429) window.showToast("⏳ Too many attempts. Try again later.");
+            else window.showToast("❌ " + (data.error || "Server Error. Please try again."));
+        }
+
+        // 🟢 API: Check User Status
         window.checkUserAndProceed = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
             if(phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) return window.showToast("⚠️ Enter a valid 10-digit Indian mobile number.");
             
             showLoader(true);
-
             try {
-                // Using Frontend Firebase directly for testing UI flow
-                const q = query(collection(db, "users"), where("phone", "==", phone));
-                const snap = await getDocs(q);
+                const response = await fetch('/api/check-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
                 
-                if (!snap.empty) {
-                    existingUserDocId = snap.docs[0].id;
-                    existingUserData = snap.docs[0].data();
-                    
-                    if(existingUserData.status === "blocked") {
-                        showLoader(false);
-                        return window.showToast("🚫 Account Suspended.");
-                    }
+                const data = await response.json();
+                if (response.ok && data.exists) {
+                    if(data.status === "blocked") { showLoader(false); return window.showToast("🚫 Account Suspended."); }
                     isNewUser = false;
                     document.getElementById('display-number-pin').innerText = "+91 " + phone;
                     switchStep('step-1', 'step-pin');
                     setTimeout(() => { document.getElementById('l-pin1').focus(); showLoader(false); }, 400);
-                } else {
+                } else if(response.ok && !data.exists) {
                     isNewUser = true;
                     document.getElementById('new-user-fields').style.display = 'block';
                     document.getElementById('otp-heading').innerText = "Register Account";
                     document.getElementById('back-btn-otp').onclick = () => window.goBack('step-otp', 'step-1');
                     await trigger2FactorOTP(phone, 'step-1'); 
-                }
-            } catch(error) { 
-                console.error(error);
-                window.showToast("❌ Network Error!");
-                showLoader(false);
-            } 
+                } else { handleApiError(response, data); showLoader(false); }
+            } catch(error) { window.showToast("❌ Network Error!"); showLoader(false); } 
         }
 
-        // 🟢 API CALL: Request OTP
+        // 🟢 API: Request OTP
         async function trigger2FactorOTP(phone, fromStep) {
             document.getElementById('display-number-otp').innerText = "+91 " + phone;
-
             try {
                 const response = await fetch('/api/send-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phoneNumber: phone }) // Updated to match your API expected param
+                    body: JSON.stringify({ phone }) 
                 });
-                
                 const data = await response.json();
-
                 if (response.ok && data.sessionId) {
                     window.currentOtpSessionId = data.sessionId;
                     window.showToast("📲 Security OTP Sent!");
                     switchStep(fromStep, 'step-otp');
                     startOtpTimer(); 
-                    
-                    setTimeout(() => {
-                        if(isNewUser) document.getElementById('name-input').focus();
-                        else document.getElementById('s-pin1').focus();
-                        showLoader(false);
-                    }, 400);
-                } else {
-                    window.showToast("❌ " + (data.error || "Failed to send OTP"));
-                    showLoader(false);
-                }
-            } catch (error) {
-                console.error("OTP Error:", error);
-                window.showToast("❌ Network Connection Failed.");
-                showLoader(false);
-            }
+                    setTimeout(() => { if(isNewUser) document.getElementById('name-input').focus(); else document.getElementById('s-pin1').focus(); showLoader(false); }, 400);
+                } else { handleApiError(response, data); showLoader(false); }
+            } catch (error) { window.showToast("❌ Network Connection Failed."); showLoader(false); }
         }
 
-        window.resendOTP = async function() {
-            triggerHaptic();
-            const phone = document.getElementById('mobile-input').value.trim();
-            showLoader(true);
-            await trigger2FactorOTP(phone, 'step-otp');
-        }
+        window.resendOTP = async function() { triggerHaptic(); showLoader(true); await trigger2FactorOTP(document.getElementById('mobile-input').value.trim(), 'step-otp'); }
 
         window.triggerForgotPin = async function() {
-            triggerHaptic();
-            isForgotPin = true;
+            triggerHaptic(); isForgotPin = true;
             document.getElementById('new-user-fields').style.display = 'none'; 
             document.getElementById('otp-heading').innerText = "Reset PIN";
             document.getElementById('pin-setup-label').innerText = "Create New 4-Digit PIN";
             document.getElementById('back-btn-otp').onclick = () => window.goBack('step-otp', 'step-pin');
-
-            const phone = document.getElementById('mobile-input').value.trim();
-            showLoader(true);
-            await trigger2FactorOTP(phone, 'step-pin');
+            showLoader(true); await trigger2FactorOTP(document.getElementById('mobile-input').value.trim(), 'step-pin');
         }
 
-        // 🟢 RESTORED: Frontend PIN Login Verification
+        // 🟢 API: Login with PIN
         window.loginWithPIN = async function() {
             triggerHaptic();
             const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
@@ -464,38 +323,36 @@
             const hashedInputPin = await hashPin(enteredPin);
 
             try {
-                if(existingUserData.pin && existingUserData.pin === hashedInputPin) {
-                    const newToken = Math.random().toString(36).substring(2, 15) + Date.now().toString(36); // Generate basic token for testing
-                    await updateDoc(doc(db, "users", existingUserDocId), { sessionToken: newToken });
+                const response = await fetch('/api/login-pin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, pinHash: hashedInputPin })
+                });
+                const data = await response.json();
+                if(response.ok && data.token) {
                     localStorage.setItem("earnprox_user_phone", phone);
-                    sessionStorage.setItem("earnprox_secure_token", newToken); 
+                    sessionStorage.setItem("earnprox_secure_token", data.token); 
                     window.location.href = "dashboard.html";
                 } else {
-                    window.showToast("❌ Incorrect PIN entered!");
+                    handleApiError(response, data);
                     document.querySelectorAll('#step-pin .pin-box').forEach(el => el.value = '');
                     document.getElementById('l-pin1').focus();
                     showLoader(false);
                 }
-            } catch (e) {
-                window.showToast("❌ Connection Error.");
-                showLoader(false);
-            } 
+            } catch (e) { window.showToast("❌ Connection Error."); showLoader(false); } 
         }
 
-        // 🟢 RESTORED: Frontend Verify OTP & Save User
+        // 🟢 API: Complete Setup
         window.verifyOTPAndSave = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value + document.getElementById('otp5').value + document.getElementById('otp6').value;
             const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
             
-            let finalName = "";
-            let referCode = "None";
-
+            let finalName = "", referCode = "None";
             if(isNewUser) {
                 finalName = document.getElementById('name-input').value.trim();
                 if(!/^[a-zA-Z .]{3,}$/.test(finalName)) return window.showToast("⚠️ Enter a valid Full Name.");
-                
                 referCode = document.getElementById('refer-input').value.trim().toUpperCase();
                 if(referCode && referCode.length !== 7) referCode = "None";
             }
@@ -504,64 +361,21 @@
             if(enteredOtp.length < 6) return window.showToast("⚠️ Enter the complete 6-digit OTP.");
 
             showLoader(true);
-
             try {
-                // Verify OTP API Call
-                const response = await fetch('/api/verify-otp', {
+                const secureHashedPin = await hashPin(setupPin);
+                const response = await fetch('/api/verify-setup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        sessionId: window.currentOtpSessionId, 
-                        otpEntered: enteredOtp 
-                    })
+                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone, pinHash: secureHashedPin, isNewUser, isForgotPin, name: finalName, referCode })
                 });
 
                 const data = await response.json();
-
-                if (!response.ok) {
-                    window.showToast("❌ " + (data.error || "Invalid or Expired OTP!"));
-                    showLoader(false);
-                    return; 
-                }
-
-                const secureHashedPin = await hashPin(setupPin);
-                const newToken = Math.random().toString(36).substring(2, 15) + Date.now().toString(36); // Basic token for testing
-
-                if(isNewUser) {
-                    const myOwnCode = (finalName.substring(0,3) + phone.substring(6)).toUpperCase();
-
-                    await addDoc(collection(db, "users"), {
-                        phone: phone, 
-                        name: finalName, 
-                        pin: secureHashedPin, 
-                        sessionToken: newToken,
-                        balance: 0, 
-                        ownReferCode: myOwnCode, 
-                        referCodeUsed: referCode,
-                        status: "active", 
-                        timestamp: new Date()
-                    });
-
-                    if(referCode !== "None") {
-                        const refSnap = await getDocs(query(collection(db, "users"), where("ownReferCode", "==", referCode)));
-                        if(!refSnap.empty) {
-                            const rDoc = refSnap.docs[0];
-                            await updateDoc(doc(db, "users", rDoc.id), { balance: (rDoc.data().balance || 0) + REFER_BONUS_AMOUNT });
-                        }
-                    }
-                } else if (isForgotPin) {
-                    await updateDoc(doc(db, "users", existingUserDocId), { pin: secureHashedPin, sessionToken: newToken });
-                }
+                if (!response.ok) { handleApiError(response, data); showLoader(false); return; }
 
                 localStorage.setItem("earnprox_user_phone", phone);
-                sessionStorage.setItem("earnprox_secure_token", newToken); 
+                sessionStorage.setItem("earnprox_secure_token", data.token); 
                 window.location.href = "dashboard.html";
-                
-            } catch (error) {
-                console.error(error);
-                window.showToast("❌ Setup Failed! Network Error.");
-                showLoader(false);
-            }
+            } catch (error) { window.showToast("❌ Setup Failed! Network Error."); showLoader(false); }
         }
     </script>
 </body>
