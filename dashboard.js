@@ -87,7 +87,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function syncDashboard() {
     try {
-        // 🔥 सारा डेटा एक ही सिक्योर API कॉल से आएगा
         const response = await fetch('/api/dashboard-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -98,7 +97,6 @@ async function syncDashboard() {
 
         if (response.ok) {
             updateDashboardUI(data);
-            // Hide Loader
             const loader = document.getElementById("app-loader");
             if(loader) { loader.style.opacity = "0"; setTimeout(() => loader.style.display = "none", 500); }
         } else {
@@ -112,7 +110,6 @@ async function syncDashboard() {
 
 // ================= 3. POPULATE UI WITH REAL DATA =================
 function updateDashboardUI(data) {
-    // Set Globals
     window.currentBalance = data.wallet.balance;
     window.savedUPI = data.kyc.upi;
     window.savedBankName = data.kyc.bankName;
@@ -120,7 +117,6 @@ function updateDashboardUI(data) {
     
     localStorage.setItem("epx_cached_name", data.user.name);
 
-    // Write text safely function
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
     // Header & Home Profile
@@ -157,6 +153,16 @@ function updateDashboardUI(data) {
     setText("badge-l2", data.network.l2);
     setText("badge-l3", data.network.l3);
 
+    // 🔥 FIX: Graph Level Heights (ग्राफ की पीली लाइनें भरेंगी)
+    let maxLvl = Math.max(1, data.network.l1, data.network.l2, data.network.l3);
+    const setHeight = (id, val) => { 
+        const el = document.getElementById(id); 
+        if(el) el.style.height = Math.max(5, (val / maxLvl) * 80) + "%"; 
+    };
+    setHeight("bar-l1", data.network.l1);
+    setHeight("bar-l2", data.network.l2);
+    setHeight("bar-l3", data.network.l3);
+
     // KYC Settings update
     if (window.savedUPI) {
         document.getElementById("bank-name-input").value = window.savedBankName;
@@ -168,8 +174,6 @@ function updateDashboardUI(data) {
 }
 
 // ================= 4. SECURE ACTIONS =================
-
-// KYC SAVE API
 window.saveRealKYC = async function() { 
     const n = document.getElementById("bank-name-input").value.trim();
     const u = document.getElementById("upi-input-box").value.trim();
@@ -186,7 +190,7 @@ window.saveRealKYC = async function() {
         if(response.ok) {
             window.showToast("✅ Details Saved!"); 
             setTimeout(() => window.closeAllSheets(), 1000);
-            syncDashboard(); // refresh data
+            syncDashboard(); 
         } else {
             const data = await response.json();
             window.showToast("❌ " + data.error);
@@ -196,7 +200,6 @@ window.saveRealKYC = async function() {
     }
 }
 
-// WITHDRAWAL API (Secured)
 window.processWithdrawReal = async function() { 
     const amtInput = document.getElementById("withdraw-amount");
     if(!amtInput) return;
@@ -224,7 +227,7 @@ window.processWithdrawReal = async function() {
             window.showToast("🚀 Withdrawal Request Sent!"); 
             window.closeFullPage('withdraw-page'); 
             amtInput.value = ""; 
-            syncDashboard(); // Update balance live
+            syncDashboard(); 
         } else {
             window.showToast("❌ " + data.error); 
         }
