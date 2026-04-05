@@ -56,7 +56,6 @@
     </style>
 
     <script>
-        // 🔒 Secure Check via Session Storage (Safer than LocalStorage for SPA tokens)
         const storedPhone = localStorage.getItem("earnprox_user_phone");
         const storedToken = sessionStorage.getItem("earnprox_secure_token");
         if (storedPhone && storedToken) { window.location.replace("dashboard.html"); }
@@ -197,27 +196,47 @@
 
     <!-- Footer Note -->
     <div class="text-center mt-8 mb-4 w-full max-w-md relative z-10 flex items-center justify-center gap-2 text-slate-400">
-        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         <span class="text-xs font-bold uppercase tracking-widest">End-to-End Encrypted</span>
     </div>
     
     <div id="toast">Message Here</div>
 
-    <!-- 🚀 JS LOGIC (API CALLS ONLY) -->
-    <script>
+    <!-- Firebase Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
+          authDomain: "earnproxuc.firebaseapp.com",
+          projectId: "earnproxuc",
+          storageBucket: "earnproxuc.firebasestorage.app",
+          messagingSenderId: "411733884378",
+          appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
         let isNewUser = true; 
         let isForgotPin = false;
-        window.currentOtpSessionId = null; 
+        let existingUserData = null; 
+        let existingUserDocId = null;
         let otpInterval = null;
+        const REFER_BONUS_AMOUNT = 5; 
+        window.currentOtpSessionId = null; 
 
-        // 🔥 Haptic Feedback Helper
+        const spinnerSVG = `<svg class="animate-spin h-6 w-6 inline-block text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+        // 🔐 Haptic Feedback Helper
         function triggerHaptic() {
             if ("vibrate" in navigator) {
                 navigator.vibrate(50);
             }
         }
 
-        // 🔐 SHA-256 Hashing for PIN
+        // 🔐 Client-side Hashing
         async function hashPin(pin) {
             const msgBuffer = new TextEncoder().encode(pin);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -225,15 +244,12 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Splash handling
             setTimeout(() => { 
                 const splash = document.getElementById('splash-screen');
                 if(splash) splash.classList.add('hidden'); 
-                // Autofocus on Mobile Input
                 setTimeout(() => document.getElementById('mobile-input').focus(), 300);
             }, 1200); 
             
-            // Referral code prepopulate
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if(refCode) {
@@ -244,7 +260,7 @@
                 }
             }
 
-            // 🔥 OTP Paste Event Listener
+            // OTP Paste Event
             document.getElementById("otp-container").addEventListener("paste", (e) => {
                 e.preventDefault();
                 let paste = (e.clipboardData || window.clipboardData).getData('text').trim();
@@ -253,7 +269,6 @@
                         const otpBox = document.getElementById(`otp${i+1}`);
                         if(otpBox) {
                             otpBox.value = num;
-                            // Trigger moving to next/submit
                             window.moveToNext(otpBox, i < 5 ? `otp${i+2}` : null, {key: ''}, 'setup');
                         }
                     });
@@ -315,7 +330,6 @@
                 } 
             } 
 
-            // Auto-Submit Logic
             if(type === 'login' && current.value.length === 1) {
                 const fullLoginPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
                 if(fullLoginPin.length === 4) window.loginWithPIN();
@@ -345,15 +359,7 @@
             inputs.forEach(input => input.value = '');
         }
 
-        function handleApiError(response, data) {
-            if(response.status === 429) {
-                window.showToast("⏳ Too many attempts. Try again later.");
-            } else {
-                window.showToast("❌ " + (data.error || "Server Error. Please try again."));
-            }
-        }
-
-        // 🟢 Check User Status API
+        // 🟢 RESTORED: Frontend Firebase Call for UI Flow Testing
         window.checkUserAndProceed = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
@@ -362,16 +368,15 @@
             showLoader(true);
 
             try {
-                const response = await fetch('/api/auth/check-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone })
-                });
+                // Using Frontend Firebase directly for testing UI flow
+                const q = query(collection(db, "users"), where("phone", "==", phone));
+                const snap = await getDocs(q);
                 
-                const data = await response.json();
-
-                if (response.ok && data.exists) {
-                    if(data.status === "blocked") {
+                if (!snap.empty) {
+                    existingUserDocId = snap.docs[0].id;
+                    existingUserData = snap.docs[0].data();
+                    
+                    if(existingUserData.status === "blocked") {
                         showLoader(false);
                         return window.showToast("🚫 Account Suspended.");
                     }
@@ -379,15 +384,12 @@
                     document.getElementById('display-number-pin').innerText = "+91 " + phone;
                     switchStep('step-1', 'step-pin');
                     setTimeout(() => { document.getElementById('l-pin1').focus(); showLoader(false); }, 400);
-                } else if(response.ok && !data.exists) {
+                } else {
                     isNewUser = true;
                     document.getElementById('new-user-fields').style.display = 'block';
                     document.getElementById('otp-heading').innerText = "Register Account";
                     document.getElementById('back-btn-otp').onclick = () => window.goBack('step-otp', 'step-1');
                     await trigger2FactorOTP(phone, 'step-1'); 
-                } else {
-                    handleApiError(response, data);
-                    showLoader(false);
                 }
             } catch(error) { 
                 console.error(error);
@@ -396,15 +398,15 @@
             } 
         }
 
-        // 🟢 Request OTP API
+        // 🟢 API CALL: Request OTP
         async function trigger2FactorOTP(phone, fromStep) {
             document.getElementById('display-number-otp').innerText = "+91 " + phone;
 
             try {
-                const response = await fetch('/api/auth/request-otp', {
+                const response = await fetch('/api/send-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone })
+                    body: JSON.stringify({ phoneNumber: phone }) // Updated to match your API expected param
                 });
                 
                 const data = await response.json();
@@ -421,7 +423,7 @@
                         showLoader(false);
                     }, 400);
                 } else {
-                    handleApiError(response, data);
+                    window.showToast("❌ " + (data.error || "Failed to send OTP"));
                     showLoader(false);
                 }
             } catch (error) {
@@ -451,7 +453,7 @@
             await trigger2FactorOTP(phone, 'step-pin');
         }
 
-        // 🟢 PIN Login API
+        // 🟢 RESTORED: Frontend PIN Login Verification
         window.loginWithPIN = async function() {
             triggerHaptic();
             const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
@@ -462,20 +464,14 @@
             const hashedInputPin = await hashPin(enteredPin);
 
             try {
-                const response = await fetch('/api/auth/login-pin', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, pinHash: hashedInputPin })
-                });
-
-                const data = await response.json();
-
-                if(response.ok && data.token) {
+                if(existingUserData.pin && existingUserData.pin === hashedInputPin) {
+                    const newToken = Math.random().toString(36).substring(2, 15) + Date.now().toString(36); // Generate basic token for testing
+                    await updateDoc(doc(db, "users", existingUserDocId), { sessionToken: newToken });
                     localStorage.setItem("earnprox_user_phone", phone);
-                    sessionStorage.setItem("earnprox_secure_token", data.token); 
+                    sessionStorage.setItem("earnprox_secure_token", newToken); 
                     window.location.href = "dashboard.html";
                 } else {
-                    handleApiError(response, data);
+                    window.showToast("❌ Incorrect PIN entered!");
                     document.querySelectorAll('#step-pin .pin-box').forEach(el => el.value = '');
                     document.getElementById('l-pin1').focus();
                     showLoader(false);
@@ -486,7 +482,7 @@
             } 
         }
 
-        // 🟢 Setup API
+        // 🟢 RESTORED: Frontend Verify OTP & Save User
         window.verifyOTPAndSave = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
@@ -510,33 +506,55 @@
             showLoader(true);
 
             try {
-                const secureHashedPin = await hashPin(setupPin);
-
-                const response = await fetch('/api/auth/verify-setup', {
+                // Verify OTP API Call
+                const response = await fetch('/api/verify-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         sessionId: window.currentOtpSessionId, 
-                        otpEntered: enteredOtp,
-                        phone: phone,
-                        pinHash: secureHashedPin,
-                        isNewUser: isNewUser,
-                        isForgotPin: isForgotPin,
-                        name: finalName,
-                        referCode: referCode
+                        otpEntered: enteredOtp 
                     })
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    handleApiError(response, data);
+                    window.showToast("❌ " + (data.error || "Invalid or Expired OTP!"));
                     showLoader(false);
                     return; 
                 }
 
+                const secureHashedPin = await hashPin(setupPin);
+                const newToken = Math.random().toString(36).substring(2, 15) + Date.now().toString(36); // Basic token for testing
+
+                if(isNewUser) {
+                    const myOwnCode = (finalName.substring(0,3) + phone.substring(6)).toUpperCase();
+
+                    await addDoc(collection(db, "users"), {
+                        phone: phone, 
+                        name: finalName, 
+                        pin: secureHashedPin, 
+                        sessionToken: newToken,
+                        balance: 0, 
+                        ownReferCode: myOwnCode, 
+                        referCodeUsed: referCode,
+                        status: "active", 
+                        timestamp: new Date()
+                    });
+
+                    if(referCode !== "None") {
+                        const refSnap = await getDocs(query(collection(db, "users"), where("ownReferCode", "==", referCode)));
+                        if(!refSnap.empty) {
+                            const rDoc = refSnap.docs[0];
+                            await updateDoc(doc(db, "users", rDoc.id), { balance: (rDoc.data().balance || 0) + REFER_BONUS_AMOUNT });
+                        }
+                    }
+                } else if (isForgotPin) {
+                    await updateDoc(doc(db, "users", existingUserDocId), { pin: secureHashedPin, sessionToken: newToken });
+                }
+
                 localStorage.setItem("earnprox_user_phone", phone);
-                sessionStorage.setItem("earnprox_secure_token", data.token || crypto.randomUUID()); 
+                sessionStorage.setItem("earnprox_secure_token", newToken); 
                 window.location.href = "dashboard.html";
                 
             } catch (error) {
@@ -548,4 +566,3 @@
     </script>
 </body>
 </html>
-
