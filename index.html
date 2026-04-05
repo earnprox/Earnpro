@@ -12,15 +12,21 @@
 <style>
 body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-/* FIX: Navbar scroll offset */
+/* FIX 1: Navbar offset scroll */
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 90px;
 }
 
+/* FIX 2: Prevent horizontal scroll */
+body {
+    overflow-x: hidden;
+}
+
 /* Background */
 .bg-grid-pattern {
-    background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+    background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                      linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
     background-size: 40px 40px;
     mask-image: radial-gradient(circle at center, black, transparent 80%);
     -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
@@ -33,7 +39,7 @@ html {
     -webkit-text-fill-color: transparent;
 }
 
-/* FIX: Mobile performance */
+/* FIX 3: Mobile performance */
 @media (max-width: 768px) {
     .blur-\[120px\] {
         filter: blur(60px) !important;
@@ -42,7 +48,7 @@ html {
 </style>
 </head>
 
-<body class="bg-[#F8FAFC] text-slate-800 antialiased overflow-x-hidden">
+<body class="bg-[#F8FAFC] text-slate-800 antialiased">
 
 <!-- NAV -->
 <nav class="w-full bg-white/80 backdrop-blur-lg border-b fixed top-0 z-50">
@@ -50,7 +56,8 @@ html {
 
 <!-- Logo -->
 <div class="w-32 h-10 flex items-center">
-<img src="logo.png" alt="EarnproX Logo" loading="lazy" width="200" height="80">
+<img src="logo.png" alt="EarnproX Logo" loading="lazy"
+     onerror="this.style.display='none'">
 </div>
 
 <!-- Desktop -->
@@ -64,31 +71,35 @@ html {
 <div class="flex items-center gap-3">
 <a href="login.html" class="hidden md:block">Sign In</a>
 
-<a href="login.html" class="bg-yellow-400 px-5 py-2 rounded-full font-bold active:scale-95 active:opacity-80">
+<a href="login.html"
+class="bg-yellow-400 px-5 py-2 rounded-full font-bold transition active:scale-95 active:opacity-80">
 Start Earning
 </a>
 
 <!-- Mobile btn -->
-<button id="mobile-menu-btn" class="md:hidden p-2">
+<button id="mobile-menu-btn" class="md:hidden p-2 text-xl">
 ☰
 </button>
 </div>
 </div>
 
 <!-- Mobile Menu -->
-<div id="mobile-menu" class="hidden md:hidden bg-white shadow-xl px-5 py-6 flex flex-col gap-4 transition-all duration-300">
+<div id="mobile-menu"
+class="hidden md:hidden bg-white shadow-xl px-5 py-6 flex flex-col gap-4 transition-all duration-300">
+
 <a href="#how-it-works">How it Works</a>
 <a href="#earning-methods">Tasks</a>
 <a href="#security">Trust</a>
 <a href="contact.html">Contact</a>
 <a href="login.html">Login</a>
+
 </div>
 </nav>
 
 <!-- HERO -->
 <header class="pt-32 pb-16 text-center relative min-h-[80vh] flex flex-col justify-center items-center">
 
-<div class="absolute inset-0 bg-grid-pattern opacity-40"></div>
+<div class="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none"></div>
 
 <h1 class="text-3xl md:text-6xl font-extrabold mb-6">
 Earn Rewards with <span class="text-gradient">Simple Tasks</span>
@@ -98,7 +109,8 @@ Earn Rewards with <span class="text-gradient">Simple Tasks</span>
 No investment • 100% free
 </p>
 
-<a href="login.html" class="bg-yellow-400 px-8 py-4 rounded-xl font-bold active:scale-95 active:opacity-80">
+<a href="login.html"
+class="bg-yellow-400 px-8 py-4 rounded-xl font-bold transition active:scale-95 active:opacity-80">
 Start Earning →
 </a>
 
@@ -140,30 +152,33 @@ document.addEventListener('DOMContentLoaded', function() {
 const btn = document.getElementById('mobile-menu-btn');
 const menu = document.getElementById('mobile-menu');
 
-// toggle
+/* FIX 4: Safe toggle */
 btn.addEventListener('click', function(e) {
     e.stopPropagation();
     menu.classList.toggle('hidden');
 });
 
-// outside click close
+/* FIX 5: Outside click close */
 document.addEventListener('click', function(e) {
     if (!menu.contains(e.target) && !btn.contains(e.target)) {
         menu.classList.add('hidden');
     }
 });
 
-// ESC close
+/* FIX 6: ESC key close */
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         menu.classList.add('hidden');
     }
 });
 
-// button feedback
+/* FIX 7: Smooth UX (no permanent opacity bug) */
 document.querySelectorAll('a').forEach(el => {
     el.addEventListener('click', () => {
         el.style.opacity = "0.7";
+        setTimeout(() => {
+            el.style.opacity = "1";
+        }, 200);
     });
 });
 
