@@ -28,7 +28,7 @@
                 
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-slate-300 font-bold text-lg cursor-pointer border border-white/5" onclick="window.switchTab('profile')">
+                        <div id="top-nav-profile-initial" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-slate-300 font-bold text-lg cursor-pointer border border-white/5" onclick="window.switchTab('profile')">
                             U
                         </div>
                         <div class="bg-gradient-to-r from-[#216111] to-[#3A941C] px-4 py-1.5 rounded-full flex items-center gap-2 cursor-pointer shadow-md" onclick="window.location.href='spin.html'">
@@ -58,18 +58,10 @@
                         </button>
                     </div>
 
-                    <div class="flex justify-between items-center border-t border-white/5 pt-5 cursor-pointer" onclick="window.copyReferLink()">
+                    <div class="flex items-center border-t border-white/5 pt-5 cursor-pointer" onclick="window.copyReferLink()">
                         <div>
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Refer Code <span class="text-[#00A87A] ml-0.5">📋</span></p>
                             <p class="text-white font-black text-[13px] tracking-widest" id="home-card-refer-code">CODE</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Withdrawn</p>
-                            <p class="text-white font-semibold text-[13px]" id="home-card-withdrawn">₹0</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Active Team</p>
-                            <p class="text-white font-semibold text-[13px]" id="home-card-team-size">0</p>
                         </div>
                     </div>
                 </div>
@@ -369,7 +361,7 @@
 
         <div class="p-5 w-full mt-auto mb-6 bg-white border-t border-slate-100">
             <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-[#0B100E] text-white font-bold py-4 rounded-xl shadow-xl text-[15px] active:scale-95 transition-all flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 Confirm Transfer
             </button>
         </div>
@@ -448,6 +440,16 @@
                 bigBal.innerText = topBal.innerText.replace('₹', '').trim();
             }
             
+            // Dynamic Profile Initial
+            const userNameEl = document.getElementById('home-card-user-name');
+            const profileInitialEl = document.getElementById('top-nav-profile-initial');
+            if (userNameEl && userNameEl.innerText && profileInitialEl) {
+                const name = userNameEl.innerText.trim();
+                if (name.length > 0) {
+                    profileInitialEl.innerText = name.charAt(0).toUpperCase();
+                }
+            }
+
             // Sync stats for the new 3 columns in the home card
             const statWithdraw = document.getElementById('stat-total-withdraw');
             const homeWithdraw = document.getElementById('home-card-withdrawn');
