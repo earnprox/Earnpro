@@ -17,20 +17,22 @@
 
     <span id="home-card-user-name" class="hidden"></span>
     <span id="home-top-balance" class="hidden">₹0.00</span>
+    <span id="stat-total-withdraw-hidden" class="hidden">₹0</span>
+    <span id="total-refers-count-hidden" class="hidden">0</span>
 
     <div class="relative z-10">
 
         <div id="view-home" class="tab-content active pt-0">
             
-            <div class="bg-[#0B100E] pt-8 px-5 pb-8 relative z-0">
+            <div class="bg-[#0B100E] pt-8 px-5 pb-10 relative z-0">
                 
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-slate-300 font-bold text-lg cursor-pointer border border-white/5" onclick="window.switchTab('profile')">
                             U
                         </div>
-                        <div class="bg-gradient-to-r from-[#216111] to-[#3A941C] px-4 py-1.5 rounded-full flex items-center gap-2 cursor-pointer shadow-md">
-                            <span class="text-[12px] font-bold text-white tracking-wide leading-tight">Get Instant<br>Loans</span>
+                        <div class="bg-gradient-to-r from-[#216111] to-[#3A941C] px-4 py-1.5 rounded-full flex items-center gap-2 cursor-pointer shadow-md" onclick="window.location.href='spin.html'">
+                            <span class="text-[12px] font-bold text-white tracking-wide leading-tight">Daily Spin<br>& Win 🎡</span>
                             <svg class="w-3.5 h-3.5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                         </div>
                     </div>
@@ -44,7 +46,7 @@
                 <div class="bg-[#1D2222] rounded-[24px] p-6 pt-5 shadow-2xl relative mb-5">
                     <p class="text-slate-200/90 font-semibold text-[13px] tracking-wide mb-4">Your Wealth</p>
 
-                    <div class="flex items-center gap-4 mb-2">
+                    <div class="flex items-center gap-4 mb-6">
                         <div class="flex items-center gap-1.5 flex-1">
                             <span class="text-slate-400 text-2xl font-medium mt-1">₹</span>
                             <h2 class="text-[44px] font-bold text-white leading-none tracking-tight" id="home-card-big-balance">0</h2>
@@ -54,6 +56,21 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
                             Add accounts
                         </button>
+                    </div>
+
+                    <div class="flex justify-between items-center border-t border-white/5 pt-5 cursor-pointer" onclick="window.copyReferLink()">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Refer Code <span class="text-[#00A87A] ml-0.5">📋</span></p>
+                            <p class="text-white font-black text-[13px] tracking-widest" id="home-card-refer-code">CODE</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Withdrawn</p>
+                            <p class="text-white font-semibold text-[13px]" id="home-card-withdrawn">₹0</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Active Team</p>
+                            <p class="text-white font-semibold text-[13px]" id="home-card-team-size">0</p>
+                        </div>
                     </div>
                 </div>
 
@@ -65,7 +82,7 @@
                 </div>
             </div>
             
-            <div class="bg-[#F8FAFC] rounded-t-[32px] px-5 pt-8 pb-10 -mt-8 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[60vh]">
+            <div class="bg-[#F8FAFC] rounded-t-[32px] px-5 pt-8 pb-10 -mt-6 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[60vh]">
                 
                 <div class="mb-10">
                     <p class="text-[14px] font-medium text-slate-600 mb-4 tracking-wide px-1">Rewards worth up to ₹1000/month</p>
@@ -79,7 +96,7 @@
                             <div class="flex-1 flex items-center justify-center relative z-10 py-2">
                                 <img src="https://cdn3d.iconscout.com/3d/premium/thumb/bank-building-5374026-4496468.png" alt="Bank" class="w-[90px] h-[90px] object-contain drop-shadow-md">
                             </div>
-                            <button class="bg-[#F0F4F8] text-[#557BA1] text-[12px] font-semibold py-2 px-5 rounded-full w-max mx-auto relative z-10">Get it now</button>
+                            <button class="bg-[#F0F4F8] text-[#557BA1] text-[12px] font-semibold py-2 px-5 rounded-full w-max mx-auto relative z-10 hover:bg-[#D6E6FF] transition-colors">Get it now</button>
                         </div>
                         
                         <div class="w-[55%] flex flex-col gap-2.5">
@@ -144,7 +161,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 relative overflow-hidden group/network">
+                <div class="bg-white rounded-[24px] p-6 shadow-[0_4px_15px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-5 relative overflow-hidden group/network">
                     <div class="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-400"></div>
 
                     <div class="flex justify-between items-center mb-6 pt-2">
@@ -390,7 +407,7 @@
             </div>
         </div>
         <div class="p-5 bg-white border-t border-slate-100">
-            <button onclick="window.saveRealKYC()" class="w-full bg-[#0B100E] text-white font-bold py-4 rounded-xl text-[14px] active:scale-95 transition-all">Lock Details Securely</button>
+            <button onclick="window.saveRealKYC()" class="w-full bg-[#0B100E] text-white font-black py-4 rounded-xl text-[14px] active:scale-95 transition-all">Lock Details Securely</button>
         </div>
     </div>
 
@@ -429,6 +446,25 @@
             const topBal = document.getElementById('home-top-balance');
             if(bigBal && topBal && topBal.innerText !== '₹0.00') {
                 bigBal.innerText = topBal.innerText.replace('₹', '').trim();
+            }
+            
+            // Sync stats for the new 3 columns in the home card
+            const statWithdraw = document.getElementById('stat-total-withdraw');
+            const homeWithdraw = document.getElementById('home-card-withdrawn');
+            if(statWithdraw && homeWithdraw) {
+                homeWithdraw.innerText = statWithdraw.innerText;
+            }
+
+            const statTeam = document.getElementById('total-refers-count');
+            const homeTeam = document.getElementById('home-card-team-size');
+            if(statTeam && homeTeam) {
+                homeTeam.innerText = statTeam.innerText;
+            }
+
+            const statCode = document.getElementById('referral-code-text');
+            const homeCode = document.getElementById('home-card-refer-code');
+            if(statCode && homeCode && statCode.innerText !== 'CODE') {
+                homeCode.innerText = statCode.innerText;
             }
             
             document.querySelectorAll('.nav-btn').forEach(btn => {
