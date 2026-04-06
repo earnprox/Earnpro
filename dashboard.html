@@ -42,34 +42,18 @@
                 </div>
 
                 <div class="bg-[#1D2222] rounded-[24px] p-6 shadow-2xl relative mb-4">
-                    <p class="text-slate-200/90 font-semibold text-[13px] tracking-wide mb-5">Your Wealth</p>
+                    <p class="text-slate-200/90 font-semibold text-[13px] tracking-wide mb-4">Your Wealth</p>
 
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="flex items-center gap-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-1.5">
                             <span class="text-slate-400 text-2xl font-medium">₹</span>
                             <h2 class="text-[40px] font-bold text-white leading-none tracking-tight" id="home-card-big-balance">0</h2>
-                            <svg class="w-5 h-5 text-[#00A87A] ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
                         </div>
                         
-                        <button onclick="window.location.href='recharge.html'" class="bg-[#121E1A] text-[#00A87A] px-4 py-2.5 rounded-full font-bold text-[13px] flex items-center gap-2 transition-all active:scale-95 border border-[#00A87A]/20">
+                        <button onclick="window.location.href='recharge.html'" class="bg-[#121E1A] text-[#00A87A] px-4 py-2.5 rounded-full font-bold text-[13px] flex items-center gap-2 transition-all active:scale-95 border border-[#00A87A]/20 shadow-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
                             Add accounts
                         </button>
-                    </div>
-
-                    <div class="flex justify-between border-t border-white/5 pt-5">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">A/C Balance</p>
-                            <p class="text-white font-semibold text-[13px]">₹0</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Investments</p>
-                            <p class="text-white font-semibold text-[13px]">₹0</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Assets</p>
-                            <p class="text-white font-semibold text-[13px]">₹0</p>
-                        </div>
                     </div>
                 </div>
 
@@ -218,7 +202,7 @@
         </div>
 
         <div id="view-refer" class="tab-content relative -mx-5 -mt-5">
-            <div class="bg-[#0B100E] p-8 pb-10 text-center rounded-b-[3rem] shadow-xl relative overflow-hidden">
+            <div class="bg-[#0B100E] p-8 pb-10 text-center rounded-b-[3rem] shadow-xl relative overflow-hidden border-b border-white/10">
                 <div class="w-20 h-20 mx-auto rounded-full bg-slate-800 p-1 mb-4 border border-white/10 relative z-10"><img id="refer-profile-img" src="" class="w-full h-full rounded-full object-cover"></div>
                 <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 relative z-10">EarnproX Member</h3>
                 <h2 class="text-3xl font-black text-white mb-6 relative z-10" id="refer-page-name">User Name</h2>
@@ -342,7 +326,7 @@
         </div>
 
         <div class="flex flex-col items-center mt-10">
-            <div class="w-16 h-16 rounded-[1.25rem] bg-[#0A100D] flex items-center justify-center text-white font-black text-2xl mb-4 shadow-xl">
+            <div class="w-16 h-16 rounded-[1.25rem] bg-[#0B100E] flex items-center justify-center text-white font-black text-2xl mb-4 shadow-xl">
                 <span id="withdraw-avatar-text">U</span>
             </div>
             <h2 class="text-xl font-black text-slate-900" id="withdraw-display-name">Bank Transfer</h2>
@@ -361,7 +345,7 @@
         </div>
 
         <div class="p-5 w-full mt-auto mb-6 bg-white border-t border-slate-100">
-            <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-[#0A100D] text-white font-bold py-4 rounded-xl shadow-xl text-[15px] active:scale-95 transition-all flex items-center justify-center gap-2">
+            <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-[#0B100E] text-white font-bold py-4 rounded-xl shadow-xl text-[15px] active:scale-95 transition-all flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 Confirm Transfer
             </button>
@@ -400,7 +384,7 @@
             </div>
         </div>
         <div class="p-5 bg-white border-t border-slate-100">
-            <button onclick="window.saveRealKYC()" class="w-full bg-[#0A100D] text-white font-bold py-4 rounded-xl text-[14px] active:scale-95 transition-all">Lock Details Securely</button>
+            <button onclick="window.saveRealKYC()" class="w-full bg-[#0B100E] text-white font-black py-4 rounded-xl text-[14px] active:scale-95 transition-all">Lock Details Securely</button>
         </div>
     </div>
 
@@ -429,7 +413,7 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[90px] -translate-x-1/2 bg-[#0A100D] text-white font-bold text-[13px] px-5 py-2.5 rounded-full shadow-2xl opacity-0 invisible transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">Message Here</div>
+    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[90px] -translate-x-1/2 bg-[#0B100E] text-white font-bold text-[13px] px-5 py-2.5 rounded-full shadow-2xl opacity-0 invisible transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">Message Here</div>
 
     <script src="dashboard.js"></script>
 
@@ -438,7 +422,7 @@
             const bigBal = document.getElementById('home-card-big-balance');
             const topBal = document.getElementById('home-top-balance');
             if(bigBal && topBal && topBal.innerText !== '₹0.00') {
-                bigBal.innerText = topBal.innerText;
+                bigBal.innerText = topBal.innerText.replace('₹', '').trim();
             }
             
             document.querySelectorAll('.nav-btn').forEach(btn => {
