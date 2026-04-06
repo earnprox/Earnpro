@@ -71,115 +71,132 @@
                         </span>
                     </div>
 
-                    <!-- BANK ICON SIZE REDUCED TO LESS THAN HALF (24px) -->
+                    <!-- BANK ICON SIZE REDUCED -->
                     <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bank/3D/bank_3d.png" alt="Bank" class="absolute bottom-6 right-5 w-[24px] h-[24px] object-contain z-0 opacity-80">
                 </div>
                 <!-- END OF BALANCE CARD -->
 
                 <div class="flex items-center gap-1.5 px-2">
-                    <span class="text-white/90 text-[10px] font-bold mr-1">1/3</span>
+                    <span class="text-white/90 text-[10px] font-bold mr-1">1/1</span> <!-- Changed 1/3 to 1/1 -->
                     <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
                     <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
                     <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
                 </div>
             </div>
             
+            <!-- WHITE SECTION STARTS HERE -->
             <div class="bg-white rounded-t-[32px] px-5 pt-8 pb-10 -mt-6 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[60vh]">
 
-                <!-- 1000% EXACT IMAGE UI STRUCTURE -->
-                
-                <!-- Rewards Section -->
-                <div class="mb-8">
-                    <p class="text-[14px] font-medium text-slate-600 mb-4 tracking-wide px-1">Rewards worth up to ₹1000/month</p>
+                <!-- 1000% EXACT REPLICA OF THE IMAGE UI -->
+                <div class="mb-8 mt-1">
+                    <h3 class="text-[15px] font-semibold text-slate-700 tracking-wide mb-4 px-1">Rewards worth up to ₹1000/daily</h3> <!-- Changed month to daily -->
                     
-                    <div class="flex gap-3">
+                    <div class="flex gap-2.5 mb-8">
                         <!-- Left Big Card -->
-                        <div class="w-[45%] bg-[#F0F2F5] rounded-[24px] p-4 flex flex-col justify-between relative cursor-pointer active:scale-95 transition-transform">
+                        <div class="w-[45%] bg-[#E8EBF0] rounded-[24px] p-4 flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
+                            <div class="absolute -bottom-10 -right-6 w-28 h-28 bg-[#DFE3E9] rounded-full blur-2xl z-0"></div>
                             <div class="relative z-10">
-                                <p class="text-[11px] text-slate-500 font-medium mb-1">Earn as you spend</p>
-                                <h4 class="text-[18px] text-slate-800 font-semibold leading-tight mb-2">Savings<br>account</h4>
+                                <p class="text-[11px] text-slate-500 font-medium mb-1">Earn as you complete</p> <!-- Changed text here -->
+                                <h4 class="text-[17px] text-slate-800 font-semibold leading-tight">Daily Task<br>for Active</h4> <!-- Changed text here -->
                             </div>
-                            <div class="flex-1 flex items-center justify-center relative z-10 py-3">
-                                <img src="https://cdn3d.iconscout.com/3d/premium/thumb/bank-building-5374026-4496468.png" alt="Bank" class="w-[75px] h-[75px] object-contain drop-shadow-md">
+                            <div class="flex-1 flex items-center justify-center relative z-10 py-5">
+                                <!-- Changed Bank to 3D Gift 🎁 -->
+                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Wrapped%20gift/3D/wrapped_gift_3d.png" alt="Gift" class="w-[85px] h-[85px] object-contain drop-shadow-xl">
                             </div>
-                            <button class="bg-[#DFE3E9] text-slate-600 text-[12px] font-semibold py-2 px-5 rounded-full w-max mx-auto relative z-10">Get it now</button>
+                            <!-- Changed button text and color to red -->
+                            <button class="bg-[#EF4444] text-white text-[11px] font-bold py-2 px-5 rounded-full w-max mx-auto relative z-10 shadow-[0_4px_10px_rgba(239,68,68,0.3)]">Start Now</button>
                         </div>
                         
-                        <!-- Right Small Cards -->
+                        <!-- Right Small Stacked Cards -->
                         <div class="w-[55%] flex flex-col gap-2.5">
                             
-                            <!-- Card 1 -->
-                            <div class="bg-[#F0F2F5] rounded-[20px] p-4 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <p class="text-[11px] text-slate-500 font-medium mb-0.5">Get back</p>
-                                <h4 class="text-[14px] text-slate-800 font-semibold leading-tight z-10">2% on spends</h4>
-                                <span class="absolute bottom-2 right-3 text-[22px] text-slate-300 font-bold z-0">%</span>
+                            <!-- Small Card 1 -->
+                            <div class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
+                                <div class="absolute -bottom-5 -right-5 w-16 h-16 bg-[#DFE3E9] rounded-full blur-xl z-0"></div>
+                                <div class="relative z-10">
+                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">Get back</p>
+                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">2% on spends</h4>
+                                </div>
+                                <span class="absolute bottom-2 right-3 text-[18px] text-slate-400 font-black z-10">%</span>
                             </div>
                             
-                            <!-- Card 2 -->
-                            <div class="bg-[#F0F2F5] rounded-[20px] p-4 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <p class="text-[11px] text-slate-500 font-medium mb-0.5">Invest with ease</p>
-                                <h4 class="text-[14px] text-slate-800 font-semibold leading-tight z-10">US Stocks, FD, etc</h4>
-                                <svg class="absolute bottom-2 right-3 w-5 h-5 text-slate-400 z-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                            <!-- Small Card 2 -->
+                            <div class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
+                                <div class="relative z-10">
+                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">Invest with ease</p>
+                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">US Stocks, FD, etc</h4>
+                                </div>
+                                <svg class="absolute bottom-2.5 right-3 w-4 h-4 text-slate-400 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
                             </div>
                             
-                            <!-- Card 3 -->
-                            <div class="bg-[#F0F2F5] rounded-[20px] p-4 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <p class="text-[11px] text-slate-500 font-medium mb-0.5">International Debit Card</p>
-                                <h4 class="text-[14px] text-slate-800 font-semibold leading-tight z-10">0 forex fee*</h4>
-                                <svg class="absolute bottom-2 right-3 w-5 h-5 text-slate-400 z-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2" stroke-width="2"></rect><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18"></path></svg>
+                            <!-- Small Card 3 -->
+                            <div class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
+                                <div class="absolute -bottom-5 -right-5 w-16 h-16 bg-[#DFE3E9] rounded-full blur-xl z-0"></div>
+                                <div class="relative z-10">
+                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">International Debit Card</p>
+                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">0 forex fee*</h4>
+                                </div>
+                                <svg class="absolute bottom-2.5 right-3 w-4 h-4 text-slate-400 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18"></path></svg>
                             </div>
 
                         </div>
                     </div>
-                </div>
 
-                <!-- 5 Icons Shortcuts Section -->
-                <div class="mb-10 px-1">
-                    <div class="flex justify-between items-start">
+                    <!-- 5 Shortcut Icons Row -->
+                    <div class="flex justify-between items-start mb-8 px-1">
                         
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-                            <div class="w-[60px] h-[60px] bg-[#F0F2F5] rounded-[20px] flex items-center justify-center">
+                        <!-- Instant Loan -->
+                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
+                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
                                 <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20bag/3D/money_bag_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-tight">Instant<br>Loan</span>
+                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Instant<br>Loan</span>
                         </div>
 
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-                            <div class="w-[60px] h-[60px] bg-[#F0F2F5] rounded-[20px] flex items-center justify-center">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rosette/3D/rosette_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
+                        <!-- Card Offers -->
+                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
+                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
+                                <div class="relative w-8 h-8 flex items-center justify-center">
+                                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rosette/3D/rosette_3d.png" class="absolute inset-0 w-full h-full object-contain" style="filter: hue-rotate(-45deg) saturate(1.5);">
+                                    <span class="absolute text-[10px] font-black text-amber-100 z-10">%</span>
+                                </div>
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-tight">Card<br>Offers</span>
+                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Card<br>Offers</span>
                         </div>
 
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-                            <div class="w-[60px] h-[60px] bg-[#F0F2F5] rounded-[20px] flex items-center justify-center">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Label/3D/label_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
+                        <!-- Collected Offers -->
+                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
+                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
+                                <div class="relative w-8 h-8 flex items-center justify-center">
+                                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Label/3D/label_3d.png" class="absolute inset-0 w-full h-full object-contain" style="filter: hue-rotate(-20deg) saturate(1.5);">
+                                    <span class="absolute text-[10px] font-black text-amber-100 z-10">%</span>
+                                </div>
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-tight">Collected<br>Offers</span>
+                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Collected<br>Offers</span>
                         </div>
 
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-                            <div class="w-[60px] h-[60px] bg-[#F0F2F5] rounded-[20px] flex items-center justify-center">
+                        <!-- Earn Rewards -->
+                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
+                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
                                 <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Potted%20plant/3D/potted_plant_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-tight">Earn<br>Rewards</span>
+                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Earn<br>Rewards</span>
                         </div>
 
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-                            <div class="w-[60px] h-[60px] bg-[#F0F2F5] rounded-[20px] flex items-center justify-center">
-                                <svg class="w-5 h-5 text-[#00A87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        <!-- Edit Shortcuts -->
+                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
+                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
+                                <svg class="w-4 h-4 text-[#00A87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-tight">Edit<br>Shortcuts</span>
+                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Edit<br>Shortcuts</span>
                         </div>
 
                     </div>
-                </div>
 
-                <!-- Make Payments Heading -->
-                <div class="mb-5 px-1">
-                    <h3 class="text-[15px] font-semibold text-slate-800 tracking-wide">Make Payments</h3>
-                </div>
+                    <!-- Make Payments Heading -->
+                    <h3 class="text-[15px] font-semibold text-slate-800 tracking-wide px-1 mb-5">Make Payments</h3>
 
+                </div>
                 <!-- END OF EXACT IMAGE UI STRUCTURE -->
 
                 <div class="bg-white rounded-[24px] p-6 shadow-[0_4px_15px_-5px_rgba(0,0,0,0.05)] border border-slate-100 mb-5 relative overflow-hidden group/network">
