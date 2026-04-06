@@ -19,6 +19,7 @@
     <span id="home-top-balance" class="hidden">₹0.00</span>
     <span id="stat-total-withdraw-hidden" class="hidden">₹0</span>
     <span id="total-refers-count-hidden" class="hidden">0</span>
+    <span id="home-card-refer-code" class="hidden">CODE</span>
 
     <div class="relative z-10">
 
@@ -43,27 +44,28 @@
                     </button>
                 </div>
 
-                <div class="bg-[#1D2222] rounded-[24px] p-6 pt-5 shadow-2xl relative mb-5">
-                    <p class="text-slate-200/90 font-semibold text-[13px] tracking-wide mb-4">Your Wealth</p>
-
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="flex items-center gap-1.5 flex-1">
-                            <span class="text-slate-400 text-2xl font-medium mt-1">₹</span>
+                <!-- NEW TOP BALANCE CARD (Federal Bank Design) -->
+                <div class="bg-[#313439] rounded-[24px] p-6 shadow-xl relative mb-5 overflow-hidden min-h-[170px] flex flex-col justify-between">
+                    
+                    <!-- Top Text Content -->
+                    <div class="relative z-10 w-[75%]">
+                        <p class="text-slate-300 font-medium text-[14px] mb-1 tracking-wide">Your Wealth</p>
+                        <div class="flex items-center gap-1.5 flex-1 mb-2">
+                            <span class="text-slate-400 text-3xl font-medium mt-1">₹</span>
                             <h2 class="text-[44px] font-bold text-white leading-none tracking-tight" id="home-card-big-balance">0</h2>
                         </div>
-                        
-                        <button onclick="window.location.href='recharge.html'" class="bg-[#121E1A] text-[#00A87A] px-4 py-2.5 rounded-full font-bold text-[13px] flex items-center gap-2 transition-all active:scale-95 border border-[#00A87A]/20 shadow-sm shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
-                            Add accounts
-                        </button>
+                    </div>
+                    
+                    <!-- Bottom Link (Refer Your Friends) -->
+                    <div class="relative z-10 mt-5 w-max cursor-pointer active:scale-95 transition-transform" onclick="window.switchTab('refer')">
+                        <span class="text-[#00E5A0] font-bold text-[15px] flex items-center gap-1.5">
+                            Refer Your Friends 
+                            <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
                     </div>
 
-                    <div class="flex items-center border-t border-white/5 pt-5 cursor-pointer" onclick="window.copyReferLink()">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Refer Code <span class="text-[#00A87A] ml-0.5">📋</span></p>
-                            <p class="text-white font-black text-[13px] tracking-widest" id="home-card-refer-code">CODE</p>
-                        </div>
-                    </div>
+                    <!-- 3D Bank/Wealth Icon (Updated URL for stability) -->
+                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/bank-building-5374026-4496468.png" alt="Bank" class="absolute -bottom-2 right-4 w-[90px] h-[90px] object-contain z-0 drop-shadow-2xl">
                 </div>
 
                 <div class="flex items-center gap-1.5 px-2">
@@ -76,31 +78,7 @@
             
             <div class="bg-[#F8FAFC] rounded-t-[32px] px-5 pt-8 pb-10 -mt-6 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[60vh]">
                 
-                <!-- NEW FEDERAL BANK SAVINGS CARD SECTION -->
-                <div class="mb-10">
-                    <div class="bg-[#313439] rounded-[24px] p-6 shadow-xl relative overflow-hidden min-h-[170px] flex flex-col justify-between cursor-pointer active:scale-[0.98] transition-transform">
-                        
-                        <!-- Top Text Content -->
-                        <div class="relative z-10 w-[75%]">
-                            <p class="text-slate-300 font-medium text-[14px] mb-2 tracking-wide">Federal Bank Savings A/C</p>
-                            <h2 class="text-[20px] font-bold text-white leading-snug tracking-tight">Get 2% back on UPI &<br>Debit Card spends</h2>
-                        </div>
-                        
-                        <!-- Bottom Link -->
-                        <div class="relative z-10 mt-6">
-                            <span class="text-[#00E5A0] font-bold text-[15px] flex items-center gap-1.5">
-                                Open a Savings Account 
-                                <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                            </span>
-                        </div>
-
-                        <!-- 3D Bank Icon -->
-                        <img src="https://cdn3d.iconscout.com/3d/premium/thumb/bank-building-5374026-4496468.png" alt="Bank" class="absolute -bottom-2 right-4 w-[90px] h-[90px] object-contain z-0 drop-shadow-2xl">
-                    </div>
-                </div>
-                <!-- END OF FEDERAL BANK SAVINGS CARD SECTION -->
-
-                <div class="mb-10 px-1">
+                <div class="mb-8 px-1 mt-2">
                     <div class="flex justify-between items-center mb-5">
                         <h3 class="text-[18px] font-black text-slate-900 tracking-tight">Quick Actions</h3>
                         <button onclick="window.location.href='task.html'" class="text-[12px] font-bold text-[#00A87A] bg-[#00A87A]/10 px-3.5 py-1.5 rounded-full flex items-center gap-1 hover:bg-[#00A87A]/20 transition-colors">
