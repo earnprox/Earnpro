@@ -13,7 +13,7 @@
         }
     </script>
 </head>
-<body class="relative min-h-screen selection:bg-emerald-100 pb-20 bg-[#F2F5F8] font-['Inter'] antialiased">
+<body class="relative min-h-screen selection:bg-emerald-100 pb-24 bg-[#F2F5F8] font-['Inter'] antialiased">
 
     <span id="home-card-user-name" class="hidden"></span>
     <span id="home-top-balance" class="hidden">₹0.00</span>
@@ -283,23 +283,24 @@
 
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 z-50 px-5 pb-5 max-w-md mx-auto">
-        <nav class="bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-full flex justify-between items-center px-6 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
-            <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-[#00A87A]" data-target="home">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span class="text-[9px] font-bold">Home</span>
+    <!-- UPDATED DARK BOTTOM NAVIGATION -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto">
+        <nav class="bg-[#121615] flex justify-between items-center px-8 pt-3 pb-4 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] border-t border-white/5">
+            <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-[#00A87A] transition-colors" data-target="home">
+                <svg class="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span class="text-[10px] font-medium tracking-wide">Home</span>
             </button>
-            <button onclick="window.switchTab('refer')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700" data-target="refer">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <span class="text-[9px] font-medium">Refer</span>
+            <button onclick="window.switchTab('refer')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="refer">
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span class="text-[10px] font-medium tracking-wide">Refer</span>
             </button>
-            <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700" data-target="wallet">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2"></path></svg>
-                <span class="text-[9px] font-medium">Vault</span>
+            <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="wallet">
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2"></path></svg>
+                <span class="text-[10px] font-medium tracking-wide">Vault</span>
             </button>
-            <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700" data-target="profile">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="text-[9px] font-medium">Profile</span>
+            <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="profile">
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="text-[10px] font-medium tracking-wide">Profile</span>
             </button>
         </nav>
     </div>
