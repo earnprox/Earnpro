@@ -1,13 +1,13 @@
-const { db } = require('./_firebase'); // 'C' छोटा कर दिया गया है
+const { db } = require('./_firebase');
 const crypto = require('crypto');
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     
-    const { phone, pin } = req.body; 
+    const { phone, pin } = req.body;
 
-    // 🔥 FIX 1: Input Validation (अगर फोन या पिन खाली है तो एरर दो)
-    if (!phone || !pin) {
+    // अगर फोन या पिन खाली है तो एरर दो
+    if (!phone || pin === undefined || pin === null) {
         return res.status(400).json({ error: 'Phone and PIN are required' });
     }
 
@@ -18,27 +18,45 @@ module.exports = async function handler(req, res) {
         const userDoc = snapshot.docs[0];
         const userData = userDoc.data();
 
-        // 🔥 FIX 2: Salted Hashing (4-digit PIN को हैक होने से बचाने के लिए Secret Salt जोड़ा गया है)
-        // नोट: आप इस secret को Vercel के Environment Variables में भी रख सकते हैं
+        // 🔥 FIX 1: क्रैश रोकने के लिए PIN को पक्का String में बदलें
+        const pinString = String(pin);
         const SECRET_SALT = process.env.PIN_SECRET_KEY || "EarnproX_Super_Secret_Salt_2026"; 
-        const hashedInputPin = crypto.createHash('sha256').update(pin + SECRET_SALT).digest('hex');
+        const hashedInputPin = crypto.createHash('sha256').update(pinString + SECRET_SALT).digest('hex');
 
-        // पिन चेक करना
+        // 🔥 FIX 2: पुराने (Plain Text) और नए (Hashed) दोनों PIN को सपोर्ट करना
+        let isPinValid = false;
+        let needsHashUpgrade = false;
+
         if (userData.pin === hashedInputPin) {
-            // एक नया मज़बूत टोकन जनरेट करें
+            isPinValid = true; // नया सिक्योर हैश पिन मैच हो गया
+        } else if (String(userData.pin) === pinString) {
+            isPinValid = true; // पुराना सिंपल पिन मैच हो गया
+            needsHashUpgrade = true; // इसे डेटाबेस में हैश करना है
+        }
+
+        // पिन सही होने पर लॉगिन करें
+        if (isPinValid) {
             const token = crypto.randomBytes(32).toString('hex');
             
-            await db.collection('users').doc(userDoc.id).update({ 
+            const updateData = { 
                 sessionToken: token,
                 lastLogin: new Date() 
-            });
+            };
+
+            // अगर यूज़र का पुराना पिन था, तो उसे डेटाबेस में हमेशा के लिए सिक्योर (Hashed) कर दो
+            if (needsHashUpgrade) {
+                updateData.pin = hashedInputPin;
+            }
+
+            await db.collection('users').doc(userDoc.id).update(updateData);
             
             return res.status(200).json({ token });
         } else {
             return res.status(401).json({ error: 'Incorrect PIN' });
         }
     } catch (e) {
-        console.error("Login Error:", e); // Vercel logs में एरर देखने के लिए
-        return res.status(500).json({ error: 'Login Server Error' });
+        console.error("Login Error Details:", e); // Vercel Logs में देखने के लिए
+        // Frontend पर असली एरर भेजें ताकि पता चले अगर कोई और दिक्कत हो
+        return res.status(500).json({ error: 'Login Server Error', details: e.message });
     }
 };
