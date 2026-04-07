@@ -162,12 +162,6 @@
 
         function triggerHaptic() { if ("vibrate" in navigator) navigator.vibrate(50); }
 
-        async function hashPin(pin) {
-            const msgBuffer = new TextEncoder().encode(pin);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { 
                 const splash = document.getElementById('splash-screen');
@@ -189,6 +183,7 @@
         });
 
         function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
+        
         window.showToast = function(msg) { 
             const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
             triggerHaptic(); setTimeout(()=>t.classList.remove("show"), 3500); 
@@ -224,7 +219,6 @@
                 const fullLoginPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
                 if(fullLoginPin.length === 4) window.loginWithPIN();
             } else if (type === 'setup' && current.value.length === 1) {
-                // 🔥 FIX: 4-Digit Auto-Submit Check 🔥
                 const fullSetupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
                 const fullOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
                 if(fullSetupPin.length === 4 && fullOtp.length === 4) window.verifyOTPAndSave();
@@ -316,13 +310,12 @@
             
             showLoader(true);
             const phone = document.getElementById('mobile-input').value.trim();
-            const hashedInputPin = await hashPin(enteredPin);
 
             try {
                 const response = await fetch('/api/login-pin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, pinHash: hashedInputPin })
+                    body: JSON.stringify({ phone: phone, pin: enteredPin }) 
                 });
                 const data = await response.json();
                 if(response.ok && data.token) {
@@ -341,8 +334,6 @@
         window.verifyOTPAndSave = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
-            
-            // 🔥 FIX: Check only 4 values 🔥
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
             const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
             
@@ -359,11 +350,10 @@
 
             showLoader(true);
             try {
-                const secureHashedPin = await hashPin(setupPin);
                 const response = await fetch('/api/verify-setup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone, pinHash: secureHashedPin, isNewUser, isForgotPin, name: finalName, referCode })
+                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone: phone, pin: setupPin, isNewUser, isForgotPin, name: finalName, referCode })
                 });
 
                 const data = await response.json();
@@ -375,5 +365,3 @@
             } catch (error) { window.showToast("❌ Setup Failed! Network Error."); showLoader(false); }
         }
     </script>
-</body>
-</html>
