@@ -1,4 +1,4 @@
-const { db, admin } = require('./_firebase');
+const { db, admin } = require('./_firebase'); // 🔥 FIX 1: 'Const' को 'const' कर दिया है
 const crypto = require('crypto');
 
 module.exports = async function handler(req, res) {
@@ -6,10 +6,11 @@ module.exports = async function handler(req, res) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { sessionId, otpEntered, phone, pinHash, isNewUser, isForgotPin, name, referCode } = req.body;
+    // 🔥 FIX 2: Frontend अब 'pin' भेज रहा है, 'pinHash' नहीं
+    const { sessionId, otpEntered, phone, pin, isNewUser, isForgotPin, name, referCode } = req.body;
     const API_KEY = process.env.TWO_FACTOR_API_KEY;
 
-    if (!sessionId || !otpEntered || !phone) {
+    if (!sessionId || !otpEntered || !phone || !pin) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -22,6 +23,12 @@ module.exports = async function handler(req, res) {
         if (data.Status !== 'Success' || data.Details !== 'OTP Matched') {
             return res.status(400).json({ error: 'Invalid or Expired OTP' });
         }
+
+        // 🔥 FIX 3: BACKEND HASHING (सिक्योरिटी)
+        // जो PIN फ्रंटएंड से आया है, उसे हैश करके सिक्योर कर रहे हैं
+        const pinString = String(pin);
+        const SECRET_SALT = process.env.PIN_SECRET_KEY || "EarnproX_Super_Secret_Salt_2026"; 
+        const secureHashedPin = crypto.createHash('sha256').update(pinString + SECRET_SALT).digest('hex');
 
         // 2. Process Firebase Logic
         const token = crypto.randomUUID(); 
@@ -39,7 +46,7 @@ module.exports = async function handler(req, res) {
             batch.set(newUserRef, {
                 phone: phone,
                 name: name,
-                pin: pinHash,
+                pin: secureHashedPin, // 🔥 हैश किया हुआ PIN डेटाबेस में सेव होगा
                 sessionToken: token,
                 balance: 0,
                 ownReferCode: myOwnCode,
@@ -63,7 +70,7 @@ module.exports = async function handler(req, res) {
             const snap = await db.collection('users').where('phone', '==', phone).get();
             if (!snap.empty) {
                 await db.collection('users').doc(snap.docs[0].id).update({ 
-                    pin: pinHash, 
+                    pin: secureHashedPin, // 🔥 नया हैश किया हुआ PIN डेटाबेस में अपडेट होगा
                     sessionToken: token 
                 });
             } else {
