@@ -1,477 +1,380 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | Premium App</title>
+    <title>EarnproX | Secure Login & Setup</title>
+    
+    <meta name="description" content="Secure login to EarnproX. Complete simple digital tasks and receive rewards.">
+    <meta name="robots" content="noindex, nofollow"> 
+    <link rel="icon" type="image/png" href="favicon.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; overflow-x: hidden; }
+        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05); }
+        .form-step { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: absolute; top: 0; left: 0; padding: 24px; visibility: hidden; }
+        .step-out-left { transform: translateX(-120%); opacity: 0; pointer-events: none; visibility: hidden; }
+        .step-in-right { transform: translateX(120%); opacity: 0; pointer-events: none; visibility: hidden; }
+        .step-active { transform: translateX(0); opacity: 1; pointer-events: auto; position: relative; padding: 0; visibility: visible; }
+        
+        .otp-box, .pin-box { width: 45px; height: 55px; text-align: center; font-size: 24px; font-weight: 800; border-radius: 12px; border: 2px solid #E2E8F0; background: #F1F5F9; outline: none; transition: all 0.2s; color: #0F172A; }
+        .otp-box:focus, .pin-box:focus { border-color: #FACC15; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.15); }
+        @media (max-width: 380px) { .otp-box { width: 38px; height: 50px; font-size: 20px; } .pin-box { width: 40px; height: 50px; font-size: 20px; } }
+        
+        #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 99px; padding: 12px 24px; position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+        #global-loader { position: fixed; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); z-index: 9998; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #F8FAFC; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; }
+        #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .pulse-logo { animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    </style>
     <script>
-        if (!localStorage.getItem("earnprox_user_phone") || !sessionStorage.getItem("earnprox_secure_token")) {
-            window.location.replace("login.html");
-        }
+        const storedPhone = localStorage.getItem("earnprox_user_phone");
+        const storedToken = sessionStorage.getItem("earnprox_secure_token");
+        if (storedPhone && storedToken) { window.location.replace("dashboard.html"); }
     </script>
 </head>
-<body class="relative min-h-screen selection:bg-emerald-100 pb-24 bg-[#F2F5F8] font-['Inter'] antialiased">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-5 selection:bg-yellow-200 selection:text-yellow-900 relative overflow-hidden">
 
-    <span id="home-card-user-name" class="hidden"></span>
-    <span id="home-top-balance" class="hidden">₹0.00</span>
-    <span id="stat-total-withdraw-hidden" class="hidden">₹0</span>
-    <span id="total-refers-count-hidden" class="hidden">0</span>
-    <span id="home-card-refer-code" class="hidden">CODE</span>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] bg-yellow-400 rounded-full blur-[100px] sm:blur-[120px] opacity-15 pointer-events-none -z-10"></div>
 
-    <div class="relative z-10">
+    <div id="global-loader">
+        <svg class="animate-spin h-10 w-10 text-yellow-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <p class="text-sm font-bold text-slate-700 animate-pulse">Securing Connection...</p>
+    </div>
 
-        <div id="view-home" class="tab-content active pt-0">
+    <div id="splash-screen">
+        <div class="relative w-56 h-16 mx-auto overflow-hidden pulse-logo mb-3">
+            <img src="logo.png" alt="EarnproX Logo" onerror="this.style.display='none'; document.getElementById('splash-text').classList.remove('hidden');" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[250%] max-w-none">
+            <span id="splash-text" class="font-black text-3xl hidden text-slate-900 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-full text-center">EarnproX</span>
+        </div>
+        <div class="mt-4 flex gap-2 justify-center items-center">
+            <div class="w-2.5 h-2.5 bg-yellow-500 rounded-full animate-bounce"></div>
+            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-2.5 h-2.5 bg-yellow-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+        </div>
+    </div>
+
+    <div class="text-center mb-8 mt-2 relative z-10">
+        <a href="index.html" class="block relative w-48 h-12 mx-auto overflow-hidden mb-2 transition-transform active:scale-95">
+            <img src="logo.png" alt="EarnproX Logo" onerror="this.style.display='none'; document.getElementById('header-text').classList.remove('hidden');" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[250%] max-w-none drop-shadow-sm">
+            <span id="header-text" class="font-black text-2xl hidden text-slate-900 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-full text-center">EarnproX</span>
+        </a>
+        <p class="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Complete digital tasks securely.</p>
+    </div>
+
+    <div class="premium-card rounded-[2rem] p-6 sm:p-8 w-full max-w-md relative overflow-hidden min-h-[460px] flex flex-col justify-start z-10 border-t-4 border-t-yellow-400">
+        
+        <div id="step-1" class="form-step step-active">
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Let's get started</h2>
+            <p class="text-sm text-slate-500 mb-8 font-medium">Enter your mobile number to securely login or create an account.</p>
+            <div class="mb-6">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Mobile Number</label>
+                <div class="relative flex items-center bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-1 focus-within:border-yellow-400 focus-within:ring-4 focus-within:ring-yellow-400/20 transition duration-300 shadow-sm">
+                    <span class="text-slate-400 font-black mr-3 border-r-2 border-slate-200 pr-3">+91</span>
+                    <input type="tel" inputmode="numeric" pattern="[0-9]*" id="mobile-input" maxlength="10" placeholder="98765 43210" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onkeyup="if(this.value.length === 10) window.checkUserAndProceed()" class="w-full text-xl font-black text-slate-800 bg-transparent outline-none py-3 tracking-wider placeholder:font-semibold placeholder:text-slate-300">
+                </div>
+            </div>
+            <button onclick="window.checkUserAndProceed()" id="send-otp-btn" class="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black py-4 rounded-xl shadow-[0_8px_20px_rgba(250,204,21,0.3)] text-lg active:scale-95 transition flex justify-center items-center gap-2 mt-auto focus:outline-none focus:ring-4 focus:ring-yellow-400/50">
+                Continue <span class="text-xl">→</span>
+            </button>
+        </div>
+
+        <div id="step-pin" class="form-step step-in-right">
+            <button onclick="window.goBack('step-pin', 'step-1')" class="text-slate-400 hover:text-slate-800 mb-6 transition flex items-center gap-1 -ml-2 p-2 rounded-lg hover:bg-slate-50 focus:outline-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span class="text-xs font-bold uppercase tracking-wider">Back</span>
+            </button>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Welcome Back!</h2>
+            <p class="text-sm text-slate-500 mb-8 font-medium">Enter your 4-digit PIN for <b id="display-number-pin" class="text-slate-800 tracking-wider"></b></p>
+            <div class="mb-6">
+                <div class="flex gap-3 justify-center">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" id="l-pin1" onkeyup="window.moveToNext(this, 'l-pin2', event, 'login')">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" id="l-pin2" onkeyup="window.moveToNext(this, 'l-pin3', event, 'login')">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" id="l-pin3" onkeyup="window.moveToNext(this, 'l-pin4', event, 'login')">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" id="l-pin4" onkeyup="window.moveToNext(this, null, event, 'login')">
+                </div>
+            </div>
+            <div class="text-center mb-8">
+                <button onclick="window.triggerForgotPin()" class="text-xs font-bold text-yellow-600 hover:underline">Forgot PIN? Login via OTP</button>
+            </div>
+            <button onclick="window.loginWithPIN()" id="pin-login-btn" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
+                Secure Login
+            </button>
+        </div>
+
+        <div id="step-otp" class="form-step step-in-right">
+            <button id="back-btn-otp" onclick="window.goBack('step-otp', 'step-1')" class="text-slate-400 hover:text-slate-800 mb-4 transition flex items-center gap-1 -ml-2 p-2 rounded-lg hover:bg-slate-50">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span class="text-xs font-bold uppercase tracking-wider">Back</span>
+            </button>
+            <h2 class="text-2xl font-black text-slate-900 mb-2" id="otp-heading">Verify & Setup</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mb-4 font-medium">OTP sent to <b id="display-number-otp" class="text-slate-800 tracking-wider"></b></p>
             
-            <div class="bg-[#0B100E] pt-8 px-5 pb-10 relative z-0">
+            <div id="new-user-fields" class="mb-4">
+                <input type="text" id="name-input" placeholder="What's your full name?" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-yellow-400 transition mb-3">
+                <input type="text" id="refer-input" placeholder="Invite Code (Optional)" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold rounded-xl px-4 py-3 outline-none focus:border-emerald-400 transition uppercase tracking-widest">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center" id="pin-setup-label">Set a New 4-Digit PIN</label>
+                <div class="flex gap-3 justify-center">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin1" onkeyup="window.moveToNext(this, 's-pin2', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin2" onkeyup="window.moveToNext(this, 's-pin3', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin3" onkeyup="window.moveToNext(this, 's-pin4', event, 'setup')">
+                    <input type="password" inputmode="numeric" maxlength="1" class="pin-box !border-yellow-300" id="s-pin4" onkeyup="window.moveToNext(this, 'otp1', event, 'setup')">
+                </div>
+            </div>
+
+            <div class="mb-4 border-t-2 border-slate-100 pt-4 relative">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">Enter 4-Digit SMS OTP</label>
+                <div class="flex gap-2 sm:gap-3 justify-center" id="otp-container">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp1" onkeyup="window.moveToNext(this, 'otp2', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp2" onkeyup="window.moveToNext(this, 'otp3', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp3" onkeyup="window.moveToNext(this, 'otp4', event, 'setup')">
+                    <input type="tel" autocomplete="one-time-code" maxlength="1" class="otp-box !text-lg" id="otp4" onkeyup="window.moveToNext(this, null, event, 'setup')">
+                </div>
                 
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-3">
-                        <div id="top-nav-profile-initial" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-slate-300 font-bold text-lg cursor-pointer border border-white/5" onclick="window.switchTab('profile')">
-                            U
-                        </div>
-                        <!-- RED DAILY SPIN BUTTON -->
-                        <div class="bg-gradient-to-r from-[#E53935] to-[#EF4444] px-4 py-1.5 rounded-full flex items-center gap-2 cursor-pointer shadow-[0_4px_12px_rgba(239,68,68,0.3)]" onclick="window.location.href='spin.html'">
-                            <span class="text-[12px] font-bold text-white tracking-wide leading-tight">Daily Spin<br>& Win 🎡</span>
-                            <svg class="w-3.5 h-3.5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                        </div>
-                    </div>
-                    
-                    <button onclick="window.openSheet('notification-sheet')" class="w-10 h-10 rounded-full flex items-center justify-center bg-[#1C211F] text-white hover:bg-white/10 transition-all border border-white/5 relative">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span id="notification-badge" class="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full hidden"></span>
-                    </button>
-                </div>
-
-                <!-- MAIN BALANCE CARD -->
-                <div class="bg-[#313439] rounded-[24px] p-6 shadow-2xl relative mb-5 overflow-hidden flex flex-col justify-between" style="min-height: 180px;">
-                    
-                    <!-- Top Content & Withdraw Button -->
-                    <div class="relative z-10 flex justify-between items-start w-full">
-                        <p class="text-slate-300 font-medium text-[14px] tracking-wide mt-1">Your Wealth</p>
-                        <button onclick="window.openFullPage('withdraw-page')" class="bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded-full font-bold text-[12px] flex items-center gap-1.5 backdrop-blur-sm active:scale-95 transition-all border border-white/5 shadow-sm z-20 relative">
-                            Withdraw
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        </button>
-                    </div>
-
-                    <!-- Main Balance Text -->
-                    <div class="flex items-center gap-1.5 relative z-10 mt-3 mb-5">
-                        <span class="text-slate-400 text-3xl font-medium mt-1">₹</span>
-                        <h2 class="text-[44px] font-bold text-white leading-none tracking-tight" id="home-card-big-balance">0</h2>
-                    </div>
-                    
-                    <!-- Bottom Link -->
-                    <div class="relative z-10 w-max cursor-pointer active:scale-95 transition-transform" onclick="window.switchTab('refer')">
-                        <span class="text-[#00E5A0] font-bold text-[15px] flex items-center gap-1.5">
-                            Refer Your Friends 
-                            <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                        </span>
-                    </div>
-
-                    <!-- BANK ICON SIZE REDUCED -->
-                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bank/3D/bank_3d.png" alt="Bank" class="absolute bottom-6 right-5 w-[24px] h-[24px] object-contain z-0 opacity-80">
-                </div>
-                <!-- END OF BALANCE CARD -->
-
-                <div class="flex items-center gap-1.5 px-2">
-                    <span class="text-white/90 text-[10px] font-bold mr-1">1/1</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
-                </div>
-            </div>
-            
-            <!-- WHITE SECTION STARTS HERE -->
-            <div class="bg-white rounded-t-[32px] px-5 pt-8 pb-10 -mt-6 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[60vh]">
-
-                <div class="mb-8 mt-1">
-                    <h3 class="text-[15px] font-semibold text-slate-700 tracking-wide mb-4 px-1">Rewards worth up to ₹1000/daily</h3>
-                    
-                    <div class="flex gap-2.5 mb-8">
-                        <!-- Left Big Card -->
-                        <div class="w-[45%] bg-[#E8EBF0] rounded-[24px] p-4 flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
-                            <div class="absolute -bottom-10 -right-6 w-28 h-28 bg-[#DFE3E9] rounded-full blur-2xl z-0"></div>
-                            <div class="relative z-10">
-                                <p class="text-[11px] text-slate-500 font-medium mb-1">Earn as you complete</p>
-                                <h4 class="text-[17px] text-slate-800 font-semibold leading-tight">Daily Task<br>for Active</h4>
-                            </div>
-                            <div class="flex-1 flex items-center justify-center relative z-10 py-5">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Wrapped%20gift/3D/wrapped_gift_3d.png" alt="Gift" class="w-[85px] h-[85px] object-contain drop-shadow-xl">
-                            </div>
-                            <button class="bg-[#EF4444] text-white text-[11px] font-bold py-2 px-5 rounded-full w-max mx-auto relative z-10 shadow-[0_4px_10px_rgba(239,68,68,0.3)]">Start Now</button>
-                        </div>
-                        
-                        <!-- Right Small Stacked Cards -->
-                        <div class="w-[55%] flex flex-col gap-2.5">
-                            
-                            <!-- Small Card 1 -->
-                            <div class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <div class="absolute -bottom-5 -right-5 w-16 h-16 bg-[#DFE3E9] rounded-full blur-xl z-0"></div>
-                                <div class="relative z-10">
-                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">Get back</p>
-                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">2% on spends</h4>
-                                </div>
-                                <span class="absolute bottom-2 right-3 text-[18px] text-slate-400 font-black z-10">%</span>
-                            </div>
-                            
-                            <!-- Small Card 2 -->
-                            <div class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <div class="relative z-10">
-                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">Invest with ease</p>
-                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">US Stocks, FD, etc</h4>
-                                </div>
-                                <svg class="absolute bottom-2.5 right-3 w-4 h-4 text-slate-400 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-                            </div>
-                            
-                            <!-- Small Card 3 -->
-                            <div class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <div class="absolute -bottom-5 -right-5 w-16 h-16 bg-[#DFE3E9] rounded-full blur-xl z-0"></div>
-                                <div class="relative z-10">
-                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">International Debit Card</p>
-                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">0 forex fee*</h4>
-                                </div>
-                                <svg class="absolute bottom-2.5 right-3 w-4 h-4 text-slate-400 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18"></path></svg>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- 4 Shortcut Icons Row -->
-                    <div class="flex justify-between items-start mb-8 px-1">
-                        
-                        <!-- Instant Loan -->
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20bag/3D/money_bag_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
-                            </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Instant<br>Loan</span>
-                        </div>
-
-                        <!-- Card Offers -->
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
-                                <div class="relative w-8 h-8 flex items-center justify-center">
-                                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rosette/3D/rosette_3d.png" class="absolute inset-0 w-full h-full object-contain" style="filter: hue-rotate(-45deg) saturate(1.5);">
-                                    <span class="absolute text-[10px] font-black text-amber-100 z-10">%</span>
-                                </div>
-                            </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Card<br>Offers</span>
-                        </div>
-
-                        <!-- Collected Offers -->
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
-                                <div class="relative w-8 h-8 flex items-center justify-center">
-                                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Label/3D/label_3d.png" class="absolute inset-0 w-full h-full object-contain" style="filter: hue-rotate(-20deg) saturate(1.5);">
-                                    <span class="absolute text-[10px] font-black text-amber-100 z-10">%</span>
-                                </div>
-                            </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Collected<br>Offers</span>
-                        </div>
-
-                        <!-- Earn Rewards -->
-                        <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Potted%20plant/3D/potted_plant_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
-                            </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Earn<br>Rewards</span>
-                        </div>
-
-                    </div>
-
-                    <!-- NEW TRUSTED BY SECTION -->
-                    <div class="mt-12 px-1 mb-2">
-                        <h2 class="text-[32px] font-bold text-[#B0B6C3] leading-[1.1] mb-2 tracking-tight">Trusted by<br>Indians <span class="text-red-500">♥️</span></h2>
-                        <p class="text-[13px] font-medium text-slate-500 mb-6">Your money safely rests with Earnprox</p>
-                        
-                        <div class="flex items-center mb-8">
-                            <!-- logo.png - Increased Size -->
-                            <img src="logo.png" alt="Earnprox Logo" class="h-16 w-auto object-contain">
-                        </div>
-
-                        <!-- Badge and Button Container -->
-                        <div class="flex flex-col gap-4 items-start">
-                            <button class="flex items-center gap-1.5 text-[12px] font-bold text-[#00A87A] bg-emerald-50/80 px-4 py-2 rounded-full transition-transform active:scale-95 border border-[#00A87A]/10">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-                                Why trust Earnprox?
-                            </button>
-
-                            <!-- Security Practices Badge -->
-                            <div class="flex items-center gap-3 bg-[#F6F8FA] px-4 py-2.5 rounded-2xl border border-slate-100 shadow-sm w-max">
-                                <span class="text-xl leading-none">🏆</span>
-                                <span class="text-[11px] font-bold text-slate-700 leading-tight">Best Digital Earning<br>Security Practices</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div id="view-refer" class="tab-content relative -mx-5 -mt-5">
-            <div class="bg-[#0B100E] p-8 pb-10 text-center rounded-b-[3rem] shadow-xl relative overflow-hidden border-b border-white/10">
-                <div class="w-20 h-20 mx-auto rounded-full bg-slate-800 p-1 mb-4 border border-white/10 relative z-10"><img id="refer-profile-img" src="" class="w-full h-full rounded-full object-cover"></div>
-                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 relative z-10">EarnproX Member</h3>
-                <h2 class="text-3xl font-black text-white mb-6 relative z-10" id="refer-page-name">User Name</h2>
-                <div class="flex justify-center items-center gap-3 relative z-10">
-                    <div class="bg-white/5 px-6 py-3 rounded-xl border border-white/5 font-black text-white tracking-widest text-sm" id="referral-code-text">CODE</div>
-                    <button onclick="window.copyReferLink()" class="bg-[#00A87A] p-3.5 rounded-xl text-white active:scale-90 transition-transform"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
-                </div>
-            </div>
-            <div class="px-5 pt-8 pb-4">
-                <div class="mb-6 bg-white p-5 rounded-[20px] shadow-sm border border-slate-100">
-                    <h2 class="text-xl font-black mb-1 text-slate-800">Team Insights</h2>
-                    <p class="text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-widest">Total Registered</p>
-                    <h1 class="text-5xl font-black text-[#00A87A] leading-none" id="total-refers-count">0</h1>
-                </div>
-                <h3 class="text-xs font-black text-slate-800 mb-2 px-2">Network Logs</h3>
-                <div class="bg-white rounded-xl p-3 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3 border border-slate-100 shadow-sm">
-                    <div class="w-1/2">User Name</div><div class="w-1/4 text-center">Date</div><div class="w-1/4 text-right">Level</div>
-                </div>
-                <div id="referral-list-container" class="space-y-2 pb-20"></div>
-            </div>
-        </div>
-
-        <div id="view-wallet" class="tab-content">
-            <h2 class="text-2xl font-black tracking-tight mb-4 text-slate-900">My Vault</h2>
-            <div class="rounded-[24px] p-6 mb-5 bg-[#0B100E] text-white shadow-xl relative overflow-hidden border border-white/5">
-                <div class="flex justify-between items-start mb-6 relative z-10">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Withdrawable Balance</p>
-                    <button onclick="window.openFullPage('withdraw-page')" class="bg-white text-slate-900 font-bold py-1.5 px-4 rounded-lg active:scale-95 text-xs transition-transform">Withdraw</button>
-                </div>
-                <h2 class="text-[40px] font-bold tracking-tight mb-2 relative z-10 leading-none" id="main-balance-display">₹0.00</h2>
-            </div>
-            
-            <div class="bg-white rounded-[20px] overflow-hidden mb-6 shadow-sm border border-slate-100 p-1.5">
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">💰</div><div><p class="text-xs font-bold text-slate-900">Total Earning</p><p class="text-[9px] text-slate-400">Lifetime</p></div></div>
-                    <span class="text-xs font-bold text-slate-900" id="stat-total-earn">₹0.00</span>
-                </div>
-                <div class="w-full h-[1px] bg-slate-50 my-0.5"></div>
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">📤</div><div><p class="text-xs font-bold text-slate-900">Withdrawals</p><p class="text-[9px] text-slate-400">To Bank</p></div></div>
-                    <span class="text-xs font-bold text-rose-500" id="stat-total-withdraw">₹0.00</span>
-                </div>
-                <div class="w-full h-[1px] bg-slate-50 my-0.5"></div>
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">🎯</div><div><p class="text-xs font-bold text-slate-900">Task Earning</p><p class="text-[9px] text-slate-400">Work Rewards</p></div></div>
-                    <span class="text-xs font-bold text-[#00A87A]" id="stat-task-earn">₹0.00</span>
-                </div>
-                <div class="w-full h-[1px] bg-slate-50 my-0.5"></div>
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">🎁</div><div><p class="text-xs font-bold text-slate-900">Refer Earning</p><p class="text-[9px] text-slate-400">Network Bonus</p></div></div>
-                    <span class="text-xs font-bold text-[#00A87A]" id="stat-refer-earn">₹0.00</span>
-                </div>
+                <p id="otp-timer-container" class="text-center text-xs font-bold text-slate-400 mt-4 hidden">
+                    Resend OTP in <span id="otp-timer-count" class="text-yellow-600">30</span>s
+                </p>
+                <button id="resend-otp-btn" onclick="window.resendOTP()" class="w-full text-center text-xs font-bold text-yellow-600 hover:underline mt-4 hidden focus:outline-none">
+                    Resend OTP Now
+                </button>
             </div>
 
-            <div class="bg-white rounded-[20px] shadow-sm border border-slate-100">
-                <div onclick="window.openSheet('history-sheet')" class="flex justify-between items-center p-4 hover:bg-slate-50 cursor-pointer rounded-[20px]">
-                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-xl">📜</div><p class="text-sm font-bold text-slate-800">Ledger & History</p></div>
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-profile" class="tab-content">
-            <div class="bg-white rounded-[24px] p-6 mb-5 text-center mt-2 shadow-sm border border-slate-100">
-                <div class="w-24 h-24 rounded-full bg-slate-100 mx-auto mb-4 border-[3px] border-white shadow-md overflow-hidden"><img id="profile-avatar" src="" class="w-full h-full object-cover"></div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-1" id="profile-user-name">User</h2>
-                <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Verified Member</p>
-            </div>
-            
-            <div class="bg-white rounded-[24px] overflow-hidden mb-6 shadow-sm border border-slate-100">
-                <div class="px-5 py-4 flex items-center gap-3 border-b border-slate-100 bg-slate-50">
-                    <div class="w-1 h-5 bg-slate-900 rounded-full"></div>
-                    <h3 class="font-bold text-slate-900 text-[15px]">Settings</h3>
-                </div>
-                <div onclick="window.openSheet('kyc-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 cursor-pointer">
-                    <p class="text-[13px] font-medium text-slate-800">KYC & Bank Details</p>
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <div class="flex flex-wrap gap-5 px-5 py-5 border-b border-slate-100 justify-center">
-                    <a href="privacy.html" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Privacy</a>
-                    <a href="terms.html" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Terms</a>
-                    <a href="contact.html" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Support</a>
-                </div>
-                <div onclick="window.logoutUser()" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 cursor-pointer group">
-                    <p class="text-[13px] font-bold text-red-500">Logout Account</p>
-                    <svg class="w-4 h-4 text-red-300 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- UPDATED DARK BOTTOM NAVIGATION -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto">
-        <nav class="bg-[#121615] flex justify-between items-center px-8 pt-3 pb-4 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] border-t border-white/5">
-            <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-[#00A87A] transition-colors" data-target="home">
-                <svg class="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span class="text-[10px] font-medium tracking-wide">Home</span>
-            </button>
-            <button onclick="window.switchTab('refer')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="refer">
-                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <span class="text-[10px] font-medium tracking-wide">Refer</span>
-            </button>
-            <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="wallet">
-                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2"></path></svg>
-                <span class="text-[10px] font-medium tracking-wide">Vault</span>
-            </button>
-            <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="profile">
-                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="text-[10px] font-medium tracking-wide">Profile</span>
-            </button>
-        </nav>
-    </div>
-
-    <div id="withdraw-page" class="fixed inset-0 z-[150] bg-[#F8FAFC] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col max-w-md mx-auto">
-        <div class="px-5 py-5 flex items-center justify-between bg-white border-b border-slate-100">
-            <button onclick="window.closeFullPage('withdraw-page')" class="text-slate-800 p-2 bg-slate-50 rounded-full active:scale-90 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            </button>
-            <h3 class="font-black text-[15px] text-slate-800">Secure Payout</h3>
-            <div class="w-9"></div>
-        </div>
-
-        <div class="flex flex-col items-center mt-10">
-            <div class="w-16 h-16 rounded-[1.25rem] bg-[#0B100E] flex items-center justify-center text-white font-black text-2xl mb-4 shadow-xl">
-                <span id="withdraw-avatar-text">U</span>
-            </div>
-            <h2 class="text-xl font-black text-slate-900" id="withdraw-display-name">Bank Transfer</h2>
-            <p class="text-xs font-bold text-slate-500 mt-1 bg-slate-100 px-3 py-1 rounded-md" id="withdraw-display-upi">Processing...</p>
-        </div>
-
-        <div class="flex-1 flex flex-col justify-center items-center px-8 pb-10">
-            <div class="flex items-center justify-center w-full relative mb-8">
-                <span class="text-4xl font-medium text-slate-300 absolute left-1/2 -translate-x-[calc(50%+70px)]">₹</span>
-                <input type="number" id="withdraw-amount" placeholder="0" class="w-full text-center text-[70px] font-black text-slate-900 bg-transparent outline-none p-0 hide-arrows" style="max-width: 250px;">
-            </div>
-            <div class="bg-white px-5 py-3 rounded-2xl border border-slate-200 flex items-center gap-3 cursor-pointer active:scale-95 transition-all shadow-sm" onclick="document.getElementById('withdraw-amount').value = Math.floor(window.currentBalance)">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available</span>
-                <span class="text-sm font-black text-[#00A87A] bg-emerald-50 px-2 py-0.5 rounded-lg" id="withdraw-page-balance">₹0</span>
-            </div>
-        </div>
-
-        <div class="p-5 w-full mt-auto mb-6 bg-white border-t border-slate-100">
-            <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-[#0B100E] text-white font-bold py-4 rounded-xl shadow-xl text-[15px] active:scale-95 transition-all flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                Confirm Transfer
+            <button onclick="window.verifyOTPAndSave()" id="verify-btn" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl shadow-lg text-lg active:scale-95 transition mt-auto flex justify-center items-center gap-2">
+                Complete Setup
             </button>
         </div>
     </div>
-
-    <div id="universal-overlay" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 max-w-md mx-auto" onclick="window.closeAllSheets()"></div>
-
-    <div id="notification-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] h-[75vh] max-w-md mx-auto">
-        <div class="flex justify-between items-center p-6 pb-4 border-b border-slate-100 relative">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-900 mt-2">Alerts</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="p-6 overflow-y-auto" id="notification-container">
-            <p class="text-slate-400 font-bold text-center py-10 text-sm">Fetching Alerts...</p>
-        </div>
-    </div>
-
-    <div id="kyc-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-[#F8FAFC] w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] max-w-md mx-auto">
-        <div class="flex justify-between items-center p-6 pb-4 bg-white rounded-t-[2.5rem] border-b border-slate-100 relative">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-900 mt-2">Payout Bank</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="p-6 overflow-y-auto">
-            <div class="bg-white p-5 rounded-[20px] shadow-sm border border-slate-100">
-                <div class="mb-4">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Account Name</label>
-                    <input type="text" id="bank-name-input" placeholder="e.g. Akash Kumar" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3.5 outline-none focus:border-[#00A87A] transition-all">
-                </div>
-                <div class="mb-1">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">UPI ID</label>
-                    <input type="text" id="upi-input-box" placeholder="e.g. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3.5 outline-none focus:border-[#00A87A] transition-all">
-                </div>
-            </div>
-        </div>
-        <div class="p-5 bg-white border-t border-slate-100">
-            <button onclick="window.saveRealKYC()" class="w-full bg-[#0B100E] text-white font-black py-4 rounded-xl text-[14px] active:scale-95 transition-all">Lock Details Securely</button>
-        </div>
-    </div>
-
-    <div id="history-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] h-[80vh] max-w-md mx-auto">
-        <div class="flex justify-between items-center p-6 pb-4 border-b border-slate-100 relative">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-900 mt-2">Passbook</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="p-6 overflow-y-auto space-y-3" id="history-container">
-            <div class="text-4xl mb-3 text-center mt-10">🏦</div>
-            <p class="text-slate-400 font-bold text-center text-sm">Loading Records...</p>
-        </div>
-    </div>
-
-    <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center transition-all duration-500 max-w-md mx-auto">
-        <div class="relative flex flex-col items-center">
-            <div class="absolute inset-0 bg-slate-900 rounded-full blur-[40px] opacity-10 animate-pulse"></div>
-            <div class="relative w-48 h-16 mx-auto overflow-hidden z-10 mb-3 animate-[pulse_2s_ease-in-out_infinite]">
-                <img src="logo.png" alt="EarnproX Logo" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[250%] max-w-none">
-            </div>
-            <div class="w-32 h-1 bg-slate-200 rounded-full overflow-hidden relative z-10">
-                <div class="w-1/2 h-full bg-[#00A87A] rounded-full animate-[slide_1.5s_ease-in-out_infinite_alternate]"></div>
-            </div>
-            <p class="text-[9px] font-black text-slate-400 tracking-[0.2em] mt-3 relative z-10 uppercase">Authenticating...</p>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[90px] -translate-x-1/2 bg-[#0B100E] text-white font-bold text-[13px] px-5 py-2.5 rounded-full shadow-2xl opacity-0 invisible transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">Message Here</div>
-
-    <script src="dashboard.js"></script>
+    
+    <div id="toast">Message Here</div>
 
     <script>
-        setInterval(() => {
-            const bigBal = document.getElementById('home-card-big-balance');
-            const topBal = document.getElementById('home-top-balance');
-            if(bigBal && topBal && topBal.innerText !== '₹0.00') {
-                bigBal.innerText = topBal.innerText.replace('₹', '').trim();
-            }
-            
-            // Dynamic Profile Initial
-            const userNameEl = document.getElementById('home-card-user-name');
-            const profileInitialEl = document.getElementById('top-nav-profile-initial');
-            if (userNameEl && userNameEl.innerText && profileInitialEl) {
-                const name = userNameEl.innerText.trim();
-                if (name.length > 0) {
-                    profileInitialEl.innerText = name.charAt(0).toUpperCase();
-                }
-            }
+        let isNewUser = true; 
+        let isForgotPin = false;
+        window.currentOtpSessionId = null; 
+        let otpInterval = null;
 
-            // Sync stats for the new 3 columns in the home card
-            const statWithdraw = document.getElementById('stat-total-withdraw');
-            const homeWithdraw = document.getElementById('home-card-withdrawn');
-            if(statWithdraw && homeWithdraw) {
-                homeWithdraw.innerText = statWithdraw.innerText;
-            }
+        function triggerHaptic() { if ("vibrate" in navigator) navigator.vibrate(50); }
 
-            const statTeam = document.getElementById('total-refers-count');
-            const homeTeam = document.getElementById('home-card-team-size');
-            if(statTeam && homeTeam) {
-                homeTeam.innerText = statTeam.innerText;
-            }
+        async function hashPin(pin) {
+            const msgBuffer = new TextEncoder().encode(pin);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
-            const statCode = document.getElementById('referral-code-text');
-            const homeCode = document.getElementById('home-card-refer-code');
-            if(statCode && homeCode && statCode.innerText !== 'CODE') {
-                homeCode.innerText = statCode.innerText;
-            }
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.classList.contains('text-[#00A87A]')) {
-                    btn.classList.remove('text-[#00A87A]');
-                    btn.classList.add('text-[#00A87A]');
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { 
+                const splash = document.getElementById('splash-screen');
+                if(splash) splash.classList.add('hidden'); 
+                setTimeout(() => document.getElementById('mobile-input').focus(), 300);
+            }, 1200); 
+
+            // 🔥 FIX: 4-Digit Paste Logic 🔥
+            document.getElementById("otp-container").addEventListener("paste", (e) => {
+                e.preventDefault();
+                let paste = (e.clipboardData || window.clipboardData).getData('text').trim();
+                if(/^\d{4}$/.test(paste)){
+                    paste.split('').forEach((num, i)=>{
+                        const otpBox = document.getElementById(`otp${i+1}`);
+                        if(otpBox) { otpBox.value = num; window.moveToNext(otpBox, i < 3 ? `otp${i+2}` : null, {key: ''}, 'setup'); }
+                    });
                 }
             });
-        }, 500);
+        });
+
+        function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
+        window.showToast = function(msg) { 
+            const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
+            triggerHaptic(); setTimeout(()=>t.classList.remove("show"), 3500); 
+        }
+        
+        function startOtpTimer() {
+            let timer = 30;
+            document.getElementById('resend-otp-btn').classList.add('hidden');
+            document.getElementById('otp-timer-container').classList.remove('hidden');
+            document.getElementById('otp-timer-count').innerText = timer;
+            
+            clearInterval(otpInterval);
+            otpInterval = setInterval(() => {
+                timer--; document.getElementById('otp-timer-count').innerText = timer;
+                if(timer <= 0) {
+                    clearInterval(otpInterval);
+                    document.getElementById('otp-timer-container').classList.add('hidden');
+                    document.getElementById('resend-otp-btn').classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        window.moveToNext = function(current, nextId, event, type) { 
+            current.value = current.value.replace(/[^0-9]/g, '');
+            if (current.value.length === 1 && nextId && document.getElementById(nextId)) document.getElementById(nextId).focus(); 
+            if (event.key === "Backspace" && current.value === "") { 
+                const prevId = current.id.replace(/\d+$/, (num) => parseInt(num) - 1); 
+                const prevElem = document.getElementById(prevId);
+                if (current.id === "otp1" && document.getElementById('s-pin4')) document.getElementById('s-pin4').focus();
+                else if(prevElem) prevElem.focus(); 
+            } 
+            if(type === 'login' && current.value.length === 1) {
+                const fullLoginPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
+                if(fullLoginPin.length === 4) window.loginWithPIN();
+            } else if (type === 'setup' && current.value.length === 1) {
+                // 🔥 FIX: 4-Digit Auto-Submit Check 🔥
+                const fullSetupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
+                const fullOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
+                if(fullSetupPin.length === 4 && fullOtp.length === 4) window.verifyOTPAndSave();
+            }
+        }
+
+        function switchStep(fromId, toId) {
+            document.getElementById(fromId).classList.remove('step-active'); document.getElementById(fromId).classList.add('step-out-left');
+            document.getElementById(toId).classList.remove('step-in-right'); document.getElementById(toId).classList.add('step-active');
+        }
+
+        window.goBack = function(currentStepId, targetStepId) {
+            triggerHaptic();
+            document.getElementById(currentStepId).classList.remove('step-active'); document.getElementById(currentStepId).classList.add('step-in-right');
+            document.getElementById(targetStepId).classList.remove('step-out-left'); document.getElementById(targetStepId).classList.add('step-active');
+            if(targetStepId === 'step-1') isForgotPin = false; 
+            document.querySelectorAll(`#${currentStepId} input`).forEach(input => input.value = '');
+        }
+
+        function handleApiError(response, data) {
+            if(response.status === 429) window.showToast("⏳ Too many attempts. Try again later.");
+            else window.showToast("❌ " + (data.error || "Server Error. Please try again."));
+        }
+
+        window.checkUserAndProceed = async function() {
+            triggerHaptic();
+            const phone = document.getElementById('mobile-input').value.trim();
+            if(phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) return window.showToast("⚠️ Enter a valid 10-digit Indian mobile number.");
+            
+            showLoader(true);
+            try {
+                const response = await fetch('/api/check-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                
+                const data = await response.json();
+                if (response.ok && data.exists) {
+                    if(data.status === "blocked") { showLoader(false); return window.showToast("🚫 Account Suspended."); }
+                    isNewUser = false;
+                    document.getElementById('display-number-pin').innerText = "+91 " + phone;
+                    switchStep('step-1', 'step-pin');
+                    setTimeout(() => { document.getElementById('l-pin1').focus(); showLoader(false); }, 400);
+                } else if(response.ok && !data.exists) {
+                    isNewUser = true;
+                    document.getElementById('new-user-fields').style.display = 'block';
+                    document.getElementById('otp-heading').innerText = "Register Account";
+                    document.getElementById('back-btn-otp').onclick = () => window.goBack('step-otp', 'step-1');
+                    await trigger2FactorOTP(phone, 'step-1'); 
+                } else { handleApiError(response, data); showLoader(false); }
+            } catch(error) { window.showToast("❌ Network Error!"); showLoader(false); } 
+        }
+
+        async function trigger2FactorOTP(phone, fromStep) {
+            document.getElementById('display-number-otp').innerText = "+91 " + phone;
+            try {
+                const response = await fetch('/api/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone }) 
+                });
+                const data = await response.json();
+                if (response.ok && data.sessionId) {
+                    window.currentOtpSessionId = data.sessionId;
+                    window.showToast("📲 Security OTP Sent!");
+                    switchStep(fromStep, 'step-otp');
+                    startOtpTimer(); 
+                    setTimeout(() => { if(isNewUser) document.getElementById('name-input').focus(); else document.getElementById('s-pin1').focus(); showLoader(false); }, 400);
+                } else { handleApiError(response, data); showLoader(false); }
+            } catch (error) { window.showToast("❌ Network Connection Failed."); showLoader(false); }
+        }
+
+        window.resendOTP = async function() { triggerHaptic(); showLoader(true); await trigger2FactorOTP(document.getElementById('mobile-input').value.trim(), 'step-otp'); }
+
+        window.triggerForgotPin = async function() {
+            triggerHaptic(); isForgotPin = true;
+            document.getElementById('new-user-fields').style.display = 'none'; 
+            document.getElementById('otp-heading').innerText = "Reset PIN";
+            document.getElementById('pin-setup-label').innerText = "Create New 4-Digit PIN";
+            document.getElementById('back-btn-otp').onclick = () => window.goBack('step-otp', 'step-pin');
+            showLoader(true); await trigger2FactorOTP(document.getElementById('mobile-input').value.trim(), 'step-pin');
+        }
+
+        window.loginWithPIN = async function() {
+            triggerHaptic();
+            const enteredPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
+            if(enteredPin.length < 4) return window.showToast("⚠️ Enter complete 4-digit PIN.");
+            
+            showLoader(true);
+            const phone = document.getElementById('mobile-input').value.trim();
+            const hashedInputPin = await hashPin(enteredPin);
+
+            try {
+                const response = await fetch('/api/login-pin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // 🔥 FIX: 'pinHash' ki jagah 'pin' pass kiya gaya hai 🔥
+                    body: JSON.stringify({ phone: phone, pin: hashedInputPin })
+                });
+                const data = await response.json();
+                if(response.ok && data.token) {
+                    localStorage.setItem("earnprox_user_phone", phone);
+                    sessionStorage.setItem("earnprox_secure_token", data.token); 
+                    window.location.href = "dashboard.html";
+                } else {
+                    handleApiError(response, data);
+                    document.querySelectorAll('#step-pin .pin-box').forEach(el => el.value = '');
+                    document.getElementById('l-pin1').focus();
+                    showLoader(false);
+                }
+            } catch (e) { window.showToast("❌ Connection Error."); showLoader(false); } 
+        }
+
+        window.verifyOTPAndSave = async function() {
+            triggerHaptic();
+            const phone = document.getElementById('mobile-input').value.trim();
+            
+            const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
+            const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
+            
+            let finalName = "", referCode = "None";
+            if(isNewUser) {
+                finalName = document.getElementById('name-input').value.trim();
+                if(!/^[a-zA-Z .]{3,}$/.test(finalName)) return window.showToast("⚠️ Enter a valid Full Name.");
+                referCode = document.getElementById('refer-input').value.trim().toUpperCase();
+                if(referCode && referCode.length !== 7) referCode = "None";
+            }
+
+            if(setupPin.length < 4) return window.showToast("⚠️ Set a complete 4-Digit PIN.");
+            if(enteredOtp.length < 4) return window.showToast("⚠️ Enter the complete 4-digit OTP.");
+
+            showLoader(true);
+            try {
+                const secureHashedPin = await hashPin(setupPin);
+                const response = await fetch('/api/verify-setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // 🔥 FIX: 'pinHash' ki jagah 'pin' pass kiya gaya hai 🔥
+                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone: phone, pin: secureHashedPin, isNewUser, isForgotPin, name: finalName, referCode })
+                });
+
+                const data = await response.json();
+                if (!response.ok) { handleApiError(response, data); showLoader(false); return; }
+
+                localStorage.setItem("earnprox_user_phone", phone);
+                sessionStorage.setItem("earnprox_secure_token", data.token); 
+                window.location.href = "dashboard.html";
+            } catch (error) { window.showToast("❌ Setup Failed! Network Error."); showLoader(false); }
+        }
     </script>
 </body>
 </html>
