@@ -153,7 +153,6 @@
     </div>
     
     <div id="toast">Message Here</div>
-
     <script>
         let isNewUser = true; 
         let isForgotPin = false;
@@ -162,12 +161,6 @@
 
         function triggerHaptic() { if ("vibrate" in navigator) navigator.vibrate(50); }
 
-        async function hashPin(pin) {
-            const msgBuffer = new TextEncoder().encode(pin);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { 
                 const splash = document.getElementById('splash-screen');
@@ -175,7 +168,6 @@
                 setTimeout(() => document.getElementById('mobile-input').focus(), 300);
             }, 1200); 
 
-            // 🔥 FIX: 4-Digit Paste Logic 🔥
             document.getElementById("otp-container").addEventListener("paste", (e) => {
                 e.preventDefault();
                 let paste = (e.clipboardData || window.clipboardData).getData('text').trim();
@@ -224,7 +216,6 @@
                 const fullLoginPin = document.getElementById('l-pin1').value + document.getElementById('l-pin2').value + document.getElementById('l-pin3').value + document.getElementById('l-pin4').value;
                 if(fullLoginPin.length === 4) window.loginWithPIN();
             } else if (type === 'setup' && current.value.length === 1) {
-                // 🔥 FIX: 4-Digit Auto-Submit Check 🔥
                 const fullSetupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
                 const fullOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
                 if(fullSetupPin.length === 4 && fullOtp.length === 4) window.verifyOTPAndSave();
@@ -316,14 +307,12 @@
             
             showLoader(true);
             const phone = document.getElementById('mobile-input').value.trim();
-            const hashedInputPin = await hashPin(enteredPin);
 
             try {
                 const response = await fetch('/api/login-pin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // 🔥 FIX: 'pinHash' ki jagah 'pin' pass kiya gaya hai 🔥
-                    body: JSON.stringify({ phone: phone, pin: hashedInputPin })
+                    body: JSON.stringify({ phone: phone, pin: enteredPin }) // 🔥 अब हैशिंग हट गई है, सीधा PIN जा रहा है
                 });
                 const data = await response.json();
                 if(response.ok && data.token) {
@@ -342,7 +331,6 @@
         window.verifyOTPAndSave = async function() {
             triggerHaptic();
             const phone = document.getElementById('mobile-input').value.trim();
-            
             const enteredOtp = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
             const setupPin = document.getElementById('s-pin1').value + document.getElementById('s-pin2').value + document.getElementById('s-pin3').value + document.getElementById('s-pin4').value;
             
@@ -359,12 +347,10 @@
 
             showLoader(true);
             try {
-                const secureHashedPin = await hashPin(setupPin);
                 const response = await fetch('/api/verify-setup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // 🔥 FIX: 'pinHash' ki jagah 'pin' pass kiya gaya hai 🔥
-                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone: phone, pin: secureHashedPin, isNewUser, isForgotPin, name: finalName, referCode })
+                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone: phone, pin: setupPin, isNewUser, isForgotPin, name: finalName, referCode }) // 🔥 सीधा PIN जा रहा है
                 });
 
                 const data = await response.json();
@@ -376,5 +362,6 @@
             } catch (error) { window.showToast("❌ Setup Failed! Network Error."); showLoader(false); }
         }
     </script>
+
 </body>
 </html>
