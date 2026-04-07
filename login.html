@@ -154,7 +154,7 @@
     
     <div id="toast">Message Here</div>
 
-    <script>
+       <script>
         let isNewUser = true; 
         let isForgotPin = false;
         window.currentOtpSessionId = null; 
@@ -169,7 +169,6 @@
                 setTimeout(() => document.getElementById('mobile-input').focus(), 300);
             }, 1200); 
 
-            // 🔥 FIX: 4-Digit Paste Logic 🔥
             document.getElementById("otp-container").addEventListener("paste", (e) => {
                 e.preventDefault();
                 let paste = (e.clipboardData || window.clipboardData).getData('text').trim();
@@ -183,7 +182,6 @@
         });
 
         function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
-        
         window.showToast = function(msg) { 
             const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
             triggerHaptic(); setTimeout(()=>t.classList.remove("show"), 3500); 
@@ -315,7 +313,7 @@
                 const response = await fetch('/api/login-pin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: phone, pin: enteredPin }) 
+                    body: JSON.stringify({ phone: phone, pin: enteredPin }) // 🔥 अब हैशिंग हट गई है, सीधा PIN जा रहा है
                 });
                 const data = await response.json();
                 if(response.ok && data.token) {
@@ -353,7 +351,7 @@
                 const response = await fetch('/api/verify-setup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone: phone, pin: setupPin, isNewUser, isForgotPin, name: finalName, referCode })
+                    body: JSON.stringify({ sessionId: window.currentOtpSessionId, otpEntered: enteredOtp, phone: phone, pin: setupPin, isNewUser, isForgotPin, name: finalName, referCode }) // 🔥 सीधा PIN जा रहा है
                 });
 
                 const data = await response.json();
@@ -365,5 +363,6 @@
             } catch (error) { window.showToast("❌ Setup Failed! Network Error."); showLoader(false); }
         }
     </script>
+
 </body>
 </html>
