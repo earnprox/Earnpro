@@ -1,4 +1,4 @@
-const { db } = require('./_firebase');
+const { db } = require('./_firebase'); // 🔥 'Const' की जगह 'const' (छोटा c) कर दिया है
 const crypto = require('crypto');
 
 module.exports = async function handler(req, res) {
@@ -18,12 +18,12 @@ module.exports = async function handler(req, res) {
         const userDoc = snapshot.docs[0];
         const userData = userDoc.data();
 
-        // 🔥 FIX 1: क्रैश रोकने के लिए PIN को पक्का String में बदलें
+        // 🔥 क्रैश रोकने के लिए PIN को पक्का String में बदलें
         const pinString = String(pin);
         const SECRET_SALT = process.env.PIN_SECRET_KEY || "EarnproX_Super_Secret_Salt_2026"; 
         const hashedInputPin = crypto.createHash('sha256').update(pinString + SECRET_SALT).digest('hex');
 
-        // 🔥 FIX 2: पुराने (Plain Text) और नए (Hashed) दोनों PIN को सपोर्ट करना
+        // 🔥 पुराने (Plain Text) और नए (Hashed) दोनों PIN को सपोर्ट करना
         let isPinValid = false;
         let needsHashUpgrade = false;
 
