@@ -2,426 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earnprox - Daily Tasks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | Daily Tasks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* --- CSS STYLING --- */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-        :root {
-            --primary-pink: #ff477e;
-            --gradient-pink: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-            --yellow-coin: #ffc107;
-            --bg-color: #f8f9fc;
-            --text-dark: #1e2335;
-            --text-muted: #888ea8;
-            --card-bg: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #e0e5ec;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 400px;
-            background-color: var(--bg-color);
-            min-height: 100vh;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: var(--card-bg);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-
-        .back-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--text-dark);
-            cursor: pointer;
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .balance-badge {
-            background-color: var(--text-dark);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .coin {
-            color: var(--yellow-coin);
-        }
-
-        .content {
-            padding: 20px;
-        }
-
-        .status-card {
-            background: var(--gradient-pink);
-            border-radius: 20px;
-            padding: 20px;
-            color: white;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 15px rgba(255, 71, 126, 0.3);
-        }
-
-        .status-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .progress-container {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            height: 10px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: #fff;
-            height: 100%;
-            width: 0%;
-            border-radius: 10px;
-            transition: width 0.4s ease;
-        }
-
-        .status-text {
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 15px;
-        }
-
-        .task-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            transition: transform 0.2s;
-        }
-
-        .task-card:active {
-            transform: scale(0.98);
-        }
-
-        .task-icon {
-            width: 50px;
-            height: 50px;
-            background-color: #fff0f3;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-        }
-
-        .task-details {
-            flex: 1;
-            padding: 0 15px;
-        }
-
-        .task-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .task-reward {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        .task-reward span {
-            color: var(--yellow-coin);
-            font-weight: 700;
-        }
-
-        .action-btn {
-            background: var(--gradient-pink);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255, 117, 140, 0.3);
-            transition: all 0.3s;
-        }
-
-        .action-btn.completed {
-            background: #e2e8f0;
-            color: #94a3b8;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-        
-        #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s; font-weight: 600; font-size: 14px; }
-        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+        /* Custom hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="bg-[#F2F5F8] font-['Inter'] antialiased text-slate-900 selection:bg-emerald-100 flex justify-center min-h-screen">
 
-    <div class="app-container">
-        <header class="header">
-            <button class="back-btn" onclick="window.location.href='dashboard.html'">&#8592;</button>
-            <h1 class="header-title">Daily Active Tasks</h1>
-            <div class="balance-badge">
-                <span class="coin">&#128176;</span> <span id="userBalance">₹0.00</span>
+    <!-- Mobile App Container constraint -->
+    <div class="w-full max-w-md bg-[#F2F5F8] relative pb-20 shadow-2xl overflow-hidden min-h-screen flex flex-col">
+        
+        <!-- Top Header -->
+        <div class="px-5 py-5 flex items-center justify-between bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+            <!-- Back to dashboard (simulate) -->
+            <button onclick="window.history.back()" class="text-slate-800 p-2 bg-slate-50 hover:bg-slate-100 rounded-full active:scale-90 transition-all border border-slate-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </button>
+            <h3 class="font-black text-[15px] text-slate-800">Daily Active Tasks</h3>
+            <div class="bg-emerald-50 px-3 py-1.5 rounded-xl flex items-center gap-1.5 border border-emerald-100 shadow-sm">
+                <span class="text-emerald-500 font-bold text-sm">₹</span>
+                <span class="text-[13px] font-black text-[#00A87A]" id="header-balance">35.50</span>
             </div>
-        </header>
-
-        <div class="content">
-            <div class="status-card">
-                <h3>Stay Active Today</h3>
-                <div class="progress-container">
-                    <div class="progress-fill" id="progressBar"></div>
-                </div>
-                <div class="status-text">
-                    <span id="taskCountText">0/3 Tasks Completed</span>
-                    <span>Bonus: ₹5.00</span>
-                </div>
-            </div>
-
-            <h2 class="section-title">Today's Tasks</h2>
-
-            <div class="task-card">
-                <div class="task-icon">&#127873;</div> 
-                <div class="task-details">
-                    <div class="task-title">Daily Check-in</div>
-                    <div class="task-reward">Reward: <span>₹1.00</span></div>
-                </div>
-                <button class="action-btn" id="btn-task-1" onclick="window.completeTask(this, 1, 'task1')">Claim</button>
-            </div>
-
-            <div class="task-card">
-                <div class="task-icon">&#128241;</div> 
-                <div class="task-details">
-                    <div class="task-title">Share with 1 Friend</div>
-                    <div class="task-reward">Reward: <span>₹2.00</span></div>
-                </div>
-                <button class="action-btn" id="btn-task-2" onclick="window.completeTask(this, 2, 'task2')">Share</button>
-            </div>
-
-            <div class="task-card">
-                <div class="task-icon">&#128065;</div> 
-                <div class="task-details">
-                    <div class="task-title">View Sponsered Post</div>
-                    <div class="task-reward">Reward: <span>₹2.00</span></div>
-                </div>
-                <button class="action-btn" id="btn-task-3" onclick="window.completeTask(this, 2, 'task3')">View</button>
-            </div>
-
         </div>
+
+        <!-- Progress Hero Section (Matches 'Your Wealth' card theme) -->
+        <div class="px-5 mt-6 mb-2 relative z-10">
+            <div class="bg-[#0B100E] rounded-[24px] p-6 shadow-xl relative overflow-hidden border border-white/5">
+                <!-- Glow Effect -->
+                <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#00A87A] rounded-full blur-[50px] opacity-20 z-0"></div>
+                
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Today's Progress</p>
+                <div class="flex items-baseline gap-1 relative z-10 mb-4">
+                    <h2 class="text-4xl font-black text-white leading-none tracking-tight" id="completed-count">0</h2>
+                    <span class="text-xl font-bold text-slate-500">/<span id="total-count">0</span></span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full h-2.5 bg-white/10 rounded-full mb-3 relative z-10 overflow-hidden shadow-inner">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-[#00E5A0] to-[#00A87A] rounded-full transition-all duration-700 w-[0%]"></div>
+                </div>
+                
+                <div class="flex justify-between items-center relative z-10">
+                    <p class="text-[11px] font-medium text-slate-400">Finish all for bonus</p>
+                    <span class="bg-white/10 px-2 py-1 rounded-md text-[10px] font-black text-[#00E5A0] tracking-wider uppercase">+₹5.00 Bonus</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Notice / Alert -->
+        <div class="px-5 mb-5 mt-2">
+            <div class="bg-rose-50 border border-rose-100 rounded-xl p-3 flex gap-3 items-start">
+                <span class="text-rose-500 text-lg">💡</span>
+                <p class="text-[11px] font-bold text-rose-600 leading-snug">Tasks reset every night at 12:00 AM. Fake proofs will result in permanent account ban.</p>
+            </div>
+        </div>
+
+        <!-- Task List Container -->
+        <div class="px-5 pb-10 space-y-3 relative z-10 flex-1" id="task-list-container">
+            <!-- Dynamic Tasks will be injected here by JS -->
+        </div>
+
+        <!-- Toast Notification (Matches existing app theme) -->
+        <div id="toast" class="fixed z-[1000] left-1/2 bottom-[40px] -translate-x-1/2 bg-[#0B100E] text-white font-bold text-[13px] px-6 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap border border-white/10 flex items-center gap-2">
+            <span id="toast-icon">✅</span>
+            <span id="toast-msg">Task Completed!</span>
+        </div>
+
     </div>
-    
-    <div id="toast">Message Here</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI",
-            authDomain: "earnproxuc.firebaseapp.com",
-            projectId: "earnproxuc",
-            storageBucket: "earnproxuc.firebasestorage.app",
-            messagingSenderId: "411733884378",
-            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Security Check
-        const userPhone = localStorage.getItem("earnprox_user_phone");
-        if (!userPhone) {
-            window.location.href = "login.html";
-        }
-
-        let userDocId = null;
-        let currentBalance = 0;
-        let taskEarning = 0;
-        let totalEarning = 0;
-        let completedTasksCount = 0;
-        const totalTasks = 3;
-        
-        // India Timezone Date (To avoid midnight errors)
-        const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
-        const todayStr = new Intl.DateTimeFormat('en-CA', options).format(new Date()).split('/').join('-');
-
-        window.showToast = function(msg) { 
-            const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); 
-            setTimeout(()=>t.classList.remove("show"), 3000); 
-        }
-
-        // Fetch User Data & Status
-        async function fetchUserData() {
-            try {
-                // Fetch User Details
-                const q = query(collection(db, "users"), where("phone", "==", userPhone));
-                const snap = await getDocs(q);
-                if (!snap.empty) {
-                    userDocId = snap.docs[0].id;
-                    const data = snap.docs[0].data();
-                    
-                    currentBalance = data.balance || 0;
-                    taskEarning = data.taskEarning || 0;
-                    totalEarning = data.totalEarning || 0;
-                    
-                    document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
-                } else {
-                    window.location.href = "login.html"; return;
-                }
-
-                // Check Today's Task Status
-                const trackerRef = doc(db, "dailyTasks", `${userPhone}_${todayStr}`);
-                const trackerSnap = await getDoc(trackerRef);
-                
-                if (trackerSnap.exists()) {
-                    const tasks = trackerSnap.data();
-                    if(tasks.task1) markButtonCompleted('btn-task-1', 'Claimed');
-                    if(tasks.task2) markButtonCompleted('btn-task-2', 'Shared');
-                    if(tasks.task3) markButtonCompleted('btn-task-3', 'Viewed');
-                    if(tasks.bonusClaimed) completedTasksCount = 3;
-                } else {
-                    await setDoc(trackerRef, { task1: false, task2: false, task3: false, bonusClaimed: false });
-                }
-                
-                updateUIProgress();
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                window.showToast("Connection Error!");
+    <!-- JavaScript simulating Admin Control & Backend API -->
+    <script>
+        // 1. ADMIN DATA SIMULATION (This data will come from your backend database)
+        // Admin can add, remove, or edit these parameters in the database.
+        const adminTasksAPI = [
+            {
+                id: "tsk_101",
+                title: "Daily Login Bonus",
+                subtitle: "Open the app today",
+                reward: 1.00,
+                icon: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Wrapped%20gift/3D/wrapped_gift_3d.png",
+                isCompleted: false,
+                type: "instant" // Admin parameter for instant claim
+            },
+            {
+                id: "tsk_102",
+                title: "Follow on Instagram",
+                subtitle: "Follow @EarnproX official",
+                reward: 2.50,
+                icon: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Mobile%20phone/3D/mobile_phone_3d.png",
+                isCompleted: false,
+                type: "link" // Admin parameter to redirect
+            },
+            {
+                id: "tsk_103",
+                title: "Watch Ad Video",
+                subtitle: "Watch 30 sec sponsor video",
+                reward: 1.50,
+                icon: "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Television/3D/television_3d.png",
+                isCompleted: false,
+                type: "video"
             }
-        }
+        ];
 
-        // Helper: Style completed buttons
-        function markButtonCompleted(btnId, text) {
-            const btn = document.getElementById(btnId);
-            if(btn && !btn.classList.contains('completed')) {
-                btn.innerText = text;
-                btn.classList.add('completed');
-                completedTasksCount++;
-            }
-        }
+        // System State
+        let userBalance = 35.50; // Fetch from session in real app
+        let tasks = [...adminTasksAPI];
 
-        // Helper: Update Progress Bar
-        function updateUIProgress() {
-            let progressPercentage = (completedTasksCount / totalTasks) * 100;
-            document.getElementById('progressBar').style.width = progressPercentage + '%';
-            document.getElementById('taskCountText').innerText = `${completedTasksCount}/${totalTasks} Tasks Completed`;
-        }
+        // 2. RENDER TASKS DYNAMICALLY
+        function renderTasks() {
+            const container = document.getElementById('task-list-container');
+            container.innerHTML = ''; // Clear existing
 
-        // Process Task & Ensure Accurate Database Sync
-        window.completeTask = async function(buttonElement, rewardAmount, taskId) {
-            if (buttonElement.classList.contains('completed')) return;
+            let completedTasksCount = 0;
+
+            tasks.forEach(task => {
+                if(task.isCompleted) completedTasksCount++;
+
+                // Build Card HTML dynamically
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-[20px] p-3.5 shadow-sm border border-slate-100 flex items-center justify-between transition-transform active:scale-[0.98]";
+                
+                // Content based on completion state
+                const buttonClass = task.isCompleted 
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none" 
+                    : "bg-[#00A87A] text-white active:scale-90 shadow-[0_4px_10px_rgba(0,168,122,0.3)]";
+                
+                const buttonText = task.isCompleted ? "Claimed" : "Start";
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 bg-[#E8EBF0] rounded-2xl flex items-center justify-center p-2 relative overflow-hidden">
+                            <img src="${task.icon}" class="w-full h-full object-contain drop-shadow-sm relative z-10">
+                        </div>
+                        <div>
+                            <h4 class="text-[14px] font-bold text-slate-800 leading-tight mb-0.5">${task.title}</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-medium text-slate-500">${task.subtitle}</span>
+                                <span class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded uppercase tracking-wider">+₹${task.reward.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btn-${task.id}" onclick="handleTaskAction('${task.id}')" class="${buttonClass} px-4 py-2 rounded-xl text-[12px] font-bold transition-all relative z-10" ${task.isCompleted ? 'disabled' : ''}>
+                        ${buttonText}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+
+            // Update UI Counters
+            document.getElementById('completed-count').innerText = completedTasksCount;
+            document.getElementById('total-count').innerText = tasks.length;
             
-            buttonElement.innerText = "Processing...";
-            buttonElement.disabled = true;
-            
-            try {
-                // 1. Math Update
-                currentBalance += rewardAmount;
-                taskEarning += rewardAmount;
-                totalEarning += rewardAmount;
+            // Update Progress Bar
+            const progressPercent = (completedTasksCount / tasks.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
-                // 2. Update Firestore User Doc
-                await updateDoc(doc(db, "users", userDocId), { 
-                    balance: currentBalance,
-                    taskEarning: taskEarning,
-                    totalEarning: totalEarning
-                });
-                
-                // 3. Update Daily Task Tracker
-                const trackerRef = doc(db, "dailyTasks", `${userPhone}_${todayStr}`);
-                await updateDoc(trackerRef, { [taskId]: true });
-
-                // 4. Update UI
-                document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
-                if(taskId === 'task1') markButtonCompleted(buttonElement.id, 'Claimed');
-                if(taskId === 'task2') markButtonCompleted(buttonElement.id, 'Shared');
-                if(taskId === 'task3') markButtonCompleted(buttonElement.id, 'Viewed');
-                
-                updateUIProgress();
-                window.showToast(`+ ₹${rewardAmount.toFixed(2)} Added!`);
-
-                // 5. Bonus Check (If all 3 are done)
-                if(completedTasksCount === totalTasks) {
-                    setTimeout(async () => {
-                        currentBalance += 5.00;
-                        taskEarning += 5.00;
-                        totalEarning += 5.00;
-                        
-                        await updateDoc(doc(db, "users", userDocId), { 
-                            balance: currentBalance,
-                            taskEarning: taskEarning,
-                            totalEarning: totalEarning
-                        });
-                        await updateDoc(trackerRef, { bonusClaimed: true });
-                        
-                        document.getElementById('userBalance').innerText = '₹' + currentBalance.toFixed(2);
-                        alert("🎉 Congratulations! You are ACTIVE for today. Bonus ₹5.00 added to your wallet.");
-                    }, 500);
-                }
-
-            } catch (error) {
-                console.error("Task Error:", error);
-                window.showToast("Failed to complete task. Try again.");
-                buttonElement.innerText = "Try Again";
-                buttonElement.disabled = false;
+            // Check for Bonus
+            if(completedTasksCount === tasks.length && completedTasksCount > 0) {
+                setTimeout(() => { showToast("All Tasks Done! ₹5.00 Bonus Added", "🎁"); }, 500);
             }
         }
 
-        // Initialize on page load
-        document.addEventListener("DOMContentLoaded", fetchUserData);
+        // 3. HANDLE TASK ACTIONS
+        function handleTaskAction(taskId) {
+            const taskIndex = tasks.findIndex(t => t.id === taskId);
+            if (taskIndex === -1 || tasks[taskIndex].isCompleted) return;
+
+            const task = tasks[taskIndex];
+            const btn = document.getElementById(`btn-${task.id}`);
+            
+            // Show loading state on button
+            btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+            // Simulate Network Request / Task Logic
+            setTimeout(() => {
+                // Update Logic
+                tasks[taskIndex].isCompleted = true;
+                userBalance += task.reward;
+                
+                // Update Balance UI
+                document.getElementById('header-balance').innerText = userBalance.toFixed(2);
+                
+                // Show Success Toast
+                showToast(`+₹${task.reward.toFixed(2)} Added to Vault`, "💸");
+                
+                // Re-render UI
+                renderTasks();
+            }, 800);
+        }
+
+        // 4. TOAST NOTIFICATION SYSTEM
+        function showToast(message, icon = "✅") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            document.getElementById('toast-icon').innerText = icon;
+            
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // INITIALIZE APP
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTasks();
+        });
 
     </script>
-
 </body>
 </html>
