@@ -34,7 +34,6 @@
     </div>
 
     <div id="admin-app">
-        <!-- Sidebar Navigation -->
         <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r hidden md:flex flex-col p-6 z-50 overflow-y-auto shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
             <h1 class="text-3xl font-black mb-8 tracking-tighter text-slate-800 px-2">EarnproX<span class="text-indigo-600">.</span></h1>
             <nav class="flex flex-col gap-1.5 flex-1">
@@ -49,7 +48,6 @@
             <button onclick="window.doLogout()" class="mt-8 p-4 text-rose-500 font-bold bg-rose-50 rounded-xl active:scale-95 transition">🚪 Secure Disconnect</button>
         </aside>
 
-        <!-- Mobile Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-1.5 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] overflow-x-auto">
             <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn nav-active"><span class="text-lg">📊</span><span class="text-[9px] font-black mt-1">Dash</span></button>
             <button onclick="window.switchView('settings', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🎨</span><span class="text-[9px] font-black mt-1">Design</span></button>
@@ -61,7 +59,7 @@
         </nav>
 
         <main class="p-5 md:p-10 max-w-6xl mx-auto">
-            <!-- Sections remain identical, styling unchanged -->
+            
             <section id="view-dash" class="view-section active">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-3xl font-extrabold">System Overview</h2>
@@ -150,7 +148,6 @@
         </main>
     </div>
 
-    <!-- Edit User Modal -->
     <div id="modal-edit" class="modal p-4">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative">
             <h3 class="text-xl font-black text-slate-900 mb-6 border-b pb-3">Edit User Data</h3>
@@ -167,50 +164,66 @@
         </div>
     </div>
 
-    <script>
-        // ==========================================
-        // 🛡️ SECURE VERCEL API SETUP 🛡️
-        // ==========================================
-        const API_BASE_URL = "/api/admin"; // Vercel API Route
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        // 🔥 SECURITY: Only READ functions are imported from Firebase now. All Writes go through Secure API.
+        import { getFirestore, collection, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 🔒 SECURITY: Hashed Master Password
+        // Firebase Config
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
+            authDomain: "earnproxuc.firebaseapp.com", 
+            projectId: "earnproxuc", 
+            storageBucket: "earnproxuc.firebasestorage.app", 
+            messagingSenderId: "411733884378", 
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" 
+        };
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app);
+
+        // 🔒 SECURITY HASHES & TOKENS
         const MASTER_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; 
+        const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; // Match with your api/Rashiandakash.js
 
-        let globalUsersData = {}; 
-        let globalTasksData = {}; 
-        let globalWithdrawData = {}; 
-        let activeUserId = "";
+        let globalUsersData = {}; let globalTasksData = {}; let globalWithdrawData = {}; let activeUserId = "";
 
-        // Utilities
-        const isToday = (ts) => { if(!ts) return false; const d = new Date(ts); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); };
+        const isToday = (dateObj) => { if(!dateObj) return false; const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); };
+        const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
+        
+        // 🔒 Data Masking
         const maskPhone = (phone) => phone && phone.length >= 10 ? phone.substring(0,2) + '******' + phone.substring(8) : 'N/A';
         const maskUpi = (upi) => { if(!upi || upi=='None') return 'NOT LINKED'; const pts = upi.split('@'); return pts[0].length > 2 ? pts[0].substring(0,2) + '****@' + (pts[1]||'') : upi; };
 
-        // 🌐 SECURE API CALLER WRAPPER
-        async function adminApiCall(action, payload = {}) {
-            const token = sessionStorage.getItem("secure_master_session");
+        // 🛡️ API HELPER FUNCTION (Connects HTML to Backend)
+        async function callAdminApi(actionName, payloadData, btnElement) {
+            const ogText = btnElement ? btnElement.innerText : "";
+            if(btnElement) { btnElement.innerText = "Processing..."; btnElement.disabled = true; }
+
             try {
-                const res = await fetch(API_BASE_URL, {
+                const response = await fetch('/api/Rashiandakash', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': `Bearer ${token}` 
-                    },
-                    body: JSON.stringify({ action, ...payload })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: actionName, payload: payloadData, secureToken: SECURE_API_TOKEN })
                 });
-                const data = await res.json();
-                if (!res.ok) {
-                    if(res.status === 401) window.doLogout();
-                    throw new Error(data.error || "API Error");
+
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    return true;
+                } else {
+                    alert("❌ " + (data.error || "Action failed"));
+                    return false;
                 }
-                return data;
-            } catch (err) {
-                console.error("API Call Failed:", err);
-                throw err;
+            } catch (error) {
+                alert("❌ Network/Server Error!");
+                return false;
+            } finally {
+                if(btnElement) { 
+                    btnElement.innerText = ogText; 
+                    setTimeout(() => btnElement.disabled = false, 2000); 
+                }
             }
         }
 
-        // 🔒 Login Handler
         window.doLogin = async (btn) => { 
             const pass = document.getElementById('admin-pass').value;
             btn.innerText = "Verifying..."; btn.disabled = true;
@@ -222,7 +235,7 @@
             if (hashHex === MASTER_HASH) { 
                 sessionStorage.setItem("secure_master_session", hashHex); 
                 document.body.classList.add('authenticated'); 
-                window.loadAllData(); 
+                window.startServerSync(); 
             } else { 
                 alert("❌ Access Denied! Incorrect Password."); 
                 btn.innerText = "Secure Connect 🚀"; btn.disabled = false;
@@ -253,97 +266,96 @@
             if(url) { document.getElementById('banner-preview').src = url; }
         });
 
-        // 🟢 LOAD ALL DASHBOARD DATA FROM BACKEND
-        window.loadAllData = async function() {
-            try {
-                // Backend se combined data fetch karo
-                const res = await adminApiCall('get_dashboard_data');
-                const data = res.data;
-
-                // 1. App Settings
-                if(data.settings && data.settings.bannerUrl) {
-                    document.getElementById('banner-url-input').value = data.settings.bannerUrl;
-                    document.getElementById('banner-preview').src = data.settings.bannerUrl;
+        // 🟢 DATA SYNC (Read-Only Direct from Firebase)
+        window.startServerSync = function() {
+            onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
+                if(docSnap.exists() && docSnap.data().bannerUrl) {
+                    const url = docSnap.data().bannerUrl;
+                    document.getElementById('banner-url-input').value = url;
+                    document.getElementById('banner-preview').src = url;
                 }
+            });
 
-                // 2. Users Parsing
-                document.getElementById('stat-users').innerText = data.users.length;
-                let userHtml = ""; let totalUserBal = 0; let totalReferUsers = 0;
+            onSnapshot(collection(db, "users"), (snap) => {
+                document.getElementById('stat-users').innerText = snap.size;
+                let html = ""; let totalUserBal = 0; let totalReferUsers = 0;
                 
-                data.users.forEach(u => {
-                    globalUsersData[u.id] = u; totalUserBal += parseFloat(u.balance || 0);
+                snap.forEach(d => {
+                    const u = d.data(); globalUsersData[d.id] = u; totalUserBal += parseFloat(u.balance || 0);
                     if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
                     const isBlocked = u.status === 'blocked';
-                    userHtml += `<div class="user-item bg-white p-4 md:p-5 rounded-2xl border card-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isBlocked ? 'opacity-50 grayscale' : ''}"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xl shrink-0">${(u.name?u.name.charAt(0):"U").toUpperCase()}</div><div><p class="font-extrabold text-slate-800 text-sm">${u.name || "Unknown"} ${isBlocked ? '🚫' : ''}</p><p class="text-xs font-bold text-slate-400 mt-0.5">+91 ${maskPhone(u.phone)}</p><p class="text-[10px] font-black text-indigo-500 uppercase mt-1">UPI: ${maskUpi(u.upi)}</p></div></div><div class="w-full md:w-auto flex md:flex-col justify-between items-center md:items-end gap-2"><p class="font-black text-emerald-600 text-xl">₹${parseFloat(u.balance || 0).toFixed(2)}</p><div class="flex gap-1.5"><button onclick="window.openEditModal('${u.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">Edit</button><button onclick="window.toggleBlockUser('${u.id}', '${u.status}', this)" class="${isBlocked?'bg-emerald-50 text-emerald-600':'bg-orange-50 text-orange-600'} text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">${isBlocked?'Unblock':'Block'}</button></div></div></div>`;
+                    html += `<div class="user-item bg-white p-4 md:p-5 rounded-2xl border card-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isBlocked ? 'opacity-50 grayscale' : ''}"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xl shrink-0">${(u.name?u.name.charAt(0):"U").toUpperCase()}</div><div><p class="font-extrabold text-slate-800 text-sm">${u.name || "Unknown"} ${isBlocked ? '🚫' : ''}</p><p class="text-xs font-bold text-slate-400 mt-0.5">+91 ${maskPhone(u.phone)}</p><p class="text-[10px] font-black text-indigo-500 uppercase mt-1">UPI: ${maskUpi(u.upi)}</p></div></div><div class="w-full md:w-auto flex md:flex-col justify-between items-center md:items-end gap-2"><p class="font-black text-emerald-600 text-xl">₹${parseFloat(u.balance || 0).toFixed(2)}</p><div class="flex gap-1.5"><button onclick="window.openEditModal('${d.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">Edit</button><button onclick="window.toggleBlockUser('${d.id}', '${u.status}', this)" class="${isBlocked?'bg-emerald-50 text-emerald-600':'bg-orange-50 text-orange-600'} text-[10px] font-black px-3 py-2 rounded-lg uppercase transition">${isBlocked?'Unblock':'Block'}</button></div></div></div>`;
                 });
-                document.getElementById('user-list').innerHTML = userHtml || "<p class='text-center py-10 font-bold text-slate-400'>No Users Found.</p>";
+                document.getElementById('user-list').innerHTML = html || "<p class='text-center py-10 font-bold text-slate-400'>No Users Found.</p>";
                 document.getElementById('stat-user-bal').innerText = `₹${totalUserBal.toFixed(2)}`;
                 document.getElementById('stat-refer-earn').innerText = `${totalReferUsers} Active`; 
+            });
 
-                // 3. Task Proofs Parsing
-                let taskHtml = ""; let todayTaskEarn = 0; let totalTaskEarn = 0;
-                
-                data.tasks.forEach(t => {
+            onSnapshot(collection(db, "task_submissions"), (snap) => {
+                let html = ""; let todayTaskEarn = 0; let totalTaskEarn = 0; const tasks = [];
+                snap.forEach(d => tasks.push({id: d.id, ...d.data()}));
+                tasks.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
+
+                tasks.forEach(t => {
                     globalTasksData[t.id] = t; const rewardAmt = parseFloat(t.gigReward || 0);
                     if(t.status === "Completed" || t.status === "Approved") { totalTaskEarn += rewardAmt; if(isToday(t.timestamp)) todayTaskEarn += rewardAmt; }
                     
                     if(t.status === "Pending Approval") {
                         const remark = t.remark && t.remark !== "No Remark" ? `🗣️ User Remark: "${t.remark}"` : "";
-                        taskHtml += `<div class="bg-white p-5 rounded-3xl border card-shadow border-l-8 border-l-orange-400"><div class="flex justify-between items-start mb-4 border-b border-slate-50 pb-4"><div><p class="text-[10px] font-black text-orange-500 mb-1 uppercase tracking-widest bg-orange-50 px-2 py-0.5 rounded inline-block">Review Task</p><h4 class="font-black text-slate-800 text-lg mt-1">${t.gigName}</h4><p class="text-xs font-bold text-slate-500 mt-1">User: +91 ${maskPhone(t.userPhone)}</p>${remark ? `<p class="text-xs font-semibold text-indigo-600 mt-2 bg-indigo-50 p-2 rounded-lg border border-indigo-100">${remark}</p>` : ''}</div><a href="${t.proofLink}" target="_blank" class="bg-slate-900 hover:bg-black text-white font-black text-[10px] px-4 py-2.5 rounded-xl uppercase shadow-md shrink-0 transition">View Proof ↗</a></div><div class="flex gap-2"><button onclick="window.approveTask('${t.id}', this)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-xl text-xs active:scale-95 shadow-sm transition">Approve (₹${rewardAmt})</button><button onclick="window.rejectTask('${t.id}', this)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-black py-3 rounded-xl text-xs active:scale-95 border border-rose-100 transition">Reject Task</button></div></div>`;
+                        html += `<div class="bg-white p-5 rounded-3xl border card-shadow border-l-8 border-l-orange-400"><div class="flex justify-between items-start mb-4 border-b border-slate-50 pb-4"><div><p class="text-[10px] font-black text-orange-500 mb-1 uppercase tracking-widest bg-orange-50 px-2 py-0.5 rounded inline-block">Review Task</p><h4 class="font-black text-slate-800 text-lg mt-1">${t.gigName}</h4><p class="text-xs font-bold text-slate-500 mt-1">User: +91 ${maskPhone(t.userPhone)}</p>${remark ? `<p class="text-xs font-semibold text-indigo-600 mt-2 bg-indigo-50 p-2 rounded-lg border border-indigo-100">${remark}</p>` : ''}</div><a href="${t.proofLink}" target="_blank" class="bg-slate-900 hover:bg-black text-white font-black text-[10px] px-4 py-2.5 rounded-xl uppercase shadow-md shrink-0 transition">View Proof ↗</a></div><div class="flex gap-2"><button onclick="window.approveTask('${t.id}', this)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-xl text-xs active:scale-95 shadow-sm transition">Approve (₹${rewardAmt})</button><button onclick="window.rejectTask('${t.id}', this)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-black py-3 rounded-xl text-xs active:scale-95 border border-rose-100 transition">Reject Task</button></div></div>`;
                     }
                 });
                 document.getElementById('stat-today-tasks').innerText = `₹${todayTaskEarn.toFixed(2)}`;
                 document.getElementById('stat-total-tasks').innerText = `₹${totalTaskEarn.toFixed(2)}`;
-                document.getElementById('review-list').innerHTML = taskHtml || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>No pending proofs. ✨</p>";
+                document.getElementById('review-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>No pending proofs. ✨</p>";
+            });
 
-                // 4. Withdrawals Parsing
-                let withHtml = ""; let pendingAmt = 0; let totalPaid = 0; let todayPaid = 0;
-                
-                data.withdrawals.forEach(w => {
+            onSnapshot(collection(db, "withdrawals"), (snap) => {
+                let html = ""; let pendingAmt = 0; let totalPaid = 0; let todayPaid = 0; const withs = [];
+                snap.forEach(d => withs.push({ id: d.id, ...d.data() }));
+                withs.sort((a, b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
+
+                withs.forEach(w => {
                     globalWithdrawData[w.id] = w; const wAmt = parseFloat(w.amount || 0);
                     if(w.status === "Pending") {
                         pendingAmt += wAmt;
-                        withHtml += `<div class="payout-item bg-white p-5 rounded-2xl border card-shadow flex flex-col md:flex-row justify-between items-start md:items-center border-l-4 border-l-rose-500 gap-4"><div class="w-full md:w-auto"><p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">UPI Transfer</p><h4 class="font-black text-slate-800 text-sm break-all">${maskUpi(w.upi)}</h4><p class="text-xs font-bold text-slate-400 mt-0.5">${w.userName || 'Unknown'} (+91 ${maskPhone(w.userPhone)})</p></div><div class="w-full md:w-auto text-left md:text-right"><p class="font-black text-rose-600 text-2xl mb-2">₹${wAmt}</p><div class="flex gap-2"><button onclick="window.markAsPaid('${w.id}', this)" class="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-lg uppercase shadow-md active:scale-95 transition">Paid ✅</button><button onclick="window.rejectPayout('${w.id}', this)" class="flex-1 md:flex-none bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase active:scale-95 transition">Reject Refund</button></div></div></div>`;
+                        html += `<div class="payout-item bg-white p-5 rounded-2xl border card-shadow flex flex-col md:flex-row justify-between items-start md:items-center border-l-4 border-l-rose-500 gap-4"><div class="w-full md:w-auto"><p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">UPI Transfer</p><h4 class="font-black text-slate-800 text-sm break-all">${maskUpi(w.upi)}</h4><p class="text-xs font-bold text-slate-400 mt-0.5">${w.userName || 'Unknown'} (+91 ${maskPhone(w.userPhone)})</p></div><div class="w-full md:w-auto text-left md:text-right"><p class="font-black text-rose-600 text-2xl mb-2">₹${wAmt}</p><div class="flex gap-2"><button onclick="window.markAsPaid('${w.id}', this)" class="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-lg uppercase shadow-md active:scale-95 transition">Paid ✅</button><button onclick="window.rejectPayout('${w.id}', this)" class="flex-1 md:flex-none bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase active:scale-95 transition">Reject Refund</button></div></div></div>`;
                     } else if (w.status === "Completed") { totalPaid += wAmt; if(isToday(w.completedAt || w.timestamp)) todayPaid += wAmt; }
                 });
                 document.getElementById('stat-today-paid').innerText = `₹${todayPaid.toFixed(2)}`;
                 document.getElementById('stat-total-paid').innerText = `₹${totalPaid.toFixed(2)}`;
                 document.getElementById('stat-pending-pay').innerText = `₹${pendingAmt.toFixed(2)}`;
-                document.getElementById('payouts-list').innerHTML = withHtml || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>All Clear! 💸</p>";
+                document.getElementById('payouts-list').innerHTML = html || "<p class='text-center py-20 text-slate-400 font-bold italic text-lg'>All Clear! 💸</p>";
+            });
 
-                // 5. Gigs Parsing
-                let gigHtml = "";
-                data.gigs.forEach(g => {
-                    gigHtml += `<div class="bg-white p-5 rounded-2xl border card-shadow flex flex-col gap-3"><div class="flex justify-between items-start border-b border-slate-50 pb-3"><div><h4 class="font-black text-slate-800 text-lg leading-tight mb-1">${g.title}</h4><p class="text-[10px] font-black text-emerald-500 uppercase bg-emerald-50 inline-block px-2 py-1 rounded">Reward: ₹${parseFloat(g.reward||0)}</p></div><button onclick="window.deleteGig('${g.id}', this)" class="bg-rose-50 hover:bg-rose-100 text-rose-500 p-2 rounded-lg transition active:scale-95 text-xs font-bold shrink-0">Delete</button></div><p class="text-xs text-slate-500 font-medium truncate">Link: ${g.link || 'None'}</p></div>`;
+            onSnapshot(collection(db, "gigs"), (snap) => {
+                let html = "";
+                snap.forEach(d => {
+                    const g = d.data();
+                    html += `<div class="bg-white p-5 rounded-2xl border card-shadow flex flex-col gap-3"><div class="flex justify-between items-start border-b border-slate-50 pb-3"><div><h4 class="font-black text-slate-800 text-lg leading-tight mb-1">${g.title}</h4><p class="text-[10px] font-black text-emerald-500 uppercase bg-emerald-50 inline-block px-2 py-1 rounded">Reward: ₹${parseFloat(g.reward||0)}</p></div><button onclick="window.deleteGig('${d.id}', this)" class="bg-rose-50 hover:bg-rose-100 text-rose-500 p-2 rounded-lg transition active:scale-95 text-xs font-bold shrink-0">Delete</button></div><p class="text-xs text-slate-500 font-medium truncate">Link: ${g.link || 'None'}</p></div>`;
                 });
-                document.getElementById('live-gigs-list').innerHTML = gigHtml || "<p class='text-slate-400 text-sm font-bold mt-4'>No gigs published yet.</p>";
+                document.getElementById('live-gigs-list').innerHTML = html || "<p class='text-slate-400 text-sm font-bold mt-4'>No gigs published yet.</p>";
+            });
 
-                // 6. Notifications Parsing
-                let notifyHtml = "";
-                data.notifications.forEach(n => {
-                    const timeDate = n.timestamp ? new Date(n.timestamp).toLocaleString('en-GB', {day:'numeric', month:'short'}) : '';
-                    notifyHtml += `<div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-start shadow-sm"><div class="w-4/5"><h4 class="font-black text-sm text-slate-800">${n.title}</h4><p class="text-xs text-slate-500 mt-1 truncate">${n.message}</p><span class="text-[9px] text-slate-400 font-bold mt-2 block">${timeDate}</span></div><button onclick="window.deleteNotification('${n.id}', this)" class="text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded text-xs font-bold transition">Delete</button></div>`;
+            onSnapshot(collection(db, "notifications"), (snap) => {
+                let html = ""; const notifs = [];
+                snap.forEach(d => notifs.push({ id: d.id, ...d.data() }));
+                notifs.sort((a, b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
+                notifs.forEach(n => {
+                    const timeDate = n.timestamp ? new Date(getSafeTime(n.timestamp)).toLocaleString('en-GB', {day:'numeric', month:'short'}) : '';
+                    html += `<div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-start shadow-sm"><div class="w-4/5"><h4 class="font-black text-sm text-slate-800">${n.title}</h4><p class="text-xs text-slate-500 mt-1 truncate">${n.message}</p><span class="text-[9px] text-slate-400 font-bold mt-2 block">${timeDate}</span></div><button onclick="window.deleteNotification('${n.id}', this)" class="text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded text-xs font-bold transition">Delete</button></div>`;
                 });
-                document.getElementById('notify-list').innerHTML = notifyHtml || "<p class='text-slate-400 text-sm font-bold mt-4'>No active notifications.</p>";
-
-            } catch (error) {
-                console.error("Failed to sync dashboard:", error);
-            }
+                document.getElementById('notify-list').innerHTML = html || "<p class='text-slate-400 text-sm font-bold mt-4'>No active notifications.</p>";
+            });
         };
 
-
-        // ================= ADMIN ACTIONS (POST REQUESTS TO VERCEL) =================
+        // ================= API ACTION HANDLERS =================
 
         window.updateAppBanner = async (btn) => {
             const url = document.getElementById('banner-url-input').value.trim();
             if(!url) return alert("⚠️ Please enter a valid image URL");
-            const ogText = btn.innerText; btn.innerText = "Saving..."; btn.disabled = true;
-            try {
-                await adminApiCall('update_banner', { bannerUrl: url });
-                alert("✅ Banner Updated! Users will see this instantly.");
-                window.loadAllData();
-            } catch(e) { alert("❌ Failed to update banner."); }
-            finally { btn.innerText = ogText; setTimeout(()=> btn.disabled = false, 2000); }
+            const success = await callAdminApi('update_banner', { url }, btn);
+            if(success) alert("✅ Banner Updated! Users will see this instantly.");
         };
 
         window.openEditModal = (id) => { 
@@ -356,151 +368,96 @@
         };
 
         window.saveUserData = async (btn) => { 
-            const ogText = btn.innerText; btn.innerText = "Saving..."; btn.disabled = true;
             const n = document.getElementById('edit-name').value; 
             const p = document.getElementById('edit-phone').value; 
             const u = document.getElementById('edit-upi').value; 
             let b = parseFloat(document.getElementById('edit-bal').value); 
             if (isNaN(b) || b < 0) b = 0; 
             
-            try { 
-                await adminApiCall('edit_user', { userId: activeUserId, name: n, upi: u, balance: b });
-                document.getElementById('modal-edit').classList.remove('active'); 
-                alert("✅ User Details Saved!"); 
-                window.loadAllData();
-            } catch (e) { alert("❌ Error saving user data."); } 
-            finally { btn.innerText = ogText; setTimeout(()=> btn.disabled = false, 2000); } 
+            const success = await callAdminApi('edit_user', { userId: activeUserId, name: n, phone: p, upi: u || "None", balance: b }, btn);
+            if(success) document.getElementById('modal-edit').classList.remove('active'); 
         };
 
         window.toggleBlockUser = async (id, status, btn) => { 
-            btn.disabled = true;
             const isB = status === 'blocked'; 
             if(confirm(`User will be ${isB ? 'Unblocked' : 'Blocked'}. Confirm?`)) {
-                try {
-                    await adminApiCall('toggle_block_user', { userId: id, status: isB ? "active" : "blocked" });
-                    window.loadAllData();
-                } catch(e) { alert("❌ Failed to change status"); }
+                await callAdminApi('toggle_block_user', { userId: id, status: isB ? "active" : "blocked" }, btn);
             }
-            setTimeout(()=> btn.disabled = false, 2000);
         };
 
-        window.deleteUser = async (id) => { 
+        window.deleteUser = async (id, btn) => { 
             if(confirm("🚨 DANGER: Delete user permanently? This action cannot be undone.")) {
-                try {
-                    await adminApiCall('delete_user', { userId: id });
-                    window.loadAllData();
-                } catch(e) { alert("❌ Failed to delete user"); }
+                await callAdminApi('delete_user', { userId: id }, btn);
             }
         };
 
-        // Tasks
         window.approveTask = async (id, btn) => { 
-            btn.innerText = "Approving..."; btn.disabled = true; btn.classList.add('opacity-50');
-            try { 
-                await adminApiCall('approve_task', { taskId: id });
-                window.loadAllData();
-            } catch (e) { 
-                alert("❌ Failed."); btn.innerText = "Approve"; btn.classList.remove('opacity-50');
-            } 
-            setTimeout(()=> btn.disabled = false, 3000);
+            const tData = globalTasksData[id];
+            if(tData.status !== "Pending Approval") return alert("Task already processed!");
+            await callAdminApi('approve_task', { taskId: id, userPhone: tData.userPhone, reward: tData.gigReward }, btn);
         };
         
         window.rejectTask = async (id, btn) => { 
+            const tData = globalTasksData[id];
+            if(tData.status !== "Pending Approval") return alert("Task already processed!");
             const reason = prompt("Reason for rejection (Optional):") || "Invalid proof or instructions not followed.";
             if(reason) {
-                btn.innerText = "Rejecting..."; btn.disabled = true;
-                try { 
-                    await adminApiCall('reject_task', { taskId: id, reason: reason });
-                    window.loadAllData();
-                } catch (e) { alert("❌ Failed to reject."); btn.innerText = "Reject Task"; }
-                setTimeout(()=> btn.disabled = false, 3000);
+                await callAdminApi('reject_task', { taskId: id, userPhone: tData.userPhone, reason }, btn);
             }
         };
 
-        // Payouts
         window.markAsPaid = async (id, btn) => { 
+            const wData = globalWithdrawData[id];
+            if(wData.status !== "Pending") return alert("Payout already processed!");
             if(confirm("Are you sure you have paid this user?")) {
-                btn.innerText = "Processing..."; btn.disabled = true;
-                try {
-                    await adminApiCall('mark_payout_paid', { withdrawalId: id });
-                    window.loadAllData();
-                } catch(e) { alert("❌ Failed to mark as paid"); btn.innerText = "Paid ✅"; }
-                setTimeout(()=> btn.disabled = false, 3000);
+                await callAdminApi('mark_paid', { withdrawId: id }, btn);
             }
         };
         
         window.rejectPayout = async (id, btn) => {
+            const wData = globalWithdrawData[id];
+            if(wData.status !== "Pending") return alert("Payout already processed!");
             const reason = prompt("Rejection Reason (Amount will be refunded to user):") || "UPI Error";
             if(reason) {
-                btn.innerText = "Refunding..."; btn.disabled = true;
-                try {
-                    await adminApiCall('reject_payout', { withdrawalId: id, reason: reason });
-                    alert(`✅ Refunded back to User's Wallet.`);
-                    window.loadAllData();
-                } catch(e) { alert("❌ Error rejecting payout."); btn.innerText = "Reject Refund"; }
-                setTimeout(()=> btn.disabled = false, 3000);
+                await callAdminApi('reject_payout', { withdrawId: id, userPhone: wData.userPhone, amount: wData.amount, reason }, btn);
             }
         };
 
-        // Gigs
         window.addGigToDB = async (btn) => {
             const t = document.getElementById('gig-title').value.trim(); 
             let r = parseFloat(document.getElementById('gig-reward').value); 
             const l = document.getElementById('gig-link').value.trim(); 
             const desc = document.getElementById('gig-desc').value.trim();
-            
             if(!t || isNaN(r) || r <= 0) return alert("⚠️ Title and valid Reward amount required!");
             
-            const ogText = btn.innerText; btn.innerText = "Publishing..."; btn.disabled = true;
-            try { 
-                await adminApiCall('create_gig', { title: t, reward: r, link: l, desc: desc });
-                document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = ""; document.getElementById('gig-link').value = ""; document.getElementById('gig-desc').value = ""; 
-                alert("🚀 Gig Published Successfully!"); 
-                window.loadAllData();
-            } catch (e) { alert("❌ Error Publishing."); } 
-            finally { btn.innerText = ogText; setTimeout(()=> btn.disabled = false, 3000); }
+            const success = await callAdminApi('add_gig', { title: t, reward: r, link: l, desc: desc }, btn);
+            if(success) {
+                document.getElementById('gig-title').value = ""; document.getElementById('gig-reward').value = ""; 
+                document.getElementById('gig-link').value = ""; document.getElementById('gig-desc').value = ""; 
+            }
         };
 
         window.deleteGig = async (id, btn) => { 
-            if(confirm("Delete Gig?")) {
-                btn.disabled = true;
-                try {
-                    await adminApiCall('delete_gig', { gigId: id });
-                    window.loadAllData();
-                } catch(e) { alert("❌ Error deleting"); }
-            } 
+            if(confirm("Delete Gig?")) await callAdminApi('delete_gig', { gigId: id }, btn);
         };
 
-        // Notifications
         window.sendNotification = async (btn) => {
             const title = document.getElementById('notify-title').value.trim(); 
             const msg = document.getElementById('notify-msg').value.trim();
             if(!title || !msg) return alert("⚠️ Title and Message required!");
             
-            const ogText = btn.innerText; btn.innerText = "Sending..."; btn.disabled = true;
-            try { 
-                await adminApiCall('send_notification', { title: title, message: msg });
-                document.getElementById('notify-title').value = ""; document.getElementById('notify-msg').value = ""; 
-                alert("📡 Notification Broadcasted!"); 
-                window.loadAllData();
-            } catch (e) { alert("❌ Error sending notification."); } 
-            finally { btn.innerText = ogText; setTimeout(()=> btn.disabled = false, 3000); }
+            const success = await callAdminApi('send_notification', { title, message: msg }, btn);
+            if(success) { document.getElementById('notify-title').value = ""; document.getElementById('notify-msg').value = ""; }
         };
 
         window.deleteNotification = async (id, btn) => { 
-            if(confirm("Delete this notification?")) {
-                btn.disabled = true;
-                try {
-                    await adminApiCall('delete_notification', { notificationId: id });
-                    window.loadAllData();
-                } catch(e) { alert("❌ Error deleting"); }
-            } 
+            if(confirm("Delete this notification?")) await callAdminApi('delete_notification', { notifId: id }, btn);
         };
 
         // FIREWALL CHECK
         if(sessionStorage.getItem("secure_master_session") === MASTER_HASH) { 
             document.body.classList.add('authenticated'); 
-            window.loadAllData(); 
+            window.startServerSync(); 
         }
     </script>
 </body>
