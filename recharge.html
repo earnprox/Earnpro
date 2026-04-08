@@ -2,137 +2,142 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnproX | Recharge & Bills</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | Premium Recharge</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="dashboard.css">
     <style>
-        .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .hide-arrows[type=number] {
-            -moz-appearance: textfield;
-        }
-        /* Modal Animation Setup */
+        .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .hide-arrows[type=number] { -moz-appearance: textfield; }
         .modal-slide-up { transform: translateY(0%); }
         .modal-slide-down { transform: translateY(100%); }
-        /* Toast Notification */
-        #toast { visibility: hidden; min-width: 250px; background-color: #1E293B; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s; font-weight: 600; font-size: 14px; }
+        #toast { visibility: hidden; min-width: 250px; background-color: #0B100E; color: #fff; text-align: center; border-radius: 99px; padding: 12px 24px; position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; font-size: 13px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); white-space: nowrap; }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
-<body class="bg-[#F8FAFC] min-h-screen selection:bg-blue-100 pb-10">
+<body class="bg-[#F2F5F8] min-h-screen selection:bg-emerald-100 font-['Inter'] antialiased">
 
-    <div class="px-5 py-4 flex items-center justify-between bg-white border-b border-slate-100 shadow-[0_2px_15px_-5px_rgba(0,0,0,0.05)] sticky top-0 z-40">
-        <div class="flex items-center gap-4">
-            <button onclick="window.location.href='dashboard.html'" class="text-slate-800 p-2 active:scale-90 transition-all duration-200 bg-slate-50 rounded-full hover:bg-slate-100">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <div>
-                <h2 class="text-[18px] font-black text-slate-800 leading-tight tracking-tight">Recharge</h2>
-                <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> 100% Secure
-                </p>
+    <div class="bg-[#0B100E] px-5 pt-6 pb-12 relative z-0 max-w-md mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='dashboard.html'" class="text-white p-2.5 active:scale-90 transition-all duration-200 bg-white/10 rounded-full border border-white/5 hover:bg-white/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div>
+                    <h2 class="text-[22px] font-black text-white leading-tight tracking-tight">Recharge</h2>
+                    <p class="text-[10px] font-bold text-[#00E5A0] uppercase tracking-widest mt-0.5 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-[#00E5A0] rounded-full animate-pulse shadow-[0_0_8px_#00E5A0]"></span> 100% Secure
+                    </p>
+                </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 flex items-center gap-1.5 shadow-inner">
+                <span class="text-[11px] font-bold text-slate-400">Vault:</span>
+                <span class="text-[14px] font-black text-white" id="walletBalanceDisplay">₹0</span>
             </div>
         </div>
-        <div class="bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-inner">
-            <span class="text-[11px] font-bold text-slate-500">Wallet:</span>
-            <span class="text-[13px] font-black text-slate-800" id="walletBalanceDisplay">₹0</span>
+
+        <div class="rounded-[24px] bg-gradient-to-r from-[#00A87A] to-[#008A62] p-5 text-white shadow-[0_8px_20px_rgba(0,168,122,0.3)] relative overflow-hidden group border border-white/10">
+            <div class="absolute -right-5 -top-5 w-32 h-32 bg-white/20 rounded-full blur-[20px] pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
+            <div class="relative z-10 w-3/4">
+                <h3 class="text-[18px] font-black mb-1 leading-tight drop-shadow-sm">
+                    Flat 5% Cashback 💸
+                </h3>
+                <p class="text-[11px] font-medium text-emerald-50 mb-3 opacity-90">Auto-applied on every Recharge!</p>
+                <div class="bg-white/20 backdrop-blur-md text-white text-[9px] font-black px-3 py-1 rounded-md border border-white/20 w-max uppercase tracking-widest">
+                    Guaranteed
+                </div>
+            </div>
+            <div class="absolute bottom-2 right-3 text-6xl opacity-90 transform translate-y-2 drop-shadow-xl pointer-events-none">🎁</div>
         </div>
     </div>
 
-    <div class="max-w-md mx-auto pt-5">
+    <div class="bg-white rounded-t-[32px] px-5 pt-8 pb-10 -mt-8 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[65vh] max-w-md mx-auto">
         
-        <div class="mx-5 mb-6 rounded-[1.5rem] bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] p-6 text-white shadow-lg shadow-indigo-500/30 relative overflow-hidden group cursor-pointer">
-            <div class="absolute -right-5 -top-5 w-32 h-32 bg-white/20 rounded-full blur-[20px] pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
-            <div class="relative z-10">
-                <h3 class="text-[20px] font-black mb-1.5 leading-tight flex items-center gap-2 drop-shadow-sm">
-                    Get 5% Cashback 💸
-                </h3>
-                <p class="text-[13px] font-medium text-indigo-100 mb-5">On your mobile or DTH recharge!</p>
-                <button class="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white text-[12px] font-bold px-6 py-2.5 rounded-full transition-all active:scale-95 shadow-sm">
-                    Auto Applied
-                </button>
+        <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-5 px-1">Bill Payments</h3>
+        
+        <div class="flex justify-between items-start mb-8 px-1">
+            <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
+                <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center border border-slate-100">
+                    <span class="text-[26px] drop-shadow-sm">📱</span>
+                </div>
+                <span class="text-[11px] font-semibold text-slate-800 text-center leading-[1.2]">Mobile<br>Prepaid</span>
             </div>
-            <div class="absolute bottom-0 right-0 opacity-20 text-6xl transform translate-x-4 translate-y-4">🎁</div>
-        </div>
 
-        <div class="bg-white rounded-[1.5rem] p-5 mx-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.03)] border border-slate-100 mb-6">
-            <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-5 px-1">Categories</h3>
-            <div class="grid grid-cols-4 gap-y-6 gap-x-2">
-                <div class="flex flex-col items-center gap-2 cursor-pointer group">
-                    <div class="w-[3.5rem] h-[3.5rem] bg-blue-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-blue-100/50 shadow-sm">📱</div>
-                    <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-blue-600 transition-colors">Mobile</span>
+            <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]" onclick="window.showToast('DTH coming soon!')">
+                <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center border border-slate-100 opacity-70">
+                    <span class="text-[26px] drop-shadow-sm grayscale-[30%]">📺</span>
                 </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('DTH coming soon!')">
-                    <div class="w-[3.5rem] h-[3.5rem] bg-orange-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-orange-100/50 shadow-sm">📡</div>
-                    <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-orange-600 transition-colors">DTH</span>
+                <span class="text-[11px] font-semibold text-slate-500 text-center leading-[1.2]">DTH<br>Recharge</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]" onclick="window.showToast('Electricity coming soon!')">
+                <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center border border-slate-100 opacity-70">
+                    <span class="text-[26px] drop-shadow-sm grayscale-[30%]">💡</span>
                 </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('Electricity coming soon!')">
-                    <div class="w-[3.5rem] h-[3.5rem] bg-amber-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-amber-100/50 shadow-sm">💡</div>
-                    <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-amber-600 transition-colors">Electricity</span>
+                <span class="text-[11px] font-semibold text-slate-500 text-center leading-[1.2]">Pay<br>Electricity</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]" onclick="window.showToast('FASTag coming soon!')">
+                <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center border border-slate-100 opacity-70">
+                    <span class="text-[26px] drop-shadow-sm grayscale-[30%]">🚘</span>
                 </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="window.showToast('FASTag coming soon!')">
-                    <div class="w-[3.5rem] h-[3.5rem] bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl group-active:scale-95 transition-all duration-200 border border-emerald-100/50 shadow-sm">🚘</div>
-                    <span class="text-[11px] font-bold text-slate-700 text-center group-hover:text-emerald-600 transition-colors">FASTag</span>
-                </div>
+                <span class="text-[11px] font-semibold text-slate-500 text-center leading-[1.2]">FASTag<br>Recharge</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-[1.5rem] p-6 mx-5 shadow-[0_8px_30px_-5px_rgba(0,0,0,0.04)] border border-slate-100 mb-8 relative overflow-hidden">
-            <h3 class="text-[16px] font-black text-slate-800 tracking-tight mb-5 flex items-center gap-2">
-                <span class="bg-blue-50 p-2 rounded-xl text-blue-600 shadow-inner">⚡</span> Quick Recharge
+        <div class="bg-[#F8FAFC] rounded-[24px] p-5 border border-slate-100 shadow-inner mb-6">
+            <h3 class="text-[15px] font-black text-slate-800 tracking-tight mb-5 flex items-center gap-2">
+                <span class="bg-[#00A87A]/10 p-1.5 rounded-lg text-[#00A87A]">⚡</span> Quick Recharge
             </h3>
             
-            <div class="relative mb-4">
-                <input type="number" id="mobileInput" placeholder="Enter Mobile Number" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[16px] font-bold rounded-xl px-5 py-4 pl-12 outline-none focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)] transition-all duration-200 hide-arrows tracking-wider" maxlength="10">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">📞</span>
+            <div class="relative mb-3.5">
+                <input type="number" id="mobileInput" placeholder="10-digit Mobile Number" class="w-full bg-white border border-slate-200 text-slate-900 text-[15px] font-bold rounded-xl px-4 py-3.5 pl-12 outline-none focus:border-[#00A87A] focus:shadow-[0_0_0_3px_rgba(0,168,122,0.1)] transition-all duration-200 hide-arrows tracking-wider" maxlength="10">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
             </div>
 
-            <div class="relative mb-4">
-                <select id="operatorSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-bold rounded-xl px-5 py-4 pl-12 outline-none focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)] transition-all duration-200 appearance-none">
+            <div class="relative mb-3.5">
+                <select id="operatorSelect" class="w-full bg-white border border-slate-200 text-slate-900 text-[15px] font-bold rounded-xl px-4 py-3.5 pl-12 outline-none focus:border-[#00A87A] focus:shadow-[0_0_0_3px_rgba(0,168,122,0.1)] transition-all duration-200 appearance-none">
                     <option value="" disabled selected>Select Operator</option>
                     <option value="1">Airtel</option>
                     <option value="2">Jio</option>
                     <option value="3">Vi</option>
                     <option value="4">BSNL</option>
                 </select>
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">🏢</span>
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
             </div>
 
             <div class="relative mb-6">
-                <input type="number" id="amountInput" placeholder="Enter Amount" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[16px] font-bold rounded-xl px-5 py-4 pl-12 pr-32 outline-none focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)] transition-all duration-200 hide-arrows tracking-wider">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">₹</span>
+                <input type="number" id="amountInput" placeholder="Amount (₹)" class="w-full bg-white border border-slate-200 text-slate-900 text-[15px] font-bold rounded-xl px-4 py-3.5 pl-11 pr-24 outline-none focus:border-[#00A87A] focus:shadow-[0_0_0_3px_rgba(0,168,122,0.1)] transition-all duration-200 hide-arrows tracking-wider">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">₹</span>
                 
-                <button onclick="openPlansModal()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-black text-blue-600 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100 active:scale-95 transition-all shadow-sm">
+                <button onclick="window.openPlansModal()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#00A87A] bg-emerald-50 px-3 py-1.5 rounded-lg hover:bg-emerald-100 active:scale-95 transition-all shadow-sm uppercase tracking-widest border border-emerald-100">
                     Browse Plans
                 </button>
             </div>
             
-            <button id="payBtn" onclick="window.processRechargeWithWallet()" class="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-black py-4 rounded-xl text-[15px] active:scale-95 transition-all duration-300 shadow-[0_10px_20px_-10px_rgba(15,23,42,0.6)] flex justify-center items-center gap-2">
-                Process Recharge <span class="text-xl leading-none">→</span>
+            <button id="payBtn" onclick="window.processRechargeWithWallet()" class="w-full bg-[#0B100E] text-white font-black py-4 rounded-xl text-[14px] active:scale-95 transition-all duration-300 shadow-xl flex justify-center items-center gap-2 tracking-wide">
+                Process Recharge <span class="text-lg leading-none">→</span>
             </button>
         </div>
-
     </div>
 
-    <div id="plansModal" class="fixed inset-0 z-[100] hidden">
-        <div id="modalBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closePlansModal()"></div>
+    <div id="plansModal" class="fixed inset-0 z-[150] hidden flex-col justify-end max-w-md mx-auto">
+        <div id="modalBackdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="window.closePlansModal()"></div>
         
-        <div id="plansSheet" class="absolute bottom-0 left-0 right-0 bg-[#F8FAFC] rounded-t-[2rem] h-[85vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.1)] modal-slide-down transition-transform duration-300 ease-out">
-            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-white rounded-t-[2rem] z-10 shrink-0">
+        <div id="plansSheet" class="relative bg-white w-full rounded-t-[2.5rem] h-[85vh] flex flex-col shadow-2xl modal-slide-down transition-transform duration-300 ease-out">
+            <div class="flex justify-between items-center p-6 pb-4 border-b border-slate-100 relative shrink-0">
+                <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
                 <div>
-                    <h3 class="text-[18px] font-black text-slate-800" id="modalOperatorTitle">Browse Plans</h3>
-                    <p class="text-[11px] font-bold text-blue-500 uppercase tracking-widest mt-0.5">Select your offer</p>
+                    <h3 class="font-black text-xl text-slate-900 mt-2" id="modalOperatorTitle">Browse Plans</h3>
+                    <p class="text-[10px] font-bold text-[#00A87A] uppercase tracking-widest mt-0.5">Select your offer</p>
                 </div>
-                <button onclick="closePlansModal()" class="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 active:scale-90 transition-all hover:bg-slate-200">
+                <button onclick="window.closePlansModal()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all active:scale-90">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div id="plansContainer" class="p-5 overflow-y-auto space-y-4 pb-10 flex-1">
-                <div class="text-center text-slate-500 font-bold text-sm py-10 animate-pulse">Loading Plans...</div>
+            <div id="plansContainer" class="p-5 overflow-y-auto space-y-4 pb-10 flex-1 bg-[#F8FAFC]">
+                <div class="text-center text-slate-400 font-bold text-sm py-10 animate-pulse">Fetching best offers... 🎁</div>
             </div>
         </div>
     </div>
@@ -156,7 +161,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global Variables
         const userPhone = localStorage.getItem("earnprox_user_phone");
         if (!userPhone) window.location.href = "login.html";
 
@@ -168,7 +172,6 @@
             setTimeout(()=>t.classList.remove("show"), 3000); 
         }
 
-        // 1. Fetch User Balance on Load
         async function fetchUserBalance() {
             try {
                 const q = query(collection(db, "users"), where("phone", "==", userPhone));
@@ -187,7 +190,6 @@
         }
         document.addEventListener("DOMContentLoaded", fetchUserBalance);
 
-        // 2. Recharge Process with Wallet Deduction
         window.processRechargeWithWallet = async function() {
             const mobile = document.getElementById('mobileInput').value;
             const operator = document.getElementById('operatorSelect').value;
@@ -199,7 +201,6 @@
             if(mobile.length !== 10) return window.showToast("⚠️ Invalid mobile number");
             if(amount < 10) return window.showToast("⚠️ Minimum amount is ₹10");
 
-            // CHECK WALLET BALANCE
             if (walletBalance < amount) {
                 return window.showToast("❌ Insufficient Wallet Balance! (₹" + walletBalance.toFixed(2) + ")");
             }
@@ -210,7 +211,6 @@
             btn.classList.add('opacity-80');
 
             try {
-                // CALLING YOUR VERCEL API
                 const response = await fetch('/api/recharge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -222,25 +222,19 @@
                 });
 
                 const data = await response.json();
-                console.log("API Response:", data);
                 
-                // IF RECHARGE IS SUCCESSFUL (STATUS 1 or 2 as per your setup)
                 if(data.STATUS == "2" || data.STATUS == "1") {
                     
-                    // 1. Deduct Balance + Give 5% Cashback
                     const cashback = amount * 0.05;
                     const finalDeduction = amount - cashback;
                     walletBalance = walletBalance - finalDeduction;
                     
-                    // Update Firebase User Document
                     await updateDoc(doc(db, "users", userDocId), { 
                         balance: walletBalance 
                     });
                     
-                    // Update UI Balance
                     document.getElementById('walletBalanceDisplay').innerText = '₹' + walletBalance.toFixed(2);
 
-                    // 2. Save Ledger History (Optional but recommended)
                     await addDoc(collection(db, "transactions"), {
                         phone: userPhone,
                         type: "recharge",
@@ -269,7 +263,6 @@
             }
         }
 
-        // 3. Modal and Plans Logic (Same as yours, moved to window scope)
         window.openPlansModal = function() {
             const opSelect = document.getElementById('operatorSelect');
             if(opSelect.selectedIndex === 0) return window.showToast("⚠️ Select Operator first!");
@@ -282,6 +275,7 @@
             const sheet = document.getElementById('plansSheet');
             
             modal.classList.remove('hidden');
+            modal.style.display = 'flex';
             setTimeout(() => {
                 backdrop.classList.remove('opacity-0');
                 sheet.classList.remove('modal-slide-down');
@@ -301,6 +295,7 @@
 
             setTimeout(() => {
                 document.getElementById('plansModal').classList.add('hidden');
+                document.getElementById('plansModal').style.display = 'none';
             }, 300); 
         }
 
@@ -311,7 +306,7 @@
 
         async function fetchAndRenderPlans(operatorName) {
             const container = document.getElementById('plansContainer');
-            container.innerHTML = '<div class="text-center text-slate-500 font-bold text-sm py-10 animate-pulse">Fetching best offers... 🎁</div>';
+            container.innerHTML = '<div class="text-center text-slate-400 font-bold text-sm py-10 animate-pulse">Fetching best offers... 🎁</div>';
 
             try {
                 const response = await fetch('/plans.json');
@@ -319,7 +314,7 @@
                 const plansList = data[operatorName];
 
                 if(!plansList || plansList.length === 0) {
-                    container.innerHTML = '<div class="text-center text-red-500 font-bold py-10">No plans found for this operator.</div>';
+                    container.innerHTML = '<div class="text-center text-rose-500 font-bold py-10">No plans found for this operator.</div>';
                     return;
                 }
 
@@ -327,27 +322,27 @@
                 
                 plansList.forEach(plan => {
                     const card = document.createElement('div');
-                    card.className = "bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-blue-500 active:bg-blue-50 cursor-pointer transition-all duration-200 shadow-sm relative overflow-hidden group";
+                    card.className = "bg-white p-4 rounded-[20px] border border-slate-100 hover:border-[#00A87A] active:scale-[0.98] cursor-pointer transition-all duration-200 shadow-[0_4px_15px_rgba(0,0,0,0.03)] relative overflow-hidden group";
                     card.onclick = () => window.selectPlan(plan.price);
                     
-                    const badge = plan.type ? `<span class="absolute top-0 right-0 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-bl-xl shadow-sm">${plan.type}</span>` : '';
+                    const badge = plan.type ? `<span class="absolute top-0 right-0 bg-[#0B100E] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-bl-xl shadow-sm">${plan.type}</span>` : '';
 
                     card.innerHTML = `
                         ${badge}
                         <div class="flex justify-between items-center mb-3 mt-1 pr-16">
                             <h4 class="text-[26px] font-black text-slate-800 tracking-tight">₹${plan.price}</h4>
                         </div>
-                        <div class="flex justify-between items-center bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                        <div class="flex justify-between items-center bg-[#F8FAFC] p-3 rounded-xl border border-slate-100">
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Validity</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Validity</p>
                                 <p class="text-[13px] font-black text-slate-700">${plan.validity}</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Data</p>
-                                <p class="text-[13px] font-black text-blue-600">${plan.data}</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Data</p>
+                                <p class="text-[13px] font-black text-[#00A87A]">${plan.data}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Details</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Details</p>
                                 <p class="text-[11px] font-bold text-slate-600 line-clamp-1 max-w-[100px]">${plan.desc}</p>
                             </div>
                         </div>
@@ -357,7 +352,7 @@
 
             } catch (error) {
                 console.error("JSON Error:", error);
-                container.innerHTML = '<div class="text-center text-red-500 font-bold text-sm py-10">Network error! Could not fetch plans.</div>';
+                container.innerHTML = '<div class="text-center text-rose-500 font-bold text-sm py-10">Network error! Could not fetch plans.</div>';
             }
         }
     </script>
