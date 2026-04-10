@@ -1,4 +1,4 @@
-const { db } = require('./_firebase');
+const { db } = require('./_firebase'); // 🔥 FIX 1: 'Const' को 'const' कर दिया है
 const jwt = require('jsonwebtoken');
 
 // Secret Key (Ise Vercel environment variables me 'JWT_SECRET' naam se save karna)
@@ -13,7 +13,8 @@ module.exports = async function handler(req, res) {
     const { phone } = req.body;
 
     // 2. Strict Phone Validation
-    if (!phone || !/^\d{10}$/.env.test(phone)) {
+    // 🔥 FIX 2: .env हटा दिया है, अब यह सही से 10-digit चेक करेगा
+    if (!phone || !/^\d{10}$/.test(phone)) {
         return res.status(400).json({ error: 'Invalid 10-digit phone number' });
     }
 
@@ -31,7 +32,6 @@ module.exports = async function handler(req, res) {
             }
 
             // 4. Generate Secure JWT Token
-            // Is token ke bina koi hacker balance nahi badha payega
             const token = jwt.sign(
                 { userId: userId, phone: phone }, 
                 JWT_SECRET, 
@@ -41,7 +41,7 @@ module.exports = async function handler(req, res) {
             return res.status(200).json({ 
                 exists: true, 
                 status: userData.status || 'active',
-                token: token, // Yeh token frontend ko jayega
+                token: token, 
                 message: 'User verified successfully'
             });
         }
