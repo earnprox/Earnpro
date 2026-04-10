@@ -86,8 +86,8 @@
             <section id="view-settings" class="view-section">
                 <h2 class="text-3xl font-extrabold mb-8">App Settings</h2>
                 
-                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl mb-8">
-                    <h3 class="font-black text-xl text-slate-800 border-b pb-4">Update Home Promo Banner 🖼️</h3>
+                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl">
+                    <h3 class="font-black text-xl text-slate-800 border-b pb-4">Update Promo Banner 🖼️</h3>
                     <input type="url" id="banner-url-input" placeholder="https://example.com/banner.jpg" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium">
                     <div class="mt-4 p-4 border rounded-xl bg-slate-50">
                         <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Live Preview:</p>
@@ -96,7 +96,7 @@
                     <button onclick="window.updateAppBanner(this)" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition mt-4">Save Banner Image ✅</button>
                 </div>
 
-                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl">
+                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl mt-8">
                     <h3 class="font-black text-xl text-emerald-600 border-b pb-4 flex items-center gap-2">🛡️ Manage 'Trust' Slides</h3>
                     <p class="text-xs font-bold text-slate-500">Upload portrait (9:16) image URLs for the 'Why trust EarnproX' Reels-style page.</p>
                     
@@ -106,7 +106,7 @@
                     </div>
 
                     <div class="mt-6 border-t pt-4">
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-4">Active Slides (Drag to reorder not supported yet, delete & re-add)</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-4">Active Slides</p>
                         <div id="trust-images-list" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             </div>
                     </div>
@@ -183,7 +183,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        // 🔥 SECURITY: Only READ functions are imported from Firebase now. All Writes go through Secure API.
         import { getFirestore, collection, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // Firebase Config
@@ -200,10 +199,10 @@
 
         // 🔒 SECURITY HASHES & TOKENS
         const MASTER_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; 
-        const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; // Match with your api/Rashiandakash.js
+        const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; 
 
         let globalUsersData = {}; let globalTasksData = {}; let globalWithdrawData = {}; let activeUserId = "";
-        let currentTrustImages = []; // Global Array for Trust Images
+        let currentTrustImages = []; // 🔥 FOR TRUST SLIDES
 
         const isToday = (dateObj) => { if(!dateObj) return false; const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); };
         const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
@@ -212,7 +211,7 @@
         const maskPhone = (phone) => phone && phone.length >= 10 ? phone.substring(0,2) + '******' + phone.substring(8) : 'N/A';
         const maskUpi = (upi) => { if(!upi || upi=='None') return 'NOT LINKED'; const pts = upi.split('@'); return pts[0].length > 2 ? pts[0].substring(0,2) + '****@' + (pts[1]||'') : upi; };
 
-        // 🛡️ API HELPER FUNCTION (Connects HTML to Backend)
+        // 🛡️ API HELPER FUNCTION 
         async function callAdminApi(actionName, payloadData, btnElement) {
             const ogText = btnElement ? btnElement.innerText : "";
             if(btnElement) { btnElement.innerText = "Processing..."; btnElement.disabled = true; }
@@ -284,8 +283,29 @@
             if(url) { document.getElementById('banner-preview').src = url; }
         });
 
-        // 🟢 DATA SYNC (Read-Only Direct from Firebase)
+        // 🎨 RENDER TRUST IMAGES IN ADMIN
+        window.renderTrustImages = function() {
+            const container = document.getElementById('trust-images-list');
+            if (currentTrustImages.length === 0) {
+                container.innerHTML = "<p class='text-xs text-slate-400 font-bold col-span-full'>No slides added yet.</p>";
+                return;
+            }
+            
+            let html = "";
+            currentTrustImages.forEach((url, index) => {
+                html += `
+                <div class="relative group rounded-xl overflow-hidden border-2 border-slate-200 aspect-[9/16] bg-slate-100 shadow-sm">
+                    <img src="${url}" class="w-full h-full object-cover">
+                    <button onclick="window.deleteTrustImage(${index}, this)" class="absolute inset-0 bg-red-500/80 text-white font-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">DELETE</button>
+                    <span class="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur-md font-bold">#${index + 1}</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // 🟢 DATA SYNC 
         window.startServerSync = function() {
+            // Settings Sync (Banner + Trust Images)
             onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
@@ -295,7 +315,7 @@
                     }
                     if(data.trustImages) {
                         currentTrustImages = data.trustImages;
-                        renderTrustImages();
+                        window.renderTrustImages();
                     }
                 }
             });
@@ -373,26 +393,6 @@
             });
         };
 
-        // 🎨 RENDER TRUST IMAGES IN ADMIN
-        function renderTrustImages() {
-            const container = document.getElementById('trust-images-list');
-            if (currentTrustImages.length === 0) {
-                container.innerHTML = "<p class='text-xs text-slate-400 font-bold col-span-full'>No slides added yet.</p>";
-                return;
-            }
-            
-            let html = "";
-            currentTrustImages.forEach((url, index) => {
-                html += `
-                <div class="relative group rounded-xl overflow-hidden border-2 border-slate-200 aspect-[9/16] bg-slate-100 shadow-sm">
-                    <img src="${url}" class="w-full h-full object-cover">
-                    <button onclick="window.deleteTrustImage(${index}, this)" class="absolute inset-0 bg-red-500/80 text-white font-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">DELETE</button>
-                    <span class="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur-md font-bold">#${index + 1}</span>
-                </div>`;
-            });
-            container.innerHTML = html;
-        }
-
         // ================= API ACTION HANDLERS =================
 
         window.updateAppBanner = async (btn) => {
@@ -421,11 +421,11 @@
             if(!confirm("Remove this slide from the Trust Page?")) return;
             
             const newImagesArray = [...currentTrustImages];
-            newImagesArray.splice(index, 1); // Remove item at index
+            newImagesArray.splice(index, 1); 
             
             const ogText = btn.innerText; btn.innerText = "⏳";
             const success = await callAdminApi('update_trust_images', { images: newImagesArray }, null);
-            if(!success) btn.innerText = ogText; // revert if failed
+            if(!success) btn.innerText = ogText; 
         };
 
         window.openEditModal = (id) => { 
