@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Why Trust EarnproX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0B100E; margin: 0; overflow: hidden; }
+        /* Instagram Reels / Fi Money Style Vertical Snap Scroll */
+        .snap-container { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+        .snap-container::-webkit-scrollbar { display: none; }
+        .snap-slide { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; justify-content: center; align-items: center; background: #F8FAFC; }
+        .snap-slide img { width: 100%; height: 100%; object-fit: cover; } /* object-cover for full screen posters */
+        
+        /* Skeleton Loader */
+        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="fixed top-0 left-0 right-0 p-5 z-50 flex items-center gap-4 bg-gradient-to-b from-black/60 to-transparent text-white">
+        <button onclick="history.back()" class="p-2 bg-white/20 backdrop-blur-md rounded-full active:scale-90 transition-transform border border-white/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <h1 class="font-bold text-[17px] tracking-wide drop-shadow-md">Why Trust EarnproX?</h1>
+    </div>
+
+    <div id="slides-container" class="snap-container">
+        <div class="snap-slide skeleton flex flex-col items-center justify-center">
+            <p class="text-slate-400 font-bold mt-4 animate-pulse">Loading Secure Data...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
+            authDomain: "earnproxuc.firebaseapp.com", 
+            projectId: "earnproxuc", 
+            storageBucket: "earnproxuc.firebasestorage.app", 
+            messagingSenderId: "411733884378", 
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" 
+        };
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app);
+
+        async function fetchTrustImages() {
+            const container = document.getElementById('slides-container');
+            try {
+                const docSnap = await getDoc(doc(db, "app_settings", "master_config"));
+                if (docSnap.exists() && docSnap.data().trustImages && docSnap.data().trustImages.length > 0) {
+                    const images = docSnap.data().trustImages;
+                    container.innerHTML = ''; // Clear loader
+                    
+                    images.forEach((imgUrl, index) => {
+                        const slide = document.createElement('div');
+                        slide.className = 'snap-slide';
+                        // Added subtle bottom indicator to show there's more to scroll
+                        const scrollIndicator = index < images.length - 1 ? `<div class="absolute bottom-10 flex flex-col items-center animate-bounce text-white/80 drop-shadow-md"><span class="text-xs font-bold mb-1 tracking-widest uppercase">Scroll</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>` : '';
+                        
+                        slide.innerHTML = `<img src="${imgUrl}" alt="Trust EarnproX"> ${scrollIndicator}`;
+                        container.appendChild(slide);
+                    });
+                } else {
+                    container.innerHTML = `<div class="snap-slide bg-slate-900 text-white flex-col"><div class="text-6xl mb-4">🛡️</div><h2 class="text-xl font-bold">100% Safe & Secure</h2><p class="text-slate-400 text-sm mt-2">Verified by Trust System</p></div>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="snap-slide bg-slate-900 text-white font-bold">Failed to load secure slides.</div>`;
+            }
+        }
+        
+        fetchTrustImages();
+    </script>
+</body>
+</html>
