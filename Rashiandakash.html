@@ -85,14 +85,31 @@
 
             <section id="view-settings" class="view-section">
                 <h2 class="text-3xl font-extrabold mb-8">App Settings</h2>
-                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl">
-                    <h3 class="font-black text-xl text-slate-800 border-b pb-4">Update Promo Banner 🖼️</h3>
+                
+                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl mb-8">
+                    <h3 class="font-black text-xl text-slate-800 border-b pb-4">Update Home Promo Banner 🖼️</h3>
                     <input type="url" id="banner-url-input" placeholder="https://example.com/banner.jpg" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium">
                     <div class="mt-4 p-4 border rounded-xl bg-slate-50">
                         <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Live Preview:</p>
                         <img id="banner-preview" src="https://img.freepik.com/free-vector/special-offer-modern-sale-banner-template_1017-20667.jpg?w=1000" alt="Preview" class="w-full h-[130px] object-cover rounded-lg border shadow-sm">
                     </div>
                     <button onclick="window.updateAppBanner(this)" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition mt-4">Save Banner Image ✅</button>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl">
+                    <h3 class="font-black text-xl text-emerald-600 border-b pb-4 flex items-center gap-2">🛡️ Manage 'Trust' Slides</h3>
+                    <p class="text-xs font-bold text-slate-500">Upload portrait (9:16) image URLs for the 'Why trust EarnproX' Reels-style page.</p>
+                    
+                    <div class="flex gap-2">
+                        <input type="url" id="trust-url-input" placeholder="Paste Image URL here..." class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-medium text-sm">
+                        <button onclick="window.addTrustImage(this)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 rounded-xl active:scale-95 transition shrink-0">Add Slide</button>
+                    </div>
+
+                    <div class="mt-6 border-t pt-4">
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-4">Active Slides (Drag to reorder not supported yet, delete & re-add)</p>
+                        <div id="trust-images-list" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            </div>
+                    </div>
                 </div>
             </section>
 
@@ -186,6 +203,7 @@
         const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; // Match with your api/Rashiandakash.js
 
         let globalUsersData = {}; let globalTasksData = {}; let globalWithdrawData = {}; let activeUserId = "";
+        let currentTrustImages = []; // Global Array for Trust Images
 
         const isToday = (dateObj) => { if(!dateObj) return false; const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); };
         const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
@@ -269,10 +287,16 @@
         // 🟢 DATA SYNC (Read-Only Direct from Firebase)
         window.startServerSync = function() {
             onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
-                if(docSnap.exists() && docSnap.data().bannerUrl) {
-                    const url = docSnap.data().bannerUrl;
-                    document.getElementById('banner-url-input').value = url;
-                    document.getElementById('banner-preview').src = url;
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.bannerUrl) {
+                        document.getElementById('banner-url-input').value = data.bannerUrl;
+                        document.getElementById('banner-preview').src = data.bannerUrl;
+                    }
+                    if(data.trustImages) {
+                        currentTrustImages = data.trustImages;
+                        renderTrustImages();
+                    }
                 }
             });
 
@@ -349,6 +373,26 @@
             });
         };
 
+        // 🎨 RENDER TRUST IMAGES IN ADMIN
+        function renderTrustImages() {
+            const container = document.getElementById('trust-images-list');
+            if (currentTrustImages.length === 0) {
+                container.innerHTML = "<p class='text-xs text-slate-400 font-bold col-span-full'>No slides added yet.</p>";
+                return;
+            }
+            
+            let html = "";
+            currentTrustImages.forEach((url, index) => {
+                html += `
+                <div class="relative group rounded-xl overflow-hidden border-2 border-slate-200 aspect-[9/16] bg-slate-100 shadow-sm">
+                    <img src="${url}" class="w-full h-full object-cover">
+                    <button onclick="window.deleteTrustImage(${index}, this)" class="absolute inset-0 bg-red-500/80 text-white font-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">DELETE</button>
+                    <span class="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur-md font-bold">#${index + 1}</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
         // ================= API ACTION HANDLERS =================
 
         window.updateAppBanner = async (btn) => {
@@ -356,6 +400,32 @@
             if(!url) return alert("⚠️ Please enter a valid image URL");
             const success = await callAdminApi('update_banner', { url }, btn);
             if(success) alert("✅ Banner Updated! Users will see this instantly.");
+        };
+
+        // 🚀 ACTION: ADD TRUST IMAGE
+        window.addTrustImage = async (btn) => {
+            const url = document.getElementById('trust-url-input').value.trim();
+            if(!url) return alert("⚠️ Paste an image URL first!");
+            
+            const newImagesArray = [...currentTrustImages, url];
+            const success = await callAdminApi('update_trust_images', { images: newImagesArray }, btn);
+            
+            if(success) {
+                document.getElementById('trust-url-input').value = "";
+                alert("✅ Slide Added! It is now live on the Trust Page.");
+            }
+        };
+
+        // 🚀 ACTION: DELETE TRUST IMAGE
+        window.deleteTrustImage = async (index, btn) => {
+            if(!confirm("Remove this slide from the Trust Page?")) return;
+            
+            const newImagesArray = [...currentTrustImages];
+            newImagesArray.splice(index, 1); // Remove item at index
+            
+            const ogText = btn.innerText; btn.innerText = "⏳";
+            const success = await callAdminApi('update_trust_images', { images: newImagesArray }, null);
+            if(!success) btn.innerText = ogText; // revert if failed
         };
 
         window.openEditModal = (id) => { 
