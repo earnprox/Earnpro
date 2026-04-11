@@ -18,13 +18,12 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #051334; /* Deep Navy Blue */
+            background-color: #051334; 
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Neon Perspective Grid Floor */
         .grid-floor {
             position: absolute;
             bottom: 0; left: 0; right: 0;
@@ -39,7 +38,6 @@
             pointer-events: none;
         }
 
-        /* 🎡 Patterned Golden Rim */
         .wheel-rim {
             position: relative;
             width: 340px;
@@ -57,7 +55,6 @@
             justify-content: center;
         }
 
-        /* The Spinning Wheel (6 Segments alternating blue) */
         .wheel-container {
             position: relative;
             width: 310px;
@@ -68,8 +65,8 @@
             overflow: hidden;
             transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.1, 1);
             background: conic-gradient(
-                #13B9E6 0deg 60deg,   /* Light Blue */
-                #0B2A6B 60deg 120deg, /* Dark Blue */
+                #13B9E6 0deg 60deg,   
+                #0B2A6B 60deg 120deg, 
                 #13B9E6 120deg 180deg,
                 #0B2A6B 180deg 240deg,
                 #13B9E6 240deg 300deg,
@@ -77,7 +74,6 @@
             );
         }
 
-        /* Separation Lines */
         .wheel-lines {
             position: absolute; inset: 0; border-radius: 50%;
             background: 
@@ -87,7 +83,6 @@
             z-index: 1;
         }
 
-        /* Text placements on the wheel */
         .slice-text {
             position: absolute;
             width: 50%; height: 20px;
@@ -108,7 +103,6 @@
         .t-5 { transform: translateY(-50%) rotate(270deg); }  
         .t-6 { transform: translateY(-50%) rotate(330deg); color: #FFD700; } 
 
-        /* Golden Center Pin */
         .wheel-center {
             position: absolute;
             top: 50%; left: 50%;
@@ -120,7 +114,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 -2px 6px rgba(0,0,0,0.4);
         }
 
-        /* Top Blue Layered Pointer */
         .pointer-container {
             position: absolute;
             top: -20px; left: 50%;
@@ -135,24 +128,22 @@
             width: 0; height: 0;
             border-left: 24px solid transparent;
             border-right: 24px solid transparent;
-            border-top: 35px solid #00E5A0; /* Light Cyan/Blue */
+            border-top: 35px solid #00E5A0; 
             position: relative;
         }
         .pointer-inner {
             width: 0; height: 0;
             border-left: 14px solid transparent;
             border-right: 14px solid transparent;
-            border-top: 22px solid #0B2A6B; /* Dark Blue */
+            border-top: 22px solid #0B2A6B; 
             position: absolute;
             top: -35px; left: -14px;
         }
 
-        /* Advanced 3D Bottom SPIN Button */
         .btn-3d {
             background: linear-gradient(to bottom, #40dbff, #12b5e6);
             border-radius: 50%;
             border: 2px solid #0ba1d1;
-            /* Box shadow magic to create 3D depth without inner divs */
             box-shadow: 
                 0 8px 0 #0e5bc2, 
                 0 16px 0 #063b82, 
@@ -218,8 +209,8 @@
                 SPIN
             </button>
             
-            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-[#0B2A6B] border-2 border-yellow-400 text-yellow-400 font-bold px-4 py-1 rounded-full text-sm flex items-center gap-1.5 shadow-lg pointer-events-none">
-                <span class="w-3 h-3 rounded-full bg-[#13B9E6] drop-shadow-md"></span> 3
+            <div id="spin-badge" class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-[#0B2A6B] border-2 border-yellow-400 text-yellow-400 font-bold px-4 py-1 rounded-full text-sm flex items-center gap-1.5 shadow-lg pointer-events-none">
+                <span class="w-3 h-3 rounded-full bg-[#13B9E6] drop-shadow-md"></span> 1
             </div>
         </div>
 
@@ -240,7 +231,7 @@
                 <div id="result-icon" class="text-6xl mb-4 drop-shadow-md">🎉</div>
                 <h3 id="result-title" class="text-2xl font-black text-[#0B2A6B] mb-2 tracking-tight">Congratulations!</h3>
                 <p id="result-msg" class="text-slate-600 font-bold mb-8 text-sm">You won ₹5 in your vault.</p>
-                <button onclick="window.location.href='dashboard.html'" class="w-full bg-[#0B2A6B] text-white font-black py-4 rounded-xl active:scale-95 transition-transform shadow-lg text-[14px]">Claim & Go to Dashboard</button>
+                <button onclick="window.location.href='dashboard.html'" class="w-full bg-[#0B2A6B] text-white font-black py-4 rounded-xl active:scale-95 transition-transform shadow-lg text-[14px]">Go to Dashboard</button>
             </div>
         </div>
     </div>
@@ -248,8 +239,6 @@
     <script>
         let isSpinning = false;
 
-        // Backend Se Prize aayega toh kis angle pe rokna hai?
-        // Mapping: Index 0 = ₹1, 1 = ₹2, 2 = ₹3, 3 = Loss, 4 = ₹5, 5 = ₹10
         const prizeMap = {
             1: { index: 0, title: "Small Win!", icon: "👍" },
             2: { index: 1, title: "Nice Job!", icon: "✌️" },
@@ -263,7 +252,7 @@
             if(isSpinning) return;
             isSpinning = true;
             
-            // 1. Show Fake Ad (3 seconds)
+            // Show the loading Ad first even if they have 0 spins (Smart Monetization Strategy)
             const adOverlay = document.getElementById("ad-overlay");
             adOverlay.classList.remove("pointer-events-none", "opacity-0");
             
@@ -277,7 +266,7 @@
                 if(timeLeft <= 0) {
                     clearInterval(countdown);
                     adOverlay.classList.add("pointer-events-none", "opacity-0");
-                    executeRealSpin(); // Call API After Ad
+                    executeRealSpin(); // Backend decides if they get a spin or a limit warning
                 }
             }, 1000);
         }
@@ -289,7 +278,6 @@
             spinBtn.style.fontStyle = "normal";
 
             try {
-                // 2. Call Secure Backend API
                 const response = await fetch('/api/spin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -299,19 +287,27 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Update badge to 0 immediately upon success
+                    document.getElementById('spin-badge').innerHTML = `<span class="w-3 h-3 rounded-full bg-slate-400 drop-shadow-md"></span> 0`;
                     const rewardAmt = data.reward;
                     spinTheWheel(rewardAmt);
                 } else {
-                    alert(data.error); 
-                    window.location.href = "dashboard.html";
+                    // API blocked the spin (e.g., limit reached)
+                    showAlreadySpunPopup(data.error); 
+                    resetSpinButton();
                 }
             } catch (error) {
-                alert("Network Error! Try again.");
-                isSpinning = false;
-                spinBtn.innerHTML = "SPIN";
-                spinBtn.style.fontSize = "30px";
-                spinBtn.style.fontStyle = "italic";
+                showAlreadySpunPopup("Network Error! Try again.");
+                resetSpinButton();
             }
+        }
+
+        function resetSpinButton() {
+            isSpinning = false;
+            const spinBtn = document.getElementById("spin-btn");
+            spinBtn.innerHTML = "SPIN";
+            spinBtn.style.fontSize = "30px";
+            spinBtn.style.fontStyle = "italic";
         }
 
         function spinTheWheel(rewardAmt) {
@@ -343,6 +339,21 @@
                 document.getElementById("result-msg").innerText = info.msg;
             }
 
+            overlay.classList.remove("pointer-events-none", "opacity-0");
+            setTimeout(() => card.classList.remove("scale-90"), 50);
+        }
+
+        function showAlreadySpunPopup(errMsg) {
+            const overlay = document.getElementById("result-overlay");
+            const card = document.getElementById("result-card");
+            
+            // Custom look for Limit Reached
+            document.getElementById("result-icon").innerText = "⏳";
+            document.getElementById("result-title").innerText = "Limit Reached!";
+            
+            // Use the backend error or default text
+            document.getElementById("result-msg").innerText = "You have already claimed your daily spin. Come back tomorrow!";
+            
             overlay.classList.remove("pointer-events-none", "opacity-0");
             setTimeout(() => card.classList.remove("scale-90"), 50);
         }
