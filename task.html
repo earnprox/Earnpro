@@ -5,36 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EarnproX | App Tasks</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        const userToken = sessionStorage.getItem("earnprox_secure_token");
+        if (!userPhone || !userToken) {
+            window.location.replace("login.html");
+        }
+    </script>
 </head>
-<body class="bg-[#F2F5F8] font-['Inter'] antialiased pb-10">
+<body class="bg-[#F2F5F8] font-['Inter'] antialiased pb-10 min-h-screen flex flex-col">
 
-    <div class="px-5 py-5 flex items-center bg-white border-b border-slate-100 sticky top-0 z-50">
-        <button onclick="window.history.back()" class="p-2 bg-slate-50 rounded-full mr-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
-        <h3 class="font-black text-slate-800">App Install Tasks</h3>
+    <div class="px-5 py-5 flex items-center bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+        <button onclick="window.history.back()" class="p-2 bg-slate-50 hover:bg-slate-100 rounded-full mr-3 active:scale-95 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </button>
+        <h3 class="font-black text-slate-800 text-lg">App Install Tasks</h3>
     </div>
 
     <div class="p-5">
-        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex gap-3">
-            <span class="text-xl">⚡</span>
-            <p class="text-[11px] font-bold text-emerald-700 leading-tight">These tasks are auto-verified. Money will be added instantly after completing the action.</p>
+        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+            <span class="text-2xl drop-shadow-sm">⚡</span>
+            <p class="text-[11px] font-bold text-emerald-700 leading-tight">Complete these high-paying app install tasks. Money is tracked and verified automatically.</p>
         </div>
     </div>
 
-    <div class="px-5 space-y-3" id="task-list">
-        <div class="bg-white rounded-[24px] p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+    <div class="px-5 space-y-4 flex-1" id="task-list">
+        
+        <div class="bg-white rounded-[24px] p-4 shadow-sm border border-slate-100 flex items-center justify-between animate-pulse">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden">
-                    <img src="https://cdn-icons-png.flaticon.com/512/888/888841.png" class="w-8 h-8 object-contain">
-                </div>
-                <div>
-                    <h4 class="text-[14px] font-bold text-slate-800">Install PhonePe</h4>
-                    <p class="text-[10px] font-semibold text-[#00A87A]">Reward: ₹5.00</p>
+                <div class="w-12 h-12 bg-slate-200 rounded-2xl"></div>
+                <div class="space-y-2">
+                    <div class="w-24 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-16 h-2 bg-slate-200 rounded"></div>
                 </div>
             </div>
-            <a href="https://your-tracking-link.com?subid=USER_ID" class="bg-[#0B100E] text-white px-5 py-2.5 rounded-xl text-[12px] font-bold active:scale-90 transition-all">Start Task</a>
+            <div class="w-20 h-10 bg-slate-200 rounded-xl"></div>
         </div>
+
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 🔥 Firebase Config (अपना वाला ही रखा है)
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
+            authDomain: "earnproxuc.firebaseapp.com", 
+            projectId: "earnproxuc", 
+            storageBucket: "earnproxuc.firebasestorage.app", 
+            messagingSenderId: "411733884378", 
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" 
+        };
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app);
+
+        // Fetch Live Tasks for "App Install" Category
+        const q = query(collection(db, "gigs"), where("category", "==", "App Install"));
+        
+        onSnapshot(q, (snapshot) => {
+            const taskList = document.getElementById("task-list");
+            
+            if (snapshot.empty) {
+                taskList.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 opacity-70">
+                        <span class="text-5xl mb-3">📱</span>
+                        <h4 class="font-black text-slate-700">No App Tasks Yet!</h4>
+                        <p class="text-xs font-bold text-slate-400 mt-1 text-center">Admin is adding new tasks. Please check back later.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = "";
+            snapshot.forEach((doc) => {
+                const task = doc.data();
+                
+                // Affiliate Tracking Logic (Append userPhone as SubID)
+                let trackingLink = task.link;
+                if(trackingLink.includes('?')) {
+                    trackingLink += `&subid=${userPhone}`;
+                } else {
+                    trackingLink += `?subid=${userPhone}`;
+                }
+
+                html += `
+                <div class="bg-white rounded-[24px] p-4 shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-transform active:scale-[0.98]">
+                    <div class="flex items-center gap-3 w-full">
+                        <div class="w-[52px] h-[52px] bg-slate-50 rounded-[18px] flex items-center justify-center border border-slate-100 shrink-0 text-2xl shadow-sm">
+                            📱
+                        </div>
+                        <div class="flex-1 pr-2">
+                            <h4 class="text-[15px] font-black text-slate-800 leading-tight line-clamp-1">${task.title}</h4>
+                            <p class="text-[10px] font-black text-[#00A87A] mt-1 bg-emerald-50 inline-block px-2 py-0.5 rounded tracking-widest uppercase">Reward: ₹${parseFloat(task.reward).toFixed(2)}</p>
+                            ${task.desc ? `<p class="text-[10px] font-semibold text-slate-500 mt-1.5 line-clamp-1">${task.desc}</p>` : ''}
+                        </div>
+                    </div>
+                    <a href="${trackingLink}" target="_blank" class="w-full md:w-auto bg-[#0B100E] text-white px-6 py-3.5 rounded-xl text-[12px] font-black shadow-md text-center uppercase tracking-widest shrink-0 hover:bg-slate-800 active:scale-95 transition-all flex justify-center items-center gap-1">
+                        Start Task
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>`;
+            });
+            
+            taskList.innerHTML = html;
+        });
+    </script>
 </body>
 </html>
