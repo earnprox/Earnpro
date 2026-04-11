@@ -263,7 +263,7 @@
             if(isSpinning) return;
             isSpinning = true;
             
-            // 1. Show Fake Ad (3 seconds) - Real App me yahan AdMob Network load hoga
+            // 1. Show Fake Ad (3 seconds)
             const adOverlay = document.getElementById("ad-overlay");
             adOverlay.classList.remove("pointer-events-none", "opacity-0");
             
@@ -285,7 +285,7 @@
         async function executeRealSpin() {
             const spinBtn = document.getElementById("spin-btn");
             spinBtn.innerHTML = "Processing...";
-            spinBtn.style.fontSize = "16px"; // Adjust font size for long text on circle
+            spinBtn.style.fontSize = "16px"; 
             spinBtn.style.fontStyle = "normal";
 
             try {
@@ -302,7 +302,7 @@
                     const rewardAmt = data.reward;
                     spinTheWheel(rewardAmt);
                 } else {
-                    alert(data.error); // E.g., "Already spinned today"
+                    alert(data.error); 
                     window.location.href = "dashboard.html";
                 }
             } catch (error) {
@@ -318,22 +318,16 @@
             const wheel = document.getElementById("wheel");
             const prizeInfo = prizeMap[rewardAmt];
             
-            // Calculation: 6 segments = 60 degrees each.
-            // Formula to land on correct slice (with 5 full rotations extra for effect)
-            // Extra random degree added so pointer doesn't land exactly on the line
             const sliceDegree = 60;
-            const randomOffset = Math.floor(Math.random() * 40) + 10; // 10 to 50
+            const randomOffset = Math.floor(Math.random() * 40) + 10; 
             
-            // 360 - (index * 60) aligns the slice to the top pointer
             const targetDegree = (5 * 360) + (360 - (prizeInfo.index * sliceDegree)) - sliceDegree/2 + randomOffset;
 
-            // Start Rotation CSS Animation
             wheel.style.transform = `rotate(${targetDegree}deg)`;
 
-            // Wait 4 Seconds for wheel to stop, then show popup
             setTimeout(() => {
                 showResult(rewardAmt, prizeInfo);
-            }, 4600); // Thoda time badhaya for smoother stop
+            }, 4600); 
         }
 
         function showResult(amt, info) {
@@ -355,5 +349,8 @@
     </script>
 
     <script>(function(s){s.dataset.zone='10860816',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
+    <script>(function(s){s.dataset.zone='10860872',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
 </body>
 </html>
