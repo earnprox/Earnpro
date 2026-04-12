@@ -138,7 +138,7 @@
             <div class="flex justify-between items-end mb-5 relative z-10">
                 <div>
                     <p class="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Balance
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Coins
                     </p>
                     <h2 class="text-4xl font-black flex items-center gap-2 tracking-tighter">
                         <span id="coin-balance">0</span>
@@ -151,8 +151,8 @@
                 </div>
             </div>
 
-            <button onclick="convertToCash()" id="convert-btn" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-black py-3.5 rounded-xl uppercase tracking-widest shadow-[0_8px_25px_rgba(245,158,11,0.3)] active:scale-95 transition-all">
-                Convert to Wallet 💸
+            <button onclick="goToWallet()" id="convert-btn" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-black py-3.5 rounded-xl uppercase tracking-widest shadow-[0_8px_25px_rgba(245,158,11,0.3)] active:scale-95 transition-all">
+                Go to Wallet to Convert 💸
             </button>
         </div>
 
@@ -180,11 +180,7 @@
             </div>
         </div>
 
-        <p class="text-center text-[10px] font-bold text-muted mt-4 tracking-widest uppercase">Secure Mode • Ad every 15 Taps</p>
-    </div>
-
-    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[40px] -translate-x-1/2 bg-emerald-500 border border-emerald-400 text-white font-black text-[12px] px-6 py-3.5 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.3)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">
-        Success! Redirecting to Wallet...
+        <p class="text-center text-[10px] font-bold text-muted mt-4 tracking-widest uppercase">Secure Mode • Notification Ad every 15 Taps</p>
     </div>
 
     <script type="module">
@@ -217,7 +213,6 @@
             document.getElementById('theme-btn').innerText = isLight ? '🌙' : '🌞';
         };
 
-        // Load saved theme
         if (localStorage.getItem('earnprox_theme') === 'light') {
             document.body.classList.add('light-mode');
             document.getElementById('theme-btn').innerText = '🌙';
@@ -308,10 +303,10 @@
             totalCoins++; dailyTapped++; unsyncedCoins++; adCounter++;
             updateUI();
 
-            // 💰 TRIGGER AD EVERY 15 TAPS
+            // 💰 TRIGGER NOTIFICATION AD EVERY 15 TAPS
             if(adCounter >= 15) { 
                 adCounter = 0; 
-                showRewardAd(); 
+                showNotificationAd(); 
             }
 
             clearTimeout(syncTimer);
@@ -330,48 +325,29 @@
             } catch(e) { unsyncedCoins += toSync; }
         }
 
-        // 💸 CONVERT & DIRECT REDIRECT TO WALLET
-        window.convertToCash = async () => {
-            if(totalCoins < 1000) {
-                alert("⚠️ You need at least 1,000 coins (₹1) to convert!");
-                return;
-            }
+        // 💸 GO TO WALLET DIRECTLY (No Conversion happens here)
+        window.goToWallet = async () => {
             const btn = document.getElementById('convert-btn');
-            const originalText = btn.innerHTML;
             btn.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>`; 
             btn.disabled = true;
 
+            // Sync any pending coins before leaving the page
             await syncToFirebase(); 
-
-            const cashAmount = Math.floor(totalCoins / 1000);
-            const coinsToDeduct = cashAmount * 1000;
-
-            try {
-                await updateDoc(doc(db, "users", userId), {
-                    coinBalance: increment(-coinsToDeduct),
-                    balance: increment(cashAmount)
-                });
-                
-                const toast = document.getElementById('toast');
-                toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-                
-                // 🔄 Redirect to Wallet.html automatically
-                setTimeout(() => { 
-                    window.location.href = "wallet.html"; 
-                }, 1500);
-
-            } catch(e) {
-                alert("❌ Server Error! Refresh page.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+            
+            // Redirect to Wallet
+            window.location.href = "wallet.html"; 
         }
 
-        function showRewardAd() {
-            if(window.showTag) { window.showTag(); }
+        // 🚀 DYNAMIC SCRIPT INJECTION FOR MONETAG NOTIFICATION (IN-PAGE PUSH) AD
+        function showNotificationAd() {
+            console.log("Triggering Notification Ad at 15 clicks...");
+            
+            // Inject the script exactly when 15 clicks happen to force the ad to show
+            const script = document.createElement('script');
+            script.dataset.zone = '10860922'; // This is your Notification / In-Page Push Zone ID
+            script.src = 'https://nap5k.com/tag.min.js';
+            document.body.appendChild(script);
         }
     </script>
-
-    <script>(function(s){s.dataset.zone='10860816',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 </body>
 </html>
