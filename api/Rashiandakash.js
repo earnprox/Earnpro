@@ -3,14 +3,13 @@ const { db, admin } = require('./_firebase'); // अपना सही पा�
 const SECURE_API_TOKEN = process.env.ADMIN_SECRET_KEY || "RashiAkash@2026_Secure";
 
 module.exports = async function handler(req, res) {
-    // 1. Sirf POST requests allow karenge
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     const { action, payload, secureToken } = req.body;
 
-    // 2. 🛡️ STRICT SECURITY: Verify Master Token
+    // 🛡️ STRICT SECURITY: Verify Master Token
     if (secureToken !== SECURE_API_TOKEN) {
         return res.status(401).json({ error: '🚨 Unauthorized Access. Hacker spotted!' });
     }
@@ -21,7 +20,83 @@ module.exports = async function handler(req, res) {
         switch (action) {
 
             // ==========================================
-            // 🎨 APP SETTINGS
+            // 🪙 NEW LEVEL-2: SECURE TAP SYNC (Mining)
+            // ==========================================
+            case 'sync_taps': {
+                const { userPhone, newTaps } = payload;
+                if(!userPhone || !newTaps) return res.status(400).json({error: "Missing data"});
+
+                const uSnap = await db.collection('users').where('phone', '==', userPhone).get();
+                if(uSnap.empty) return res.status(400).json({error: "User not found"});
+
+                const uDoc = uSnap.docs[0];
+                const uData = uDoc.data();
+                const uId = uDoc.id;
+
+                const now = Date.now();
+                const lastSync = uData.lastSyncTime || 0;
+                const timeDiffSec = (now - lastSync) / 1000;
+
+                // 🛡️ SPEED HACK CHECK (Auto-clicker blocker)
+                if (lastSync !== 0 && timeDiffSec > 0) {
+                    const maxTaps = Math.floor(timeDiffSec * 15); 
+                    if (newTaps > maxTaps && newTaps > 20) { 
+                        console.log(`🚨 Hack attempt blocked for ${userPhone}. Sent ${newTaps} taps in ${timeDiffSec}s`);
+                        return res.status(403).json({error: "Too fast! Auto-clicker detected."});
+                    }
+                }
+
+                // 🛡️ DAILY LIMIT CHECK AT SERVER
+                const today = new Date().toDateString();
+                const lastDateStr = uData.lastCoinDate ? new Date(uData.lastCoinDate).toDateString() : "";
+                let currentDaily = (lastDateStr === today) ? (uData.dailyCoinsEarned || 0) : 0;
+                let finalTapsToSync = newTaps;
+
+                if (currentDaily + finalTapsToSync > 2000) {
+                    finalTapsToSync = 2000 - currentDaily;
+                    if(finalTapsToSync <= 0) return res.status(400).json({error: "Daily limit reached"});
+                }
+
+                await db.collection('users').doc(uId).update({
+                    coinBalance: admin.firestore.FieldValue.increment(finalTapsToSync),
+                    dailyCoinsEarned: currentDaily + finalTapsToSync,
+                    lastSyncTime: now,
+                    lastCoinDate: new Date().toISOString()
+                });
+
+                return res.status(200).json({success: true});
+            }
+
+            // ==========================================
+            // 💸 NEW LEVEL-2: SECURE COIN TO CASH CONVERT
+            // ==========================================
+            case 'convert_coins': {
+                const { userPhone } = payload;
+                if(!userPhone) return res.status(400).json({error: "Missing data"});
+
+                const uSnap = await db.collection('users').where('phone', '==', userPhone).get();
+                if(uSnap.empty) return res.status(400).json({error: "User not found"});
+
+                const uDoc = uSnap.docs[0];
+                const uData = uDoc.data();
+                const uId = uDoc.id;
+
+                const currentCoins = uData.coinBalance || 0;
+                if(currentCoins < 1) return res.status(400).json({error: "Not enough coins"});
+
+                const cashToAdd = currentCoins / 1000;
+                const coinsToDeduct = currentCoins;
+
+                await db.collection('users').doc(uId).update({
+                    coinBalance: admin.firestore.FieldValue.increment(-coinsToDeduct),
+                    balance: admin.firestore.FieldValue.increment(cashToAdd)
+                });
+
+                return res.status(200).json({success: true, added: cashToAdd});
+            }
+
+            // ==========================================
+            // 🎨 OLD CODE: APP SETTINGS
             // ==========================================
             case 'update_banner':
                 await db.collection("app_settings").doc("master_config").set({ bannerUrl: payload.url }, { merge: true });
@@ -33,7 +108,7 @@ module.exports = async function handler(req, res) {
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 👥 USER MANAGEMENT
+            // 👥 OLD CODE: USER MANAGEMENT
             // ==========================================
             case 'edit_user':
                 await db.collection('users').doc(payload.userId).update({
@@ -52,7 +127,7 @@ module.exports = async function handler(req, res) {
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 📝 TASK APPROVALS
+            // 📝 OLD CODE: TASK APPROVALS
             // ==========================================
             case 'approve_task':
                 const taskRef = db.collection('task_submissions').doc(payload.taskId);
@@ -64,10 +139,9 @@ module.exports = async function handler(req, res) {
 
                 await taskRef.update({ status: 'Completed' });
 
-                // Secure wallet increment
-                const uSnap = await db.collection('users').where('phone', '==', payload.userPhone).get();
-                if (!uSnap.empty) {
-                    await uSnap.docs[0].ref.update({ 
+                const uSnapTask = await db.collection('users').where('phone', '==', payload.userPhone).get();
+                if (!uSnapTask.empty) {
+                    await uSnapTask.docs[0].ref.update({ 
                         balance: admin.firestore.FieldValue.increment(parseFloat(payload.reward)) 
                     });
                 }
@@ -81,7 +155,7 @@ module.exports = async function handler(req, res) {
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 💸 PAYOUTS (WITHDRAWALS)
+            // 💸 OLD CODE: PAYOUTS (WITHDRAWALS)
             // ==========================================
             case 'mark_paid':
                 await db.collection('withdrawals').doc(payload.withdrawId).update({ 
@@ -96,8 +170,6 @@ module.exports = async function handler(req, res) {
 
                 if (withDoc.exists && withDoc.data().status === 'Pending') {
                     await withRef.update({ status: 'Rejected', remark: payload.reason });
-
-                    // Refund Wallet
                     const wpq = await db.collection('users').where('phone', '==', payload.userPhone).get();
                     if (!wpq.empty) {
                         await wpq.docs[0].ref.update({ 
@@ -109,16 +181,12 @@ module.exports = async function handler(req, res) {
                 return res.status(400).json({ error: "Invalid Payout Request" });
 
             // ==========================================
-            // 🚀 GIGS MANAGEMENT
+            // 🚀 OLD CODE: GIGS MANAGEMENT
             // ==========================================
             case 'add_gig':
                 await db.collection('gigs').add({
-                    title: payload.title,
-                    reward: parseFloat(payload.reward),
-                    category: payload.category, 
-                    link: payload.link,
-                    desc: payload.desc,
-                    timestamp: new Date()
+                    title: payload.title, reward: parseFloat(payload.reward), category: payload.category, 
+                    link: payload.link, desc: payload.desc, timestamp: new Date()
                 });
                 return res.status(200).json({ success: true });
 
@@ -127,13 +195,11 @@ module.exports = async function handler(req, res) {
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 📢 NOTIFICATIONS
+            // 📢 OLD CODE: NOTIFICATIONS
             // ==========================================
             case 'send_notification':
                 await db.collection('notifications').add({ 
-                    title: payload.title, 
-                    message: payload.message, 
-                    timestamp: new Date() 
+                    title: payload.title, message: payload.message, timestamp: new Date() 
                 });
                 return res.status(200).json({ success: true });
 
@@ -142,16 +208,12 @@ module.exports = async function handler(req, res) {
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 🛒 DEALS MANAGEMENT (Affiliate Shopping)
+            // 🛒 OLD CODE: DEALS MANAGEMENT
             // ==========================================
             case 'add_deal':
                 await db.collection('deals').add({
-                    title: payload.title,
-                    mrp: parseFloat(payload.mrp),
-                    dealPrice: parseFloat(payload.dealPrice),
-                    image: payload.image,
-                    link: payload.link,
-                    timestamp: new Date()
+                    title: payload.title, mrp: parseFloat(payload.mrp), dealPrice: parseFloat(payload.dealPrice),
+                    image: payload.image, link: payload.link, timestamp: new Date()
                 });
                 return res.status(200).json({ success: true });
 
