@@ -55,6 +55,7 @@
             <button onclick="window.switchView('payouts', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">💸</span><span class="text-[9px] font-black mt-1">Pays</span></button>
             <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🚀</span><span class="text-[9px] font-black mt-1">Gigs</span></button>
             <button onclick="window.switchView('deals', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🛒</span><span class="text-[9px] font-black mt-1">Deals</span></button>
+            <button onclick="window.switchView('notify', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">📢</span><span class="text-[9px] font-black mt-1">Alerts</span></button>
         </nav>
 
         <main class="p-5 md:p-10 max-w-6xl mx-auto">
@@ -106,8 +107,7 @@
 
                     <div class="mt-6 border-t pt-4">
                         <p class="text-[10px] font-black text-slate-400 uppercase mb-4">Active Slides</p>
-                        <div id="trust-images-list" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            </div>
+                        <div id="trust-images-list" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
                     </div>
                 </div>
             </section>
@@ -214,7 +214,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, doc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = { 
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
             authDomain: "earnproxuc.firebaseapp.com", 
@@ -226,7 +225,6 @@
         const app = initializeApp(firebaseConfig); 
         const db = getFirestore(app);
 
-        // 🔒 SECURITY HASHES & TOKENS
         const MASTER_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; 
         const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; 
 
@@ -251,21 +249,10 @@
                 });
 
                 const data = await response.json();
-                if (response.ok && data.success) {
-                    return true;
-                } else {
-                    alert("❌ " + (data.error || "Action failed"));
-                    return false;
-                }
-            } catch (error) {
-                alert("❌ Network/Server Error!");
-                return false;
-            } finally {
-                if(btnElement) { 
-                    btnElement.innerText = ogText; 
-                    setTimeout(() => btnElement.disabled = false, 2000); 
-                }
-            }
+                if (response.ok && data.success) { return true; } 
+                else { alert("❌ " + (data.error || "Action failed")); return false; }
+            } catch (error) { alert("❌ Network/Server Error!"); return false; } 
+            finally { if(btnElement) { btnElement.innerText = ogText; setTimeout(() => btnElement.disabled = false, 2000); } }
         }
 
         window.doLogin = async (btn) => { 
@@ -316,7 +303,6 @@
                 container.innerHTML = "<p class='text-xs text-slate-400 font-bold col-span-full'>No slides added yet.</p>";
                 return;
             }
-            
             let html = "";
             currentTrustImages.forEach((url, index) => {
                 html += `
@@ -333,21 +319,14 @@
             onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.bannerUrl) {
-                        document.getElementById('banner-url-input').value = data.bannerUrl;
-                        document.getElementById('banner-preview').src = data.bannerUrl;
-                    }
-                    if(data.trustImages) {
-                        currentTrustImages = data.trustImages;
-                        window.renderTrustImages();
-                    }
+                    if(data.bannerUrl) { document.getElementById('banner-url-input').value = data.bannerUrl; document.getElementById('banner-preview').src = data.bannerUrl; }
+                    if(data.trustImages) { currentTrustImages = data.trustImages; window.renderTrustImages(); }
                 }
             });
 
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
                 let html = ""; let totalUserBal = 0; let totalReferUsers = 0;
-                
                 snap.forEach(d => {
                     const u = d.data(); globalUsersData[d.id] = u; totalUserBal += parseFloat(u.balance || 0);
                     if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
@@ -363,11 +342,9 @@
                 let html = ""; let todayTaskEarn = 0; let totalTaskEarn = 0; const tasks = [];
                 snap.forEach(d => tasks.push({id: d.id, ...d.data()}));
                 tasks.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-
                 tasks.forEach(t => {
                     globalTasksData[t.id] = t; const rewardAmt = parseFloat(t.gigReward || 0);
                     if(t.status === "Completed" || t.status === "Approved") { totalTaskEarn += rewardAmt; if(isToday(t.timestamp)) todayTaskEarn += rewardAmt; }
-                    
                     if(t.status === "Pending Approval") {
                         const remark = t.remark && t.remark !== "No Remark" ? `🗣️ User Remark: "${t.remark}"` : "";
                         html += `<div class="bg-white p-5 rounded-3xl border card-shadow border-l-8 border-l-orange-400"><div class="flex justify-between items-start mb-4 border-b border-slate-50 pb-4"><div><p class="text-[10px] font-black text-orange-500 mb-1 uppercase tracking-widest bg-orange-50 px-2 py-0.5 rounded inline-block">Review Task</p><h4 class="font-black text-slate-800 text-lg mt-1">${t.gigName}</h4><p class="text-xs font-bold text-slate-500 mt-1">User: +91 ${maskPhone(t.userPhone)}</p>${remark ? `<p class="text-xs font-semibold text-indigo-600 mt-2 bg-indigo-50 p-2 rounded-lg border border-indigo-100">${remark}</p>` : ''}</div><a href="${t.proofLink}" target="_blank" class="bg-slate-900 hover:bg-black text-white font-black text-[10px] px-4 py-2.5 rounded-xl uppercase shadow-md shrink-0 transition">View Proof ↗</a></div><div class="flex gap-2"><button onclick="window.approveTask('${t.id}', this)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-xl text-xs active:scale-95 shadow-sm transition">Approve (₹${rewardAmt})</button><button onclick="window.rejectTask('${t.id}', this)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-black py-3 rounded-xl text-xs active:scale-95 border border-rose-100 transition">Reject Task</button></div></div>`;
@@ -382,7 +359,6 @@
                 let html = ""; let pendingAmt = 0; let totalPaid = 0; let todayPaid = 0; const withs = [];
                 snap.forEach(d => withs.push({ id: d.id, ...d.data() }));
                 withs.sort((a, b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-
                 withs.forEach(w => {
                     globalWithdrawData[w.id] = w; const wAmt = parseFloat(w.amount || 0);
                     if(w.status === "Pending") {
@@ -422,7 +398,7 @@
                 snap.forEach(d => {
                     const deal = d.data();
                     html += `
-                    <div class="bg-white p-5 rounded-2xl border card-shadow flex gap-4 items-center relative">
+                    <div class="bg-white p-5 rounded-2xl border card-shadow flex gap-4 items-center relative mb-3">
                         <img src="${deal.image}" class="w-16 h-16 object-contain rounded-lg border p-1 shrink-0">
                         <div class="flex-1">
                             <h4 class="font-black text-slate-800 text-sm leading-tight line-clamp-2">${deal.title}</h4>
@@ -444,7 +420,7 @@
             const url = document.getElementById('banner-url-input').value.trim();
             if(!url) return alert("⚠️ Please enter a valid image URL");
             const success = await callAdminApi('update_banner', { url }, btn);
-            if(success) alert("✅ Banner Updated! Users will see this instantly.");
+            if(success) alert("✅ Banner Updated!");
         };
 
         window.addTrustImage = async (btn) => {
@@ -491,7 +467,7 @@
         };
 
         window.deleteUser = async (id, btn) => { 
-            if(confirm("🚨 DANGER: Delete user permanently? This action cannot be undone.")) {
+            if(confirm("🚨 DANGER: Delete user permanently?")) {
                 await callAdminApi('delete_user', { userId: id }, btn);
             }
         };
