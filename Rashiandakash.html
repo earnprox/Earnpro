@@ -43,6 +43,7 @@
                 <button onclick="window.switchView('reviews', this)" class="nav-btn p-3.5 text-left font-bold text-slate-500 transition hover:bg-slate-50 rounded-xl relative">🔍 Task Proofs</button>
                 <button onclick="window.switchView('payouts', this)" class="nav-btn p-3.5 text-left font-bold text-slate-500 transition hover:bg-slate-50 rounded-xl relative">💸 Payouts</button>
                 <button onclick="window.switchView('gigs', this)" class="nav-btn p-3.5 text-left font-bold text-slate-500 transition hover:bg-slate-50 rounded-xl">🚀 Manage Gigs</button>
+                <button onclick="window.switchView('deals', this)" class="nav-btn p-3.5 text-left font-bold text-slate-500 transition hover:bg-slate-50 rounded-xl">🛒 Loot Deals</button>
                 <button onclick="window.switchView('notify', this)" class="nav-btn p-3.5 text-left font-bold text-slate-500 transition hover:bg-slate-50 rounded-xl">📢 Push Alerts</button>
             </nav>
             <button onclick="window.doLogout()" class="mt-8 p-4 text-rose-500 font-bold bg-rose-50 rounded-xl active:scale-95 transition">🚪 Secure Disconnect</button>
@@ -50,12 +51,10 @@
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden flex justify-around p-1.5 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] overflow-x-auto">
             <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn nav-active"><span class="text-lg">📊</span><span class="text-[9px] font-black mt-1">Dash</span></button>
-            <button onclick="window.switchView('settings', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🎨</span><span class="text-[9px] font-black mt-1">Design</span></button>
             <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">👥</span><span class="text-[9px] font-black mt-1">Users</span></button>
-            <button onclick="window.switchView('reviews', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🔍</span><span class="text-[9px] font-black mt-1">Proofs</span></button>
             <button onclick="window.switchView('payouts', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">💸</span><span class="text-[9px] font-black mt-1">Pays</span></button>
             <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🚀</span><span class="text-[9px] font-black mt-1">Gigs</span></button>
-            <button onclick="window.switchView('notify', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">📢</span><span class="text-[9px] font-black mt-1">Alerts</span></button>
+            <button onclick="window.switchView('deals', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-lg">🛒</span><span class="text-[9px] font-black mt-1">Deals</span></button>
         </nav>
 
         <main class="p-5 md:p-10 max-w-6xl mx-auto">
@@ -158,6 +157,28 @@
                 <div id="live-gigs-list" class="grid md:grid-cols-2 gap-4"></div>
             </section>
 
+            <section id="view-deals" class="view-section">
+                <h2 class="text-3xl font-extrabold mb-8">Manage Loot Deals</h2>
+                <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 mb-10 max-w-2xl">
+                    <h3 class="font-black text-xl text-slate-800 border-b pb-4 flex items-center gap-2">🔥 Add Affiliate Deal</h3>
+                    
+                    <input type="text" id="deal-title" placeholder="Product Name (e.g., Apple AirPods Pro)" class="w-full bg-slate-50 p-4 rounded-xl border outline-none font-bold">
+                    
+                    <div class="flex gap-4">
+                        <input type="number" id="deal-mrp" placeholder="Original MRP (₹)" class="w-1/2 bg-slate-50 p-4 rounded-xl border font-bold text-slate-600 outline-none line-through">
+                        <input type="number" id="deal-price" placeholder="Deal Price (₹)" class="w-1/2 bg-rose-50 p-4 rounded-xl border border-rose-100 font-black text-rose-600 outline-none">
+                    </div>
+
+                    <input type="url" id="deal-image" placeholder="Product Image URL (JPG/PNG)" class="w-full bg-slate-50 p-4 rounded-xl border font-medium outline-none">
+                    <input type="url" id="deal-link" placeholder="Your Affiliate Link (Amazon/Flipkart)" class="w-full bg-slate-50 p-4 rounded-xl border font-medium outline-none">
+                    
+                    <button onclick="window.addDealToDB(this)" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition mt-4">Publish Deal 🛒</button>
+                </div>
+
+                <h3 class="font-black text-xl text-slate-800 mb-4">Live Deals</h3>
+                <div id="live-deals-list" class="grid md:grid-cols-2 gap-4"></div>
+            </section>
+
             <section id="view-notify" class="view-section">
                 <h2 class="text-3xl font-extrabold mb-8">Push Notifications</h2>
                 <div class="bg-white p-6 md:p-8 rounded-[2rem] border card-shadow space-y-4 max-w-2xl mb-10">
@@ -191,7 +212,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // Firebase Config
         const firebaseConfig = { 
@@ -223,7 +244,6 @@
             if(btnElement) { btnElement.innerText = "Processing..."; btnElement.disabled = true; }
 
             try {
-                // ⚠️ Ensure your JS file in Vercel is named Rashiandakash.js (or match this endpoint)
                 const response = await fetch('/api/Rashiandakash', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -380,7 +400,6 @@
                 let html = "";
                 snap.forEach(d => {
                     const g = d.data();
-                    // 🚀 SHOWING CATEGORY IN LIVE GIGS CARD
                     html += `<div class="bg-white p-5 rounded-2xl border card-shadow flex flex-col gap-3"><div class="flex justify-between items-start border-b border-slate-50 pb-3"><div><p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1">${g.category || 'Normal Task'}</p><h4 class="font-black text-slate-800 text-lg leading-tight mb-1">${g.title}</h4><p class="text-[10px] font-black text-emerald-500 uppercase bg-emerald-50 inline-block px-2 py-1 rounded">Reward: ₹${parseFloat(g.reward||0)}</p></div><button onclick="window.deleteGig('${d.id}', this)" class="bg-rose-50 hover:bg-rose-100 text-rose-500 p-2 rounded-lg transition active:scale-95 text-xs font-bold shrink-0">Delete</button></div><p class="text-xs text-slate-500 font-medium truncate">Link: ${g.link || 'None'}</p></div>`;
                 });
                 document.getElementById('live-gigs-list').innerHTML = html || "<p class='text-slate-400 text-sm font-bold mt-4'>No gigs published yet.</p>";
@@ -395,6 +414,27 @@
                     html += `<div class="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-start shadow-sm"><div class="w-4/5"><h4 class="font-black text-sm text-slate-800">${n.title}</h4><p class="text-xs text-slate-500 mt-1 truncate">${n.message}</p><span class="text-[9px] text-slate-400 font-bold mt-2 block">${timeDate}</span></div><button onclick="window.deleteNotification('${n.id}', this)" class="text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded text-xs font-bold transition">Delete</button></div>`;
                 });
                 document.getElementById('notify-list').innerHTML = html || "<p class='text-slate-400 text-sm font-bold mt-4'>No active notifications.</p>";
+            });
+
+            // 🛒 LIVE DEALS SYNC
+            onSnapshot(query(collection(db, "deals"), orderBy("timestamp", "desc")), (snap) => {
+                let html = "";
+                snap.forEach(d => {
+                    const deal = d.data();
+                    html += `
+                    <div class="bg-white p-5 rounded-2xl border card-shadow flex gap-4 items-center relative">
+                        <img src="${deal.image}" class="w-16 h-16 object-contain rounded-lg border p-1 shrink-0">
+                        <div class="flex-1">
+                            <h4 class="font-black text-slate-800 text-sm leading-tight line-clamp-2">${deal.title}</h4>
+                            <div class="flex gap-2 mt-1 items-end">
+                                <span class="text-rose-600 font-black">₹${deal.dealPrice}</span>
+                                <span class="text-slate-400 text-[10px] line-through mb-0.5">₹${deal.mrp}</span>
+                            </div>
+                        </div>
+                        <button onclick="window.deleteDeal('${d.id}', this)" class="bg-rose-50 hover:bg-rose-100 text-rose-500 p-2 rounded-lg transition active:scale-95 text-xs font-bold shrink-0">Delete</button>
+                    </div>`;
+                });
+                document.getElementById('live-deals-list').innerHTML = html || "<p class='text-slate-400 text-sm font-bold mt-4'>No active deals.</p>";
             });
         };
 
@@ -484,7 +524,6 @@
             if(reason) { await callAdminApi('reject_payout', { withdrawId: id, userPhone: wData.userPhone, amount: wData.amount, reason }, btn); }
         };
 
-        // 🚀 NEW: CATEGORY ADDED TO PAYLOAD
         window.addGigToDB = async (btn) => {
             const t = document.getElementById('gig-title').value.trim(); 
             let r = parseFloat(document.getElementById('gig-reward').value); 
@@ -515,6 +554,28 @@
 
         window.deleteNotification = async (id, btn) => { 
             if(confirm("Delete this notification?")) await callAdminApi('delete_notification', { notifId: id }, btn);
+        };
+
+        // 🛒 ADD DEAL LOGIC
+        window.addDealToDB = async (btn) => {
+            const title = document.getElementById('deal-title').value.trim(); 
+            const mrp = parseFloat(document.getElementById('deal-mrp').value); 
+            const dealPrice = parseFloat(document.getElementById('deal-price').value); 
+            const image = document.getElementById('deal-image').value.trim(); 
+            const link = document.getElementById('deal-link').value.trim(); 
+
+            if(!title || isNaN(mrp) || isNaN(dealPrice) || !link || !image) return alert("⚠️ All fields are required!");
+            
+            const success = await callAdminApi('add_deal', { title, mrp, dealPrice, image, link }, btn);
+            if(success) {
+                document.getElementById('deal-title').value = ""; document.getElementById('deal-mrp').value = ""; 
+                document.getElementById('deal-price').value = ""; document.getElementById('deal-image').value = ""; 
+                document.getElementById('deal-link').value = ""; 
+            }
+        };
+
+        window.deleteDeal = async (id, btn) => { 
+            if(confirm("Delete this deal?")) await callAdminApi('delete_deal', { dealId: id }, btn);
         };
 
         if(sessionStorage.getItem("secure_master_session") === MASTER_HASH) { 
