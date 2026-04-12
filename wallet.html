@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | Wallet & Redeem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        const userToken = sessionStorage.getItem("earnprox_secure_token");
+        if (!userPhone || !userToken) { window.location.replace("login.html"); }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; }
+        
+        /* Premium Circular Progress Bar */
+        .circular-progress {
+            position: relative;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            background: conic-gradient(#F8FAFC 100%, transparent 0);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02), 0 10px 30px rgba(0,0,0,0.03);
+            transition: background 0.5s ease-out;
+        }
+        .circular-inner {
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            display: flex; flex-direction: column; items-center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+        }
+        
+        /* Smooth Slide Up Sheet */
+        .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .bottom-sheet.active { transform: translateY(0); }
+        .overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+    </style>
+</head>
+<body class="text-slate-900 min-h-screen flex flex-col relative selection:bg-slate-200">
+
+    <div class="w-full max-w-md mx-auto flex flex-col min-h-screen relative">
+        
+        <div class="px-6 pt-8 pb-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button onclick="window.history.back()" class="active:scale-90 transition-transform">
+                    <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h3 class="font-black text-[22px] tracking-tight">Wallet</h3>
+            </div>
+            <div class="flex gap-3">
+                <button class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center active:scale-95 transition-all">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
+                <button class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center active:scale-95 transition-all">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center mt-6">
+            <h1 class="text-5xl font-black tracking-tighter" id="display-total-bal">₹0.00</h1>
+            <p class="text-sm font-bold text-slate-400 mt-2">Total Monies</p>
+        </div>
+
+        <div class="flex items-center justify-center mt-12 mb-10 relative">
+            
+            <button onclick="openConvertSheet()" class="absolute -top-6 bg-white border border-slate-100 shadow-md p-2 rounded-full z-10 active:scale-90 transition-transform">
+                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+            </button>
+
+            <div class="circular-progress" id="circle-bar">
+                <div class="circular-inner text-center">
+                    <h2 class="text-3xl font-black tracking-tight" id="display-cash">₹0.00</h2>
+                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1">Cash</p>
+                    
+                    <div class="w-full h-[1px] bg-slate-100 my-3 w-1/2 mx-auto"></div>
+                    
+                    <h2 class="text-lg font-bold text-amber-500" id="display-coins">0 🪙</h2>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Unconverted</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-auto mb-6 px-6">
+            <p class="text-rose-500 font-black text-[13px] mb-1">Reward Rate: 1000 🪙 = ₹1.00</p>
+            <p class="text-slate-400 font-bold text-[11px]">Withdraw instantly to your UPI account. Minimum withdrawal is ₹10.00.</p>
+        </div>
+
+        <div class="px-6 pb-8">
+            <button id="redeem-btn" onclick="openRedeemSheet()" class="w-full bg-[#F1F5F9] text-slate-400 font-black py-4 rounded-2xl text-[15px] pointer-events-none transition-all duration-300">
+                Redeem
+            </button>
+        </div>
+    </div>
+
+    <div id="modal-overlay" onclick="closeSheets()" class="overlay fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50"></div>
+    
+    <div id="convert-sheet" class="bottom-sheet fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 p-6 pt-2 pb-10 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] max-w-md mx-auto">
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto my-3"></div>
+        <h3 class="text-xl font-black text-slate-800 text-center mb-1">Convert Coins</h3>
+        <p class="text-xs font-bold text-slate-400 text-center mb-6">Move your mining coins to cash wallet</p>
+
+        <div class="bg-amber-50 p-5 rounded-2xl flex justify-between items-center mb-6 border border-amber-100">
+            <div>
+                <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Available Coins</p>
+                <h4 class="text-2xl font-black text-amber-700 mt-1" id="sheet-avail-coins">0</h4>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Value</p>
+                <h4 class="text-2xl font-black text-emerald-600 mt-1" id="sheet-coin-value">₹0.00</h4>
+            </div>
+        </div>
+
+        <button id="action-convert-btn" onclick="processConversion()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl text-sm shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
+            Convert Everything 🚀
+        </button>
+    </div>
+
+    <div id="redeem-sheet" class="bottom-sheet fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-50 p-6 pt-2 pb-10 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] max-w-md mx-auto">
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto my-3"></div>
+        <h3 class="text-xl font-black text-slate-800 text-center mb-1">Withdraw Cash</h3>
+        <p class="text-xs font-bold text-slate-400 text-center mb-6">Send money directly to your bank</p>
+
+        <div class="space-y-4 mb-6">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Withdraw Amount (₹)</label>
+                <input type="number" id="withdraw-amount" placeholder="Enter amount" class="w-full bg-transparent text-2xl font-black text-slate-800 outline-none">
+            </div>
+            
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Your UPI ID</label>
+                <input type="text" id="user-upi" placeholder="example@ybl" class="w-full bg-transparent text-sm font-bold text-slate-800 outline-none">
+            </div>
+        </div>
+
+        <button id="action-withdraw-btn" onclick="processWithdrawal()" class="w-full bg-emerald-500 text-white font-black py-4 rounded-xl text-sm shadow-xl active:scale-95 transition-all">
+            Transfer to Bank 💸
+        </button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, doc, query, where, getDocs, onSnapshot, updateDoc, increment, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
+            authDomain: "earnproxuc.firebaseapp.com", 
+            projectId: "earnproxuc", 
+            storageBucket: "earnproxuc.firebasestorage.app", 
+            messagingSenderId: "411733884378", 
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" 
+        };
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app);
+
+        let userId = "";
+        let currentCash = 0.00;
+        let currentCoins = 0;
+        const MIN_WITHDRAW = 10.00; // Minimum 10 rs to bank
+
+        async function initWallet() {
+            const q = query(collection(db, "users"), where("phone", "==", userPhone));
+            const snap = await getDocs(q);
+            
+            if(!snap.empty) {
+                userId = snap.docs[0].id;
+                
+                // Real-time Data Sync
+                onSnapshot(doc(db, "users", userId), (docSnap) => {
+                    const data = docSnap.data();
+                    currentCash = parseFloat(data.balance || 0);
+                    currentCoins = parseInt(data.coinBalance || 0);
+                    
+                    // Auto-fill UPI if exists
+                    if(data.upi && data.upi !== "None") {
+                        document.getElementById('user-upi').value = data.upi;
+                    }
+
+                    updateUI();
+                });
+            }
+        }
+        initWallet();
+
+        function updateUI() {
+            // 1 Paisa logic: We format to 2 decimal places to show exact value
+            document.getElementById('display-total-bal').innerText = `₹${currentCash.toFixed(2)}`;
+            document.getElementById('display-cash').innerText = `₹${currentCash.toFixed(2)}`;
+            document.getElementById('display-coins').innerText = `${currentCoins} 🪙`;
+
+            // Calculate Circular Progress (Visual logic based on a target e.g., 100rs)
+            const target = 100;
+            let percent = (currentCash / target) * 100;
+            if(percent > 100) percent = 100;
+            
+            // Premium colored ring effect
+            let ringColor = currentCash >= MIN_WITHDRAW ? '#10B981' : '#CBD5E1'; // Green if withdrawable, else gray
+            document.getElementById('circle-bar').style.background = `conic-gradient(${ringColor} ${percent}%, #F8FAFC 0)`;
+
+            // Redeem Button Logic
+            const redeemBtn = document.getElementById('redeem-btn');
+            if (currentCash >= MIN_WITHDRAW) {
+                redeemBtn.classList.remove('bg-[#F1F5F9]', 'text-slate-400', 'pointer-events-none');
+                redeemBtn.classList.add('bg-slate-900', 'text-white', 'shadow-xl', 'active:scale-95');
+            } else {
+                redeemBtn.classList.add('bg-[#F1F5F9]', 'text-slate-400', 'pointer-events-none');
+                redeemBtn.classList.remove('bg-slate-900', 'text-white', 'shadow-xl', 'active:scale-95');
+            }
+        }
+
+        // --- SHEET LOGIC ---
+        window.openConvertSheet = () => {
+            if(currentCoins === 0) return alert("You don't have any coins to convert!");
+            
+            const valueInRs = currentCoins / 1000;
+            document.getElementById('sheet-avail-coins').innerText = currentCoins;
+            document.getElementById('sheet-coin-value').innerText = `₹${valueInRs.toFixed(2)}`; // Shows even 1 paisa (0.01)
+
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('convert-sheet').classList.add('active');
+        }
+
+        window.openRedeemSheet = () => {
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('redeem-sheet').classList.add('active');
+        }
+
+        window.closeSheets = () => {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.getElementById('convert-sheet').classList.remove('active');
+            document.getElementById('redeem-sheet').classList.remove('active');
+        }
+
+        // --- ACTION LOGIC ---
+        window.processConversion = async () => {
+            if(currentCoins < 1) return;
+            
+            const btn = document.getElementById('action-convert-btn');
+            btn.innerText = "Processing..."; btn.disabled = true;
+
+            const cashToAdd = currentCoins / 1000; // Allows floating point values like 0.05
+            const coinsToDeduct = currentCoins;
+
+            try {
+                await updateDoc(doc(db, "users", userId), {
+                    coinBalance: increment(-coinsToDeduct),
+                    balance: increment(cashToAdd) // Firebase will store exactly 0.xx values safely
+                });
+                
+                alert(`Successfully converted into ₹${cashToAdd.toFixed(2)} cash!`);
+                closeSheets();
+            } catch (e) {
+                alert("Network error!");
+            } finally {
+                btn.innerText = "Convert Everything 🚀"; btn.disabled = false;
+            }
+        }
+
+        window.processWithdrawal = async () => {
+            const amtInput = parseFloat(document.getElementById('withdraw-amount').value);
+            const upiInput = document.getElementById('user-upi').value.trim();
+            const btn = document.getElementById('action-withdraw-btn');
+
+            if(isNaN(amtInput) || amtInput < MIN_WITHDRAW) {
+                return alert(`Minimum withdrawal amount is ₹${MIN_WITHDRAW}`);
+            }
+            if(amtInput > currentCash) {
+                return alert("Insufficient balance!");
+            }
+            if(!upiInput || !upiInput.includes('@')) {
+                return alert("Please enter a valid UPI ID");
+            }
+
+            btn.innerText = "Processing Request..."; btn.disabled = true;
+
+            try {
+                // 1. Deduct Balance
+                await updateDoc(doc(db, "users", userId), {
+                    balance: increment(-amtInput),
+                    upi: upiInput // Save latest UPI
+                });
+
+                // 2. Create Payout Request in Admin Panel
+                await addDoc(collection(db, "withdrawals"), {
+                    userId: userId,
+                    userPhone: userPhone,
+                    userName: "User", // Can fetch from local storage if saved
+                    amount: amtInput,
+                    upi: upiInput,
+                    status: "Pending",
+                    timestamp: serverTimestamp()
+                });
+
+                alert(`Withdrawal request of ₹${amtInput} sent to Admin!`);
+                document.getElementById('withdraw-amount').value = "";
+                closeSheets();
+            } catch (e) {
+                alert("Error submitting request!");
+            } finally {
+                btn.innerText = "Transfer to Bank 💸"; btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
