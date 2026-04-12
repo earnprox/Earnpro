@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | 10Cr Tap & Earn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        const userToken = sessionStorage.getItem("earnprox_secure_token");
+        if (!userPhone || !userToken || userToken === "null") {
+            window.location.replace("login.html");
+        }
+    </script>
+
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #09090B; /* Deep Premium Slate */
+            color: white; 
+            overflow: hidden; 
+            touch-action: manipulation; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 🌟 10Cr Glassmorphism Cards */
+        .glass-card { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(24px); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        /* 🪙 Ultra-Premium 3D Coin */
+        .coin-wrapper {
+            perspective: 1000px;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+        
+        .the-coin {
+            width: 260px; height: 260px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #FFE55C 0%, #F59E0B 40%, #B45309 80%, #78350F 100%);
+            box-shadow: 
+                0 20px 50px rgba(245, 158, 11, 0.4), 
+                inset 0 10px 20px rgba(255, 255, 255, 0.6),
+                inset 0 -20px 40px rgba(0, 0, 0, 0.8),
+                0 0 0 14px rgba(245, 158, 11, 0.15);
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; user-select: none;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        
+        .coin-inner-ring {
+            width: 190px; height: 190px; border-radius: 50%;
+            border: 5px solid #FCD34D;
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 8px 20px rgba(0,0,0,0.4), 0 2px 10px rgba(255,255,255,0.3);
+            transform: translateZ(20px); /* 3D pop effect */
+        }
+
+        /* ✨ Organic Particle Animation */
+        .floating-text { 
+            position: absolute; 
+            font-weight: 900; font-size: 38px;
+            text-shadow: 0px 4px 15px rgba(245,158,11,0.8);
+            pointer-events: none; z-index: 50;
+            animation: organicFloat 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
+        }
+
+        @keyframes organicFloat { 
+            0% { opacity: 1; transform: translate(0, 0) scale(0.8) rotate(0deg); } 
+            50% { transform: translate(var(--tx), -60px) scale(1.2) rotate(var(--tr)); }
+            100% { opacity: 0; transform: translate(calc(var(--tx) * 1.5), -120px) scale(1) rotate(calc(var(--tr) * 2)); } 
+        }
+
+        /* Glowing Progress Tip */
+        .progress-glow { box-shadow: 0 0 15px 2px #F59E0B; }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen relative">
+
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+    <div class="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-black to-transparent z-0"></div>
+
+    <div class="w-full max-w-md flex flex-col min-h-screen relative z-10 pt-6 pb-10 px-5">
+        
+        <div class="flex items-center justify-between mb-6">
+            <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-full hover:bg-white/10 active:scale-90 transition-all shadow-lg">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <div class="text-center">
+                <h3 class="font-black text-xl tracking-tight text-white">EarnproX <span class="text-amber-400">Mining</span></h3>
+            </div>
+            <div class="w-10 h-10"></div>
+        </div>
+
+        <div class="glass-card rounded-[2rem] p-6 mb-8 relative overflow-hidden">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl"></div>
+            
+            <div class="flex justify-between items-end mb-5 relative z-10">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Balance
+                    </p>
+                    <h2 class="text-4xl font-black text-white flex items-center gap-2 tracking-tighter">
+                        <span id="coin-balance">0</span>
+                        <span class="text-2xl drop-shadow-md">🪙</span>
+                    </h2>
+                </div>
+                <div class="bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg text-right backdrop-blur-md">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Exchange Rate</p>
+                    <p class="text-xs font-black text-amber-400">1000 🪙 = ₹1</p>
+                </div>
+            </div>
+
+            <button onclick="convertToCash()" id="convert-btn" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 text-sm font-black py-3.5 rounded-xl uppercase tracking-widest shadow-[0_8px_25px_rgba(245,158,11,0.3)] active:scale-95 transition-all">
+                Convert to Cash 💸
+            </button>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-center relative my-4">
+            <div class="coin-wrapper" id="coin-wrapper">
+                <div class="the-coin" id="tap-coin">
+                    <div class="coin-inner-ring">
+                        <span class="text-7xl drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] text-amber-950 font-black tracking-tighter">E<span class="text-5xl">X</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 mt-auto">
+            <div class="flex justify-between items-end mb-2.5">
+                <h4 class="font-bold text-[13px] text-white flex items-center gap-1.5">
+                    <span class="text-amber-400 text-lg leading-none">⚡</span> Daily Energy
+                </h4>
+                <h4 class="font-black text-[13px] text-amber-400 tracking-wide"><span id="daily-tapped">0</span> <span class="text-slate-500">/ 2000</span></h4>
+            </div>
+            <div class="w-full bg-black/50 rounded-full h-3 border border-white/10 overflow-hidden relative">
+                <div id="progress-bar" class="bg-gradient-to-r from-amber-600 via-amber-400 to-yellow-300 h-full rounded-full transition-all duration-300 relative">
+                    <div class="absolute right-0 top-0 bottom-0 w-2 progress-glow bg-white rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-[10px] font-bold text-slate-500 mt-4 tracking-widest uppercase">Secure Mode • Ads every 200 Taps</p>
+    </div>
+
+    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[40px] -translate-x-1/2 bg-emerald-500 border border-emerald-400 text-white font-black text-[12px] px-6 py-3.5 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.3)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">
+        Success! Cash added to wallet.
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
+            authDomain: "earnproxuc.firebaseapp.com", 
+            projectId: "earnproxuc", 
+            storageBucket: "earnproxuc.firebasestorage.app", 
+            messagingSenderId: "411733884378", 
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" 
+        };
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app);
+
+        let totalCoins = 0; let dailyTapped = 0; let userId = "";
+        let adCounter = 0; let unsyncedCoins = 0; let syncTimer = null;
+        let lastTapTime = 0;
+
+        const coinEl = document.getElementById('tap-coin');
+        const coinWrapper = document.getElementById('coin-wrapper');
+
+        async function init() {
+            const q = query(collection(db, "users"), where("phone", "==", userPhone));
+            const snap = await getDocs(q);
+            if(!snap.empty) {
+                userId = snap.docs[0].id;
+                onSnapshot(doc(db, "users", userId), (docSnap) => {
+                    const data = docSnap.data();
+                    if(!data) window.location.replace("login.html");
+
+                    totalCoins = data.coinBalance || 0;
+                    const lastDate = data.lastCoinDate ? new Date(data.lastCoinDate).toDateString() : "";
+                    dailyTapped = (lastDate === new Date().toDateString()) ? (data.dailyCoinsEarned || 0) : 0;
+                    updateUI();
+                });
+            } else {
+                window.location.replace("login.html");
+            }
+        }
+        init();
+
+        function updateUI() {
+            // Number formatting for premium feel (e.g. 1,000)
+            document.getElementById('coin-balance').innerText = totalCoins.toLocaleString();
+            document.getElementById('daily-tapped').innerText = dailyTapped;
+            document.getElementById('progress-bar').style.width = (dailyTapped / 2000 * 100) + "%";
+            
+            if(dailyTapped >= 2000) {
+                coinEl.style.filter = "grayscale(1) brightness(0.5)";
+                coinEl.style.pointerEvents = "none";
+            }
+        }
+
+        // 🎯 DYNAMIC 3D TILT EFFECT
+        coinWrapper.addEventListener('mousemove', (e) => {
+            if(dailyTapped >= 2000) return;
+            const rect = coinWrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            coinEl.style.transform = `rotateX(${-y / 10}deg) rotateY(${x / 10}deg) scale(0.98)`;
+        });
+
+        coinWrapper.addEventListener('mouseleave', () => {
+            coinEl.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+        });
+
+        // 🚀 THE MAGIC TAP LOGIC
+        coinEl.addEventListener('pointerdown', (e) => {
+            if(dailyTapped >= 2000) return;
+
+            // 🛡️ Anti-Auto Clicker (80ms human limit)
+            const now = Date.now();
+            if (now - lastTapTime < 80) return; 
+            lastTapTime = now;
+
+            // 📳 Haptic Feedback (Vibration for premium feel)
+            if (navigator.vibrate) navigator.vibrate(15);
+
+            // 3D Click Depth
+            coinEl.style.transform = `scale(0.92) translateZ(-20px)`;
+            setTimeout(() => { coinEl.style.transform = `scale(1) translateZ(0)`; }, 100);
+
+            // ✨ Organic Particle Creation
+            const float = document.createElement('div');
+            float.className = 'floating-text text-amber-400'; 
+            float.innerText = '+1';
+            
+            // Randomize trajectory (X axis spread and Rotation)
+            const randomX = (Math.random() - 0.5) * 80; // Spread between -40px and +40px
+            const randomRotate = (Math.random() - 0.5) * 40; // Rotate between -20deg and +20deg
+            
+            float.style.setProperty('--tx', `${randomX}px`);
+            float.style.setProperty('--tr', `${randomRotate}deg`);
+            
+            // Spawn at exact touch point
+            const rect = coinEl.getBoundingClientRect();
+            const touchX = e.clientX || (e.touches && e.touches[0].clientX) || rect.left + rect.width/2;
+            const touchY = e.clientY || (e.touches && e.touches[0].clientY) || rect.top + rect.height/2;
+
+            float.style.left = `${touchX - 20}px`; 
+            float.style.top = `${touchY - 30}px`;
+            document.body.appendChild(float);
+            
+            setTimeout(() => float.remove(), 800);
+
+            // Update State
+            totalCoins++; dailyTapped++; unsyncedCoins++; adCounter++;
+            updateUI();
+
+            // 💰 TRIGGER AD
+            if(adCounter >= 200) { adCounter = 0; showRewardAd(); }
+
+            // 🔄 Fast Sync
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(syncToFirebase, 1500); 
+        });
+
+        async function syncToFirebase() {
+            if(unsyncedCoins === 0 || !userId) return;
+            const toSync = unsyncedCoins; unsyncedCoins = 0;
+            try {
+                await updateDoc(doc(db, "users", userId), {
+                    coinBalance: increment(toSync),
+                    dailyCoinsEarned: increment(toSync),
+                    lastCoinDate: new Date().toISOString()
+                });
+            } catch(e) { unsyncedCoins += toSync; }
+        }
+
+        window.convertToCash = async () => {
+            if(totalCoins < 1000) {
+                alert("⚠️ You need at least 1,000 coins (₹1) to convert!");
+                return;
+            }
+            const btn = document.getElementById('convert-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto"></div>`; 
+            btn.disabled = true;
+
+            await syncToFirebase(); 
+
+            const cashAmount = Math.floor(totalCoins / 1000);
+            const coinsToDeduct = cashAmount * 1000;
+
+            try {
+                await updateDoc(doc(db, "users", userId), {
+                    coinBalance: increment(-coinsToDeduct),
+                    balance: increment(cashAmount)
+                });
+                
+                const toast = document.getElementById('toast');
+                toast.innerText = `✅ ₹${cashAmount} moved to your Main Wallet!`;
+                toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'); }, 3000);
+
+            } catch(e) {
+                alert("❌ Server Error! Refresh page.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function showRewardAd() {
+            // Monetag Vignette or Interstitial trigger
+            if(window.showTag) { window.showTag(); }
+        }
+    </script>
+
+    <script>(function(s){s.dataset.zone='10860816',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+</body>
+</html>
