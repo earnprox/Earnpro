@@ -16,47 +16,40 @@
     </script>
 
     <style>
-        /* 💎 Ultra-Premium White Mesh Theme */
+        /* 💎 Ultra-Premium Clean "CRED/Apple" Aesthetic */
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #FAFAFA;
-            /* Premium subtle colorful glow on white background */
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
-            color: #09090B; 
+            background-color: #F4F5F7; /* Very light premium grey/white */
+            color: #000000; 
             overflow: hidden; 
             touch-action: manipulation; 
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Elevate Cards with soft 3D shadows */
+        /* Expensive Soft Shadow Cards */
         .premium-card { 
             background: #FFFFFF;
-            border: 1px solid rgba(229, 231, 235, 0.6); 
-            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05), 0 0 10px rgba(0,0,0,0.01);
-            border-radius: 32px;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.04); 
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.08);
+            border-radius: 36px;
         }
 
-        /* 🪙 Vibrant 3D Glossy Coin */
+        /* 🪙 Real 3D Gold Metallic Coin */
         .coin-wrapper {
             perspective: 1500px;
             display: flex; justify-content: center; align-items: center;
             position: relative; z-index: 20;
         }
         
-        /* The vibrant coin base */
         .the-coin {
-            width: 260px; height: 260px; border-radius: 50%;
-            background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%);
-            border: 6px solid #FFFFFF;
+            width: 270px; height: 270px; border-radius: 50%;
+            /* Metallic Gold Texture Gradient */
+            background: linear-gradient(135deg, #F9D423 0%, #FF4E50 100%);
+            border: 8px solid #FFFFFF;
             box-shadow: 
-                0 25px 50px -12px rgba(237, 143, 3, 0.4), 
-                inset 0 -15px 30px rgba(0,0,0,0.15),
-                inset 0 15px 20px rgba(255,255,255,0.8);
+                0 30px 60px rgba(255, 78, 80, 0.35), 
+                inset 0 -20px 40px rgba(0,0,0,0.2),
+                inset 0 20px 40px rgba(255,255,255,0.6);
             display: flex; align-items: center; justify-content: center; 
             cursor: pointer; user-select: none;
             transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -64,20 +57,20 @@
         }
         
         .coin-inner-ring {
-            width: 190px; height: 190px; border-radius: 50%;
-            border: 3px dashed rgba(255,255,255,0.8);
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+            width: 200px; height: 200px; border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
             display: flex; align-items: center; justify-content: center;
-            transform: translateZ(25px); 
-            box-shadow: inset 0 0 15px rgba(255,255,255,0.5);
+            transform: translateZ(30px); 
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
         }
 
-        /* ✨ Colorful Particles */
+        /* ✨ Glowing Text on Click */
         .floating-text { 
-            position: absolute; font-weight: 900; font-size: 38px;
-            background: linear-gradient(to right, #FF416C, #FF4B2B);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            position: absolute; font-weight: 900; font-size: 42px;
+            color: #FF4E50;
+            text-shadow: 0 10px 20px rgba(255, 78, 80, 0.5);
             pointer-events: none; z-index: 50;
             animation: cleanFloat 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
         }
@@ -88,77 +81,89 @@
             100% { opacity: 0; transform: translate(var(--tx), -120px) scale(0.9); } 
         }
 
-        /* Energetic Progress Bar */
-        .progress-track { background: #F1F5F9; border-radius: 100px; overflow: hidden; height: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.03); }
+        /* Limit Dark Capsule */
+        .limit-capsule {
+            background: #09090B;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 20px 24px;
+            color: white;
+        }
+
+        .progress-track { background: rgba(255,255,255,0.15); border-radius: 100px; overflow: hidden; height: 12px; }
         .progress-fill { 
-            background: linear-gradient(90deg, #8A2387, #E94057, #F27121); 
+            background: linear-gradient(90deg, #F9D423, #FF4E50); 
+            box-shadow: 0 0 10px #FF4E50;
             height: 100%; border-radius: 100px; transition: width 0.4s ease; 
         }
 
-        /* Vibrant Gradients for text/buttons */
-        .btn-gradient {
-            background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
-            box-shadow: 0 10px 20px -10px rgba(142, 84, 233, 0.6);
+        .text-gold {
+            background: linear-gradient(135deg, #F9D423 0%, #FF4E50 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
-<body class="flex flex-col items-center min-h-screen relative selection:bg-indigo-100">
+<body class="flex flex-col items-center min-h-screen relative">
 
-    <div id="admin-notif" class="w-full bg-slate-900 text-white py-3.5 px-4 text-center text-[11px] font-bold tracking-widest uppercase hidden z-50 flex items-center justify-center gap-2 shadow-sm">
-        <span class="animate-pulse text-[#FF4B2B]">●</span> <span id="notif-text">System Notification</span>
+    <div id="admin-notif" class="w-full bg-[#FF4E50] text-white py-3 px-4 text-center text-[12px] font-black tracking-widest uppercase hidden z-50 flex items-center justify-center gap-2 shadow-lg">
+        <span class="animate-pulse text-yellow-300">●</span> <span id="notif-text">System Notification</span>
     </div>
 
-    <div class="w-full max-w-md flex flex-col min-h-screen relative z-10 pt-6 pb-8 px-6">
+    <div class="w-full max-w-md flex flex-col min-h-screen relative z-10 pt-6 pb-6 px-5">
         
-        <div class="flex items-center justify-between mb-8">
-            <button onclick="window.history.back()" class="w-12 h-12 flex items-center justify-center bg-white border border-slate-100 rounded-full active:scale-90 transition-all shadow-[0_8px_16px_rgba(0,0,0,0.04)] text-slate-800 hover:shadow-md">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+        <div class="flex items-center justify-between mb-6">
+            <button onclick="window.history.back()" class="w-12 h-12 flex items-center justify-center bg-white border border-gray-200 rounded-full active:scale-90 transition-all shadow-sm">
+                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
             <div class="flex flex-col items-center">
-                <h3 class="font-black text-[22px] tracking-tight text-slate-900 leading-none">EarnproX</h3>
+                <h3 class="font-black text-[24px] tracking-tight text-black leading-none">EarnproX</h3>
             </div>
             <div class="w-12 h-12"></div>
         </div>
 
-        <div class="premium-card p-6 mb-10">
-            <div class="flex justify-between items-start mb-6">
+        <div class="premium-card p-7 mb-6 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-gray-50 rounded-full blur-xl"></div>
+            
+            <div class="flex justify-between items-start mb-6 relative z-10">
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                        <span class="w-2 h-2 bg-[#8E54E9] rounded-full animate-pulse"></span> Portfolio
-                    </p>
-                    <h2 class="text-[44px] leading-none font-black text-slate-900 tracking-tighter">
+                    <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Balance</p>
+                    <h2 class="text-[50px] leading-none font-black text-black tracking-tighter">
                         <span id="coin-balance">0</span>
                     </h2>
                 </div>
-                <div class="bg-slate-50/80 border border-slate-100 px-3 py-1.5 rounded-xl text-right">
-                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Rate</p>
-                    <p class="text-[12px] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#4776E6] to-[#8E54E9]">1000 = ₹1</p>
+                <div class="bg-black px-4 py-2 rounded-xl text-right shadow-lg">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Rate</p>
+                    <p class="text-[14px] font-black text-gold">1K = ₹1</p>
                 </div>
             </div>
 
-            <button onclick="goToWallet()" id="convert-btn" class="w-full btn-gradient hover:opacity-90 text-white text-[14px] font-bold py-4 rounded-2xl uppercase tracking-widest active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <button onclick="goToWallet()" id="convert-btn" class="w-full bg-black hover:bg-gray-900 text-white text-[15px] font-black py-4.5 rounded-[20px] uppercase tracking-widest active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2">
                 Convert to Wallet
             </button>
         </div>
 
         <div class="flex-1 flex flex-col items-center justify-center relative my-4">
-            <div class="absolute inset-0 bg-orange-400 opacity-10 blur-[60px] rounded-full pointer-events-none w-[280px] h-[280px] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-            
             <div class="coin-wrapper" id="coin-wrapper">
                 <div class="the-coin" id="tap-coin">
                     <div class="coin-inner-ring">
-                        <span class="text-[70px] text-white font-black tracking-tighter drop-shadow-md">E<span class="text-[45px] text-white/80">X</span></span>
+                        <span class="text-[85px] text-white font-black tracking-tighter drop-shadow-2xl">E<span class="text-[55px] opacity-80">X</span></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="premium-card p-5 mt-auto">
-            <div class="flex justify-between items-end mb-3">
-                <h4 class="font-bold text-[12px] text-slate-900 uppercase tracking-widest flex items-center gap-1.5">
-                    Daily Limit
-                </h4>
-                <h4 class="font-black text-[15px] text-slate-900 tracking-wide"><span id="daily-tapped" class="text-transparent bg-clip-text bg-gradient-to-r from-[#E94057] to-[#F27121]">0</span> <span class="text-slate-400 text-[11px] font-bold">/ 2000</span></h4>
+        <div class="limit-capsule mt-auto">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-[#FF4E50] rounded-full animate-pulse shadow-[0_0_10px_#FF4E50]"></span> Energy Limit
+                    </p>
+                    <h4 class="font-black text-[22px] tracking-tight">
+                        <span id="daily-tapped" class="text-white">0</span> 
+                        <span class="text-gray-500 text-[16px]"> / 2000</span>
+                    </h4>
+                </div>
             </div>
             <div class="progress-track w-full">
                 <div id="progress-bar" class="progress-fill" style="width: 0%;"></div>
@@ -166,15 +171,15 @@
         </div>
     </div>
 
-    <div id="ad-modal" class="fixed inset-0 z-[9999] bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center p-6 opacity-0 transition-opacity duration-300">
+    <div id="ad-modal" class="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-md hidden flex items-center justify-center p-6 opacity-0 transition-opacity duration-300">
         <div class="premium-card w-full max-w-sm rounded-[2rem] p-8 text-center transform scale-95 transition-transform duration-300" id="ad-modal-content">
-            <div class="w-20 h-20 bg-gradient-to-tr from-[#FF416C] to-[#FF4B2B] border-4 border-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_10px_20px_rgba(255,75,43,0.3)]">
-                <span class="text-4xl text-white drop-shadow-md">⚡</span>
+            <div class="w-24 h-24 bg-gradient-to-tr from-[#F9D423] to-[#FF4E50] rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
+                <span class="text-5xl text-white drop-shadow-lg">⚡</span>
             </div>
-            <h2 class="text-2xl font-black text-slate-900 mb-2">Energy Refilled!</h2>
-            <p class="text-sm text-slate-500 font-medium mb-8 leading-relaxed">Watch a quick sponsor ad to continue mining.</p>
+            <h2 class="text-3xl font-black text-black mb-2">Refilled!</h2>
+            <p class="text-sm text-gray-500 font-bold mb-8">Watch a quick sponsor ad to continue mining your rewards.</p>
 
-            <button onclick="claimAdBonus()" class="w-full bg-slate-900 text-white hover:bg-slate-800 text-[15px] font-black py-4 rounded-xl uppercase tracking-widest active:scale-95 transition-all shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
+            <button onclick="claimAdBonus()" class="w-full bg-black text-white hover:bg-gray-900 text-[16px] font-black py-4.5 rounded-[20px] uppercase tracking-widest active:scale-95 transition-all shadow-xl">
                 Continue Mining
             </button>
         </div>
@@ -233,7 +238,7 @@
             if(dailyTapped >= DAILY_MAX) {
                 coinEl.style.opacity = "0.5";
                 coinEl.style.pointerEvents = "none";
-                coinEl.style.filter = "grayscale(80%)";
+                coinEl.style.filter = "grayscale(100%) brightness(0.8)";
             } else {
                 coinEl.style.opacity = "1";
                 coinEl.style.pointerEvents = "auto";
@@ -259,19 +264,19 @@
 
             if (navigator.vibrate) navigator.vibrate(10);
             
-            coinEl.style.transform = `scale(0.94) translateZ(-25px)`;
+            coinEl.style.transform = `scale(0.94) translateZ(-30px)`;
             setTimeout(() => { coinEl.style.transform = `scale(1) translateZ(0)`; }, 120);
 
             const float = document.createElement('div');
             float.className = 'floating-text'; float.innerText = '+1';
-            const randomX = (Math.random() - 0.5) * 100; 
+            const randomX = (Math.random() - 0.5) * 120; 
             float.style.setProperty('--tx', `${randomX}px`); 
             
             const rect = coinEl.getBoundingClientRect();
             const touchX = e.clientX || (e.touches && e.touches[0].clientX) || rect.left + rect.width/2;
             const touchY = e.clientY || (e.touches && e.touches[0].clientY) || rect.top + rect.height/2;
 
-            float.style.left = `${touchX - 15}px`; float.style.top = `${touchY - 20}px`;
+            float.style.left = `${touchX - 20}px`; float.style.top = `${touchY - 20}px`;
             document.body.appendChild(float);
             setTimeout(() => float.remove(), 900);
 
@@ -288,7 +293,7 @@
             syncTimer = setTimeout(syncToVercelBackend, 1500); 
         });
 
-        // 🛡️ VERCEL BACKEND SYNC (Level-2 Secure)
+        // 🛡️ VERCEL BACKEND SYNC
         async function syncToVercelBackend() {
             if(unsyncedCoins === 0 || !userId) return;
             const toSync = unsyncedCoins; unsyncedCoins = 0; 
@@ -306,7 +311,7 @@
 
         window.goToWallet = async () => {
             const btn = document.getElementById('convert-btn');
-            btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`; 
+            btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`; 
             btn.disabled = true;
 
             await syncToVercelBackend(); 
