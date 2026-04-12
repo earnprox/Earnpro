@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | Premium Mining</title>
+    <title>EarnproX | Mining</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <script>
         const userPhone = localStorage.getItem("earnprox_user_phone");
@@ -16,202 +16,119 @@
     </script>
 
     <style>
-        :root {
-            /* Deep Premium Dark Theme */
-            --bg-base: #070B14;
-            --text-main: #FFFFFF;
-            --text-muted: #8B9BB4;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            --accent-glow: rgba(245, 158, 11, 0.15);
-        }
-
-        /* 🌓 Light Mode (Clean & Crisp) */
-        body.light-mode {
-            --bg-base: #F8FAFC;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(15, 23, 42, 0.05);
-            --glass-shadow: 0 8px 32px 0 rgba(30, 41, 59, 0.05);
-            --accent-glow: rgba(245, 158, 11, 0.1);
-        }
-
+        /* Ultra Minimalist White Theme */
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-base); 
-            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            background-color: #FFFFFF; 
+            color: #0F172A; 
             overflow: hidden; 
             touch-action: manipulation; 
             -webkit-tap-highlight-color: transparent;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Apple Style Glassmorphism */
-        .glass-card { 
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); 
-            box-shadow: var(--glass-shadow);
-            transition: all 0.4s ease;
+        .clean-card { 
+            background: #FFFFFF;
+            border: 1px solid #F1F5F9; 
+            box-shadow: 0 12px 32px rgba(0,0,0,0.04);
         }
 
-        /* 🪙 Ultimate 3D Gold Token */
+        /* 🪙 Solid Black Minimalist Coin */
         .coin-wrapper {
-            perspective: 1200px;
+            perspective: 1000px;
             display: flex; justify-content: center; align-items: center;
             position: relative; z-index: 20;
         }
         
-        .coin-glow {
-            position: absolute;
-            width: 280px; height: 280px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            border-radius: 50%;
-            z-index: 0;
-            pointer-events: none;
-            animation: pulseGlow 3s infinite alternate;
-        }
-
         .the-coin {
             width: 250px; height: 250px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #FFE975 0%, #F5A623 40%, #D07B04 80%, #7A4600 100%);
-            box-shadow: 
-                0 25px 50px rgba(0,0,0,0.5), 
-                inset 0 10px 20px rgba(255, 255, 255, 0.8), 
-                inset 0 -20px 40px rgba(0, 0, 0, 0.7),
-                0 0 0 10px rgba(245, 166, 35, 0.1);
+            background: #000000;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), inset 0 -10px 20px rgba(0, 0, 0, 0.4), inset 0 10px 20px rgba(255, 255, 255, 0.2);
             display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; user-select: none; z-index: 10;
+            cursor: pointer; user-select: none;
             transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
         }
         
         .coin-inner-ring {
             width: 180px; height: 180px; border-radius: 50%;
-            border: 4px solid #FFE975;
-            background: linear-gradient(135deg, #F5A623, #B86A00);
+            border: 2px solid #334155;
+            background: #0F172A;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 10px 25px rgba(0,0,0,0.5), 0 4px 15px rgba(255,255,255,0.4);
-            transform: translateZ(30px); /* Deep 3D Pop */
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.6);
+            transform: translateZ(20px); 
         }
 
-        @keyframes pulseGlow {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.2); opacity: 1; }
-        }
-
-        /* ✨ Premium Particle Animation */
+        /* ✨ Minimalist Particles */
         .floating-text { 
-            position: absolute; font-weight: 900; font-size: 42px;
-            background: linear-gradient(to bottom, #FFE975, #F5A623);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 10px 20px rgba(245,166,35,0.3);
+            position: absolute; font-weight: 900; font-size: 38px;
+            color: #000000;
             pointer-events: none; z-index: 50;
-            animation: floatAway 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards; 
+            animation: floatUp 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards; 
         }
 
-        @keyframes floatAway { 
-            0% { opacity: 1; transform: translate(0, 0) scale(0.5) rotate(0deg); } 
-            50% { transform: translate(var(--tx), -70px) scale(1.2) rotate(var(--tr)); }
-            100% { opacity: 0; transform: translate(calc(var(--tx) * 1.5), -140px) scale(0.9) rotate(calc(var(--tr) * 2)); } 
+        @keyframes floatUp { 
+            0% { opacity: 1; transform: translateY(0) scale(0.8); } 
+            100% { opacity: 0; transform: translateY(-100px) scale(1.2); } 
         }
     </style>
 </head>
-<body class="flex flex-col items-center min-h-screen relative selection:bg-amber-500/30">
+<body class="flex flex-col items-center min-h-screen relative selection:bg-slate-200">
 
-    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
-
-    <div id="admin-notif" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 py-3 px-4 text-center text-[11px] font-black tracking-widest uppercase hidden z-50 flex items-center justify-center gap-2 shadow-lg">
-        <span class="animate-bounce">🔔</span> <span id="notif-text">Notification Text</span>
+    <div id="admin-notif" class="w-full bg-black text-white py-3 px-4 text-center text-[11px] font-bold tracking-widest uppercase hidden z-50 flex items-center justify-center gap-2">
+        <span class="animate-pulse">🔔</span> <span id="notif-text">Notification Text</span>
     </div>
 
-    <div class="w-full max-w-md flex flex-col min-h-screen relative z-10 pt-6 pb-10 px-6">
+    <div class="w-full max-w-md flex flex-col min-h-screen relative z-10 pt-6 pb-8 px-6">
         
         <div class="flex items-center justify-between mb-8">
-            <button onclick="window.history.back()" class="w-11 h-11 flex items-center justify-center glass-card rounded-2xl active:scale-90 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+            <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-full active:scale-90 transition-all shadow-sm">
+                <svg class="w-5 h-5 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
-            
-            <div class="text-center">
-                <h3 class="font-black text-xl tracking-tight flex items-center gap-1">Earnpro<span class="text-amber-500">X</span></h3>
-            </div>
-            
-            <div class="flex gap-2.5">
-                <button onclick="toggleTheme()" class="w-11 h-11 flex items-center justify-center glass-card rounded-2xl active:scale-90 transition-all text-lg" id="theme-btn">
-                    🌙
-                </button>
-                <button class="w-11 h-11 flex items-center justify-center glass-card rounded-2xl active:scale-90 transition-all relative">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                    <span id="bell-dot" class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-rose-500 rounded-full hidden border-2 border-slate-900"></span>
-                </button>
-            </div>
+            <h3 class="font-black text-xl tracking-tight text-slate-900">EarnproX</h3>
+            <div class="w-10 h-10"></div>
         </div>
 
-        <div class="glass-card rounded-[2rem] p-6 mb-8 relative overflow-hidden group">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
-            
-            <div class="flex justify-between items-end mb-6 relative z-10">
+        <div class="clean-card rounded-3xl p-6 mb-8 relative">
+            <div class="flex justify-between items-end mb-6">
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_#34d399]"></span> Live Balance
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-black rounded-full animate-pulse"></span> Balance
                     </p>
-                    <h2 class="text-[40px] font-black leading-none tracking-tighter flex items-center gap-2">
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tighter">
                         <span id="coin-balance">0</span>
                     </h2>
                 </div>
-                <div class="glass-card px-3 py-2 rounded-xl text-right border-white/5">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Exchange</p>
-                    <p class="text-[11px] font-black text-amber-500">1000 X = ₹1</p>
+                <div class="bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg text-right">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Rate</p>
+                    <p class="text-xs font-black text-slate-900">1000 = ₹1</p>
                 </div>
             </div>
 
-            <button onclick="goToWallet()" id="convert-btn" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 text-[14px] font-black py-4 rounded-xl uppercase tracking-widest shadow-[0_10px_30px_rgba(245,158,11,0.25)] active:scale-[0.98] transition-all">
-                Convert to Wallet 💳
+            <button onclick="goToWallet()" id="convert-btn" class="w-full bg-black hover:bg-slate-800 text-white text-[13px] font-bold py-4 rounded-xl uppercase tracking-widest active:scale-95 transition-all shadow-md">
+                Convert to Wallet
             </button>
         </div>
 
         <div class="flex-1 flex flex-col items-center justify-center relative my-4">
             <div class="coin-wrapper" id="coin-wrapper">
-                <div class="coin-glow"></div>
                 <div class="the-coin" id="tap-coin">
                     <div class="coin-inner-ring">
-                        <span class="text-[80px] text-amber-950 font-black tracking-tighter drop-shadow-md">E<span class="text-[55px]">X</span></span>
+                        <span class="text-6xl text-white font-black tracking-tighter">E<span class="text-4xl">X</span></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="glass-card rounded-[1.5rem] p-5 mt-auto">
+        <div class="clean-card rounded-2xl p-5 mt-auto">
             <div class="flex justify-between items-end mb-3">
-                <h4 class="font-bold text-[13px] flex items-center gap-1.5">
-                    <span class="text-amber-500 text-lg">⚡</span> Energy Limit
+                <h4 class="font-bold text-[12px] text-slate-900 uppercase tracking-widest">
+                    Daily Limit
                 </h4>
-                <h4 class="font-black text-[14px] text-amber-500 tracking-wide"><span id="daily-tapped">0</span> <span class="text-slate-500 text-[12px] font-bold">/ 2000</span></h4>
+                <h4 class="font-black text-[14px] text-slate-900 tracking-wide"><span id="daily-tapped">0</span> <span class="text-slate-400 text-[12px] font-bold">/ 2000</span></h4>
             </div>
-            <div class="w-full bg-slate-800/50 rounded-full h-2.5 overflow-hidden relative border border-white/5">
-                <div id="progress-bar" class="bg-gradient-to-r from-amber-600 via-amber-400 to-yellow-300 h-full rounded-full transition-all duration-300 relative">
-                    <div class="absolute right-0 top-0 bottom-0 w-2 bg-white rounded-full shadow-[0_0_10px_#fff]"></div>
-                </div>
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden relative">
+                <div id="progress-bar" class="bg-black h-full rounded-full transition-all duration-300"></div>
             </div>
-        </div>
-    </div>
-
-    <div id="ad-modal" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-6 opacity-0 transition-opacity duration-300">
-        <div class="glass-card w-full max-w-sm rounded-[2rem] p-8 text-center transform scale-95 transition-transform duration-300 border-amber-500/20 shadow-[0_0_50px_rgba(245,158,11,0.1)]" id="ad-modal-content">
-            <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg shadow-amber-500/30">
-                <span class="text-4xl text-white">⚡</span>
-            </div>
-            <h2 class="text-2xl font-black mb-2">Energy Refilled!</h2>
-            <p class="text-sm text-slate-400 font-medium mb-8 leading-relaxed">Watch a quick sponsor ad to continue mining your X Coins.</p>
-
-            <button onclick="claimAdBonus()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 text-[15px] font-black py-4 rounded-xl uppercase tracking-widest shadow-[0_8px_25px_rgba(245,158,11,0.3)] active:scale-95 transition-all">
-                Continue Mining 🚀
-            </button>
         </div>
     </div>
 
@@ -232,24 +149,11 @@
 
         let totalCoins = 0; let dailyTapped = 0; let userId = "";
         let adCounter = 0; let unsyncedCoins = 0; let syncTimer = null; let lastTapTime = 0;
-        let isAdModalOpen = false;
 
         const coinEl = document.getElementById('tap-coin');
         const coinWrapper = document.getElementById('coin-wrapper');
         const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
-
-        // 🌗 THEME LOGIC
-        window.toggleTheme = () => {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('earnprox_theme', isLight ? 'light' : 'dark');
-            document.getElementById('theme-btn').innerText = isLight ? '🌙' : '🌞';
-        };
-
-        if (localStorage.getItem('earnprox_theme') === 'light') { 
-            document.body.classList.add('light-mode'); 
-            document.getElementById('theme-btn').innerText = '🌙'; 
-        }
+        const DAILY_MAX = 2000;
 
         async function init() {
             onSnapshot(collection(db, "notifications"), (snap) => {
@@ -257,7 +161,6 @@
                     const latest = snap.docs[0].data();
                     document.getElementById('notif-text').innerText = `${latest.title}: ${latest.message}`;
                     document.getElementById('admin-notif').classList.remove('hidden');
-                    document.getElementById('bell-dot').classList.remove('hidden');
                 }
             });
 
@@ -281,43 +184,37 @@
         function updateUI() {
             document.getElementById('coin-balance').innerText = totalCoins.toLocaleString();
             document.getElementById('daily-tapped').innerText = dailyTapped;
-            document.getElementById('progress-bar').style.width = (dailyTapped / 2000 * 100) + "%";
+            document.getElementById('progress-bar').style.width = (dailyTapped / DAILY_MAX * 100) + "%";
             
-            if(dailyTapped >= 2000) {
-                coinEl.style.filter = "grayscale(1) brightness(0.4)";
+            if(dailyTapped >= DAILY_MAX) {
+                coinEl.style.opacity = "0.3";
                 coinEl.style.pointerEvents = "none";
             }
         }
 
-        // 🎯 DYNAMIC 3D TILT EFFECT
         coinWrapper.addEventListener('mousemove', (e) => {
-            if(dailyTapped >= 2000 || isAdModalOpen) return;
+            if(dailyTapped >= DAILY_MAX) return;
             const rect = coinWrapper.getBoundingClientRect();
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
-            coinEl.style.transform = `rotateX(${-y / 12}deg) rotateY(${x / 12}deg) scale(0.96)`;
+            coinEl.style.transform = `rotateX(${-y / 15}deg) rotateY(${x / 15}deg) scale(0.98)`;
         });
         coinWrapper.addEventListener('mouseleave', () => { coinEl.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`; });
 
-        // 🚀 THE MAGIC TAP LOGIC
         coinEl.addEventListener('pointerdown', (e) => {
-            if(dailyTapped >= 2000 || isAdModalOpen) return;
+            if(dailyTapped >= DAILY_MAX) return;
 
             const now = Date.now();
-            if (now - lastTapTime < 80) return; // Anti-Auto Clicker
+            if (now - lastTapTime < 80) return; // Hack Check
             lastTapTime = now;
 
-            if (navigator.vibrate) navigator.vibrate(15);
+            if (navigator.vibrate) navigator.vibrate(10);
             
-            // 3D Press Effect
-            coinEl.style.transform = `scale(0.90) translateZ(-30px)`;
-            setTimeout(() => { coinEl.style.transform = `scale(1) translateZ(0)`; }, 120);
+            coinEl.style.transform = `scale(0.92) translateZ(-20px)`;
+            setTimeout(() => { coinEl.style.transform = `scale(1) translateZ(0)`; }, 100);
 
-            // ✨ Particle Creation
             const float = document.createElement('div');
             float.className = 'floating-text'; float.innerText = '+1';
-            const randomX = (Math.random() - 0.5) * 100; const randomRotate = (Math.random() - 0.5) * 60; 
-            float.style.setProperty('--tx', `${randomX}px`); float.style.setProperty('--tr', `${randomRotate}deg`);
             
             const rect = coinEl.getBoundingClientRect();
             const touchX = e.clientX || (e.touches && e.touches[0].clientX) || rect.left + rect.width/2;
@@ -330,17 +227,16 @@
             totalCoins++; dailyTapped++; unsyncedCoins++; adCounter++;
             updateUI();
 
-            // 💰 TRIGGER POPUP AT 15 TAPS
+            // 💰 TRIGGER MONETAG NOTIFICATION AD AT 15 TAPS
             if(adCounter >= 15) { 
                 adCounter = 0; 
-                showAdPopup(); 
+                fireNotificationAd(); 
             }
 
             clearTimeout(syncTimer);
             syncTimer = setTimeout(syncToVercelBackend, 1500); 
         });
 
-        // 🛡️ VERCEL BACKEND SYNC (Level 2 Secure)
         async function syncToVercelBackend() {
             if(unsyncedCoins === 0 || !userId) return;
             const toSync = unsyncedCoins; unsyncedCoins = 0; 
@@ -349,11 +245,7 @@
                 const response = await fetch('/api/Rashiandakash', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'sync_taps', 
-                        payload: { userPhone: userPhone, newTaps: toSync },
-                        secureToken: SECURE_API_TOKEN 
-                    })
+                    body: JSON.stringify({ action: 'sync_taps', payload: { userPhone: userPhone, newTaps: toSync }, secureToken: SECURE_API_TOKEN })
                 });
 
                 const data = await response.json();
@@ -361,32 +253,30 @@
             } catch(e) { unsyncedCoins += toSync; }
         }
 
-        // 💸 GO TO WALLET DIRECTLY
         window.goToWallet = async () => {
             const btn = document.getElementById('convert-btn');
-            btn.innerHTML = `<div class="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto"></div>`; 
+            btn.innerHTML = `<div class="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin mx-auto"></div>`; 
             btn.disabled = true;
 
             await syncToVercelBackend(); 
             setTimeout(() => { window.location.href = "wallet.html"; }, 800);
         }
 
-        // 🚀 AD TRICK POPUP
-        function showAdPopup() {
-            isAdModalOpen = true;
-            const modal = document.getElementById('ad-modal');
-            const content = document.getElementById('ad-modal-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
-        }
+        // 🚀 DYNAMIC INJECTION FOR NOTIFICATION AD
+        function fireNotificationAd() {
+            console.log("Triggering Notification Ad...");
+            
+            // Notification / In-Page Push (Zone: 10860922)
+            const script = document.createElement('script');
+            script.dataset.zone = '10860922';
+            script.src = 'https://nap5k.com/tag.min.js';
+            document.body.appendChild(script);
 
-        window.claimAdBonus = () => {
-            window.open('https://omg10.com/4/10867186', '_blank'); // Your Direct Link
-            const modal = document.getElementById('ad-modal');
-            const content = document.getElementById('ad-modal-content');
-            modal.classList.add('opacity-0'); content.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); isAdModalOpen = false; }, 300);
-        };
+            // Trigger Vignette just in case it's available
+            if(window.showTag) { window.showTag(); }
+        }
     </script>
+    
+    <script>(function(s){s.dataset.zone='10860816',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 </body>
 </html>
