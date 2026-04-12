@@ -12,7 +12,7 @@
         const userPhone = localStorage.getItem("earnprox_user_phone");
         const userToken = sessionStorage.getItem("earnprox_secure_token");
         if (!userPhone || !userToken) {
-            // window.location.replace("login.html"); // Uncomment in production
+            window.location.replace("login.html"); 
         }
     </script>
 
@@ -21,173 +21,248 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Line clamp for product titles */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;  
             overflow: hidden;
         }
+        
+        .deal-shadow { box-shadow: 0 10px 30px -10px rgba(0,0,0,0.06); }
     </style>
 </head>
 <body class="bg-[#F2F5F8] text-slate-900 min-h-screen flex flex-col items-center selection:bg-rose-100">
 
     <div class="w-full max-w-md bg-[#F2F5F8] relative shadow-2xl overflow-hidden min-h-screen flex flex-col">
         
-        <!-- Header -->
-        <div class="px-5 pt-6 pb-4 bg-white sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-b border-slate-100">
-            <div class="flex items-center justify-between mb-4">
+        <div class="pt-6 pb-3 bg-white sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border-b border-slate-100">
+            <div class="px-5 flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
                     <button onclick="window.history.back()" class="p-2 bg-slate-50 hover:bg-slate-100 rounded-full active:scale-90 transition-all border border-slate-100">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </button>
                     <div>
                         <h3 class="font-black text-[18px] text-slate-900 leading-tight">Loot Deals</h3>
-                        <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Handpicked Offers 🔥</p>
+                        <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Handpicked Offers
+                        </p>
                     </div>
                 </div>
-                <button class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100 active:scale-90 transition-all">
-                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </button>
             </div>
 
-            <!-- Categories -->
-            <div class="flex overflow-x-auto gap-2 no-scrollbar pb-1">
-                <button class="bg-[#0B100E] text-white px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap shadow-md">All Deals</button>
-                <button class="bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap transition-all">📱 Electronics</button>
-                <button class="bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap transition-all">👕 Fashion</button>
-                <button class="bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap transition-all">🎧 Gadgets</button>
+            <div class="px-5 mb-4">
+                <div class="bg-[#F8FAFC] rounded-[16px] flex items-center px-4 py-3.5 border border-slate-100 focus-within:border-rose-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-rose-50 transition-all shadow-sm">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="search-input" placeholder="Search gadgets, shoes, brands..." class="bg-transparent w-full ml-3 outline-none text-[13px] font-bold text-slate-800 placeholder-slate-400">
+                </div>
+            </div>
+
+            <div class="px-5 flex overflow-x-auto gap-2 no-scrollbar pb-1" id="category-filters">
+                <button class="cat-btn bg-[#0B100E] text-white px-5 py-2.5 rounded-full text-[11px] font-black whitespace-nowrap shadow-md active:scale-95 transition-all" data-cat="All">All Deals</button>
+                <button class="cat-btn bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2.5 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all" data-cat="Electronics">📱 Electronics</button>
+                <button class="cat-btn bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2.5 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all" data-cat="Fashion">👕 Fashion</button>
+                <button class="cat-btn bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2.5 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all" data-cat="Gadgets">🎧 Gadgets</button>
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto no-scrollbar pb-20">
+        <div class="flex-1 overflow-y-auto no-scrollbar pb-20 pt-2" id="deals-wrapper">
             
-            <!-- Hero Featured Deal (FOMO Timer) -->
-            <div class="p-5">
-                <div class="bg-gradient-to-br from-rose-500 to-pink-600 rounded-[24px] p-1 shadow-[0_10px_25px_rgba(225,29,72,0.3)] relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform" onclick="openDeal('https://amazon.in')">
-                    <!-- Timer Badge -->
-                    <div class="absolute top-4 left-4 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black px-3 py-1.5 rounded-full flex items-center gap-1.5 z-10">
-                        <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span> Ends in 02:45:10
-                    </div>
-                    
-                    <!-- Store Badge -->
-                    <div class="absolute top-4 right-4 bg-white text-slate-900 text-[10px] font-black px-3 py-1.5 rounded-full z-10 shadow-sm flex items-center gap-1">
-                        <span class="text-blue-600">Prime</span> Deal
-                    </div>
-
-                    <div class="bg-white rounded-[20px] p-5 pt-14 mt-1 flex flex-col items-center text-center relative z-0">
-                        <img src="https://m.media-amazon.com/images/I/61V1JjINPFL._SL1500_.jpg" alt="Earbuds" class="w-32 h-32 object-contain mb-4 drop-shadow-lg transition-transform hover:scale-105">
-                        <div class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded mb-2 uppercase tracking-wider">85% OFF Price Drop</div>
-                        <h4 class="text-[16px] font-black text-slate-900 leading-tight mb-1">boAt Airdopes 141 Bluetooth TWS</h4>
-                        
-                        <div class="flex items-center gap-2 mt-2 mb-4">
-                            <span class="text-2xl font-black text-slate-900">₹999</span>
-                            <span class="text-[13px] font-bold text-slate-400 line-through">₹4,490</span>
-                        </div>
-                        
-                        <button class="w-full bg-[#0B100E] text-white font-black py-3.5 rounded-xl text-[13px] shadow-lg active:scale-95 transition-all">Grab Deal Now 🚀</button>
-                    </div>
+            <div class="p-5 animate-pulse" id="deals-loader">
+                <div class="w-full h-64 bg-slate-200 rounded-[24px] mb-4"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="h-48 bg-slate-200 rounded-[20px]"></div>
+                    <div class="h-48 bg-slate-200 rounded-[20px]"></div>
                 </div>
             </div>
 
-            <!-- Deals Grid (2 Columns) -->
-            <div class="px-5 grid grid-cols-2 gap-3 pb-6">
-                
-                <!-- Product 1 -->
-                <div class="bg-white rounded-[20px] p-3 shadow-sm border border-slate-100 relative cursor-pointer active:scale-95 transition-transform flex flex-col" onclick="openDeal('https://flipkart.com')">
-                    <div class="absolute top-2 left-2 bg-[#2874F0] text-white text-[8px] font-black px-2 py-1 rounded shadow-sm z-10">Flipkart</div>
-                    <div class="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[9px] font-black px-1.5 py-0.5 rounded z-10">70% OFF</div>
-                    
-                    <div class="bg-[#F8FAFC] rounded-xl h-32 flex items-center justify-center p-4 mb-3 relative">
-                        <img src="https://m.media-amazon.com/images/I/61bK6PMOC8L._SL1500_.jpg" class="w-full h-full object-contain mix-blend-multiply">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-end">
-                        <h4 class="text-[12px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1.5">Apple iPhone 15 (128 GB) - Blue</h4>
-                        <div class="flex items-center gap-1.5 mb-3">
-                            <span class="text-[14px] font-black text-slate-900">₹65,999</span>
-                            <span class="text-[10px] font-bold text-slate-400 line-through">₹79,900</span>
-                        </div>
-                        <button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-lg text-[11px] transition-colors">Buy Now</button>
-                    </div>
-                </div>
+            <div id="hero-container"></div>
+            <div class="px-5 grid grid-cols-2 gap-3 pb-6 mt-2" id="grid-container"></div>
 
-                <!-- Product 2 -->
-                <div class="bg-white rounded-[20px] p-3 shadow-sm border border-slate-100 relative cursor-pointer active:scale-95 transition-transform flex flex-col" onclick="openDeal('https://myntra.com')">
-                    <div class="absolute top-2 left-2 bg-[#FF3F6C] text-white text-[8px] font-black px-2 py-1 rounded shadow-sm z-10">Myntra</div>
-                    <div class="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[9px] font-black px-1.5 py-0.5 rounded z-10">55% OFF</div>
-                    
-                    <div class="bg-[#F8FAFC] rounded-xl h-32 flex items-center justify-center p-4 mb-3 relative">
-                        <img src="https://m.media-amazon.com/images/I/61utX8kBDlL._SY695_.jpg" class="w-full h-full object-contain mix-blend-multiply">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-end">
-                        <h4 class="text-[12px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1.5">Puma Unisex Smashic Sneakers</h4>
-                        <div class="flex items-center gap-1.5 mb-3">
-                            <span class="text-[14px] font-black text-slate-900">₹1,599</span>
-                            <span class="text-[10px] font-bold text-slate-400 line-through">₹3,499</span>
-                        </div>
-                        <button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-lg text-[11px] transition-colors">Buy Now</button>
-                    </div>
-                </div>
-
-                <!-- Product 3 -->
-                <div class="bg-white rounded-[20px] p-3 shadow-sm border border-slate-100 relative cursor-pointer active:scale-95 transition-transform flex flex-col" onclick="openDeal('https://amazon.in')">
-                    <div class="absolute top-2 left-2 bg-[#146EB4] text-[#FF9900] text-[8px] font-black px-2 py-1 rounded shadow-sm z-10 border border-[#FF9900]">Amazon</div>
-                    <div class="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[9px] font-black px-1.5 py-0.5 rounded z-10">60% OFF</div>
-                    
-                    <div class="bg-[#F8FAFC] rounded-xl h-32 flex items-center justify-center p-2 mb-3 relative">
-                        <img src="https://m.media-amazon.com/images/I/71lVwl3q-kL._SL1500_.jpg" class="w-full h-full object-contain mix-blend-multiply">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-end">
-                        <h4 class="text-[12px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1.5">MI 10000mAh Lithium Ion Power Bank</h4>
-                        <div class="flex items-center gap-1.5 mb-3">
-                            <span class="text-[14px] font-black text-slate-900">₹999</span>
-                            <span class="text-[10px] font-bold text-slate-400 line-through">₹2,499</span>
-                        </div>
-                        <button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-lg text-[11px] transition-colors">Buy Now</button>
-                    </div>
-                </div>
-
-                <!-- Product 4 -->
-                <div class="bg-white rounded-[20px] p-3 shadow-sm border border-slate-100 relative cursor-pointer active:scale-95 transition-transform flex flex-col" onclick="openDeal('https://flipkart.com')">
-                    <div class="absolute top-2 left-2 bg-[#2874F0] text-white text-[8px] font-black px-2 py-1 rounded shadow-sm z-10">Flipkart</div>
-                    <div class="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[9px] font-black px-1.5 py-0.5 rounded z-10">ERROR</div>
-                    
-                    <div class="bg-[#F8FAFC] rounded-xl h-32 flex items-center justify-center p-2 mb-3 relative">
-                        <img src="https://m.media-amazon.com/images/I/41b+qXX291L._SY300_SX300_.jpg" class="w-full h-full object-contain mix-blend-multiply">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-end">
-                        <h4 class="text-[12px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1.5">Noise Smartwatch Halo Plus</h4>
-                        <div class="flex items-center gap-1.5 mb-3">
-                            <span class="text-[14px] font-black text-slate-900">₹899</span>
-                            <span class="text-[10px] font-bold text-slate-400 line-through">₹5,999</span>
-                        </div>
-                        <button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-lg text-[11px] transition-colors">Buy Now</button>
-                    </div>
-                </div>
-
-            </div>
         </div>
 
-        <!-- Toast Notification -->
         <div id="toast" class="fixed z-[1000] left-1/2 bottom-[40px] -translate-x-1/2 bg-[#0B100E] text-white font-bold text-[13px] px-6 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap border border-white/10 flex items-center gap-2">
             <span class="animate-spin text-lg">⏳</span>
-            <span>Redirecting to Store...</span>
+            <span>Securing Deal Link...</span>
         </div>
 
     </div>
 
-    <script>
-        function openDeal(affiliateLink) {
-            // Show toast notification
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
+            authDomain: "earnproxuc.firebaseapp.com", 
+            projectId: "earnproxuc", 
+            storageBucket: "earnproxuc.firebasestorage.app", 
+            messagingSenderId: "411733884378", 
+            appId: "1:411733884378:web:b3944ee303740e4ae1d4e3" 
+        };
+        const app = initializeApp(firebaseConfig); 
+        const db = getFirestore(app);
+
+        // State Variables for Search & Filter
+        let allDeals = [];
+        let searchQuery = "";
+        let currentCategory = "All";
+
+        // Open Deal Toast Logic
+        window.openDeal = (affiliateLink) => {
             const toast = document.getElementById('toast');
             toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-            
-            // Redirect after 1.5 seconds (Simulating tracking link process)
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
                 window.open(affiliateLink, '_blank');
             }, 1200);
+        };
+
+        // Fetch Live Deals ONCE and store in Array
+        const q = query(collection(db, "deals"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            document.getElementById('deals-loader').style.display = 'none';
+            allDeals = [];
+            snapshot.forEach(doc => {
+                allDeals.push({ id: doc.id, ...doc.data() });
+            });
+            renderDeals();
+        });
+
+        // 🧠 Smart Render Engine
+        function renderDeals() {
+            const heroContainer = document.getElementById("hero-container");
+            const gridContainer = document.getElementById("grid-container");
+            
+            // 1. FILTER LOGIC
+            let filteredDeals = allDeals.filter(deal => {
+                let title = deal.title.toLowerCase();
+                
+                // Search Filter
+                let matchesSearch = title.includes(searchQuery.toLowerCase());
+
+                // Smart Category Filter (Keyword based)
+                let matchesCategory = true;
+                if (currentCategory === "Electronics") {
+                    matchesCategory = title.includes('phone') || title.includes('mobile') || title.includes('tv') || title.includes('laptop') || title.includes('tab');
+                } else if (currentCategory === "Fashion") {
+                    matchesCategory = title.includes('shoe') || title.includes('shirt') || title.includes('wear') || title.includes('sneaker') || title.includes('bag') || title.includes('watch') || title.includes('jeans');
+                } else if (currentCategory === "Gadgets") {
+                    matchesCategory = title.includes('ear') || title.includes('pod') || title.includes('headphone') || title.includes('bank') || title.includes('charger') || title.includes('smartwatch');
+                }
+
+                return matchesSearch && matchesCategory;
+            });
+
+            // 2. EMPTY STATE
+            if (filteredDeals.length === 0) {
+                heroContainer.innerHTML = "";
+                gridContainer.innerHTML = `
+                    <div class="col-span-2 flex flex-col items-center justify-center py-16 opacity-70">
+                        <span class="text-5xl mb-3 drop-shadow-sm">🔍</span>
+                        <h4 class="font-black text-slate-700 text-lg">No deals found</h4>
+                        <p class="text-xs font-bold text-slate-400 mt-1 text-center">Try a different search or category.</p>
+                    </div>`;
+                return;
+            }
+
+            let heroHtml = "";
+            let gridHtml = "";
+
+            // If user is searching or filtering, show EVERYTHING in Grid (No Hero Banner)
+            // If default view (All + No Search), show 1st item as Hero Banner
+            let isDefaultView = (searchQuery === "" && currentCategory === "All");
+
+            filteredDeals.forEach((deal, index) => {
+                const mrp = parseFloat(deal.mrp);
+                const dealPrice = parseFloat(deal.dealPrice);
+                const discountPercent = Math.round(((mrp - dealPrice) / mrp) * 100);
+
+                let link = deal.link;
+                let trackingLink = link.includes('?') ? `${link}&subid=${userPhone}` : `${link}?subid=${userPhone}`;
+
+                // Auto Store Detection
+                let storeName = "Store"; let storeBg = "bg-slate-800"; let storeText = "text-white"; let borderStyle = "";
+                if (link.toLowerCase().includes('amazon')) {
+                    storeName = "Amazon"; storeBg = "bg-[#146EB4]"; storeText = "text-[#FF9900]"; borderStyle = "border border-[#FF9900]";
+                } else if (link.toLowerCase().includes('flipkart')) {
+                    storeName = "Flipkart"; storeBg = "bg-[#2874F0]"; storeText = "text-white";
+                } else if (link.toLowerCase().includes('myntra')) {
+                    storeName = "Myntra"; storeBg = "bg-[#FF3F6C]"; storeText = "text-white";
+                }
+
+                if (isDefaultView && index === 0) {
+                    // HERO BANNER
+                    heroHtml = `
+                    <div class="p-5 pb-2">
+                        <div class="bg-gradient-to-br from-rose-500 to-pink-600 rounded-[24px] p-1 shadow-[0_10px_25px_rgba(225,29,72,0.3)] relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform" onclick="window.openDeal('${trackingLink}')">
+                            <div class="absolute top-4 left-4 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black px-3 py-1.5 rounded-full flex items-center gap-1.5 z-10">
+                                <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span> Limited Stock
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white text-slate-900 text-[10px] font-black px-3 py-1.5 rounded-full z-10 shadow-sm flex items-center gap-1">
+                                <span class="text-blue-600">Exclusive</span> Deal
+                            </div>
+                            <div class="bg-white rounded-[20px] p-5 pt-14 mt-1 flex flex-col items-center text-center relative z-0">
+                                <img src="${deal.image}" alt="${deal.title}" class="w-32 h-32 object-contain mb-4 drop-shadow-lg transition-transform hover:scale-105">
+                                <div class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded mb-2 uppercase tracking-wider">${discountPercent}% OFF Price Drop</div>
+                                <h4 class="text-[16px] font-black text-slate-900 leading-tight mb-1 line-clamp-2">${deal.title}</h4>
+                                <div class="flex items-center gap-2 mt-2 mb-4">
+                                    <span class="text-2xl font-black text-slate-900">₹${dealPrice}</span>
+                                    <span class="text-[13px] font-bold text-slate-400 line-through">₹${mrp}</span>
+                                </div>
+                                <button class="w-full bg-[#0B100E] text-white font-black py-3.5 rounded-xl text-[13px] shadow-lg active:scale-95 transition-all">Grab from ${storeName} 🚀</button>
+                            </div>
+                        </div>
+                    </div>`;
+                } else {
+                    // GRID DEALS
+                    gridHtml += `
+                    <div class="bg-white rounded-[20px] p-3 shadow-sm border border-slate-100 relative cursor-pointer active:scale-95 transition-transform flex flex-col" onclick="window.openDeal('${trackingLink}')">
+                        <div class="absolute top-2 left-2 ${storeBg} ${storeText} text-[8px] font-black px-2 py-1 rounded shadow-sm z-10 ${borderStyle}">${storeName}</div>
+                        <div class="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[9px] font-black px-1.5 py-0.5 rounded z-10">${discountPercent}% OFF</div>
+                        
+                        <div class="bg-[#F8FAFC] rounded-xl h-32 flex items-center justify-center p-3 mb-3 relative">
+                            <img src="${deal.image}" class="w-full h-full object-contain mix-blend-multiply transition-transform hover:scale-105">
+                        </div>
+                        <div class="flex-1 flex flex-col justify-end">
+                            <h4 class="text-[12px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1.5">${deal.title}</h4>
+                            <div class="flex items-center gap-1.5 mb-3">
+                                <span class="text-[14px] font-black text-slate-900">₹${dealPrice}</span>
+                                <span class="text-[10px] font-bold text-slate-400 line-through">₹${mrp}</span>
+                            </div>
+                            <button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-lg text-[11px] transition-colors">Buy Now</button>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            heroContainer.innerHTML = heroHtml;
+            gridContainer.innerHTML = gridHtml;
         }
+
+        // 🔍 Search Event Listener
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            renderDeals();
+        });
+
+        // 🏷️ Category Click Listeners
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // UI changes for active button
+                document.querySelectorAll('.cat-btn').forEach(b => {
+                    b.classList.remove('bg-[#0B100E]', 'text-white', 'shadow-md', 'font-black');
+                    b.classList.add('bg-[#E8EBF0]', 'text-slate-600', 'font-bold');
+                });
+                
+                const targetBtn = e.currentTarget;
+                targetBtn.classList.remove('bg-[#E8EBF0]', 'text-slate-600', 'font-bold');
+                targetBtn.classList.add('bg-[#0B100E]', 'text-white', 'shadow-md', 'font-black');
+
+                // Update State and Render
+                currentCategory = targetBtn.getAttribute('data-cat');
+                renderDeals();
+            });
+        });
     </script>
 </body>
 </html>
