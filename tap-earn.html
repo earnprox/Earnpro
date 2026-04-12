@@ -138,7 +138,7 @@
             <div class="flex justify-between items-end mb-5 relative z-10">
                 <div>
                     <p class="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Coins
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Balance
                     </p>
                     <h2 class="text-4xl font-black flex items-center gap-2 tracking-tighter">
                         <span id="coin-balance">0</span>
@@ -179,8 +179,6 @@
                 </div>
             </div>
         </div>
-
-        <p class="text-center text-[10px] font-bold text-muted mt-4 tracking-widest uppercase">Secure Mode • Notification Ad every 15 Taps</p>
     </div>
 
     <script type="module">
@@ -205,7 +203,7 @@
         const coinEl = document.getElementById('tap-coin');
         const coinWrapper = document.getElementById('coin-wrapper');
 
-        // 🌗 LIGHT/DARK THEME LOGIC
+        // 🌗 THEME LOGIC
         window.toggleTheme = () => {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -219,35 +217,26 @@
         }
 
         async function init() {
-            // 🔔 Fetch Notifications
             onSnapshot(collection(db, "notifications"), (snap) => {
                 if(!snap.empty) {
                     const latest = snap.docs[0].data();
                     document.getElementById('notif-text').innerText = `${latest.title}: ${latest.message}`;
                     document.getElementById('admin-notif').classList.remove('hidden');
                     document.getElementById('bell-dot').classList.remove('hidden');
-                } else {
-                    document.getElementById('admin-notif').classList.add('hidden');
-                    document.getElementById('bell-dot').classList.add('hidden');
                 }
             });
 
-            // Fetch User Data
             const q = query(collection(db, "users"), where("phone", "==", userPhone));
             const snap = await getDocs(q);
             if(!snap.empty) {
                 userId = snap.docs[0].id;
                 onSnapshot(doc(db, "users", userId), (docSnap) => {
                     const data = docSnap.data();
-                    if(!data) window.location.replace("login.html");
-
                     totalCoins = data.coinBalance || 0;
                     const lastDate = data.lastCoinDate ? new Date(data.lastCoinDate).toDateString() : "";
                     dailyTapped = (lastDate === new Date().toDateString()) ? (data.dailyCoinsEarned || 0) : 0;
                     updateUI();
                 });
-            } else {
-                window.location.replace("login.html");
             }
         }
         init();
@@ -256,14 +245,12 @@
             document.getElementById('coin-balance').innerText = totalCoins.toLocaleString();
             document.getElementById('daily-tapped').innerText = dailyTapped;
             document.getElementById('progress-bar').style.width = (dailyTapped / 2000 * 100) + "%";
-            
             if(dailyTapped >= 2000) {
                 coinEl.style.filter = "grayscale(1) brightness(0.5)";
                 coinEl.style.pointerEvents = "none";
             }
         }
 
-        // 🎯 DYNAMIC 3D TILT EFFECT
         coinWrapper.addEventListener('mousemove', (e) => {
             if(dailyTapped >= 2000) return;
             const rect = coinWrapper.getBoundingClientRect();
@@ -273,11 +260,9 @@
         });
         coinWrapper.addEventListener('mouseleave', () => { coinEl.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`; });
 
-        // 🚀 THE MAGIC TAP LOGIC (AD ON 15 CLICKS)
         coinEl.addEventListener('pointerdown', (e) => {
             if(dailyTapped >= 2000) return;
 
-            // 🛡️ Anti-Auto Clicker (80ms human limit)
             const now = Date.now();
             if (now - lastTapTime < 80) return; 
             lastTapTime = now;
@@ -286,7 +271,6 @@
             coinEl.style.transform = `scale(0.92) translateZ(-20px)`;
             setTimeout(() => { coinEl.style.transform = `scale(1) translateZ(0)`; }, 100);
 
-            // ✨ Organic Particle Creation
             const float = document.createElement('div');
             float.className = 'floating-text text-amber-400'; float.innerText = '+1';
             const randomX = (Math.random() - 0.5) * 80; const randomRotate = (Math.random() - 0.5) * 40; 
@@ -303,10 +287,10 @@
             totalCoins++; dailyTapped++; unsyncedCoins++; adCounter++;
             updateUI();
 
-            // 💰 TRIGGER NOTIFICATION AD EVERY 15 TAPS
+            // 💰 TRIGGER AD EXACTLY AT 15 TAPS
             if(adCounter >= 15) { 
                 adCounter = 0; 
-                showNotificationAd(); 
+                triggerMonetagAd(); 
             }
 
             clearTimeout(syncTimer);
@@ -325,29 +309,35 @@
             } catch(e) { unsyncedCoins += toSync; }
         }
 
-        // 💸 GO TO WALLET DIRECTLY (No Conversion happens here)
-        window.goToWallet = async () => {
+        // 🔥 FIXED: GO TO WALLET (No hanging Loader)
+        window.goToWallet = () => {
             const btn = document.getElementById('convert-btn');
             btn.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>`; 
             btn.disabled = true;
 
-            // Sync any pending coins before leaving the page
-            await syncToFirebase(); 
-            
-            // Redirect to Wallet
-            window.location.href = "wallet.html"; 
+            // Failsafe Redirect: Sync data in background, but redirect user immediately after max 1 second
+            syncToFirebase().finally(() => {
+                window.location.href = "wallet.html"; 
+            });
+
+            // Ultimate Failsafe (If Firebase is completely down)
+            setTimeout(() => { window.location.href = "wallet.html"; }, 1000);
         }
 
-        // 🚀 DYNAMIC SCRIPT INJECTION FOR MONETAG NOTIFICATION (IN-PAGE PUSH) AD
-        function showNotificationAd() {
-            console.log("Triggering Notification Ad at 15 clicks...");
-            
-            // Inject the script exactly when 15 clicks happen to force the ad to show
-            const script = document.createElement('script');
-            script.dataset.zone = '10860922'; // This is your Notification / In-Page Push Zone ID
-            script.src = 'https://nap5k.com/tag.min.js';
-            document.body.appendChild(script);
+        // 🚀 THE AD TRICK FOR MONETAG
+        function triggerMonetagAd() {
+            console.log("Triggering 15 Click Ad...");
+            // Monetag Vignettes intercept link clicks. We create an invisible link and click it.
+            const dummyLink = document.createElement('a');
+            dummyLink.href = "javascript:void(0)";
+            document.body.appendChild(dummyLink);
+            dummyLink.click();
+            dummyLink.remove();
         }
     </script>
+
+    <script>(function(s){s.dataset.zone='10860816',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    
+    <script>(function(s){s.dataset.zone='10860922',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 </body>
 </html>
