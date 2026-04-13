@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnproX | AI Support Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        const userPhone = localStorage.getItem("earnprox_user_phone");
+        const userToken = sessionStorage.getItem("earnprox_secure_token");
+        if (!userPhone || !userToken || userToken === "null") {
+            window.location.replace("login.html");
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #E8EBF0; -webkit-tap-highlight-color: transparent; }
+        
+        /* Custom Scrollbar for Chat */
+        #chat-box::-webkit-scrollbar { width: 4px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        
+        /* AI Typing Animation */
+        .typing-indicator span { display: inline-block; width: 5px; height: 5px; background: #94A3B8; border-radius: 50%; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body class="selection:bg-emerald-100 flex justify-center">
+
+    <div class="w-full max-w-md bg-[#F2F5F8] h-screen flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.05)] overflow-hidden">
+
+        <div class="bg-[#0B100E] px-5 pt-8 pb-10 rounded-b-[2.5rem] relative z-0">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="window.history.back()" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-white border border-white/10 active:scale-90 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="font-black text-lg text-white tracking-wide">Help Center</h1>
+                <div class="w-10 h-10"></div>
+            </div>
+
+            <div class="flex gap-3 mb-2">
+                <a href="https://t.me/EarnproxOfficial" target="_blank" class="flex-1 bg-[#1C211F] border border-white/5 p-3.5 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform cursor-pointer">
+                    <div class="w-10 h-10 bg-[#0088cc]/20 rounded-full flex items-center justify-center text-[#0088cc] text-xl">✈️</div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Community</p>
+                        <p class="text-[13px] font-bold text-white mt-0.5">Telegram</p>
+                    </div>
+                </a>
+                <a href="mailto:support@earnprox.in" class="flex-1 bg-[#1C211F] border border-white/5 p-3.5 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform cursor-pointer">
+                    <div class="w-10 h-10 bg-rose-500/20 rounded-full flex items-center justify-center text-rose-500 text-xl">📧</div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Email Us</p>
+                        <p class="text-[13px] font-bold text-white mt-0.5">Support</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex-1 bg-white -mt-6 rounded-t-[2rem] shadow-[0_-10px_20px_rgba(0,0,0,0.1)] flex flex-col relative z-10 overflow-hidden border border-slate-100">
+            
+            <div class="p-4 border-b border-slate-50 flex items-center justify-between bg-white shadow-sm z-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-2xl shadow-inner">
+                        🤖
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-slate-800 text-[15px] leading-tight">EarnproX Assistant</h2>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 bg-[#00A87A] rounded-full animate-pulse"></span>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Online 24/7</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
+                    <span class="text-[10px] font-black text-slate-400">AI Powered</span>
+                </div>
+            </div>
+
+            <div id="chat-box" class="flex-1 overflow-y-auto p-5 space-y-5 bg-[#F8FAFC]">
+                
+                <div class="flex items-end gap-2 w-full">
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0 flex items-center justify-center text-sm shadow-sm mb-1">🤖</div>
+                    <div class="bg-white p-3.5 rounded-2xl rounded-bl-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] max-w-[80%]">
+                        <p class="text-[13px] text-slate-700 font-medium leading-relaxed">
+                            नमस्ते! 👋 मैं EarnproX का AI असिस्टेंट हूँ। 
+                            <br><br>आप अपने विड्रॉल, कॉइन्स या माइनिंग से जुड़ा कोई भी सवाल पूछ सकते हैं। मैं आपकी क्या मदद करूँ?
+                        </p>
+                    </div>
+                </div>
+
+                <div id="typing-indicator" class="hidden items-end gap-2 w-full">
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0 flex items-center justify-center text-sm mb-1">🤖</div>
+                    <div class="bg-white p-4 rounded-2xl rounded-bl-sm border border-slate-200 shadow-sm max-w-[80%] typing-indicator flex items-center">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-4 bg-white border-t border-slate-100 pb-6">
+                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full p-1.5 pr-2 focus-within:border-[#00A87A] focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all shadow-inner">
+                    <input type="text" id="chat-input" placeholder="Apna sawal yahan likhein..." class="flex-1 bg-transparent border-none outline-none px-4 text-[13px] font-medium text-slate-800 placeholder-slate-400" onkeypress="handleKeyPress(event)">
+                    <button id="send-btn" onclick="sendSupportMessage()" class="w-10 h-10 bg-[#0B100E] text-white rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-md">
+                        <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const chatInput = document.getElementById('chat-input');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const sendBtn = document.getElementById('send-btn');
+        const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
+
+        // Scroll to bottom helper
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Enter key handler
+        function handleKeyPress(e) {
+            if(e.key === 'Enter') {
+                sendSupportMessage();
+            }
+        }
+
+        // Append User Message to UI
+        function appendUserMessage(msg) {
+            const html = `
+                <div class="flex items-end justify-end gap-2 w-full mt-4">
+                    <div class="bg-[#0B100E] p-3.5 rounded-2xl rounded-br-sm shadow-md max-w-[80%]">
+                        <p class="text-[13px] text-white font-medium leading-relaxed">${msg}</p>
+                    </div>
+                </div>
+            `;
+            typingIndicator.insertAdjacentHTML('beforebegin', html);
+            scrollToBottom();
+        }
+
+        // Append Bot Message to UI
+        function appendBotMessage(msg, isError = false) {
+            const textColor = isError ? 'text-rose-500' : 'text-slate-700';
+            const html = `
+                <div class="flex items-end gap-2 w-full mt-4">
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0 flex items-center justify-center text-sm shadow-sm mb-1">🤖</div>
+                    <div class="bg-white p-3.5 rounded-2xl rounded-bl-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] max-w-[80%]">
+                        <p class="text-[13px] ${textColor} font-medium leading-relaxed" style="white-space: pre-wrap;">${msg}</p>
+                    </div>
+                </div>
+            `;
+            typingIndicator.insertAdjacentHTML('beforebegin', html);
+            scrollToBottom();
+        }
+
+        async function sendSupportMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // 1. Lock Input & Show User Msg
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.style.opacity = '0.5';
+            
+            appendUserMessage(message);
+
+            // 2. Show Typing Indicator
+            typingIndicator.classList.remove('hidden');
+            typingIndicator.classList.add('flex');
+            scrollToBottom();
+
+            try {
+                // 3. Send to your Secure Vercel API
+                const response = await fetch('/api/Rashiandakash', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'support_chat', 
+                        payload: { userMessage: message },
+                        secureToken: SECURE_API_TOKEN
+                    })
+                });
+
+                const data = await response.json();
+                
+                // 4. Hide Typing & Show Bot Reply
+                typingIndicator.classList.add('hidden');
+                typingIndicator.classList.remove('flex');
+
+                if(data.success) {
+                    appendBotMessage(data.reply);
+                } else {
+                    appendBotMessage("माफ़ करें, सर्वर अभी बिजी है। कृपया थोड़ी देर बाद प्रयास करें। 🚨", true);
+                }
+            } catch(e) {
+                typingIndicator.classList.add('hidden');
+                typingIndicator.classList.remove('flex');
+                appendBotMessage("इंटरनेट कनेक्शन टूट गया है। कृपया नेटवर्क चेक करें। 📡", true);
+            } finally {
+                // Unlock Input
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                sendBtn.style.opacity = '1';
+                chatInput.focus();
+                scrollToBottom();
+            }
+        }
+    </script>
+</body>
+</html>
