@@ -44,12 +44,17 @@ module.exports = async function handler(req, res) {
                     User's Message: "${userMessage}"
                     `;
 
-                    // Apni API key yahan set hai
-                    const apiKey = process.env.GEMINI_API_KEY || "AIzaSyAQy79lGLMWm2OQLDKPjnsvqDp6wBydkic";
+                    // 🔐 API Key ab strictly Vercel Environment Variables se aayegi
+                    const apiKey = process.env.GEMINI_API_KEY;
+                    
+                    if (!apiKey) {
+                        console.error("🚨 GEMINI_API_KEY is missing in Vercel Environment Variables!");
+                        return res.status(500).json({ error: "Server Configuration Error" });
+                    }
+
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-
-                    // Direct Google server ko request (No npm package needed!)
+                    // Direct Google server ko request
                     const response = await fetch(url, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -293,4 +298,3 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
