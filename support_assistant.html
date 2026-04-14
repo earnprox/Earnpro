@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | Smart Support</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>EarnproX Care</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
+        // AUTH CHECK
         const userPhone = localStorage.getItem("earnprox_user_phone");
         const userToken = sessionStorage.getItem("earnprox_secure_token");
         if (!userPhone || !userToken || userToken === "null") {
@@ -16,81 +17,78 @@
     </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #E8EBF0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* 📱 Hide scrollbar for clean app look */
+        /* Faint Paytm-style watermark background */
+        .chat-bg {
+            background-color: #F0F5FA;
+            background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
         #chat-box::-webkit-scrollbar { width: 0px; background: transparent; }
         
         /* Typing Dots Animation */
-        .typing-indicator span { display: inline-block; width: 5px; height: 5px; background: #94A3B8; border-radius: 50%; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span { display: inline-block; width: 6px; height: 6px; background: #00BAF2; border-radius: 50%; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* Quick Action Chips */
-        .action-chip { background: #F8FAFC; border: 1px solid #E2E8F0; color: #0F172A; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .action-chip:active { transform: scale(0.95); background: #E2E8F0; }
+        .bot-bubble { border-radius: 16px; border-top-left-radius: 2px; }
+        .user-bubble { border-radius: 16px; border-top-right-radius: 2px; background-color: #00BAF2; color: white; }
     </style>
 </head>
-<body class="selection:bg-emerald-100 flex justify-center">
+<body class="selection:bg-blue-100 flex justify-center bg-slate-900">
 
-    <div class="w-full max-w-md bg-[#F2F5F8] h-screen flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.05)] overflow-hidden">
+    <div class="w-full max-w-md bg-white h-screen flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.3)] overflow-hidden">
 
-        <div class="bg-[#0B100E] px-5 pt-8 pb-10 rounded-b-[2.5rem] relative z-0">
-            <div class="flex justify-between items-center mb-2">
-                <button onclick="window.history.back()" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-white border border-white/10 active:scale-90 transition-all shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+        <div class="bg-white px-4 py-3.5 flex justify-between items-center shadow-sm z-20 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <button onclick="window.history.back()" class="text-slate-800 active:scale-90 transition-transform">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </button>
-                <h1 class="font-black text-[17px] text-white tracking-wide">24/7 Support</h1>
-                <div class="w-10 h-10"></div> </div>
-            <p class="text-center text-[11px] font-medium text-slate-400 mt-2">Chat history is securely saved.</p>
+                <h1 id="header-title" class="font-bold text-[17px] text-slate-800 tracking-tight">EarnproX Assistant</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="flex items-center gap-1 border border-slate-200 rounded-full px-3 py-1 active:bg-slate-50 transition-colors">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                    <span class="text-[12px] text-slate-700 font-medium">English</span>
+                    <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <svg class="w-6 h-6 text-[#00BAF2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            </div>
         </div>
 
-        <div class="flex-1 bg-white -mt-6 rounded-t-[2rem] shadow-[0_-10px_20px_rgba(0,0,0,0.1)] flex flex-col relative z-10 overflow-hidden border border-slate-100">
+        <div id="chat-box" class="flex-1 chat-bg overflow-y-auto p-4 space-y-5 pb-24">
+            </div>
+
+        <div id="quick-actions" class="absolute bottom-[80px] left-0 w-full px-4 hidden flex-col items-center z-10 transition-all duration-300">
+            <div class="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-slate-100 w-[90%] overflow-hidden flex flex-col">
+                <button onclick="document.getElementById('chat-input').value='Last payment issue'; sendMessage();" class="py-3.5 px-4 text-[#00BAF2] text-[14px] font-medium border-b border-slate-100 text-center active:bg-slate-50">
+                    Last payment of ₹100 issue
+                </button>
+                <button onclick="switchToAdminChat()" class="py-3.5 px-4 text-[#00BAF2] text-[14px] font-medium text-center active:bg-slate-50">
+                    I have some other issue 🤔
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white pt-3 pb-1 border-t border-slate-100 z-20 absolute bottom-0 w-full flex flex-col items-center">
             
-            <div class="p-4 border-b border-slate-50 flex items-center justify-between bg-white shadow-sm z-20">
-                <div class="flex items-center gap-3">
-                    <div id="chat-avatar" class="w-11 h-11 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center text-2xl shadow-inner transition-colors">
-                        🤖
-                    </div>
-                    <div>
-                        <h2 id="chat-title" class="font-black text-slate-800 text-[15px] leading-tight">EarnproX AI</h2>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span id="chat-status-dot" class="w-2 h-2 bg-[#00A87A] rounded-full animate-pulse"></span>
-                            <p id="chat-subtitle" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Usually replies instantly</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="chat-box" class="flex-1 overflow-y-auto p-5 space-y-5 bg-[#F8FAFC]">
-            </div>
-
-            <div id="quick-actions" class="px-4 py-2 bg-white flex gap-2 overflow-x-auto hidden border-t border-slate-50">
-                <button onclick="switchToAdminChat()" class="action-chip flex items-center gap-1.5 border-rose-200 bg-rose-50 text-rose-600">
-                    👨‍💻 Talk to Agent
-                </button>
-                <button onclick="document.getElementById('chat-input').value='Payment issue'; sendMessage();" class="action-chip">
-                    💸 Payment issue
-                </button>
-            </div>
-
-            <div id="typing-indicator" class="hidden px-5 pb-2 bg-[#F8FAFC] items-end gap-2 w-full">
-                <div id="typing-avatar" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex-shrink-0 flex items-center justify-center text-sm mb-1">🤖</div>
-                <div class="bg-white p-4 rounded-2xl rounded-bl-sm border border-slate-200 shadow-sm max-w-[80%] typing-indicator flex items-center">
+            <div id="typing-indicator" class="hidden absolute -top-8 left-4 items-center">
+                <div class="bg-white px-3 py-2 bot-bubble shadow-sm border border-slate-100 typing-indicator flex items-center">
                     <span></span><span></span><span></span>
                 </div>
             </div>
 
-            <div class="p-4 bg-white border-t border-slate-100 pb-6 z-20">
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full p-1.5 pr-1.5 focus-within:border-slate-400 focus-within:bg-white transition-all shadow-inner">
-                    <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 bg-transparent border-none outline-none px-4 text-[13px] font-medium text-slate-800 placeholder-slate-400" onkeypress="handleKeyPress(event)">
-                    <button id="send-btn" onclick="sendMessage()" class="w-10 h-10 bg-[#0B100E] text-white rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-md">
-                        <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                    </button>
-                </div>
+            <div class="flex items-center gap-3 w-full px-4 relative">
+                <input type="text" id="chat-input" placeholder="Search 'How to withdraw?'" class="flex-1 border border-slate-200 rounded-full py-3 px-5 text-[14px] font-medium outline-none focus:border-[#00BAF2] focus:ring-1 focus:ring-[#00BAF2] transition-all text-slate-800 placeholder-slate-400 shadow-sm" onkeypress="handleKeyPress(event)">
+                
+                <button id="send-btn" onclick="sendMessage()" class="w-12 h-12 bg-[#00BAF2] text-white rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform shadow-[0_4px_10px_rgba(0,186,242,0.3)]">
+                    <svg id="send-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </button>
             </div>
-
+            <a href="#" class="text-[11px] text-slate-400 underline mt-2 mb-1">Disclaimer</a>
         </div>
     </div>
 
@@ -99,92 +97,124 @@
         const chatInput = document.getElementById('chat-input');
         const typingIndicator = document.getElementById('typing-indicator');
         const sendBtn = document.getElementById('send-btn');
+        const sendIcon = document.getElementById('send-icon');
         const quickActions = document.getElementById('quick-actions');
         
-        // ⚠️ DHYAN RAHE: Live jaane se pehle is token ko frontend se hata kar backend verification use karna
         const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
-        let currentMode = 'AI'; // 'AI' or 'ADMIN'
+        let currentMode = 'AI'; 
         let chatHistory = [];
 
-        // 🟢 LOAD HISTORY ON START
+        // Toggle Mic to Send icon based on input
+        chatInput.addEventListener('input', function() {
+            if(this.value.trim().length > 0) {
+                sendIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>`;
+            } else {
+                sendIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>`;
+            }
+        });
+
         window.onload = () => {
             const saved = localStorage.getItem('earnprox_chat_history');
             if (saved) {
                 chatHistory = JSON.parse(saved);
                 renderHistory();
             } else {
-                // First time greeting
-                addBotMsgToHistory("Hello Akash! 👋 \nMain EarnproX ka AI Assistant hu. Aap withdrawal ya task se juda koi bhi sawal pooch sakte hain.");
+                // Initial Paytm Style Greeting
+                addBotMsgToHistory("Hey Akash! 👋 Welcome to EarnproX Care. I'm Amy, your AI-powered assistant.", false, false, true);
+                setTimeout(() => {
+                    addBotMsgToHistory("👍 Good news! Aapke pichle tasks successfully verify ho gaye hain 🙌. You can click on an option below, type or use the mic to speak 🗣️.");
+                    showQuickActions();
+                }, 1000);
             }
         };
+
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'hi-IN'; // Works for Hindi/English
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function showQuickActions() {
+            quickActions.classList.remove('hidden');
+            quickActions.classList.add('flex');
+            scrollToBottom();
+        }
+
+        function hideQuickActions() {
+            quickActions.classList.add('hidden');
+            quickActions.classList.remove('flex');
+        }
 
         function renderHistory() {
             chatBox.innerHTML = '';
             chatHistory.forEach(msg => {
-                if (msg.role === 'user') appendUserMessageUI(msg.text);
-                else appendBotMessageUI(msg.text, msg.isError, msg.isSystem);
+                if (msg.role === 'user') appendUserMessageUI(msg.text, msg.time);
+                else appendBotMessageUI(msg.text, msg.time, msg.isError, msg.isSystem, msg.hideTTS);
             });
             scrollToBottom();
         }
 
         function saveHistory() {
-            // Keep only last 50 messages to save space
             if(chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
             localStorage.setItem('earnprox_chat_history', JSON.stringify(chatHistory));
         }
 
         function scrollToBottom() {
-            chatBox.scrollTop = chatBox.scrollHeight;
+            setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight + 100; }, 100);
         }
 
-        function handleKeyPress(e) {
-            if(e.key === 'Enter') sendMessage();
-        }
+        function handleKeyPress(e) { if(e.key === 'Enter') sendMessage(); }
 
-        // 👨‍💻 HANDOFF TO ADMIN (Amazon Style)
         function switchToAdminChat() {
             if(currentMode === 'ADMIN') return;
             currentMode = 'ADMIN';
-            quickActions.classList.add('hidden'); // Hide chips
-            
-            // UI Changes
-            document.getElementById('chat-avatar').innerText = '👨‍💻';
-            document.getElementById('typing-avatar').innerText = '👨‍💻';
-            document.getElementById('chat-title').innerText = 'Support Agent';
-            document.getElementById('chat-status-dot').classList.replace('bg-[#00A87A]', 'bg-amber-500');
-            document.getElementById('chat-subtitle').innerText = 'Agent will reply shortly';
-            
-            addSystemMsgToHistory("Transferring chat to a human agent... 🔄");
+            hideQuickActions();
+            document.getElementById('header-title').innerText = 'Support Agent';
+            addSystemMsgToHistory("Connecting you to a human agent... 🔄");
             setTimeout(() => {
-                addBotMsgToHistory("Hi! Aap ab humari Admin Team se connect ho gaye hain. Apna sawal yahan likh dijiye, hum jaldi hi reply karenge! 🕒");
+                addBotMsgToHistory("Hi! Aap ab humari Admin Team se connect ho gaye hain. Apna sawal yahan likh dijiye. 🕒");
             }, 800);
         }
 
         // --- UI APPENDERS ---
-        function appendUserMessageUI(msg) {
+        function appendUserMessageUI(msg, time) {
             const html = `
-                <div class="flex items-end justify-end gap-2 w-full mt-4">
-                    <div class="bg-[#0B100E] p-3.5 rounded-2xl rounded-br-sm shadow-md max-w-[80%]">
-                        <p class="text-[13px] text-white font-medium leading-relaxed">${msg}</p>
+                <div class="flex flex-col items-end w-full mt-4">
+                    <div class="p-3.5 shadow-sm max-w-[85%] border border-[#00BAF2] user-bubble">
+                        <p class="text-[14px] font-medium leading-relaxed">${msg}</p>
+                        <div class="text-right mt-1"><span class="text-[10px] text-blue-100">${time}</span></div>
                     </div>
                 </div>`;
             chatBox.insertAdjacentHTML('beforeend', html);
         }
 
-        function appendBotMessageUI(msg, isError = false, isSystem = false) {
+        function appendBotMessageUI(msg, time, isError = false, isSystem = false, hideTTS = false) {
             if (isSystem) {
-                const html = `<div class="w-full text-center mt-4"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">${msg}</span></div>`;
+                const html = `<div class="w-full text-center mt-4"><span class="text-[11px] font-medium text-slate-500 bg-slate-200/50 px-4 py-1.5 rounded-full">${msg}</span></div>`;
                 chatBox.insertAdjacentHTML('beforeend', html);
                 return;
             }
 
-            const textColor = isError ? 'text-rose-500' : 'text-slate-700';
-            const avatar = currentMode === 'AI' ? '🤖' : '👨‍💻';
+            const safeMsg = msg.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const ttsButton = hideTTS ? '' : `
+                <button onclick="speakText('${safeMsg}')" class="mb-1.5 ml-2 bg-[#EAF7FD] text-[#00BAF2] text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1 active:bg-[#D5F0FA]">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.236l4.472 4.472A1 1 0 0015 19.5V4.5a1 1 0 00-1.789-.894L9.236 8H7a2 2 0 00-2 2z"></path></svg>
+                    Listen to this
+                </button>
+            `;
+
+            const textColor = isError ? 'text-rose-500' : 'text-[#1F2937]';
             const html = `
-                <div class="flex items-end gap-2 w-full mt-4">
-                    <div class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex-shrink-0 flex items-center justify-center text-sm shadow-sm mb-1">${avatar}</div>
-                    <div class="bg-white p-3.5 rounded-2xl rounded-bl-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] max-w-[80%]">
-                        <p class="text-[13px] ${textColor} font-medium leading-relaxed" style="white-space: pre-wrap;">${msg}</p>
+                <div class="flex flex-col items-start w-full mt-4">
+                    ${ttsButton}
+                    <div class="bg-white p-3.5 shadow-sm max-w-[85%] border border-slate-200 bot-bubble">
+                        <p class="text-[14px] ${textColor} font-medium leading-relaxed" style="white-space: pre-wrap;">${msg}</p>
+                        <div class="text-right mt-1.5"><span class="text-[10px] text-slate-400">${time}</span></div>
                     </div>
                 </div>`;
             chatBox.insertAdjacentHTML('beforeend', html);
@@ -192,25 +222,22 @@
 
         // --- HISTORY MANAGERS ---
         function addUserMsgToHistory(msg) {
-            chatHistory.push({ role: 'user', text: msg });
+            const time = getCurrentTime();
+            chatHistory.push({ role: 'user', text: msg, time: time });
             saveHistory();
-            appendUserMessageUI(msg);
+            appendUserMessageUI(msg, time);
             scrollToBottom();
         }
 
-        function addBotMsgToHistory(msg, isError = false) {
-            chatHistory.push({ role: 'bot', text: msg, isError: isError });
+        function addBotMsgToHistory(msg, isError = false, isSystem = false, hideTTS = false) {
+            const time = getCurrentTime();
+            chatHistory.push({ role: 'bot', text: msg, time: time, isError: isError, isSystem: isSystem, hideTTS: hideTTS });
             saveHistory();
-            appendBotMessageUI(msg, isError);
+            appendBotMessageUI(msg, time, isError, isSystem, hideTTS);
             scrollToBottom();
         }
 
-        function addSystemMsgToHistory(msg) {
-            chatHistory.push({ role: 'bot', text: msg, isSystem: true });
-            saveHistory();
-            appendBotMessageUI(msg, false, true);
-            scrollToBottom();
-        }
+        function addSystemMsgToHistory(msg) { addBotMsgToHistory(msg, false, true, true); }
 
         // --- MAIN SEND LOGIC ---
         async function sendMessage() {
@@ -220,18 +247,19 @@
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
-            quickActions.classList.add('hidden'); // Hide chips while processing
+            hideQuickActions(); // Hide stacked buttons when user types
             
+            // Reset icon to Mic
+            sendIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>`;
+
             addUserMsgToHistory(message);
 
-            // Show Typing
             typingIndicator.classList.remove('hidden');
             typingIndicator.classList.add('flex');
             scrollToBottom();
 
-            // Amazon Logic: If user specifically asks for human/admin in AI mode
             const lowerMsg = message.toLowerCase();
-            if (currentMode === 'AI' && (lowerMsg.includes('admin') || lowerMsg.includes('agent') || lowerMsg.includes('customer care') || lowerMsg.includes('insan'))) {
+            if (currentMode === 'AI' && (lowerMsg.includes('admin') || lowerMsg.includes('agent') || lowerMsg.includes('customer care'))) {
                 typingIndicator.classList.add('hidden');
                 typingIndicator.classList.remove('flex');
                 switchToAdminChat();
@@ -242,12 +270,16 @@
             }
 
             if (currentMode === 'AI') {
-                // 🤖 AI MODE - Calling the new separated AI file
                 try {
-                    const response = await fetch('/api/ai_chat', {
+                    // 🚨 FIXED URL TO MAIN FILE & ADDED ACTION 🚨
+                    const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userMessage: message, secureToken: SECURE_API_TOKEN })
+                        body: JSON.stringify({ 
+                            action: 'support_chat', 
+                            payload: { userMessage: message }, 
+                            secureToken: SECURE_API_TOKEN 
+                        })
                     });
                     const data = await response.json();
                     typingIndicator.classList.add('hidden');
@@ -255,8 +287,7 @@
 
                     if(data.success) {
                         addBotMsgToHistory(data.reply);
-                        // Show "Talk to Agent" chip after AI replies, just like Amazon
-                        setTimeout(() => { quickActions.classList.remove('hidden'); scrollToBottom(); }, 1000);
+                        setTimeout(() => { showQuickActions(); }, 1500);
                     } else {
                         addBotMsgToHistory("Server busy hai. Kripya thodi der baad try karein.", true);
                     }
@@ -266,7 +297,7 @@
                     addBotMsgToHistory("Internet connection check karein.", true);
                 }
             } else {
-                // 👨‍💻 ADMIN MODE - Calling the main backend file
+                // ADMIN MODE
                 try {
                     const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
@@ -277,12 +308,12 @@
                     typingIndicator.classList.remove('flex');
                     
                     setTimeout(() => {
-                        addBotMsgToHistory("Aapka message Admin ko bhej diya gaya hai. Kripya reply ka wait karein! ✅");
+                        addBotMsgToHistory("Aapka message Admin ko bhej diya gaya hai. Kripya reply ka wait karein! ✅", false, false, true);
                     }, 500);
                 } catch(e) {
                     typingIndicator.classList.add('hidden');
                     typingIndicator.classList.remove('flex');
-                    addBotMsgToHistory("Message bhejne mein dikkat hui. Fir se try karein.", true);
+                    addBotMsgToHistory("Message bhejne mein dikkat hui.", true);
                 }
             }
 
