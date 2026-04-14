@@ -5,7 +5,8 @@ const { createClient } = require('@supabase/supabase-js'); // Supabase
 const SECURE_API_TOKEN = process.env.ADMIN_SECRET_KEY || "RashiAkash@2026_Secure";
 
 // 🤖 1. Gemini AI Setup (Free AI Support)
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "YOUR_GEMINI_API_KEY_HERE");
+const genAI = new GoogleGenerativeAI("AIzaSyAQy79lGLMWm2OQLDKPjnsvqDp6wBydkic");
+
 
 // 🐘 2. Supabase Setup (Zero-cost Live Chat Storage)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vfwfzmbrimvnkgxvlkrj.supabase.co";
