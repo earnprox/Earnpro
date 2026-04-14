@@ -33,9 +33,6 @@
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-
-        .bot-bubble { border-radius: 16px; border-top-left-radius: 2px; }
-        .user-bubble { border-radius: 16px; border-top-right-radius: 2px; background-color: #00BAF2; color: white; }
     </style>
 </head>
 <body class="selection:bg-blue-100 flex justify-center bg-slate-900">
@@ -59,7 +56,7 @@
             </div>
         </div>
 
-        <div id="chat-box" class="flex-1 chat-bg overflow-y-auto p-4 space-y-5 pb-24">
+        <div id="chat-box" class="flex-1 chat-bg overflow-y-auto p-4 space-y-4 pb-24">
             </div>
 
         <div id="quick-actions" class="absolute bottom-[80px] left-0 w-full px-4 hidden flex-col items-center z-10 transition-all duration-300">
@@ -76,7 +73,7 @@
         <div class="bg-white pt-3 pb-1 border-t border-slate-100 z-20 absolute bottom-0 w-full flex flex-col items-center">
             
             <div id="typing-indicator" class="hidden absolute -top-8 left-4 items-center">
-                <div class="bg-white px-3 py-2 bot-bubble shadow-sm border border-slate-100 typing-indicator flex items-center">
+                <div class="bg-white px-3 py-2 rounded-2xl rounded-tl-[2px] shadow-sm border border-slate-100 typing-indicator flex items-center">
                     <span></span><span></span><span></span>
                 </div>
             </div>
@@ -119,7 +116,6 @@
                 chatHistory = JSON.parse(saved);
                 renderHistory();
             } else {
-                // Initial Paytm Style Greeting
                 addBotMsgToHistory("Hey Akash! 👋 Welcome to EarnproX Care. I'm Amy, your AI-powered assistant.", false, false, true);
                 setTimeout(() => {
                     addBotMsgToHistory("👍 Good news! Aapke pichle tasks successfully verify ho gaye hain 🙌. You can click on an option below, type or use the mic to speak 🗣️.");
@@ -135,7 +131,7 @@
         function speakText(text) {
             window.speechSynthesis.cancel();
             let utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'hi-IN'; // Works for Hindi/English
+            utterance.lang = 'hi-IN';
             window.speechSynthesis.speak(utterance);
         }
 
@@ -181,18 +177,19 @@
             }, 800);
         }
 
-        // --- UI APPENDERS ---
+        // --- 🔵 PAYTM STYLE USER BUBBLE ---
         function appendUserMessageUI(msg, time) {
             const html = `
                 <div class="flex flex-col items-end w-full mt-4">
-                    <div class="p-3.5 shadow-sm max-w-[85%] border border-[#00BAF2] user-bubble">
+                    <div class="px-4 py-3 max-w-[80%] bg-[#D4F1FB] text-slate-800 rounded-2xl rounded-tr-[2px] shadow-sm">
                         <p class="text-[14px] font-medium leading-relaxed">${msg}</p>
-                        <div class="text-right mt-1"><span class="text-[10px] text-blue-100">${time}</span></div>
+                        <div class="text-right mt-1"><span class="text-[10px] text-slate-500 font-medium">${time}</span></div>
                     </div>
                 </div>`;
             chatBox.insertAdjacentHTML('beforeend', html);
         }
 
+        // --- ⚪ PAYTM STYLE BOT BUBBLE & TTS BUTTON ---
         function appendBotMessageUI(msg, time, isError = false, isSystem = false, hideTTS = false) {
             if (isSystem) {
                 const html = `<div class="w-full text-center mt-4"><span class="text-[11px] font-medium text-slate-500 bg-slate-200/50 px-4 py-1.5 rounded-full">${msg}</span></div>`;
@@ -200,21 +197,25 @@
                 return;
             }
 
+            // Bold text fix
+            let formattedMsg = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*(.*?)\*/g, '<i>$1</i>');
             const safeMsg = msg.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            
             const ttsButton = hideTTS ? '' : `
-                <button onclick="speakText('${safeMsg}')" class="mb-1.5 ml-2 bg-[#EAF7FD] text-[#00BAF2] text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1 active:bg-[#D5F0FA]">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.236l4.472 4.472A1 1 0 0015 19.5V4.5a1 1 0 00-1.789-.894L9.236 8H7a2 2 0 00-2 2z"></path></svg>
+                <button onclick="speakText('${safeMsg}')" class="mb-1.5 bg-[#EAF7FD] text-[#00BAF2] text-[12px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 active:bg-[#D5F0FA] w-max">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.064.933-2.064 2.08v4.84c0 1.147.923 2.08 2.064 2.08h1.932l4.5 4.5c.944.945 2.56.276 2.56-1.06V4.06z"></path></svg>
                     Listen to this
                 </button>
             `;
 
             const textColor = isError ? 'text-rose-500' : 'text-[#1F2937]';
+            
             const html = `
                 <div class="flex flex-col items-start w-full mt-4">
                     ${ttsButton}
-                    <div class="bg-white p-3.5 shadow-sm max-w-[85%] border border-slate-200 bot-bubble">
-                        <p class="text-[14px] ${textColor} font-medium leading-relaxed" style="white-space: pre-wrap;">${msg}</p>
-                        <div class="text-right mt-1.5"><span class="text-[10px] text-slate-400">${time}</span></div>
+                    <div class="bg-white p-3.5 shadow-sm max-w-[85%] border border-slate-100 rounded-2xl rounded-tl-[2px]">
+                        <p class="text-[14px] ${textColor} font-medium leading-relaxed break-words" style="white-space: pre-wrap;">${formattedMsg}</p>
+                        <div class="text-right mt-1.5"><span class="text-[10px] text-slate-400 font-medium">${time}</span></div>
                     </div>
                 </div>`;
             chatBox.insertAdjacentHTML('beforeend', html);
@@ -247,9 +248,9 @@
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
-            hideQuickActions(); // Hide stacked buttons when user types
+            hideQuickActions();
             
-            // Reset icon to Mic
+            // Reset icon
             sendIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>`;
 
             addUserMsgToHistory(message);
@@ -271,7 +272,6 @@
 
             if (currentMode === 'AI') {
                 try {
-                    // 🚨 FIXED URL TO MAIN FILE & ADDED ACTION 🚨
                     const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -297,7 +297,6 @@
                     addBotMsgToHistory("Internet connection check karein.", true);
                 }
             } else {
-                // ADMIN MODE
                 try {
                     const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
@@ -325,4 +324,3 @@
     </script>
 </body>
 </html>
-
