@@ -46,7 +46,8 @@ module.exports = async function handler(req, res) {
 
                     // Apni API key yahan set hai
                     const apiKey = process.env.GEMINI_API_KEY || "AIzaSyAQy79lGLMWm2OQLDKPjnsvqDp6wBydkic";
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
 
                     // Direct Google server ko request (No npm package needed!)
                     const response = await fetch(url, {
