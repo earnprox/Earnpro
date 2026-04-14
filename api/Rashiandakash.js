@@ -37,13 +37,13 @@ module.exports = async function handler(req, res) {
                 if (!userMessage) return res.status(400).json({ error: "Message empty" });
 
                 try {
-                    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                    const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
                     
                     const systemPrompt = `
                     You are the official Customer Support AI for "EarnproX", a premium tap-to-earn platform.
                     Rules to follow strictly based on Stage 1 MVP:
                     1. 1000 X Coins = ₹1 (INR).
-                    2. Daily energy limit is 2000 taps. Daily earning limit is ₹50 to ₹100.
+                    2. Daily energy limit is 2000 taps. Daily earning limit is ₹1000.
                     3. Minimum withdrawal amount is ₹100. Processing is manual.
                     4. Reply in short, polite, and helpful sentences using emojis.
                     5. Reply in Hinglish (Hindi + English).
