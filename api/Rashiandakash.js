@@ -1,13 +1,9 @@
 const { db, admin } = require('./_firebase'); // अपना सही पाथ चेक कर लें
-const { GoogleGenerativeAI } = require("@google/generative-ai"); // Gemini AI
 const { createClient } = require('@supabase/supabase-js'); // Supabase
 
 const SECURE_API_TOKEN = process.env.ADMIN_SECRET_KEY || "RashiAkash@2026_Secure";
 
-// 🤖 1. Gemini AI Setup (Free AI Support)
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyAQy79lGLMWm2OQLDKPjnsvqDp6wBydkic");
-
-// 🐘 2. Supabase Setup (Zero-cost Live Chat Storage)
+// 🐘 Supabase Setup (Zero-cost Live Chat Storage)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vfwfzmbrimvnkgxvlkrj.supabase.co";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_fZFE7FHxvsSUSv3SAyLqIQ_f0-cDqe9";
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -30,16 +26,13 @@ module.exports = async function handler(req, res) {
         switch (action) {
 
             // ==========================================
-            // 🤖 EARNPROX AI ASSISTANT (GEMINI)
+            // 🤖 EARNPROX AI ASSISTANT (DIRECT API FIX)
             // ==========================================
             case 'support_chat': {
                 const { userMessage } = payload;
                 if (!userMessage) return res.status(400).json({ error: "Message empty" });
 
                 try {
-                    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-                    
                     const systemPrompt = `
                     You are the official Customer Support AI for "EarnproX", a premium tap-to-earn platform.
                     Rules to follow strictly based on Stage 1 MVP:
@@ -51,12 +44,31 @@ module.exports = async function handler(req, res) {
                     User's Message: "${userMessage}"
                     `;
 
-                    const result = await model.generateContent(systemPrompt);
-                    const botReply = result.response.text();
+                    // Apni API key yahan set hai
+                    const apiKey = process.env.GEMINI_API_KEY || "AIzaSyAQy79lGLMWm2OQLDKPjnsvqDp6wBydkic";
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
+                    // Direct Google server ko request (No npm package needed!)
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: systemPrompt }] }]
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        console.error("Google API Direct Error:", data);
+                        return res.status(500).json({ error: "API Version Error" });
+                    }
+
+                    const botReply = data.candidates[0].content.parts[0].text;
                     return res.status(200).json({ success: true, reply: botReply });
+
                 } catch (error) {
-                    console.error("Gemini API Error:", error);
+                    console.error("Fetch Request Error:", error);
                     return res.status(500).json({ error: "AI Server Busy. Try again later!" });
                 }
             }
@@ -280,4 +292,3 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
