@@ -64,7 +64,7 @@
             </div>
 
             <div id="chat-box" class="flex-1 overflow-y-auto p-5 space-y-5 bg-[#F8FAFC]">
-                </div>
+            </div>
 
             <div id="quick-actions" class="px-4 py-2 bg-white flex gap-2 overflow-x-auto hidden border-t border-slate-50">
                 <button onclick="switchToAdminChat()" class="action-chip flex items-center gap-1.5 border-rose-200 bg-rose-50 text-rose-600">
@@ -101,6 +101,7 @@
         const sendBtn = document.getElementById('send-btn');
         const quickActions = document.getElementById('quick-actions');
         
+        // ⚠️ DHYAN RAHE: Live jaane se pehle is token ko frontend se hata kar backend verification use karna
         const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
         let currentMode = 'AI'; // 'AI' or 'ADMIN'
         let chatHistory = [];
@@ -241,12 +242,12 @@
             }
 
             if (currentMode === 'AI') {
-                // 🤖 AI MODE
+                // 🤖 AI MODE - Calling the new separated AI file
                 try {
-                    const response = await fetch('/api/Rashiandakash', {
+                    const response = await fetch('/api/ai_chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'support_chat', payload: { userMessage: message }, secureToken: SECURE_API_TOKEN })
+                        body: JSON.stringify({ userMessage: message, secureToken: SECURE_API_TOKEN })
                     });
                     const data = await response.json();
                     typingIndicator.classList.add('hidden');
@@ -265,7 +266,7 @@
                     addBotMsgToHistory("Internet connection check karein.", true);
                 }
             } else {
-                // 👨‍💻 ADMIN MODE
+                // 👨‍💻 ADMIN MODE - Calling the main backend file
                 try {
                     const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
