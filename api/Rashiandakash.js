@@ -1,6 +1,16 @@
 const { db, admin } = require('./_firebase'); // अपना सही पाथ चेक कर लें
+const { GoogleGenerativeAI } = require("@google/generative-ai"); // Gemini AI
+const { createClient } = require('@supabase/supabase-js'); // Supabase
 
 const SECURE_API_TOKEN = process.env.ADMIN_SECRET_KEY || "RashiAkash@2026_Secure";
+
+// 🤖 1. Gemini AI Setup (Free AI Support)
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "YOUR_GEMINI_API_KEY_HERE");
+
+// 🐘 2. Supabase Setup (Zero-cost Live Chat Storage)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vfwfzmbrimvnkgxvlkrj.supabase.co";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_fZFE7FHxvsSUSv3SAyLqIQ_f0-cDqe9";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -20,7 +30,60 @@ module.exports = async function handler(req, res) {
         switch (action) {
 
             // ==========================================
-            // 🪙 NEW LEVEL-2: SECURE TAP SYNC (Mining)
+            // 🤖 EARNPROX AI ASSISTANT (GEMINI)
+            // ==========================================
+            case 'support_chat': {
+                const { userMessage } = payload;
+                if (!userMessage) return res.status(400).json({ error: "Message empty" });
+
+                try {
+                    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                    
+                    const systemPrompt = `
+                    You are the official Customer Support AI for "EarnproX", a premium tap-to-earn platform.
+                    Rules to follow strictly based on Stage 1 MVP:
+                    1. 1000 X Coins = ₹1 (INR).
+                    2. Daily energy limit is 2000 taps. Daily earning limit is ₹50 to ₹100.
+                    3. Minimum withdrawal amount is ₹100. Processing is manual.
+                    4. Reply in short, polite, and helpful sentences using emojis.
+                    5. Reply in Hinglish (Hindi + English).
+                    User's Message: "${userMessage}"
+                    `;
+
+                    const result = await model.generateContent(systemPrompt);
+                    const botReply = result.response.text();
+
+                    return res.status(200).json({ success: true, reply: botReply });
+                } catch (error) {
+                    console.error("Gemini API Error:", error);
+                    return res.status(500).json({ error: "AI Server Busy. Try again later!" });
+                }
+            }
+
+            // ==========================================
+            // 👨‍💻 LIVE CHAT: SAVE TICKET TO SUPABASE
+            // ==========================================
+            case 'save_admin_chat': {
+                const { userPhone, message } = payload;
+                if (!userPhone || !message) return res.status(400).json({ error: "Missing data" });
+
+                try {
+                    const { data, error } = await supabase
+                        .from('support_tickets')
+                        .insert([
+                            { user_phone: userPhone, message: message, status: 'open' }
+                        ]);
+
+                    if (error) throw error;
+                    return res.status(200).json({ success: true, msg: "Ticket sent to admin" });
+                } catch (error) {
+                    console.error("Supabase Error:", error);
+                    return res.status(500).json({ error: "Failed to send message to admin." });
+                }
+            }
+
+            // ==========================================
+            // 🪙 LEVEL-2: SECURE TAP SYNC (Mining)
             // ==========================================
             case 'sync_taps': {
                 const { userPhone, newTaps } = payload;
@@ -37,16 +100,15 @@ module.exports = async function handler(req, res) {
                 const lastSync = uData.lastSyncTime || 0;
                 const timeDiffSec = (now - lastSync) / 1000;
 
-                // 🛡️ SPEED HACK CHECK (Auto-clicker blocker)
+                // 🛡️ SPEED HACK CHECK
                 if (lastSync !== 0 && timeDiffSec > 0) {
                     const maxTaps = Math.floor(timeDiffSec * 15); 
                     if (newTaps > maxTaps && newTaps > 20) { 
-                        console.log(`🚨 Hack attempt blocked for ${userPhone}. Sent ${newTaps} taps in ${timeDiffSec}s`);
                         return res.status(403).json({error: "Too fast! Auto-clicker detected."});
                     }
                 }
 
-                // 🛡️ DAILY LIMIT CHECK AT SERVER
+                // 🛡️ DAILY LIMIT CHECK
                 const today = new Date().toDateString();
                 const lastDateStr = uData.lastCoinDate ? new Date(uData.lastCoinDate).toDateString() : "";
                 let currentDaily = (lastDateStr === today) ? (uData.dailyCoinsEarned || 0) : 0;
@@ -68,7 +130,7 @@ module.exports = async function handler(req, res) {
             }
 
             // ==========================================
-            // 💸 NEW LEVEL-2: SECURE COIN TO CASH CONVERT
+            // 💸 LEVEL-2: SECURE COIN TO CASH CONVERT
             // ==========================================
             case 'convert_coins': {
                 const { userPhone } = payload;
@@ -96,7 +158,7 @@ module.exports = async function handler(req, res) {
             }
 
             // ==========================================
-            // 🎨 OLD CODE: APP SETTINGS
+            // 🎨 APP SETTINGS & USERS
             // ==========================================
             case 'update_banner':
                 await db.collection("app_settings").doc("master_config").set({ bannerUrl: payload.url }, { merge: true });
@@ -107,14 +169,9 @@ module.exports = async function handler(req, res) {
                 await db.collection("app_settings").doc("master_config").set({ trustImages: payload.images }, { merge: true });
                 return res.status(200).json({ success: true });
 
-            // ==========================================
-            // 👥 OLD CODE: USER MANAGEMENT
-            // ==========================================
             case 'edit_user':
                 await db.collection('users').doc(payload.userId).update({
-                    name: payload.name, 
-                    upi: payload.upi, 
-                    balance: parseFloat(payload.balance)
+                    name: payload.name, upi: payload.upi, balance: parseFloat(payload.balance)
                 });
                 return res.status(200).json({ success: true });
 
@@ -127,7 +184,7 @@ module.exports = async function handler(req, res) {
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 📝 OLD CODE: TASK APPROVALS
+            // 📝 TASK APPROVALS
             // ==========================================
             case 'approve_task':
                 const taskRef = db.collection('task_submissions').doc(payload.taskId);
@@ -149,18 +206,16 @@ module.exports = async function handler(req, res) {
 
             case 'reject_task':
                 await db.collection('task_submissions').doc(payload.taskId).update({ 
-                    status: 'Rejected', 
-                    remark: payload.reason || "Invalid Proof" 
+                    status: 'Rejected', remark: payload.reason || "Invalid Proof" 
                 });
                 return res.status(200).json({ success: true });
 
             // ==========================================
-            // 💸 OLD CODE: PAYOUTS (WITHDRAWALS)
+            // 💸 PAYOUTS (WITHDRAWALS)
             // ==========================================
             case 'mark_paid':
                 await db.collection('withdrawals').doc(payload.withdrawId).update({ 
-                    status: 'Completed', 
-                    completedAt: new Date() 
+                    status: 'Completed', completedAt: new Date() 
                 });
                 return res.status(200).json({ success: true });
 
@@ -181,7 +236,7 @@ module.exports = async function handler(req, res) {
                 return res.status(400).json({ error: "Invalid Payout Request" });
 
             // ==========================================
-            // 🚀 OLD CODE: GIGS MANAGEMENT
+            // 🚀 GIGS, NOTIFICATIONS & DEALS
             // ==========================================
             case 'add_gig':
                 await db.collection('gigs').add({
@@ -194,9 +249,6 @@ module.exports = async function handler(req, res) {
                 await db.collection('gigs').doc(payload.gigId).delete();
                 return res.status(200).json({ success: true });
 
-            // ==========================================
-            // 📢 OLD CODE: NOTIFICATIONS
-            // ==========================================
             case 'send_notification':
                 await db.collection('notifications').add({ 
                     title: payload.title, message: payload.message, timestamp: new Date() 
@@ -207,9 +259,6 @@ module.exports = async function handler(req, res) {
                 await db.collection('notifications').doc(payload.notifId).delete();
                 return res.status(200).json({ success: true });
 
-            // ==========================================
-            // 🛒 OLD CODE: DEALS MANAGEMENT
-            // ==========================================
             case 'add_deal':
                 await db.collection('deals').add({
                     title: payload.title, mrp: parseFloat(payload.mrp), dealPrice: parseFloat(payload.dealPrice),
