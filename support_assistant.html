@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | Help Center</title>
+    <title>EarnproX | Smart Support</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -26,6 +26,10 @@
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Quick Action Chips */
+        .action-chip { background: #F8FAFC; border: 1px solid #E2E8F0; color: #0F172A; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .action-chip:active { transform: scale(0.95); background: #E2E8F0; }
     </style>
 </head>
 <body class="selection:bg-emerald-100 flex justify-center">
@@ -33,25 +37,13 @@
     <div class="w-full max-w-md bg-[#F2F5F8] h-screen flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.05)] overflow-hidden">
 
         <div class="bg-[#0B100E] px-5 pt-8 pb-10 rounded-b-[2.5rem] relative z-0">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-2">
                 <button onclick="window.history.back()" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-white border border-white/10 active:scale-90 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
-                <h1 class="font-black text-[17px] text-white tracking-wide">Help & Support</h1>
+                <h1 class="font-black text-[17px] text-white tracking-wide">24/7 Support</h1>
                 <div class="w-10 h-10"></div> </div>
-
-            <div class="flex gap-3 mb-2">
-                <div onclick="switchToAdminChat()" id="admin-mode-btn" class="flex-1 bg-gradient-to-r from-[#1C211F] to-[#121615] border border-white/10 p-4 rounded-[20px] flex items-center justify-between active:scale-95 transition-transform cursor-pointer shadow-lg">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 text-xl shadow-inner">👨‍💻</div>
-                        <div>
-                            <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-0.5">Need Human Help?</p>
-                            <p class="text-[13px] font-black text-white leading-tight">Chat with Admin</p>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-            </div>
+            <p class="text-center text-[11px] font-medium text-slate-400 mt-2">Chat history is securely saved.</p>
         </div>
 
         <div class="flex-1 bg-white -mt-6 rounded-t-[2rem] shadow-[0_-10px_20px_rgba(0,0,0,0.1)] flex flex-col relative z-10 overflow-hidden border border-slate-100">
@@ -65,39 +57,34 @@
                         <h2 id="chat-title" class="font-black text-slate-800 text-[15px] leading-tight">EarnproX AI</h2>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span id="chat-status-dot" class="w-2 h-2 bg-[#00A87A] rounded-full animate-pulse"></span>
-                            <p id="chat-subtitle" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Online (Instant)</p>
+                            <p id="chat-subtitle" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Usually replies instantly</p>
                         </div>
                     </div>
-                </div>
-                <div id="mode-badge" class="bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">AI Mode</span>
                 </div>
             </div>
 
             <div id="chat-box" class="flex-1 overflow-y-auto p-5 space-y-5 bg-[#F8FAFC]">
-                
-                <div class="flex items-end gap-2 w-full">
-                    <div class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex-shrink-0 flex items-center justify-center text-sm shadow-sm mb-1">🤖</div>
-                    <div class="bg-white p-3.5 rounded-2xl rounded-bl-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] max-w-[80%]">
-                        <p class="text-[13px] text-slate-700 font-medium leading-relaxed">
-                            Hello Akash! 👋 
-                            <br><br>Main EarnproX ka AI Assistant hu. Aap withdrawal ya task se juda koi bhi sawal pooch sakte hain.
-                        </p>
-                    </div>
                 </div>
 
-                <div id="typing-indicator" class="hidden items-end gap-2 w-full">
-                    <div id="typing-avatar" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex-shrink-0 flex items-center justify-center text-sm mb-1">🤖</div>
-                    <div class="bg-white p-4 rounded-2xl rounded-bl-sm border border-slate-200 shadow-sm max-w-[80%] typing-indicator flex items-center">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
+            <div id="quick-actions" class="px-4 py-2 bg-white flex gap-2 overflow-x-auto hidden border-t border-slate-50">
+                <button onclick="switchToAdminChat()" class="action-chip flex items-center gap-1.5 border-rose-200 bg-rose-50 text-rose-600">
+                    👨‍💻 Talk to Agent
+                </button>
+                <button onclick="document.getElementById('chat-input').value='Payment issue'; sendMessage();" class="action-chip">
+                    💸 Payment issue
+                </button>
+            </div>
 
+            <div id="typing-indicator" class="hidden px-5 pb-2 bg-[#F8FAFC] items-end gap-2 w-full">
+                <div id="typing-avatar" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex-shrink-0 flex items-center justify-center text-sm mb-1">🤖</div>
+                <div class="bg-white p-4 rounded-2xl rounded-bl-sm border border-slate-200 shadow-sm max-w-[80%] typing-indicator flex items-center">
+                    <span></span><span></span><span></span>
+                </div>
             </div>
 
             <div class="p-4 bg-white border-t border-slate-100 pb-6 z-20">
                 <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full p-1.5 pr-1.5 focus-within:border-slate-400 focus-within:bg-white transition-all shadow-inner">
-                    <input type="text" id="chat-input" placeholder="Apna message yahan type karein..." class="flex-1 bg-transparent border-none outline-none px-4 text-[13px] font-medium text-slate-800 placeholder-slate-400" onkeypress="handleKeyPress(event)">
+                    <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 bg-transparent border-none outline-none px-4 text-[13px] font-medium text-slate-800 placeholder-slate-400" onkeypress="handleKeyPress(event)">
                     <button id="send-btn" onclick="sendMessage()" class="w-10 h-10 bg-[#0B100E] text-white rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-md">
                         <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                     </button>
@@ -112,52 +99,84 @@
         const chatInput = document.getElementById('chat-input');
         const typingIndicator = document.getElementById('typing-indicator');
         const sendBtn = document.getElementById('send-btn');
-        const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
+        const quickActions = document.getElementById('quick-actions');
         
-        // Mode Tracking
-        let currentMode = 'AI'; // Can be 'AI' or 'ADMIN'
+        const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
+        let currentMode = 'AI'; // 'AI' or 'ADMIN'
+        let chatHistory = [];
+
+        // 🟢 LOAD HISTORY ON START
+        window.onload = () => {
+            const saved = localStorage.getItem('earnprox_chat_history');
+            if (saved) {
+                chatHistory = JSON.parse(saved);
+                renderHistory();
+            } else {
+                // First time greeting
+                addBotMsgToHistory("Hello Akash! 👋 \nMain EarnproX ka AI Assistant hu. Aap withdrawal ya task se juda koi bhi sawal pooch sakte hain.");
+            }
+        };
+
+        function renderHistory() {
+            chatBox.innerHTML = '';
+            chatHistory.forEach(msg => {
+                if (msg.role === 'user') appendUserMessageUI(msg.text);
+                else appendBotMessageUI(msg.text, msg.isError, msg.isSystem);
+            });
+            scrollToBottom();
+        }
+
+        function saveHistory() {
+            // Keep only last 50 messages to save space
+            if(chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
+            localStorage.setItem('earnprox_chat_history', JSON.stringify(chatHistory));
+        }
 
         function scrollToBottom() {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function handleKeyPress(e) {
-            if(e.key === 'Enter') {
-                sendMessage();
-            }
+            if(e.key === 'Enter') sendMessage();
         }
 
-        // Handoff to Admin
+        // 👨‍💻 HANDOFF TO ADMIN (Amazon Style)
         function switchToAdminChat() {
             if(currentMode === 'ADMIN') return;
-            
             currentMode = 'ADMIN';
+            quickActions.classList.add('hidden'); // Hide chips
             
-            // Update UI for Admin Mode
+            // UI Changes
             document.getElementById('chat-avatar').innerText = '👨‍💻';
             document.getElementById('typing-avatar').innerText = '👨‍💻';
-            document.getElementById('chat-title').innerText = 'Support Team';
+            document.getElementById('chat-title').innerText = 'Support Agent';
             document.getElementById('chat-status-dot').classList.replace('bg-[#00A87A]', 'bg-amber-500');
-            document.getElementById('chat-subtitle').innerText = 'Replies in a few hours';
-            document.getElementById('mode-badge').innerHTML = '<span class="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Live Agent</span>';
-            document.getElementById('admin-mode-btn').classList.add('opacity-50', 'pointer-events-none');
+            document.getElementById('chat-subtitle').innerText = 'Agent will reply shortly';
             
-            appendBotMessage("Aap ab humari Admin Team se connect ho gaye hain. Apna sawal chhod dijiye, hum jaldi hi yahi par reply karenge! 🕒");
+            addSystemMsgToHistory("Transferring chat to a human agent... 🔄");
+            setTimeout(() => {
+                addBotMsgToHistory("Hi! Aap ab humari Admin Team se connect ho gaye hain. Apna sawal yahan likh dijiye, hum jaldi hi reply karenge! 🕒");
+            }, 800);
         }
 
-        function appendUserMessage(msg) {
+        // --- UI APPENDERS ---
+        function appendUserMessageUI(msg) {
             const html = `
                 <div class="flex items-end justify-end gap-2 w-full mt-4">
                     <div class="bg-[#0B100E] p-3.5 rounded-2xl rounded-br-sm shadow-md max-w-[80%]">
                         <p class="text-[13px] text-white font-medium leading-relaxed">${msg}</p>
                     </div>
-                </div>
-            `;
-            typingIndicator.insertAdjacentHTML('beforebegin', html);
-            scrollToBottom();
+                </div>`;
+            chatBox.insertAdjacentHTML('beforeend', html);
         }
 
-        function appendBotMessage(msg, isError = false) {
+        function appendBotMessageUI(msg, isError = false, isSystem = false) {
+            if (isSystem) {
+                const html = `<div class="w-full text-center mt-4"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">${msg}</span></div>`;
+                chatBox.insertAdjacentHTML('beforeend', html);
+                return;
+            }
+
             const textColor = isError ? 'text-rose-500' : 'text-slate-700';
             const avatar = currentMode === 'AI' ? '🤖' : '👨‍💻';
             const html = `
@@ -166,88 +185,108 @@
                     <div class="bg-white p-3.5 rounded-2xl rounded-bl-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] max-w-[80%]">
                         <p class="text-[13px] ${textColor} font-medium leading-relaxed" style="white-space: pre-wrap;">${msg}</p>
                     </div>
-                </div>
-            `;
-            typingIndicator.insertAdjacentHTML('beforebegin', html);
+                </div>`;
+            chatBox.insertAdjacentHTML('beforeend', html);
+        }
+
+        // --- HISTORY MANAGERS ---
+        function addUserMsgToHistory(msg) {
+            chatHistory.push({ role: 'user', text: msg });
+            saveHistory();
+            appendUserMessageUI(msg);
             scrollToBottom();
         }
 
+        function addBotMsgToHistory(msg, isError = false) {
+            chatHistory.push({ role: 'bot', text: msg, isError: isError });
+            saveHistory();
+            appendBotMessageUI(msg, isError);
+            scrollToBottom();
+        }
+
+        function addSystemMsgToHistory(msg) {
+            chatHistory.push({ role: 'bot', text: msg, isSystem: true });
+            saveHistory();
+            appendBotMessageUI(msg, false, true);
+            scrollToBottom();
+        }
+
+        // --- MAIN SEND LOGIC ---
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
 
-            // Lock Input
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
-            sendBtn.style.opacity = '0.5';
+            quickActions.classList.add('hidden'); // Hide chips while processing
             
-            appendUserMessage(message);
+            addUserMsgToHistory(message);
 
             // Show Typing
             typingIndicator.classList.remove('hidden');
             typingIndicator.classList.add('flex');
             scrollToBottom();
 
+            // Amazon Logic: If user specifically asks for human/admin in AI mode
+            const lowerMsg = message.toLowerCase();
+            if (currentMode === 'AI' && (lowerMsg.includes('admin') || lowerMsg.includes('agent') || lowerMsg.includes('customer care') || lowerMsg.includes('insan'))) {
+                typingIndicator.classList.add('hidden');
+                typingIndicator.classList.remove('flex');
+                switchToAdminChat();
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
+                return;
+            }
+
             if (currentMode === 'AI') {
-                // 🤖 HIT GEMINI AI API
+                // 🤖 AI MODE
                 try {
                     const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: 'support_chat', 
-                            payload: { userMessage: message },
-                            secureToken: SECURE_API_TOKEN
-                        })
+                        body: JSON.stringify({ action: 'support_chat', payload: { userMessage: message }, secureToken: SECURE_API_TOKEN })
                     });
-
                     const data = await response.json();
                     typingIndicator.classList.add('hidden');
                     typingIndicator.classList.remove('flex');
 
                     if(data.success) {
-                        appendBotMessage(data.reply);
+                        addBotMsgToHistory(data.reply);
+                        // Show "Talk to Agent" chip after AI replies, just like Amazon
+                        setTimeout(() => { quickActions.classList.remove('hidden'); scrollToBottom(); }, 1000);
                     } else {
-                        appendBotMessage("Server thoda busy hai. Kripya thodi der baad try karein. 🚨", true);
+                        addBotMsgToHistory("Server busy hai. Kripya thodi der baad try karein.", true);
                     }
                 } catch(e) {
                     typingIndicator.classList.add('hidden');
                     typingIndicator.classList.remove('flex');
-                    appendBotMessage("Internet connection check karein. 📡", true);
+                    addBotMsgToHistory("Internet connection check karein.", true);
                 }
             } else {
-                // 👨‍💻 ADMIN MODE (Save to Firebase logic via Vercel)
+                // 👨‍💻 ADMIN MODE
                 try {
                     const response = await fetch('/api/Rashiandakash', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: 'save_admin_chat', 
-                            payload: { userPhone: userPhone, message: message },
-                            secureToken: SECURE_API_TOKEN
-                        })
+                        body: JSON.stringify({ action: 'save_admin_chat', payload: { userPhone: userPhone, message: message }, secureToken: SECURE_API_TOKEN })
                     });
-                    
                     typingIndicator.classList.add('hidden');
                     typingIndicator.classList.remove('flex');
-
-                    // Mocking the auto-reply for ticket received
+                    
                     setTimeout(() => {
-                        appendBotMessage("Aapka message Admin ko bhej diya gaya hai. Kripya reply ka wait karein! ✅");
+                        addBotMsgToHistory("Aapka message Admin ko bhej diya gaya hai. Kripya reply ka wait karein! ✅");
                     }, 500);
-
                 } catch(e) {
                     typingIndicator.classList.add('hidden');
                     typingIndicator.classList.remove('flex');
-                    appendBotMessage("Message bhejne mein dikkat hui. Fir se try karein.", true);
+                    addBotMsgToHistory("Message bhejne mein dikkat hui. Fir se try karein.", true);
                 }
             }
 
-            // Unlock Input
             chatInput.disabled = false;
             sendBtn.disabled = false;
-            sendBtn.style.opacity = '1';
             chatInput.focus();
             scrollToBottom();
         }
