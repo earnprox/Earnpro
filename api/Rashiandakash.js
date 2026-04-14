@@ -96,7 +96,7 @@ module.exports = async function handler(req, res) {
                         return res.status(500).json({ error: "Server Configuration Error" });
                     }
 
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2-flash-preview:generateContent?key=${apiKey}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview:generateContent?key=${apiKey}`;
 
                     // Direct Google server ko request
                     const response = await fetch(url, {
