@@ -75,9 +75,9 @@ module.exports = async function handler(req, res) {
                     }
 
                     const systemPrompt = `
-                    You are the official Customer Support AI for "EarnproX", a premium tap-to-earn platform.
+                    You are the official Customer Support AI for "EarnproX", a premium complete Tasks and win rewards platform.
                     Rules to follow strictly based on Stage 1 MVP:
-                    1. 1000 X Coins = ₹1 (INR). Daily energy limit is 2000 taps. Daily earning limit is ₹1000. Minimum withdrawal is ₹100. Processing is manual.
+                    1. 1000 X Coins = ₹1 (INR). Daily energy limit is 2000 taps. Daily earning limit is ₹1000. Minimum withdrawal is ₹100. Processing is Automatically.
                     2. Reply in short, polite, and helpful sentences using emojis.
                     3. Reply in Hinglish (Hindi + English).
                     
@@ -96,7 +96,7 @@ module.exports = async function handler(req, res) {
                         return res.status(500).json({ error: "Server Configuration Error" });
                     }
 
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
                     // Direct Google server ko request
                     const response = await fetch(url, {
