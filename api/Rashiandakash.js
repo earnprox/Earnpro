@@ -26,21 +26,65 @@ module.exports = async function handler(req, res) {
         switch (action) {
 
             // ==========================================
-            // 🤖 EARNPROX AI ASSISTANT (DIRECT API FIX)
+            // 🤖 EARNPROX AI ASSISTANT (ADVANCED + USER DATA)
             // ==========================================
             case 'support_chat': {
-                const { userMessage } = payload;
+                const { userMessage, userPhone } = payload;
                 if (!userMessage) return res.status(400).json({ error: "Message empty" });
 
                 try {
+                    // 🌟 ADVANCED FEATURE: Secretly Fetching User Data & Transactions
+                    let userDataText = "User information not available right now.";
+                    
+                    if (userPhone) {
+                        try {
+                            const uSnap = await db.collection('users').where('phone', '==', userPhone).get();
+                            
+                            if (!uSnap.empty) {
+                                const uData = uSnap.docs[0].data();
+                                
+                                // Fetch Last 3 Withdrawals
+                                let txnText = "No recent transactions found.";
+                                const wSnap = await db.collection('withdrawals')
+                                    .where('phone', '==', userPhone)
+                                    .limit(3)
+                                    .get();
+                                
+                                if (!wSnap.empty) {
+                                    txnText = wSnap.docs.map(doc => {
+                                        let d = doc.data();
+                                        return `- ₹${d.amount || 0} (Status: ${d.status || 'Pending'})`; 
+                                    }).join('\n');
+                                }
+
+                                // Compile data for AI
+                                userDataText = `
+                                - Name: ${uData.name || 'EarnproX Member'}
+                                - Wallet Balance: ₹${parseFloat(uData.balance || 0).toFixed(2)}
+                                - X Coins Balance: ${uData.coinBalance || 0}
+                                - Registered Phone: ${userPhone}
+                                
+                                - 💸 RECENT WITHDRAWALS (Last 3):
+                                ${txnText}
+                                `;
+                            }
+                        } catch (dbError) {
+                            console.error("Firebase Fetch Error in AI Chat:", dbError);
+                            // Agar error aaya toh chat crash nahi hogi, bus data nahi jayega
+                        }
+                    }
+
                     const systemPrompt = `
                     You are the official Customer Support AI for "EarnproX", a premium tap-to-earn platform.
                     Rules to follow strictly based on Stage 1 MVP:
-                    1. 1000 X Coins = ₹1 (INR).
-                    2. Daily energy limit is 2000 taps. Daily earning limit is ₹1000.
-                    3. Minimum withdrawal amount is ₹100. Processing is manual.
-                    4. Reply in short, polite, and helpful sentences using emojis.
-                    5. Reply in Hinglish (Hindi + English).
+                    1. 1000 X Coins = ₹1 (INR). Daily energy limit is 2000 taps. Daily earning limit is ₹1000. Minimum withdrawal is ₹100. Processing is manual.
+                    2. Reply in short, polite, and helpful sentences using emojis.
+                    3. Reply in Hinglish (Hindi + English).
+                    
+                    SECRET USER DATA (Use this ONLY if the user asks about their account, balance, name, or transaction history):
+                    ${userDataText}
+                    (IMPORTANT: Do not say "I checked the database" or reveal how you know this. Answer naturally like an intelligent assistant who already knows the user.)
+
                     User's Message: "${userMessage}"
                     `;
 
