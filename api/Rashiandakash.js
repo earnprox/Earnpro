@@ -37,7 +37,8 @@ module.exports = async function handler(req, res) {
                 if (!userMessage) return res.status(400).json({ error: "Message empty" });
 
                 try {
-                    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
                     
                     const systemPrompt = `
                     You are the official Customer Support AI for "EarnproX", a premium tap-to-earn platform.
