@@ -256,7 +256,8 @@ window.loadTransactionHistory = async function() {
 
     try {
         // Fetch data from Vercel Backend
-        const response = await fetch('/api/get-history', { 
+        const response = await fetch('/api/dashboard-data', {
+ 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone: userPhone, token: userToken })
