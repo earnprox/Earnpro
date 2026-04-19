@@ -55,16 +55,69 @@ module.exports = async function handler(req, res) {
             const tasksSnap = await db.collection('task_submissions').where('status', 'in', ['Approved', 'Completed']).get();
             tasksSnap.forEach(doc => {
                 const t = doc.data();
-                // खुद की कमाई
                 if (t.userPhone === phone) taskEarn += (t.gigReward || 0);
-                
-                // नेटवर्क कमीशन (10%, 6%, 3%)
                 if (t.referrerCode === myCode) referEarn += (t.gigReward * 0.10);
                 else if (l1Codes.includes(t.referrerCode)) referEarn += (t.gigReward * 0.06);
                 else if (l2Codes.includes(t.referrerCode)) referEarn += (t.gigReward * 0.03);
             });
         } catch (err) {
             console.error("Task fetch error:", err);
+        }
+
+        // ==========================================
+        // 🔥 NEW: TRANSACTION HISTORY LOGIC ADDED HERE
+        // ==========================================
+        let transactions = [];
+        try {
+            // 1. Withdrawals
+            const withdrawalsSnap = await db.collection('withdrawals').where('phone', '==', phone).get();
+            withdrawalsSnap.forEach(doc => {
+                const w = doc.data();
+                let dateObj = new Date();
+                if (w.timestamp) dateObj = w.timestamp.toDate ? w.timestamp.toDate() : new Date(w.timestamp);
+                else if (w.createdAt) dateObj = w.createdAt.toDate ? w.createdAt.toDate() : new Date(w.createdAt);
+
+                transactions.push({
+                    type: "Withdrawal",
+                    title: "Bank Transfer",
+                    dateObj: dateObj,
+                    status: w.status || "Pending",
+                    amount: parseFloat(w.amount || 0)
+                });
+            });
+
+            // 2. Earnings (Tasks specific to this user)
+            const userTasksSnap = await db.collection('task_submissions').where('userPhone', '==', phone).get();
+            userTasksSnap.forEach(doc => {
+                const t = doc.data();
+                let dateObj = new Date();
+                if (t.timestamp) dateObj = t.timestamp.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
+
+                transactions.push({
+                    type: "Earning",
+                    title: t.gigTitle ? `Task: ${t.gigTitle}` : "Task Reward",
+                    dateObj: dateObj,
+                    status: t.status || "Pending",
+                    amount: parseFloat(t.gigReward || 0)
+                });
+            });
+
+            // 3. Sort by Date and Format
+            transactions.sort((a, b) => b.dateObj - a.dateObj);
+            const formatDate = (date) => {
+                const options = { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true };
+                return date.toLocaleString('en-IN', options).replace(',', '');
+            };
+
+            transactions = transactions.map(t => ({
+                type: t.type,
+                title: t.title,
+                date: formatDate(t.dateObj),
+                status: t.status,
+                amount: t.amount
+            }));
+        } catch (err) {
+            console.error("History fetch error:", err);
         }
 
         // 4. Secure Data Packing
@@ -91,7 +144,8 @@ module.exports = async function handler(req, res) {
                 l2: l2Count,
                 l3: l3Count,
                 totalCount: l1Count + l2Count + l3Count
-            }
+            },
+            transactions: transactions // 🔥 Passbook Data Sent Here!
         };
 
         return res.status(200).json(responseData);
