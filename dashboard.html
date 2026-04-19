@@ -4,419 +4,510 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EarnproX | Premium App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="dashboard.css">
     <script>
+        // Secure Session Check
         if (!localStorage.getItem("earnprox_user_phone") || !sessionStorage.getItem("earnprox_secure_token")) {
             window.location.replace("login.html");
         }
+        // Apply tailwind config (Using Plus Jakarta Sans as default)
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }, colors: { primary: '#00A87A', textdark: '#1D2630', textgray: '#5B6B79' } } } }
     </script>
+    <style>
+        /* Modern Dark Theme Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #0B100E; }
+        ::-webkit-scrollbar-thumb { background: #1C211F; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #313439; }
+        
+        /* Modern Utilities */
+        .hide-scrollbar { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Futuristic "1 Cr Feel" Gradients */
+        .gradient-gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .gradient-mining { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+        .card-godmode { background: #1C211F; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
 </head>
-<body class="relative min-h-screen selection:bg-emerald-100 bg-[#E8EBF0] font-['Inter'] antialiased">
+<body class="relative min-h-screen selection:bg-emerald-100 bg-[#0B100E] text-slate-200 antialiased overflow-x-hidden">
 
-    <span id="home-card-user-name" class="hidden"></span>
-    <span id="home-top-balance" class="hidden">₹0.00</span>
-    <span id="stat-total-withdraw-hidden" class="hidden">₹0</span>
+    <span id="home-card-user-name" class="hidden">Admin</span>
+    <span id="home-top-balance" class="hidden">₹1.00 Cr</span> <span id="stat-total-withdraw-hidden" class="hidden">₹0</span>
     <span id="total-refers-count-hidden" class="hidden">0</span>
     <span id="home-card-refer-code" class="hidden">CODE</span>
+    <span id="ref-level1-count-hidden" class="hidden">0</span>
+    <span id="ref-level2-count-hidden" class="hidden">0</span>
+    <span id="ref-level3-count-hidden" class="hidden">0</span>
 
-    <div class="relative z-10 w-full max-w-md mx-auto bg-[#F2F5F8] min-h-screen pb-24 shadow-[0_0_50px_rgba(0,0,0,0.05)]">
+    <div class="relative z-10 w-full max-w-md mx-auto bg-[#121615] min-h-screen pb-28 shadow-[0_0_80px_rgba(0,0,0,0.5)]">
 
         <div id="view-home" class="tab-content active pt-0">
             
-            <div class="bg-[#0B100E] pt-8 px-5 pb-10 relative z-0">
+            <div class="bg-[#0B100E] pt-8 px-5 pb-10 relative z-0 border-b border-white/5">
                 
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-3">
-                        <div id="top-nav-profile-initial" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-slate-300 font-bold text-lg cursor-pointer border border-white/5" onclick="window.switchTab('profile')">
-                            U
-                        </div>
+                        <div id="top-nav-profile-initial" class="w-10 h-10 rounded-full bg-[#1C211F] flex items-center justify-center text-slate-300 font-black text-lg cursor-pointer border border-white/5" onclick="window.switchTab('profile')">A</div>
                         
-                        <div class="bg-gradient-to-r from-rose-500 to-red-600 px-4 py-1.5 rounded-full flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(225,29,72,0.4)] hover:scale-105 transition-transform" onclick="window.location.href='tap-earn.html'">
-                            <span class="text-[12px] font-bold text-white tracking-wide leading-tight">Start Mining<br>Tap to Earn ⛏️</span>
+                        <div class="gradient-mining px-4 py-1.5 rounded-full flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(225,29,72,0.4)] active:scale-95 transition-transform" onclick="window.location.href='tap-earn.html'">
+                            <span class="text-[12px] font-extrabold text-white tracking-wide leading-tight">Start Mining<br>Tap to Earn ⛏️</span>
                             <svg class="w-3.5 h-3.5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                         </div>
-
                     </div>
                     
                     <button onclick="window.openSheet('notification-sheet')" class="w-10 h-10 rounded-full flex items-center justify-center bg-[#1C211F] text-white hover:bg-white/10 transition-all border border-white/5 relative">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span id="notification-badge" class="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full hidden"></span>
                     </button>
                 </div>
 
-                <div class="bg-[#313439] rounded-[24px] p-6 shadow-2xl relative mb-5 overflow-hidden flex flex-col justify-between" style="min-height: 180px;">
+                <div class="card-godmode rounded-[32px] p-8 shadow-2xl relative mb-5 overflow-hidden flex flex-col justify-between border-2 border-primary/20" style="min-height: 200px; background: radial-gradient(circle at top right, #1C211F 0%, #121615 100%);">
                     
-                    <div class="relative z-10 flex justify-between items-start w-full">
-                        <p class="text-slate-300 font-medium text-[14px] tracking-wide mt-1">Your Wealth</p>
-                        <button onclick="window.openFullPage('withdraw-page')" class="bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded-full font-bold text-[12px] flex items-center gap-1.5 backdrop-blur-sm active:scale-95 transition-all border border-white/5 shadow-sm z-20 relative">
-                            Withdraw
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <div class="relative z-10 flex justify-between items-center w-full">
+                        <div class="flex items-center gap-2">
+                            <span class="text-primary text-xl">🛡️</span>
+                            <p class="text-slate-300 font-extrabold text-[15px] tracking-wide mt-1 uppercase">God Mode Vault</p>
+                        </div>
+                        <button onclick="window.openFullPage('withdraw-page')" class="bg-white hover:bg-slate-100 text-[#0B100E] px-5 py-2 rounded-full font-black text-[13px] flex items-center gap-2 shadow-lg active:scale-95 transition-all z-20 relative">
+                            Pega Payout
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </button>
                     </div>
 
                     <div class="flex items-center gap-1.5 relative z-10 mt-3 mb-5">
-                        <span class="text-slate-400 text-3xl font-medium mt-1">₹</span>
-                        <h2 class="text-[44px] font-bold text-white leading-none tracking-tight" id="home-card-big-balance">0</h2>
-                    </div>
+                        <span class="text-slate-400 text-3xl font-black mt-1">₹</span>
+                        <h2 class="text-[54px] font-extrabold text-white leading-none tracking-tighter" id="home-card-big-balance">1.00 Cr</h2> </div>
                     
                     <div class="relative z-10 w-max cursor-pointer active:scale-95 transition-transform" onclick="window.switchTab('refer')">
-                        <span class="text-[#00E5A0] font-bold text-[15px] flex items-center gap-1.5">
-                            Refer Your Friends 
-                            <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                        <span class="text-primary font-black text-[15px] flex items-center gap-1.5">
+                            Expand Your Network
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                         </span>
                     </div>
 
-                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bank/3D/bank_3d.png" alt="Bank" class="absolute bottom-6 right-5 w-[24px] h-[24px] object-contain z-0 opacity-80">
-                </div>
-                <div class="flex items-center gap-1.5 px-2">
-                    <span class="text-white/90 text-[10px] font-bold mr-1">1/1</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bank/3D/bank_3d.png" alt="Bank" class="absolute -bottom-8 -right-8 w-32 h-32 object-contain z-0 opacity-10">
                 </div>
             </div>
             
-            <div class="bg-white rounded-t-[32px] px-5 pt-8 pb-10 -mt-6 relative z-20 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] min-h-[60vh]">
+            <div class="bg-[#121615] rounded-t-[32px] px-5 pt-8 pb-10 -mt-6 relative z-20 min-h-[60vh] border-t border-white/5 shadow-[0_-8px_20px_rgba(0,0,0,0.3)]">
 
                 <div class="mb-8 mt-1">
-                    <h3 class="text-[15px] font-semibold text-slate-700 tracking-wide mb-4 px-1">Rewards worth up to ₹1000/daily</h3>
+                    <h3 class="text-[15px] font-semibold text-slate-400 tracking-wide mb-4 px-1 flex items-center gap-2">Max Rewards up to <span class="text-primary font-black">₹10K/daily</span> 💸</h3>
                     
                     <div class="flex gap-2.5 mb-8">
-                        <div onclick="window.location.href='task.html'" class="w-[45%] bg-[#E8EBF0] rounded-[24px] p-4 flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
-                            <div class="absolute -bottom-10 -right-6 w-28 h-28 bg-[#DFE3E9] rounded-full blur-2xl z-0"></div>
+                        <div onclick="window.location.href='task.html'" class="w-[45%] bg-[#1C211F] rounded-[24px] p-5 flex flex-col justify-between relative overflow-hidden cursor-pointer active:scale-[0.98] transition-all border border-white/5">
                             <div class="relative z-10">
-                                <p class="text-[11px] text-slate-500 font-medium mb-1">Earn as you complete</p>
-                                <h4 class="text-[17px] text-slate-800 font-semibold leading-tight">Daily Task<br>for Active</h4>
+                                <p class="text-[11px] text-slate-400 font-medium mb-1">Earn daily as you work</p>
+                                <h4 class="text-[18px] text-white font-extrabold leading-tight">Work Protocols<br>Bounty Task</h4>
                             </div>
                             <div class="flex-1 flex items-center justify-center relative z-10 py-5">
-                                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Wrapped%20Gift.png" alt="Premium Gift" class="w-[90px] h-[90px] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300">
+                                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Wrapped%20Gift.png" alt="Gift" class="w-[90px] h-[90px] object-contain drop-shadow-2xl">
                             </div>
-                            <button onclick="window.location.href='task.html'" class="bg-[#EF4444] text-white text-[11px] font-bold py-2 px-5 rounded-full w-max mx-auto relative z-10 shadow-[0_4px_10px_rgba(239,68,68,0.3)] active:scale-95 transition-transform">Start Now</button>
+                            <button onclick="window.location.href='task.html'" class="bg-primary text-[#0B100E] text-[12px] font-black py-2.5 px-6 rounded-full w-max mx-auto relative z-10 shadow-[0_4px_10px_rgba(0,168,122,0.3)] active:scale-95 transition-transform">Execute Now</button>
                         </div>
                         
                         <div class="w-[55%] flex flex-col gap-2.5">
-                            
-                            <div onclick="window.location.href='app.html'" class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <div class="absolute -bottom-5 -right-5 w-16 h-16 bg-[#DFE3E9] rounded-full blur-xl z-0"></div>
+                            <div onclick="window.location.href='app.html'" class="bg-[#1C211F] rounded-[20px] p-4 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-all border border-white/5">
                                 <div class="relative z-10">
-                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">Install & Earn</p>
-                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">App Install</h4>
+                                    <p class="text-[11px] text-slate-400 font-medium mb-0.5">Asset Install</p>
+                                    <h4 class="text-[14px] text-white font-bold leading-tight">Deploy Assets</h4>
                                 </div>
-                                <svg class="absolute bottom-2.5 right-3 w-[22px] h-[22px] z-10 drop-shadow-md" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="100" height="100" rx="20" fill="#0066CC"/>
-                                    <path d="M50 22 V 58 M35 43 L 50 58 L 65 43" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M30 75 H 70" stroke="white" stroke-width="10" stroke-linecap="round"/>
-                                </svg>
+                                <span class="absolute bottom-2.5 right-3 text-[22px] z-10 opacity-70">📲</span>
                             </div>
                             
-                            <div onclick="window.location.href='follower.html'" class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
+                            <div onclick="window.location.href='follower.html'" class="bg-[#1C211F] rounded-[20px] p-4 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-all border border-white/5">
                                 <div class="relative z-10">
-                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">Social Media</p>
-                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">Follow & Earn</h4>
+                                    <p class="text-[11px] text-slate-400 font-medium mb-0.5">Social Metrics</p>
+                                    <h4 class="text-[14px] text-white font-bold leading-tight">Boost Follows</h4>
                                 </div>
-                                <svg class="absolute bottom-2.5 right-2 w-[48px] h-[18px] z-10 drop-shadow-sm" viewBox="0 0 100 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="100" height="35" rx="8" fill="#FF3366"/>
-                                    <text x="50" y="19" font-family="'Inter', sans-serif" font-weight="800" font-size="15" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="0.5">FOLLOW</text>
-                                </svg>
+                                <span class="absolute bottom-2.5 right-3 text-[22px] z-10 opacity-70">👤</span>
                             </div>
                             
-                            <div onclick="window.location.href='finance.html'" class="bg-[#E8EBF0] rounded-[20px] p-3.5 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-transform">
-                                <div class="absolute -bottom-5 -right-5 w-16 h-16 bg-[#DFE3E9] rounded-full blur-xl z-0"></div>
+                            <div onclick="window.location.href='finance.html'" class="bg-[#1C211F] rounded-[20px] p-4 relative overflow-hidden flex-1 flex flex-col justify-center cursor-pointer active:scale-95 transition-all border border-white/5">
                                 <div class="relative z-10">
-                                    <p class="text-[11px] text-slate-500 font-medium mb-0.5">High Paying</p>
-                                    <h4 class="text-[13px] text-slate-800 font-semibold leading-tight">Finance Tasks</h4>
+                                    <p class="text-[11px] text-slate-400 font-medium mb-0.5">Bank Rewards</p>
+                                    <h4 class="text-[14px] text-white font-bold leading-tight">Finance Vectors</h4>
                                 </div>
-                                <span class="absolute bottom-2 right-3 text-[18px] text-slate-400 font-black z-10">🏦</span>
+                                <span class="absolute bottom-2 right-3 text-[22px] z-10 opacity-70">🏦</span>
                             </div>
-
                         </div>
                     </div>
 
                     <div class="flex justify-between items-start mb-6 px-1">
-                        
                         <div onclick="window.location.href='spin.html'" class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20bag/3D/money_bag_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
+                            <div class="w-[56px] h-[56px] bg-[#1C211F] rounded-[20px] flex items-center justify-center border border-white/5">
+                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20bag/3D/money_bag_3d.png" class="w-8 h-8 object-contain">
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Daily<br>Spin</span>
+                            <span class="text-[11px] font-semibold text-slate-300 text-center leading-[1.2]">Daily<br>Spin</span>
                         </div>
 
                         <div onclick="window.location.href='recharge.html'" class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
+                            <div class="w-[56px] h-[56px] bg-[#1C211F] rounded-[20px] flex items-center justify-center border border-white/5">
                                 <div class="relative w-8 h-8 flex items-center justify-center">
                                     <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rosette/3D/rosette_3d.png" class="absolute inset-0 w-full h-full object-contain" style="filter: hue-rotate(-45deg) saturate(1.5);">
-                                    <span class="absolute text-[10px] font-black text-amber-100 z-10">%</span>
                                 </div>
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Mobile<br>Recharge</span>
+                            <span class="text-[11px] font-semibold text-slate-300 text-center leading-[1.2]">Mobile<br>Recharge</span>
                         </div>
 
                         <div onclick="window.location.href='deals.html'" class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
+                            <div class="w-[56px] h-[56px] bg-[#1C211F] rounded-[20px] flex items-center justify-center border border-white/5">
                                 <div class="relative w-8 h-8 flex items-center justify-center">
                                     <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Label/3D/label_3d.png" class="absolute inset-0 w-full h-full object-contain" style="filter: hue-rotate(-20deg) saturate(1.5);">
-                                    <span class="absolute text-[10px] font-black text-amber-100 z-10">%</span>
                                 </div>
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Today<br>Offers</span>
+                            <span class="text-[11px] font-semibold text-slate-300 text-center leading-[1.2]">Today<br>Offers</span>
                         </div>
 
                         <div onclick="window.switchTab('refer')" class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform w-[58px]">
-                            <div class="w-[56px] h-[56px] bg-[#E8EBF0] rounded-[20px] flex items-center justify-center">
-                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Potted%20plant/3D/potted_plant_3d.png" class="w-8 h-8 object-contain drop-shadow-sm">
+                            <div class="w-[56px] h-[56px] bg-[#1C211F] rounded-[20px] flex items-center justify-center border border-white/5">
+                                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Potted%20plant/3D/potted_plant_3d.png" class="w-8 h-8 object-contain">
                             </div>
-                            <span class="text-[11px] font-semibold text-slate-600 text-center leading-[1.2]">Refer<br>& Earn</span>
+                            <span class="text-[11px] font-semibold text-slate-300 text-center leading-[1.2]">Refer<br>& Earn</span>
                         </div>
-
-                    </div>
-
-                    <div class="px-1 mb-8 flex justify-start">
-                        <button class="flex items-center gap-1.5 text-[11px] font-semibold text-[#00A87A] bg-emerald-50/50 hover:bg-emerald-50 px-4 py-2 rounded-full transition-all active:scale-95 border border-emerald-100/50 shadow-sm">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-                            Why trust EarnproX?
-                        </button>
                     </div>
 
                     <div class="mt-2 mb-6 flex flex-col items-center text-center relative w-full">
-                        <div class="absolute inset-0 top-1/2 -bottom-20 bg-[#F2F5F8] -mx-5" style="clip-path: polygon(0 30%, 50% 0, 100% 30%, 100% 100%, 0% 100%); z-index: 0;"></div>
+                        <div class="absolute inset-0 top-1/2 -bottom-20 bg-[#0B100E] -mx-5 border-t border-white/5" style="clip-path: polygon(0 30%, 50% 0, 100% 30%, 100% 100%, 0% 100%); z-index: 0;"></div>
                         
                         <div class="relative z-10 w-full px-2">
-                            <h2 class="text-[22px] font-bold text-slate-800 flex items-center justify-center gap-2 mb-2">
-                                You <span class="text-[#EF4444] text-[20px]">♥️</span> Earnprox
+                            <h2 class="text-[22px] font-extrabold text-white flex items-center justify-center gap-2 mb-2">
+                                Network <span class="text-rose-500 text-[20px]">♥️</span> Protocols
                             </h2>
-                            
-                            <p class="text-[15px] font-medium text-slate-600 mb-5 leading-tight">
-                                Your friends are going to<br>love us too!
-                            </p>
-                            
-                            <button onclick="window.switchTab('refer')" class="bg-white border border-slate-200 text-[#0066CC] font-semibold text-[14px] px-6 py-2.5 rounded-full shadow-sm active:scale-95 transition-transform flex items-center gap-2 mx-auto mb-4">
-                                Refer & Win up to ₹200
+                            <p class="text-[15px] font-medium text-slate-400 mb-5 leading-tight">Leverage Your Connection<br>Maximize Network Bonus!</p>
+                            <button onclick="window.switchTab('refer')" class="bg-primary text-[#0B100E] font-black text-[14px] px-6 py-2.5 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-2 mx-auto mb-4">
+                                Propagate Network Loop ₹200
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                             </button>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
         <div id="view-refer" class="tab-content relative -mx-5 -mt-5">
-            <div class="bg-[#0B100E] p-8 pb-10 text-center rounded-b-[3rem] shadow-xl relative overflow-hidden border-b border-white/10">
-                <div class="w-20 h-20 mx-auto rounded-full bg-slate-800 p-1 mb-4 border border-white/10 relative z-10"><img id="refer-profile-img" src="" class="w-full h-full rounded-full object-cover"></div>
-                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 relative z-10">EarnproX Member</h3>
-                <h2 class="text-3xl font-black text-white mb-6 relative z-10" id="refer-page-name">User Name</h2>
-                <div class="flex justify-center items-center gap-3 relative z-10">
-                    <div class="bg-white/5 px-6 py-3 rounded-xl border border-white/5 font-black text-white tracking-widest text-sm" id="referral-code-text">CODE</div>
-                    <button onclick="window.copyReferLink()" class="bg-[#00A87A] p-3.5 rounded-xl text-white active:scale-90 transition-transform"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+            <div class="bg-[#0B100E] p-8 pb-12 text-center rounded-b-[3rem] shadow-xl relative overflow-hidden border-b border-white/5">
+                <div class="w-20 h-20 mx-auto rounded-full bg-[#1C211F] p-1 mb-4 border-2 border-primary/20 shadow-xl relative z-10">
+                    <img id="refer-profile-img" src="" class="w-full h-full rounded-full object-cover">
+                </div>
+                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 relative z-10">NETWORK PROTOCOL OPERATOR</h3>
+                <h2 class="text-3xl font-black text-white mb-6 relative z-10" id="refer-page-name">Operator A</h2>
+                <div class="flex justify-center items-center gap-3 relative z-10 max-w-[300px] mx-auto">
+                    <div class="bg-white/5 flex-1 px-6 py-3.5 rounded-xl border border-white/5 font-black text-white tracking-widest text-sm" id="referral-code-text">CODE</div>
+                    <button onclick="window.copyReferLink()" class="bg-primary p-4 rounded-xl text-[#0B100E] active:scale-90 transition-transform flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
                 </div>
             </div>
+            
             <div class="px-5 pt-8 pb-4">
-                <div class="mb-6 bg-white p-5 rounded-[20px] shadow-sm border border-slate-100">
-                    <h2 class="text-xl font-black mb-1 text-slate-800">Team Insights</h2>
-                    <p class="text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-widest">Total Registered</p>
-                    <h1 class="text-5xl font-black text-[#00A87A] leading-none" id="total-refers-count">0</h1>
+                
+                <div class="card-godmode rounded-[24px] p-6 mb-6 shadow-2xl relative overflow-hidden border-2 border-primary/30" style="background: linear-gradient(135deg, #1C211F 0%, #0B100E 100%);">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex items-center gap-2">
+                            <span class="text-primary text-xl">🏆</span>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol Bonus Lifetime</p>
+                        </div>
+                        <span class="badge-green text-primary bg-primary/10 px-3 py-1 rounded-full font-black text-[10px] uppercase">Active</span>
+                    </div>
+                    
+                    <h1 class="text-6xl font-extrabold text-white leading-none tracking-tight mb-2">₹47.75 L</h1>
+                    <p class="text-slate-500 font-medium text-xs">Propagate Network to reach ₹1.00 Cr Level!</p>
+
+                    <span class="absolute -bottom-10 -right-10 text-[10rem] opacity-5 z-0">📈</span>
                 </div>
-                <h3 class="text-xs font-black text-slate-800 mb-2 px-2">Network Logs</h3>
-                <div class="bg-white rounded-xl p-3 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3 border border-slate-100 shadow-sm">
-                    <div class="w-1/2">User Name</div><div class="w-1/4 text-center">Date</div><div class="w-1/4 text-right">Level</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    
+                    <div class="card-godmode p-5 rounded-[20px] flex justify-between items-center group active:scale-[0.98] transition-all cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#1C211F] text-slate-300 flex items-center justify-center font-bold text-xl border border-white/10 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/20 transition-all">A</div>
+                            <div>
+                                <p class="font-black text-white text-[15px]">Level 1 (Direct Team)</p>
+                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Bonus Rate: 5% (Total Members)</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="text-3xl font-extrabold text-primary leading-none" id="total-refers-count">0</h3>
+                            <span class="text-[9px] font-black text-slate-600 uppercase mt-0.5">Vector Size</span>
+                        </div>
+                    </div>
+
+                    <div class="card-godmode p-5 rounded-[20px] flex justify-between items-center group active:scale-[0.98] transition-all cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#1C211F] text-slate-300 flex items-center justify-center font-bold text-xl border border-white/10 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/20 transition-all">B</div>
+                            <div>
+                                <p class="font-black text-white text-[15px]">Level 2 Network</p>
+                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Bonus Rate: 2% (Indirect)</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="text-3xl font-extrabold text-white opacity-50 leading-none" id="ref-level2-count">0</h3>
+                            <span class="text-[9px] font-black text-slate-600 uppercase mt-0.5">Vector Size</span>
+                        </div>
+                    </div>
+
+                    <div class="card-godmode p-5 rounded-[20px] flex justify-between items-center group active:scale-[0.98] transition-all cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#1C211F] text-slate-300 flex items-center justify-center font-bold text-xl border border-white/10 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/20 transition-all">C</div>
+                            <div>
+                                <p class="font-black text-white text-[15px]">Level 3 Network</p>
+                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Bonus Rate: 1% (Deep)</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="text-3xl font-extrabold text-white opacity-50 leading-none" id="ref-level3-count">0</h3>
+                            <span class="text-[9px] font-black text-slate-600 uppercase mt-0.5">Vector Size</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-xs font-black text-white mb-2 px-2 uppercase tracking-widest mt-6">Protocol Activation Logs</h3>
+                <div class="card-godmode rounded-xl p-3 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-500 mb-3 border border-white/5">
+                    <div class="w-1/2">Operator Identity</div>
+                    <div class="w-1/4 text-center">Sync Date</div>
+                    <div class="w-1/4 text-right">Layer</div>
                 </div>
                 <div id="referral-list-container" class="space-y-2 pb-20"></div>
             </div>
         </div>
 
-        <div id="view-wallet" class="tab-content">
-            <h2 class="text-2xl font-black tracking-tight mb-4 text-slate-900">My Vault</h2>
-            <div class="rounded-[24px] p-6 mb-5 bg-[#0B100E] text-white shadow-xl relative overflow-hidden border border-white/5">
+        <div id="view-wallet" class="tab-content pt-8 px-5 pb-10">
+            <h2 class="text-3xl font-black tracking-tight mb-6 text-white">EarnproX Vault</h2>
+            
+            <div class="card-godmode rounded-[24px] p-7 mb-6 shadow-xl relative overflow-hidden border-2 border-primary/20" style="background: radial-gradient(circle at top right, #1C211F 0%, #121615 100%);">
                 <div class="flex justify-between items-start mb-6 relative z-10">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Withdrawable Balance</p>
-                    <button onclick="window.openFullPage('withdraw-page')" class="bg-white text-slate-900 font-bold py-1.5 px-4 rounded-lg active:scale-95 text-xs transition-transform">Withdraw</button>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol Pay Balance</p>
+                        <p class="text-xs text-slate-500 mt-0.5">(Withdrawable Asset)</p>
+                    </div>
+                    <button onclick="window.openFullPage('withdraw-page')" class="bg-primary hover:bg-emerald-600 text-[#0B100E] font-black py-2 px-6 rounded-full active:scale-95 text-[13px] transition-transform shadow-lg">Process Payout</button>
                 </div>
-                <h2 class="text-[40px] font-bold tracking-tight mb-2 relative z-10 leading-none" id="main-balance-display">₹0.00</h2>
+                <h2 class="text-[48px] font-bold tracking-tighter mb-2 relative z-10 leading-none text-white" id="main-balance-display">₹1.00 Cr</h2> <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bank/3D/bank_3d.png" alt="Bank" class="absolute -bottom-5 -right-5 w-[100px] h-[100px] object-contain z-0 opacity-10">
             </div>
             
-            <div class="bg-white rounded-[20px] overflow-hidden mb-6 shadow-sm border border-slate-100 p-1.5">
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">💰</div><div><p class="text-xs font-bold text-slate-900">Total Earning</p><p class="text-[9px] text-slate-400">Lifetime</p></div></div>
-                    <span class="text-xs font-bold text-slate-900" id="stat-total-earn">₹0.00</span>
+            <div class="bg-[#1C211F] rounded-[24px] overflow-hidden mb-6 shadow-sm border border-white/5 p-2">
+                <div class="flex justify-between items-center p-4 hover:bg-slate-800 rounded-2xl transition-colors">
+                    <div class="flex items-center gap-3"><div class="text-2xl">💰</div><div><p class="text-xs font-bold text-white">Lifetime Distributed Asset</p><p class="text-[9px] text-slate-400">Total System Paid</p></div></div>
+                    <span class="text-xs font-bold text-white" id="stat-total-earn">₹2.50 Cr</span>
                 </div>
-                <div class="w-full h-[1px] bg-slate-50 my-0.5"></div>
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">📤</div><div><p class="text-xs font-bold text-slate-900">Withdrawals</p><p class="text-[9px] text-slate-400">To Bank</p></div></div>
+                <div class="w-full h-[1px] bg-white/5 my-0.5"></div>
+                <div class="flex justify-between items-center p-4 hover:bg-slate-800 rounded-2xl transition-colors">
+                    <div class="flex items-center gap-3"><div class="text-2xl">📤</div><div><p class="text-xs font-bold text-whitegroup-hover:text-primary">Secured Payouts</p><p class="text-[9px] text-slate-400">Transferred to Bank</p></div></div>
                     <span class="text-xs font-bold text-rose-500" id="stat-total-withdraw">₹0.00</span>
                 </div>
-                <div class="w-full h-[1px] bg-slate-50 my-0.5"></div>
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">🎯</div><div><p class="text-xs font-bold text-slate-900">Task Earning</p><p class="text-[9px] text-slate-400">Work Rewards</p></div></div>
-                    <span class="text-xs font-bold text-[#00A87A]" id="stat-task-earn">₹0.00</span>
+                <div class="w-full h-[1px] bg-white/5 my-0.5"></div>
+                <div class="flex justify-between items-center p-4 hover:bg-slate-800 rounded-2xl transition-colors">
+                    <div class="flex items-center gap-3"><div class="text-2xl">🎯</div><div><p class="text-xs font-bold text-whitegroup-hover:text-primary">Bounty Task Rewards</p><p class="text-[9px] text-slate-400">Work Rewards</p></div></div>
+                    <span class="text-xs font-bold text-primary" id="stat-task-earn">₹0.00</span>
                 </div>
-                <div class="w-full h-[1px] bg-slate-50 my-0.5"></div>
-                <div class="flex justify-between items-center p-3.5 hover:bg-slate-50 rounded-xl">
-                    <div class="flex items-center gap-3"><div class="text-2xl">🎁</div><div><p class="text-xs font-bold text-slate-900">Refer Earning</p><p class="text-[9px] text-slate-400">Network Bonus</p></div></div>
-                    <span class="text-xs font-bold text-[#00A87A]" id="stat-refer-earn">₹0.00</span>
+                <div class="w-full h-[1px] bg-white/5 my-0.5"></div>
+                <div class="flex justify-between items-center p-4 hover:bg-slate-800 rounded-2xl transition-colors">
+                    <div class="flex items-center gap-3"><div class="text-2xl">🎁</div><div><p class="text-xs font-bold text-whitegroup-hover:text-primary">Protocol Bonus</p><p class="text-[9px] text-slate-400">Network Revenue</p></div></div>
+                    <span class="text-xs font-bold text-primary" id="stat-refer-earn">₹47.75 L</span>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[20px] shadow-sm border border-slate-100">
-                <div onclick="window.openSheet('history-sheet'); loadTransactionHistory();" class="flex justify-between items-center p-4 hover:bg-slate-50 cursor-pointer rounded-[20px]">
-                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-xl">📜</div><p class="text-sm font-bold text-slate-800">Ledger & History</p></div>
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+            <div class="bg-[#1C211F] rounded-[20px] shadow-sm border border-white/5 overflow-hidden">
+                <div onclick="window.openSheet('history-sheet'); loadTransactionHistory();" class="flex justify-between items-center p-5 hover:bg-slate-800 cursor-pointer rounded-[20px] transition-colors">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-black/30 border border-white/5 rounded-xl flex items-center justify-center text-xl">📜</div><p class="text-sm font-bold text-white group-hover:text-primary">Ledger & Protocol History</p></div>
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                 </div>
             </div>
         </div>
 
-        <div id="view-profile" class="tab-content">
-            <div class="bg-white rounded-[24px] p-6 mb-5 text-center mt-2 shadow-sm border border-slate-100">
-                <div class="w-24 h-24 rounded-full bg-slate-100 mx-auto mb-4 border-[3px] border-white shadow-md overflow-hidden"><img id="profile-avatar" src="" class="w-full h-full object-cover"></div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-1" id="profile-user-name">User</h2>
-                <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Verified Member</p>
+        <div id="view-profile" class="tab-content pt-8 px-5 pb-10">
+            
+            <div class="bg-[#1C211F] rounded-[24px] p-6 mb-6 text-center mt-2 shadow-2xl border border-white/5" style="background: radial-gradient(circle at top right, #1C211F 0%, #121615 100%);">
+                <div class="relative w-24 h-24 mx-auto mb-4 p-1 rounded-full bg-[#121615] border-[3px] border-primary shadow-md overflow-hidden group">
+                    <img id="profile-avatar" src="" class="w-full h-full rounded-full object-cover">
+                    <span class="absolute bottom-1 right-1 w-5 h-5 bg-[#13C296] border-[2px] border-white rounded-full"></span>
+                </div>
+                
+                <div class="flex justify-center items-center gap-2 mb-1.5">
+                    <h2 class="text-2xl font-black text-white" id="profile-user-name">OPERATOR_A</h2>
+                    <span class="badge-green text-primary bg-primary/10 px-2.5 py-1 rounded-full font-black text-[9px] uppercase">VERIFIED ✔️</span>
+                </div>
+                <p class="text-xs font-bold text-slate-500" id="profile-user-phone">+91 9876****10</p>
+                <p class="text-[9px] font-medium text-slate-600 uppercase tracking-widest mt-1">Status: SECURE ACCESS OPERATOR</p>
             </div>
             
-            <div class="bg-white rounded-[24px] overflow-hidden mb-6 shadow-sm border border-slate-100">
-                <div class="px-5 py-4 flex items-center gap-3 border-b border-slate-100 bg-slate-50">
-                    <div class="w-1 h-5 bg-slate-900 rounded-full"></div>
-                    <h3 class="font-bold text-slate-900 text-[15px]">Settings</h3>
+            <div class="bg-[#1C211F] rounded-[24px] overflow-hidden mb-6 shadow-sm border border-white/5">
+                <div class="px-5 py-4.5 flex items-center gap-3 border-b border-white/5 bg-[#121615]">
+                    <div class="w-1 h-5 bg-primary rounded-full"></div>
+                    <h3 class="font-bold text-white text-[15px] uppercase tracking-wider">Account (KYC)</h3>
                 </div>
-                <div onclick="window.openSheet('kyc-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-50 border-b border-slate-100 cursor-pointer">
-                    <p class="text-[13px] font-medium text-slate-800">KYC & Bank Details</p>
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                
+                <div class="flex justify-between items-center px-5 py-4 hover:bg-slate-800 border-b border-white/5 cursor-default transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🛡️</span>
+                        <p class="text-[14px] font-medium text-slate-300">Identity Status</p>
+                    </div>
+                    <span id="profile-kyc-status" class="badge-red text-rose-500 bg-rose-500/10 px-3 py-1.5 rounded-full font-extrabold text-[10px] uppercase">PENDING Verification</span>
                 </div>
-                <div class="flex flex-wrap gap-5 px-5 py-5 border-b border-slate-100 justify-center">
-                    <a href="privacy.html" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Privacy</a>
-                    <a href="terms.html" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Terms</a>
-                    <a href="contact.html" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest">Support</a>
-                </div>
-                <div onclick="window.logoutUser()" class="flex justify-between items-center px-5 py-4 hover:bg-red-50 cursor-pointer group">
-                    <p class="text-[13px] font-bold text-red-500">Logout Account</p>
-                    <svg class="w-4 h-4 text-red-300 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                
+                <div onclick="window.openSheet('kyc-sheet')" class="flex justify-between items-center px-5 py-4 hover:bg-slate-800 transition-colors cursor-pointer group">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🏦</span>
+                        <p class="text-[14px] font-medium text-slate-300 group-hover:text-primary">Payout Bank Vector</p>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                 </div>
             </div>
-        </div>
 
+            <div class="bg-[#1C211F] rounded-[24px] overflow-hidden mb-6 shadow-sm border border-white/5">
+                <div class="px-5 py-4.5 flex items-center gap-3 border-b border-white/5 bg-[#121615]">
+                    <div class="w-1 h-5 bg-rose-500 rounded-full"></div>
+                    <h3 class="font-bold text-white text-[15px] uppercase tracking-wider">Securities & Support</h3>
+                </div>
+                
+                <div class="flex flex-col gap-0 border-b border-white/5">
+                    <div onclick="window.location.href='support.html'" class="flex justify-between items-center px-5 py-4.5 hover:bg-slate-800 border-b border-white/5 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">📡</span>
+                            <p class="text-[14px] font-medium text-slate-300">Support Center</p>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-5 px-5 py-5 border-b border-white/5 justify-center bg-[#121615]/50">
+                    <a href="privacy.html" class="text-[10px] font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors">Privacy Operator</a>
+                    <a href="terms.html" class="text-[10px] font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors">Usage Protocol</a>
+                </div>
+                
+                <div onclick="window.logoutUser()" class="flex justify-between items-center px-5 py-4.5 hover:bg-red-950 transition-colors cursor-pointer group">
+                    <p class="text-[14px] font-bold text-rose-500 group-hover:text-rose-400">Terminate Secure Session</p>
+                    <svg class="w-4 h-4 text-red-500 group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </div>
+            </div>
+            
+            <p class="text-[10px] font-bold text-slate-700 text-center tracking-[0.2em]">EARNPROX PRO VECTOR v1.0.01 | SECURE NODE A</p>
+        </div>
     </div>
 
     <div class="fixed bottom-0 left-0 right-0 z-50 w-full max-w-md mx-auto">
-        <nav class="bg-[#121615] flex justify-between items-center px-8 pt-3 pb-4 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] border-t border-white/5">
-            <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-[#00A87A] transition-colors" data-target="home">
+        <nav class="bg-[#121615] flex justify-between items-center px-8 pt-3.5 pb-5 shadow-[0_-8px_30px_rgba(0,0,0,0.3)] border-t border-white/5 rounded-t-[1.5rem]">
+            <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#00A87A]" data-target="home">
                 <svg class="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span class="text-[10px] font-medium tracking-wide">Home</span>
+                <span class="text-[11px] font-medium tracking-wide">Command</span>
             </button>
-            <button onclick="window.switchTab('refer')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="refer">
+            <button onclick="window.switchTab('refer')" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-slate-500 hover:text-slate-300" data-target="refer">
                 <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <span class="text-[10px] font-medium tracking-wide">Refer</span>
+                <span class="text-[11px] font-medium tracking-wide">Network</span>
             </button>
-            <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="wallet">
+            <button onclick="window.switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-slate-500 hover:text-slate-300" data-target="wallet">
                 <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2"></path></svg>
-                <span class="text-[10px] font-medium tracking-wide">Vault</span>
+                <span class="text-[11px] font-medium tracking-wide">Vault</span>
             </button>
-            <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors" data-target="profile">
+            <button onclick="window.switchTab('profile')" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-slate-500 hover:text-slate-300" data-target="profile">
                 <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="text-[10px] font-medium tracking-wide">Profile</span>
+                <span class="text-[11px] font-medium tracking-wide">Protocol</span>
             </button>
         </nav>
     </div>
 
     <div class="fixed inset-0 z-[150] w-full max-w-md mx-auto overflow-hidden pointer-events-none">
-        <div id="withdraw-page" class="absolute inset-0 bg-[#F8FAFC] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col pointer-events-auto">
-            <div class="px-5 py-5 flex items-center justify-between bg-white border-b border-slate-100">
-                <button onclick="window.closeFullPage('withdraw-page')" class="text-slate-800 p-2 bg-slate-50 rounded-full active:scale-90 transition-all">
+        <div id="withdraw-page" class="absolute inset-0 bg-[#0B100E] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col pointer-events-auto">
+            <div class="px-5 py-5 flex items-center justify-between bg-[#1C211F] border-b border-white/5 shadow-lg">
+                <button onclick="window.closeFullPage('withdraw-page')" class="text-white p-2 bg-[#121615] rounded-full active:scale-90 transition-all border border-white/5">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </button>
-                <h3 class="font-black text-[15px] text-slate-800">Secure Payout</h3>
-                <div class="w-9"></div>
+                <h3 class="font-black text-[16px] text-white">Secure Payout Terminal</h3>
+                <div class="w-9 h-9"></div>
             </div>
 
             <div class="flex flex-col items-center mt-10">
-                <div class="w-16 h-16 rounded-[1.25rem] bg-[#0B100E] flex items-center justify-center text-white font-black text-2xl mb-4 shadow-xl">
-                    <span id="withdraw-avatar-text">U</span>
+                <div class="w-20 h-20 rounded-[1.25rem] bg-[#1C211F] border-2 border-primary/20 flex items-center justify-center text-white font-black text-2xl mb-4 shadow-xl">
+                    <span id="withdraw-avatar-text">A</span>
                 </div>
-                <h2 class="text-xl font-black text-slate-900" id="withdraw-display-name">Bank Transfer</h2>
-                <p class="text-xs font-bold text-slate-500 mt-1 bg-slate-100 px-3 py-1 rounded-md" id="withdraw-display-upi">Processing...</p>
+                <h2 class="text-xl font-black text-white" id="withdraw-display-name">Millionaire Operator</h2>
+                <p class="text-xs font-bold text-[#00A87A] mt-1 bg-[#13C296]/10 px-4 py-1.5 rounded-full" id="withdraw-display-upi">Syncing Vector...</p>
             </div>
 
             <div class="flex-1 flex flex-col justify-center items-center px-8 pb-10">
-                <div class="flex items-center justify-center w-full relative mb-8">
-                    <span class="text-4xl font-medium text-slate-300 absolute left-1/2 -translate-x-[calc(50%+70px)]">₹</span>
-                    <input type="number" id="withdraw-amount" placeholder="0" class="w-full text-center text-[70px] font-black text-slate-900 bg-transparent outline-none p-0 hide-arrows" style="max-width: 250px;">
-                </div>
-                <div class="bg-white px-5 py-3 rounded-2xl border border-slate-200 flex items-center gap-3 cursor-pointer active:scale-95 transition-all shadow-sm" onclick="document.getElementById('withdraw-amount').value = Math.floor(window.currentBalance)">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available</span>
-                    <span class="text-sm font-black text-[#00A87A] bg-emerald-50 px-2 py-0.5 rounded-lg" id="withdraw-page-balance">₹0</span>
+                <div class="flex items-center justify-center w-full relative mb-12">
+                    <span class="text-5xl font-extrabold text-primary absolute left-1/2 -translate-x-[calc(50%+100px)] mt-2">₹</span>
+                    <input type="text" id="withdraw-amount" placeholder="1.00 Cr" value="₹1.00 Cr" class="w-full text-center text-[75px] font-extrabold text-white bg-transparent outline-none p-0 hide-arrows tracking-tighter" style="max-width: 320px;" readonly> </div>
+                <div class="bg-[#1C211F] px-6 py-3 rounded-2xl border border-primary/20 flex items-center gap-3 shadow-xl transition-all cursor-not-allowed">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available Payout Vector</span>
+                    <span class="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-lg" id="withdraw-page-balance">₹1.00 Cr</span>
                 </div>
             </div>
 
-            <div class="p-5 w-full mt-auto mb-6 bg-white border-t border-slate-100">
-                <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full bg-[#0B100E] text-white font-bold py-4 rounded-xl shadow-xl text-[15px] active:scale-95 transition-all flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    Confirm Transfer
+            <div class="p-5 w-full mt-auto mb-6 bg-[#1C211F] border-t border-white/5 shadow-2xl rounded-t-[2rem]">
+                <button onclick="window.processWithdrawReal()" id="withdraw-btn" class="w-full gradient-gold text-[#0B100E] font-black py-4 rounded-xl shadow-[0_4px_20px_rgba(255,165,0,0.4)] text-[16px] active:scale-95 transition-all flex items-center justify-center gap-2.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Confirm Secure Payout
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="universal-overlay" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 w-full max-w-md mx-auto" onclick="window.closeAllSheets()"></div>
+    <div id="universal-overlay" class="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 w-full max-w-md mx-auto" onclick="window.closeAllSheets()"></div>
 
-    <div id="notification-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] h-[75vh] max-w-md mx-auto">
-        <div class="flex justify-between items-center p-6 pb-4 border-b border-slate-100 relative">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-900 mt-2">Alerts</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="notification-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-[#121615] w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] h-[75vh] max-w-md mx-auto border-t border-white/5">
+        <div class="flex justify-between items-center p-6 pb-4 border-b border-white/5 bg-[#121615] rounded-t-[2.5rem] relative">
+            <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
+            <h3 class="font-black text-xl text-white mt-2">Protocol Alerts</h3>
+            <button onclick="window.closeAllSheets()" class="bg-[#1C211F] text-slate-400 p-2 rounded-full mt-2 transition-all border border-white/5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         <div class="p-6 overflow-y-auto" id="notification-container">
-            <p class="text-slate-400 font-bold text-center py-10 text-sm">Fetching Alerts...</p>
+            <p class="text-slate-500 font-bold text-center py-10 text-sm">Fetching Network Signals...</p>
         </div>
     </div>
 
-    <div id="kyc-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-[#F8FAFC] w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] max-w-md mx-auto">
-        <div class="flex justify-between items-center p-6 pb-4 bg-white rounded-t-[2.5rem] border-b border-slate-100 relative">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-900 mt-2">Payout Bank</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="kyc-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-[#0B100E] w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] max-w-md mx-auto border-t border-white/5">
+        <div class="flex justify-between items-center p-6 pb-4 bg-[#121615] rounded-t-[2.5rem] border-b border-white/5 relative">
+            <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
+            <h3 class="font-black text-xl text-white mt-2">Bank Vector Lock</h3>
+            <button onclick="window.closeAllSheets()" class="bg-[#1C211F] text-slate-400 p-2 rounded-full mt-2 transition-all border border-white/5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-        <div class="p-6 overflow-y-auto">
-            <div class="bg-white p-5 rounded-[20px] shadow-sm border border-slate-100">
-                <div class="mb-4">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Account Name</label>
-                    <input type="text" id="bank-name-input" placeholder="e.g. Akash Kumar" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3.5 outline-none focus:border-[#00A87A] transition-all">
+        <div class="p-6 overflow-y-auto bg-[#0B100E]">
+            <div class="bg-[#1C211F] p-6 rounded-[24px] shadow-sm border border-white/5">
+                <div class="mb-5">
+                    <label class="block text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5 px-1">Account Holder Identity</label>
+                    <input type="text" id="bank-name-input" placeholder="KISHOR KUMAR (Like Image 1)" class="w-full bg-[#121615] border border-white/5 text-white text-sm font-black rounded-xl px-5 py-4 outline-none focus:border-primary transition-all">
                 </div>
                 <div class="mb-1">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">UPI ID</label>
-                    <input type="text" id="upi-input-box" placeholder="e.g. 9876543210@ybl" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3.5 outline-none focus:border-[#00A87A] transition-all">
+                    <label class="block text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5 px-1">Deep UPI Vector</label>
+                    <input type="text" id="upi-input-box" placeholder="e.g. million@ybl" class="w-full bg-[#121615] border border-white/5 text-white text-sm font-black rounded-xl px-5 py-4 outline-none focus:border-primary transition-all">
                 </div>
             </div>
         </div>
-        <div class="p-5 bg-white border-t border-slate-100">
-            <button onclick="window.saveRealKYC()" class="w-full bg-[#0B100E] text-white font-black py-4 rounded-xl text-[14px] active:scale-95 transition-all">Lock Details Securely</button>
+        <div class="p-5 bg-[#121615] border-t border-white/5 rounded-t-[2rem]">
+            <button onclick="window.saveRealKYC()" class="w-full gradient-mining text-white font-black py-4 rounded-xl text-[15px] active:scale-95 transition-all shadow-lg">Lock Payout Vector Securely</button>
         </div>
     </div>
 
-    <div id="history-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-white w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] h-[80vh] max-w-md mx-auto">
-        <div class="flex justify-between items-center p-6 pb-4 border-b border-slate-100 relative">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
-            <h3 class="font-black text-xl text-slate-900 mt-2">Passbook</h3>
-            <button onclick="window.closeAllSheets()" class="bg-slate-50 hover:bg-slate-100 text-slate-500 p-2 rounded-full mt-2 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="history-sheet" class="fixed bottom-0 left-0 right-0 z-[101] bg-[#121615] w-full rounded-t-[2.5rem] transform translate-y-full transition-transform duration-300 ease-out shadow-2xl flex flex-col max-h-[90vh] h-[80vh] max-w-md mx-auto border-t border-white/5">
+        <div class="flex justify-between items-center p-6 pb-4 bg-[#121615] rounded-t-[2.5rem] border-b border-white/5 relative">
+            <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto absolute left-0 right-0 top-3"></div>
+            <h3 class="font-black text-xl text-white mt-2">Node Passbook 1.0</h3>
+            <button onclick="window.closeAllSheets()" class="bg-[#1C211F] text-slate-400 p-2 rounded-full mt-2 transition-all border border-white/5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         <div class="p-6 overflow-y-auto space-y-3" id="history-container">
             <div class="text-4xl mb-3 text-center mt-10">🏦</div>
-            <p class="text-slate-400 font-bold text-center text-sm">Loading Records...</p>
+            <p class="text-slate-500 font-bold text-center text-sm">Syncing Protocol Logs...</p>
         </div>
     </div>
 
-    <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center transition-all duration-500 w-full max-w-md mx-auto">
+    <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#0B100E] flex flex-col items-center justify-center w-full max-w-md mx-auto transition-opacity duration-500">
         <div class="relative flex flex-col items-center">
-            <div class="absolute inset-0 bg-slate-900 rounded-full blur-[40px] opacity-10 animate-pulse"></div>
-            <div class="relative w-48 h-16 mx-auto overflow-hidden z-10 mb-3 animate-[pulse_2s_ease-in-out_infinite]">
-                <img src="logo.png" alt="EarnproX Logo" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[250%] max-w-none">
+            <div class="relative w-48 h-16 mx-auto overflow-hidden z-10 mb-4 animate-[pulse_2s_ease-in-out_infinite]">
+                <img src="logo.png" alt="EarnproX Logo" class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 h-[280%] max-w-none">
             </div>
-            <div class="w-32 h-1 bg-slate-200 rounded-full overflow-hidden relative z-10">
-                <div class="w-1/2 h-full bg-[#00A87A] rounded-full animate-[slide_1.5s_ease-in-out_infinite_alternate]"></div>
+            <div class="w-32 h-1.5 bg-[#1C211F] rounded-full overflow-hidden relative z-10 border border-white/5">
+                <div class="w-1/2 h-full bg-primary rounded-full animate-[slide_1.5s_ease-in-out_infinite_alternate]"></div>
             </div>
-            <p class="text-[9px] font-black text-slate-400 tracking-[0.2em] mt-3 relative z-10 uppercase">Authenticating...</p>
+            <p class="text-[10px] font-black text-slate-500 tracking-[0.3em] mt-3.5 relative z-10 uppercase">Secure Node Authentication...</p>
         </div>
     </div>
 
-    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[90px] -translate-x-1/2 bg-[#0B100E] text-white font-bold text-[13px] px-5 py-2.5 rounded-full shadow-2xl opacity-0 invisible transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">Message Here</div>
+    <div id="toast" class="fixed z-[1000] left-1/2 bottom-[90px] -translate-x-1/2 gradient-mining text-white font-extrabold text-[13px] px-6 py-3 rounded-full shadow-xl opacity-0 invisible transition-all duration-300 transform translate-y-4 w-max whitespace-nowrap">Vector Pega Successful! 🚀</div>
 
     <script src="dashboard.js"></script>
 
@@ -424,45 +515,76 @@
         setInterval(() => {
             const bigBal = document.getElementById('home-card-big-balance');
             const topBal = document.getElementById('home-top-balance');
-            if(bigBal && topBal && topBal.innerText !== '₹0.00') {
-                bigBal.innerText = topBal.innerText.replace('₹', '').trim();
+            // Mock dynamic balance mapping for Millionaire feel
+            if(topBal && topBal.innerText === '₹0.00' && bigBal && bigBal.innerText !== '1.00 Cr') {
+                bigBal.innerText = "1.00 Cr"; 
+                document.getElementById('home-top-balance').innerText = "₹1.00 Cr";
+                document.getElementById('main-balance-display').innerText = "₹1.00 Cr";
+            } else if(topBal && bigBal && topBal.innerText !== '₹0.00') {
+                 bigBal.innerText = topBal.innerText.replace('₹', '').trim();
+                 document.getElementById('main-balance-display').innerText = topBal.innerText;
             }
             
-            // Dynamic Profile Initial
+            // Dynamic Profile Initials
             const userNameEl = document.getElementById('home-card-user-name');
             const profileInitialEl = document.getElementById('top-nav-profile-initial');
-            if (userNameEl && userNameEl.innerText && profileInitialEl) {
+            const withdrawInitialEl = document.getElementById('withdraw-avatar-text');
+            if (userNameEl && userNameEl.innerText) {
                 const name = userNameEl.innerText.trim();
                 if (name.length > 0) {
-                    profileInitialEl.innerText = name.charAt(0).toUpperCase();
+                    const init = name.charAt(0).toUpperCase();
+                    if(profileInitialEl) profileInitialEl.innerText = init;
+                    if(withdrawInitialEl) withdrawInitialEl.innerText = init;
                 }
             }
+            
+            // Sync Impersonated Name from Admin Panel if present
+            const adminPageName = document.getElementById('profile-user-name');
+            const impersonatedName = sessionStorage.getItem("earneprox_impersonate_name");
+            if(adminPageName && impersonatedName && adminPageName.innerText !== impersonatedName) {
+                adminPageName.innerText = impersonatedName.toUpperCase();
+                document.getElementById('withdraw-display-name').innerText = impersonatedName + " Operator";
+                document.getElementById('refer-page-name').innerText = impersonatedName + " Operator";
+            }
+            
+            // Mask Phone number for Profile section like Image 1
+            const profilePhoneEl = document.getElementById('profile-user-phone');
+            const realPhone = localStorage.getItem("earnprox_user_phone");
+            if(realPhone && profilePhoneEl && realPhone.length >= 10 && profilePhoneEl.innerText.includes('****')) {
+                 const masked = realPhone.substring(0, 4) + '****' + realPhone.substring(8);
+                 profilePhoneEl.innerText = '+91 ' + masked;
+            }
 
-            // Sync stats for the new 3 columns in the home card
+            // Sync stats
             const statWithdraw = document.getElementById('stat-total-withdraw');
             const homeWithdraw = document.getElementById('home-card-withdrawn');
-            if(statWithdraw && homeWithdraw) {
-                homeWithdraw.innerText = statWithdraw.innerText;
-            }
+            if(statWithdraw && homeWithdraw) homeWithdraw.innerText = statWithdraw.innerText;
 
             const statTeam = document.getElementById('total-refers-count');
             const homeTeam = document.getElementById('home-card-team-size');
-            if(statTeam && homeTeam) {
-                homeTeam.innerText = statTeam.innerText;
+            if(statTeam && homeTeam) homeTeam.innerText = statTeam.innerText;
+
+            // Sync dynamic level counts (Mocks updated here for 'Millionaire feel' until real data)
+            const level2Hidden = document.getElementById('ref-level2-count-hidden');
+            const level2Display = document.getElementById('ref-level2-count');
+            if(level2Hidden && level2Display && level2Hidden.innerText === '0' && level2Display.innerText !== '4.77 L') {
+                level2Display.innerText = "4.77 L";
+                level2Display.classList.remove('opacity-50');
+                level2Display.classList.add('text-primary');
+            }
+            
+            const level3Hidden = document.getElementById('ref-level3-count-hidden');
+            const level3Display = document.getElementById('ref-level3-count');
+            if(level3Hidden && level3Display && level3Hidden.innerText === '0' && level3Display.innerText !== '9.17 L') {
+                level3Display.innerText = "9.17 L";
+                level3Display.classList.remove('opacity-50');
+                level3Display.classList.add('text-primary');
             }
 
             const statCode = document.getElementById('referral-code-text');
             const homeCode = document.getElementById('home-card-refer-code');
-            if(statCode && homeCode && statCode.innerText !== 'CODE') {
-                homeCode.innerText = statCode.innerText;
-            }
+            if(statCode && homeCode && statCode.innerText !== 'CODE') homeCode.innerText = statCode.innerText;
             
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.classList.contains('text-[#00A87A]')) {
-                    btn.classList.remove('text-[#00A87A]');
-                    btn.classList.add('text-[#00A87A]');
-                }
-            });
         }, 500);
     </script>
 </body>
