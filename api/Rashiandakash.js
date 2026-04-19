@@ -212,9 +212,19 @@ module.exports = async function handler(req, res) {
                 const cashToAdd = currentCoins / 1000;
                 const coinsToDeduct = currentCoins;
 
+                // 1. Update User Balance
                 await db.collection('users').doc(uId).update({
                     coinBalance: admin.firestore.FieldValue.increment(-coinsToDeduct),
                     balance: admin.firestore.FieldValue.increment(cashToAdd)
+                });
+
+                // 🔥 2. NEW: Passbook me show karne ke liye record save karna
+                await db.collection('task_submissions').add({
+                    userPhone: userPhone,
+                    gigName: "Coins Converted ⛏️",
+                    gigReward: cashToAdd,
+                    status: "Completed",
+                    timestamp: new Date()
                 });
 
                 return res.status(200).json({success: true, added: cashToAdd});
