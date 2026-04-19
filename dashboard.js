@@ -35,9 +35,9 @@ window.switchTab = (id) => {
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
         if(btn.dataset.target === id) {
-            btn.classList.remove('text-slate-400'); btn.classList.add('text-pink-600');
+            btn.classList.remove('text-slate-400'); btn.classList.add('text-[#00A87A]'); // Updated to EarnproX Green
         } else {
-            btn.classList.add('text-slate-400'); btn.classList.remove('text-pink-600');
+            btn.classList.add('text-slate-400'); btn.classList.remove('text-[#00A87A]');
         }
     });
 };
@@ -241,3 +241,75 @@ window.processWithdrawReal = async function() {
         }
     } 
 }
+
+// ================= 5. TRANSACTION HISTORY (NEW) =================
+window.loadTransactionHistory = async function() {
+    const container = document.getElementById('history-container');
+    
+    // Show Loading State
+    container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-10">
+            <svg class="animate-spin h-8 w-8 text-[#00A87A] mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p class="text-slate-400 font-bold text-sm">Fetching passbook...</p>
+        </div>
+    `;
+
+    try {
+        // Fetch data from Vercel Backend
+        const response = await fetch('/api/get-history', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: userPhone, token: userToken })
+        });
+
+        const data = await response.json();
+
+        // Render Data
+        if (response.ok && data.transactions && data.transactions.length > 0) {
+            container.innerHTML = ''; // Clear loading spinner
+            
+            data.transactions.forEach(txn => {
+                const isWithdrawal = txn.type === 'Withdrawal';
+                const colorClass = isWithdrawal ? 'text-rose-500' : 'text-[#00A87A]';
+                const sign = isWithdrawal ? '-' : '+';
+                const icon = isWithdrawal ? '📤' : '🎯';
+                const statusColor = txn.status === 'Completed' ? 'text-[#00A87A]' : (txn.status === 'Rejected' ? 'text-rose-500' : 'text-amber-500');
+
+                // Create Transaction Row
+                container.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-100 rounded-[16px] p-4 flex justify-between items-center hover:bg-slate-100 transition-colors mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-lg shadow-sm">
+                                ${icon}
+                            </div>
+                            <div>
+                                <p class="text-[13px] font-bold text-slate-800 leading-tight mb-0.5">${txn.title}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                                    ${txn.date} • <span class="${statusColor}">${txn.status}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[15px] font-black ${colorClass}">${sign}₹${parseFloat(txn.amount).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            // No transactions found
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12">
+                    <div class="text-5xl mb-3">📭</div>
+                    <p class="text-slate-400 font-bold text-sm">No transactions yet.</p>
+                    <p class="text-slate-400 text-xs mt-1">Complete tasks to see history here.</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10">
+                <p class="text-rose-500 font-bold text-sm">❌ Failed to load history.</p>
+            </div>
+        `;
+    }
+};
