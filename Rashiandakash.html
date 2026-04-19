@@ -11,18 +11,18 @@
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }, colors: { primary: '#4680FF', bglight: '#F4F7FA', textdark: '#1D2630', textgray: '#5B6B79' } } } }
     </script>
     <style>
-        body { background-color: #F4F7FA; color: #1D2630; padding-bottom: 80px; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
-        @media (min-width: 768px) { body { padding-bottom: 0; padding-left: 260px; } }
+        body { background-color: #F4F7FA; color: #1D2630; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+        @media (min-width: 768px) { body { padding-left: 260px; } }
+        @media (max-width: 767px) { body { padding-top: 64px; padding-bottom: 30px; } } /* Space for mobile top bar */
         
-        /* Light Theme Cards (Phoenixcoded Style) */
+        /* Light Theme Cards */
         .light-card { background: #FFFFFF; box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.03); border-radius: 16px; border: 1px solid #F3F5F7; overflow: hidden; position: relative; }
         .card-wave { position: absolute; right: 0; top: 0; height: 100%; opacity: 0.4; pointer-events: none; }
         
         /* Navigation Sidebar */
-        .sidebar { background: #FFFFFF; border-right: 1px solid #E5E7EB; box-shadow: 4px 0 24px rgba(0,0,0,0.01); }
+        .sidebar { background: #FFFFFF; box-shadow: 4px 0 24px rgba(0,0,0,0.05); }
         .nav-btn { color: #5B6B79; display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
         .nav-active { background: #E8F0FE; color: #4680FF !important; font-weight: 700; border-right: 3px solid #4680FF; border-radius: 8px 0 0 8px; }
-        @media (max-width: 767px) { .nav-active { background: #E8F0FE; border-right: none; border-top: 3px solid #4680FF; border-radius: 8px; } }
         
         /* Smooth View Transitions */
         .view-section { display: none; opacity: 0; transform: translateY(10px); }
@@ -40,7 +40,7 @@
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
         
-        /* Badge */
+        /* Badges */
         .badge-green { background: #E6F4EA; color: #13C296; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-red { background: #FCEAEA; color: #DC2626; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
     </style>
@@ -54,19 +54,38 @@
             </div>
             <h2 class="text-2xl font-black text-textdark mb-2">Admin Portal</h2>
             <p class="text-textgray text-xs font-semibold mb-8">Sign in to manage EarnproX</p>
-            <input type="password" id="admin-pass" placeholder="Enter Master PIN" class="w-full bg-[#F8FAFC] p-4 rounded-xl mb-6 outline-none border border-slate-200 focus:border-primary font-bold text-center text-textdark transition">
+            <input type="password" id="admin-pass" placeholder="Enter Master PIN" class="w-full bg-[#F8FAFC] p-4 rounded-xl mb-6 outline-none border border-slate-200 focus:border-primary font-bold text-center text-textdark transition tracking-widest">
             <button onclick="window.doLogin(this)" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Secure Login</button>
         </div>
     </div>
 
     <div id="admin-app">
-        <aside class="sidebar fixed left-0 top-0 bottom-0 w-[260px] hidden md:flex flex-col z-50">
-            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black text-lg">E</div>
-                <h1 class="text-2xl font-black text-textdark">EarnproX<span class="text-primary text-sm align-top ml-1">PRO</span></h1>
+        
+        <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <div class="flex items-center gap-3">
+                <button onclick="window.toggleSidebar()" class="p-2 -ml-2 text-slate-600 rounded-lg hover:bg-slate-100 transition active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div class="font-black text-xl text-textdark flex items-center">
+                    EarnproX<span class="bg-blue-100 text-primary px-1.5 py-0.5 rounded text-[9px] font-black ml-1.5">PRO</span>
+                </div>
             </div>
-            <div class="px-6 py-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Dashboard</p>
+            <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 text-primary font-bold flex items-center justify-center text-sm shadow-sm">A</div>
+        </div>
+
+        <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[90] hidden md:hidden transition-opacity"></div>
+
+        <aside id="main-sidebar" class="sidebar fixed inset-y-0 left-0 w-[260px] flex flex-col z-[100] transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black text-lg shadow-md">E</div>
+                    <h1 class="text-xl font-black text-textdark">EarnproX</h1>
+                </div>
+                <button onclick="window.toggleSidebar()" class="md:hidden p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="px-6 py-4 overflow-y-auto hide-scrollbar flex-1">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 mt-2">Dashboard</p>
                 <nav class="flex flex-col gap-1">
                     <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg> Analytics</button>
                     <button onclick="window.switchView('users', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Manage Users</button>
@@ -89,40 +108,23 @@
             </div>
         </aside>
 
-        <div class="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-white border-t border-slate-200">
-            <nav class="flex justify-around p-2 shadow-lg overflow-x-auto hide-scrollbar">
-                <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn nav-active"><span class="text-xl">📊</span><span class="text-[9px] font-black mt-1">Dash</span></button>
-                <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-xl">👥</span><span class="text-[9px] font-black mt-1">Users</span></button>
-                <button onclick="window.switchView('payouts', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-xl">💸</span><span class="text-[9px] font-black mt-1">Pays</span></button>
-                <button onclick="window.switchView('gigs', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-xl">🚀</span><span class="text-[9px] font-black mt-1">Gigs</span></button>
-                <button onclick="window.switchView('settings', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-xl">⚙️</span><span class="text-[9px] font-black mt-1">Config</span></button>
-            </nav>
-        </div>
-
-        <main class="p-5 md:p-8 max-w-7xl mx-auto pt-6 md:pt-8">
+        <main class="p-5 md:p-8 max-w-7xl mx-auto md:pt-8">
             
-            <div class="flex justify-between items-center mb-8">
+            <div class="hidden md:flex justify-between items-center mb-8">
                 <div>
                     <div class="text-[11px] font-semibold text-textgray mb-1 flex items-center gap-2">Home <span class="text-slate-300">/</span> Dashboard</div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-textdark tracking-tight">Main Dashboard</h2>
+                    <h2 class="text-3xl font-extrabold text-textdark tracking-tight">Main Dashboard</h2>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="window.doLogout()" class="md:hidden text-rose-500 bg-rose-50 p-2.5 rounded-lg text-xs font-bold border border-rose-100">Logout</button>
-                    <div class="hidden md:flex w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm items-center justify-center font-bold text-slate-600">A</div>
-                </div>
+                <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center font-bold text-slate-600">A</div>
             </div>
 
             <section id="view-dash" class="view-section active">
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="light-card p-6 flex justify-between items-center">
                         <svg class="card-wave" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="#13C296" fill-opacity="0.1" d="M0,50 C50,100 150,0 200,50 L200,100 L0,100 Z"></path></svg>
                         <div class="relative z-10">
                             <p class="text-xs font-semibold text-textgray mb-1">Total Distributed</p>
-                            <div class="flex items-end gap-3">
-                                <h3 id="stat-total-paid" class="text-3xl font-extrabold text-textdark">₹0</h3>
-                                <span class="badge-green">✔ Lifetime</span>
-                            </div>
+                            <div class="flex items-end gap-3"><h3 id="stat-total-paid" class="text-3xl font-extrabold text-textdark">₹0</h3><span class="badge-green">✔ Lifetime</span></div>
                         </div>
                         <div class="w-12 h-12 bg-[#E6F4EA] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">💰</span></div>
                     </div>
@@ -130,20 +132,14 @@
                         <svg class="card-wave" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="#4680FF" fill-opacity="0.1" d="M0,50 C50,100 150,0 200,50 L200,100 L0,100 Z"></path></svg>
                         <div class="relative z-10">
                             <p class="text-xs font-semibold text-textgray mb-1">Today's Pay Run</p>
-                            <div class="flex items-end gap-3">
-                                <h3 id="stat-today-paid" class="text-3xl font-extrabold text-textdark">₹0</h3>
-                                <span class="badge-green">Live</span>
-                            </div>
+                            <div class="flex items-end gap-3"><h3 id="stat-today-paid" class="text-3xl font-extrabold text-textdark">₹0</h3><span class="badge-green">Live</span></div>
                         </div>
                         <div class="w-12 h-12 bg-[#E8F0FE] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">💳</span></div>
                     </div>
                     <div class="light-card p-6 flex justify-between items-center">
                         <div class="relative z-10">
                             <p class="text-xs font-semibold text-textgray mb-1">Pending Liabilities</p>
-                            <div class="flex items-end gap-3">
-                                <h3 id="stat-pending-pay" class="text-3xl font-extrabold text-textdark">₹0</h3>
-                                <span class="badge-red">To Pay</span>
-                            </div>
+                            <div class="flex items-end gap-3"><h3 id="stat-pending-pay" class="text-3xl font-extrabold text-textdark">₹0</h3><span class="badge-red">To Pay</span></div>
                         </div>
                         <div class="w-12 h-12 bg-[#FCEAEA] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">⏳</span></div>
                     </div>
@@ -158,9 +154,7 @@
                 
                 <div class="light-card p-6 mb-8">
                     <h3 class="text-sm font-bold text-textdark mb-4">Traffic & Activity Overview</h3>
-                    <div class="w-full h-[250px]">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
+                    <div class="w-full h-[250px]"><canvas id="revenueChart"></canvas></div>
                 </div>
             </section>
 
@@ -243,9 +237,10 @@
                 <h2 class="text-2xl font-extrabold text-textdark mb-6">System Settings</h2>
                 
                 <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl border-l-4 border-l-primary mb-6">
-                    <h3 class="font-bold text-lg text-textdark pb-2">🔐 Change Master PIN</h3>
+                    <h3 class="font-bold text-lg text-textdark pb-2">🔐 Change Master PIN (Full Control)</h3>
+                    <p class="text-xs font-semibold text-textgray mb-2">Update your Admin Password. It gets encrypted instantly and saved safely.</p>
                     <input type="password" id="new-admin-pass" placeholder="Enter New PIN" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark text-center tracking-widest">
-                    <button onclick="window.updateAdminPassword(this)" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl active:scale-95 transition">Update Password</button>
+                    <button onclick="window.updateAdminPassword(this)" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl active:scale-95 transition">Update Password Securely</button>
                 </div>
 
                 <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl mb-6">
@@ -282,7 +277,7 @@
                 <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Wallet Balance</label><input type="number" id="edit-bal" min="0" class="w-full bg-[#E8F0FE] p-3 rounded-xl border border-primary text-primary font-black text-lg outline-none"></div>
             </div>
             <div class="flex gap-2">
-                <button onclick="window.saveUserData(this)" class="flex-1 bg-[#13C296] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl active:scale-95 transition">Save Changes</button>
+                <button onclick="window.saveUserData(this)" class="flex-1 bg-[#13C296] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl active:scale-95 transition">Save</button>
                 <button onclick="document.getElementById('modal-edit').classList.remove('active'); document.getElementById('modal-edit').style.display='none';" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition">Cancel</button>
             </div>
         </div>
@@ -290,7 +285,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, doc, query, where, onSnapshot, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDoc, query, where, onSnapshot, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
@@ -303,7 +298,8 @@
         const app = initializeApp(firebaseConfig); 
         const db = getFirestore(app);
 
-        const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; 
+        const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; // Backend needs this to accept changes
+        let DB_HASH = null; // Will fetch from DB dynamically
 
         let globalUsersData = {}; let globalTasksData = {}; let globalWithdrawData = {}; let activeUserId = "";
         let currentTrustImages = []; 
@@ -314,6 +310,13 @@
         const maskPhone = (phone) => phone && phone.length >= 10 ? phone.substring(0,2) + '****' + phone.substring(8) : 'N/A';
         const maskUpi = (upi) => { if(!upi || upi=='None') return 'NULL'; const pts = upi.split('@'); return pts[0].length > 2 ? pts[0].substring(0,2) + '***@' + (pts[1]||'') : upi; };
 
+        // 🔐 Hashing Function (Creates secure code from PIN)
+        async function hashString(str) {
+            const msgBuffer = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         async function callAdminApi(actionName, payloadData, btnElement) {
             const ogText = btnElement ? btnElement.innerText : "";
             if(btnElement) { btnElement.innerText = "⏳"; btnElement.disabled = true; }
@@ -322,7 +325,7 @@
                 const data = await response.json();
                 if (response.ok && data.success) return true; 
                 else { alert("❌ Request Failed: " + (data.error || "Unknown")); return false; }
-            } catch (error) { alert("❌ Net-Link Severed!"); return false; } 
+            } catch (error) { alert("❌ Server connection lost!"); return false; } 
             finally { if(btnElement) { btnElement.innerText = ogText; setTimeout(() => btnElement.disabled = false, 1500); } }
         }
 
@@ -336,24 +339,47 @@
             });
         }
 
-        // 🔐 SECURE LOGIN (HARDCODED AS REQUESTED)
-        window.doLogin = (btn) => { 
-            const pass = document.getElementById('admin-pass').value;
-            btn.innerText = "Checking..."; btn.disabled = true;
+        // 🔥 DYNAMIC LOGIN LOGIC (Fetches from DB and Compares Hash)
+        window.doLogin = async (btn) => { 
+            const pass = document.getElementById('admin-pass').value.trim();
+            if(!pass) return alert("Enter PIN first.");
+            btn.innerText = "Verifying..."; btn.disabled = true;
             
-            // 🔥 DEFAULT PASSWORD SET TO: Akash@2026
-            if (pass === "Akash@2026") { 
-                sessionStorage.setItem("secure_master_session", "verified_god_mode"); 
-                document.body.classList.add('authenticated'); 
-                window.startServerSync(); 
-            } else { 
-                alert("❌ Incorrect Password."); 
+            try {
+                // Fetch Master Config directly to get the latest Hash
+                const docSnap = await getDoc(doc(db, "app_settings", "master_config"));
+                if (docSnap.exists() && docSnap.data().adminHash) {
+                    DB_HASH = docSnap.data().adminHash;
+                }
+
+                const inputHash = await hashString(pass);
+
+                // If DB has Hash, check it. If DB is empty (first run), check fallback "Akash@2026"
+                if ((DB_HASH && inputHash === DB_HASH) || (!DB_HASH && pass === "Akash@2026")) { 
+                    sessionStorage.setItem("secure_master_session", "verified"); 
+                    document.body.classList.add('authenticated'); 
+                    window.startServerSync(); 
+                } else { 
+                    alert("❌ Incorrect Password."); 
+                    btn.innerText = "Secure Login"; 
+                    btn.disabled = false;
+                } 
+            } catch (error) {
+                alert("❌ Database Connection Failed.");
                 btn.innerText = "Secure Login"; 
                 btn.disabled = false;
-            } 
+            }
         };
 
         window.doLogout = () => { sessionStorage.removeItem("secure_master_session"); location.reload(); };
+
+        // 📱 Hamburger Menu Toggle
+        window.toggleSidebar = () => {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        };
 
         window.switchView = (id, btn) => { 
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); 
@@ -362,6 +388,11 @@
             document.getElementById('view-' + id).classList.add('active'); 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if(id === 'dash') initChart();
+            
+            // Auto close sidebar on mobile after clicking
+            if(window.innerWidth < 768) {
+                window.toggleSidebar();
+            }
         };
 
         window.searchItems = (inputId, listId, itemClass) => {
@@ -388,19 +419,17 @@
                 });
             }
             const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `EarnproX_${type}.csv`);
+            const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", `EarnproX_${type}.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
 
-        // 🔥 IMPERSONATION FUNCTION: LOGIN AS ANY USER
+        // 🔥 LOGIN AS USER (Impersonation)
         window.loginAsUser = (phone, token) => {
             if(!token) return alert("❌ User has not generated a session token yet.");
             if(confirm(`Login directly to ${phone}'s account?`)) {
                 localStorage.setItem("earnprox_user_phone", phone);
                 sessionStorage.setItem("earnprox_secure_token", token);
-                window.open('dashboard.html', '_blank'); // Opens the user dashboard
+                window.open('dashboard.html', '_blank'); 
             }
         };
 
@@ -410,6 +439,7 @@
             onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
+                    if(data.adminHash) DB_HASH = data.adminHash; // Keep hash updated
                     if(data.bannerUrl) { document.getElementById('banner-url-input').value = data.bannerUrl; document.getElementById('banner-preview').src = data.bannerUrl; }
                     if(data.trustImages) { currentTrustImages = data.trustImages; window.renderTrustImages(); }
                 }
@@ -423,7 +453,6 @@
                     if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
                     const isB = u.status === 'blocked';
                     
-                    // User Row (With Login As Button)
                     html += `
                     <div class="user-item light-card p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isB ? 'opacity-50 grayscale bg-slate-50' : ''}">
                         <div class="flex items-center gap-4">
@@ -437,7 +466,6 @@
                             <p class="font-black text-primary text-xl">₹${parseFloat(u.balance || 0).toFixed(2)}</p>
                             <div class="flex gap-2">
                                 <button onclick="window.loginAsUser('${u.phone}', '${u.sessionToken}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[10px] font-bold px-3 py-2 rounded-lg transition" title="Login as this user">LOGIN AS 🔑</button>
-                                
                                 <button onclick="window.openEditModal('${d.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold px-3 py-2 rounded-lg transition">EDIT</button>
                                 <button onclick="window.toggleBlockUser('${d.id}', '${u.status}', this)" class="${isB?'bg-[#E6F4EA] text-[#13C296]':'bg-[#FCEAEA] text-[#DC2626]'} text-[10px] font-bold px-3 py-2 rounded-lg transition">${isB?'UNBAN':'BAN'}</button>
                             </div>
@@ -532,7 +560,30 @@
             container.innerHTML = html;
         }
 
-        window.updateAdminPassword = async (btn) => { alert("This feature is disabled for Hardcoded Login Mode."); }
+        // 🔥 FULLY DYNAMIC PASSWORD CONTROL
+        window.updateAdminPassword = async (btn) => {
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+            if(newPass.length < 4) return alert("⚠️ PIN must be at least 4 characters long.");
+            
+            const ogText = btn.innerText; btn.innerText = "Encrypting..."; btn.disabled = true;
+            try {
+                // 1. Password ko Hash me convert karo (Taki koi plain text me padh na sake)
+                const hashHex = await hashString(newPass);
+                
+                // 2. Firebase me save kar do
+                await setDoc(doc(db, "app_settings", "master_config"), { adminHash: hashHex }, { merge: true });
+                
+                alert("✅ Password Successfully Changed! Your new PIN is active.");
+                document.getElementById('new-admin-pass').value = "";
+                DB_HASH = hashHex; // Local update
+            } catch (e) {
+                console.error(e);
+                alert("❌ Could not save password. Check Firebase rules.");
+            } finally {
+                btn.innerText = ogText; btn.disabled = false;
+            }
+        };
+
         window.updateAppBanner = async (btn) => { const url = document.getElementById('banner-url-input').value.trim(); if(url) await callAdminApi('update_banner', { url }, btn); };
         window.addTrustImage = async (btn) => { const url = document.getElementById('trust-url-input').value.trim(); if(url) { const arr = [...currentTrustImages, url]; await callAdminApi('update_trust_images', { images: arr }, btn); document.getElementById('trust-url-input').value = ""; } };
         window.deleteTrustImage = async (i, btn) => { if(confirm("Remove image?")) { const arr = [...currentTrustImages]; arr.splice(i, 1); btn.innerText = "⏳"; await callAdminApi('update_trust_images', { images: arr }, null); } };
@@ -557,7 +608,7 @@
         window.deleteDeal = async (id, btn) => { if(confirm("Delete Deal?")) await callAdminApi('delete_deal', { dealId: id }, btn); };
 
         const savedSession = sessionStorage.getItem("secure_master_session");
-        if(savedSession === "verified_god_mode") {
+        if(savedSession === "verified") {
             document.body.classList.add('authenticated'); 
             window.startServerSync();
         }
