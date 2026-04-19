@@ -1,83 +1,96 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EarnproX | God Mode Admin</title>
+    <title>EarnproX | Master Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] } } } }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }, colors: { primary: '#4680FF', bglight: '#F4F7FA', textdark: '#1D2630', textgray: '#5B6B79' } } } }
     </script>
     <style>
-        body { background-color: #0F172A; color: #F8FAFC; padding-bottom: 80px; overflow-x: hidden; }
-        @media (min-width: 768px) { body { padding-bottom: 0; padding-left: 280px; } }
+        body { background-color: #F4F7FA; color: #1D2630; padding-bottom: 80px; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+        @media (min-width: 768px) { body { padding-bottom: 0; padding-left: 260px; } }
         
-        /* Glassmorphism & Cyberpunk Effects */
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .neon-shadow { box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
-        .neon-text { text-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
+        /* Light Theme Cards (Phoenixcoded Style) */
+        .light-card { background: #FFFFFF; box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.03); border-radius: 16px; border: 1px solid #F3F5F7; overflow: hidden; position: relative; }
+        .card-wave { position: absolute; right: 0; top: 0; height: 100%; opacity: 0.4; pointer-events: none; }
         
-        /* Navigation */
-        .nav-active { background: linear-gradient(90deg, rgba(99,102,241,0.2) 0%, transparent 100%); color: #818CF8 !important; border-left: 4px solid #818CF8; border-radius: 0 12px 12px 0; }
-        @media (max-width: 767px) { .nav-active { background: rgba(99,102,241,0.1); border-left: none; border-top: 3px solid #818CF8; border-radius: 12px; } }
+        /* Navigation Sidebar */
+        .sidebar { background: #FFFFFF; border-right: 1px solid #E5E7EB; box-shadow: 4px 0 24px rgba(0,0,0,0.01); }
+        .nav-btn { color: #5B6B79; display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+        .nav-active { background: #E8F0FE; color: #4680FF !important; font-weight: 700; border-right: 3px solid #4680FF; border-radius: 8px 0 0 8px; }
+        @media (max-width: 767px) { .nav-active { background: #E8F0FE; border-right: none; border-top: 3px solid #4680FF; border-radius: 8px; } }
         
         /* Smooth View Transitions */
-        .view-section { display: none; opacity: 0; transform: translateY(15px); }
-        .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .view-section { display: none; opacity: 0; transform: translateY(10px); }
+        .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.3s ease-out; }
         
         /* Auth Screen */
-        #auth-screen { display: flex; position: fixed; inset: 0; background: #020617; z-index: 9999; }
+        #auth-screen { display: flex; position: fixed; inset: 0; background: #F4F7FA; z-index: 9999; }
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0F172A; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar-track { background: #F4F7FA; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+        
+        /* Badge */
+        .badge-green { background: #E6F4EA; color: #13C296; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-red { background: #FCEAEA; color: #DC2626; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
     </style>
 </head>
-<body class="antialiased selection:bg-indigo-500 selection:text-white">
+<body class="antialiased selection:bg-blue-100 selection:text-primary">
 
-    <div id="auth-screen" class="flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-        <div class="glass-card p-10 rounded-[2.5rem] w-full max-w-sm text-center relative z-10 neon-shadow border border-white/10">
-            <div class="w-16 h-16 bg-indigo-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.5)]">
-                <span class="text-3xl">🛡️</span>
+    <div id="auth-screen" class="flex flex-col items-center justify-center p-6 relative">
+        <div class="light-card p-10 w-full max-w-sm text-center relative z-10">
+            <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             </div>
-            <h2 class="text-2xl font-black text-white mb-2 tracking-tight">EarnproX Core</h2>
-            <p class="text-slate-400 text-xs font-bold mb-8 uppercase tracking-widest">Master Clearance Required</p>
-            <input type="password" id="admin-pass" placeholder="ENTER SECURE PIN" class="w-full bg-slate-900/50 p-4 rounded-xl mb-6 outline-none border border-slate-700 focus:border-indigo-500 font-black text-center tracking-[0.3em] text-white transition">
-            <button onclick="window.doLogin(this)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] active:scale-95 transition">INITIALIZE ⚡</button>
+            <h2 class="text-2xl font-black text-textdark mb-2">Admin Portal</h2>
+            <p class="text-textgray text-xs font-semibold mb-8">Sign in to manage EarnproX</p>
+            <input type="password" id="admin-pass" placeholder="Enter Master PIN" class="w-full bg-[#F8FAFC] p-4 rounded-xl mb-6 outline-none border border-slate-200 focus:border-primary font-bold text-center text-textdark transition">
+            <button onclick="window.doLogin(this)" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Secure Login</button>
         </div>
     </div>
 
     <div id="admin-app">
-        <aside class="fixed left-0 top-0 bottom-0 w-[280px] bg-[#0B1120] border-r border-white/5 hidden md:flex flex-col z-50 overflow-y-auto">
-            <div class="p-8">
-                <h1 class="text-3xl font-black tracking-tighter text-white neon-text">EarnproX<span class="text-indigo-500">.</span></h1>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Admin God Mode</p>
+        <aside class="sidebar fixed left-0 top-0 bottom-0 w-[260px] hidden md:flex flex-col z-50">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black text-lg">E</div>
+                <h1 class="text-2xl font-black text-textdark">EarnproX<span class="text-primary text-sm align-top ml-1">PRO</span></h1>
             </div>
-            <nav class="flex flex-col gap-2 flex-1 px-4">
-                <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-3.5 text-left font-bold text-slate-400 hover:text-white transition">📊 Analytics</button>
-                <button onclick="window.switchView('users', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition">👥 User Base</button>
-                <button onclick="window.switchView('reviews', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition relative">🔍 Task Approvals</button>
-                <button onclick="window.switchView('payouts', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition relative">💸 Payout Queue</button>
-                <button onclick="window.switchView('gigs', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition">🚀 Active Gigs</button>
-                <button onclick="window.switchView('deals', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition">🛒 Loot Deals</button>
-                <button onclick="window.switchView('notify', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition">📢 Broadcast</button>
-                <button onclick="window.switchView('settings', this)" class="nav-btn p-3.5 text-left font-bold text-slate-400 hover:text-white transition">⚙️ Security & UI</button>
-            </nav>
-            <div class="p-6">
-                <button onclick="window.doLogout()" class="w-full py-3.5 text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 rounded-xl hover:bg-rose-500/20 active:scale-95 transition">Terminate Session</button>
+            <div class="px-6 py-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Dashboard</p>
+                <nav class="flex flex-col gap-1">
+                    <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg> Analytics</button>
+                    <button onclick="window.switchView('users', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Manage Users</button>
+                </nav>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-6 mb-3">Finance & Approvals</p>
+                <nav class="flex flex-col gap-1">
+                    <button onclick="window.switchView('reviews', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Task Proofs</button>
+                    <button onclick="window.switchView('payouts', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg> Payout Queue</button>
+                </nav>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-6 mb-3">Content & Setup</p>
+                <nav class="flex flex-col gap-1">
+                    <button onclick="window.switchView('gigs', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Manage Gigs</button>
+                    <button onclick="window.switchView('deals', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg> Loot Deals</button>
+                    <button onclick="window.switchView('notify', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg> Broadcasts</button>
+                    <button onclick="window.switchView('settings', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> UI Settings</button>
+                </nav>
+            </div>
+            <div class="p-6 mt-auto border-t border-slate-100">
+                <button onclick="window.doLogout()" class="w-full py-3 flex items-center justify-center gap-2 text-rose-500 font-bold bg-rose-50 rounded-xl hover:bg-rose-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Logout</button>
             </div>
         </aside>
 
-        <div class="fixed bottom-4 left-4 right-4 md:hidden z-50">
-            <nav class="bg-[#0B1120]/90 backdrop-blur-xl border border-white/10 rounded-2xl flex justify-around p-2 shadow-2xl overflow-x-auto hide-scrollbar">
+        <div class="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-white border-t border-slate-200">
+            <nav class="flex justify-around p-2 shadow-lg overflow-x-auto hide-scrollbar">
                 <button onclick="window.switchView('dash', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn nav-active"><span class="text-xl">📊</span><span class="text-[9px] font-black mt-1">Dash</span></button>
                 <button onclick="window.switchView('users', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-xl">👥</span><span class="text-[9px] font-black mt-1">Users</span></button>
                 <button onclick="window.switchView('payouts', this)" class="flex flex-col items-center p-2 min-w-[60px] nav-btn"><span class="text-xl">💸</span><span class="text-[9px] font-black mt-1">Pays</span></button>
@@ -86,156 +99,171 @@
             </nav>
         </div>
 
-        <main class="p-5 md:p-10 max-w-7xl mx-auto pt-8 md:pt-10">
+        <main class="p-5 md:p-8 max-w-7xl mx-auto pt-6 md:pt-8">
             
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <div class="text-[11px] font-semibold text-textgray mb-1 flex items-center gap-2">Home <span class="text-slate-300">/</span> Dashboard</div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-textdark tracking-tight">Main Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="window.doLogout()" class="md:hidden text-rose-500 bg-rose-50 p-2.5 rounded-lg text-xs font-bold border border-rose-100">Logout</button>
+                    <div class="hidden md:flex w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm items-center justify-center font-bold text-slate-600">A</div>
+                </div>
+            </div>
+
             <section id="view-dash" class="view-section active">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Command Center</h2>
-                        <p class="text-slate-400 font-medium text-sm mt-1">Real-time platform telemetry.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="light-card p-6 flex justify-between items-center">
+                        <svg class="card-wave" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="#13C296" fill-opacity="0.1" d="M0,50 C50,100 150,0 200,50 L200,100 L0,100 Z"></path></svg>
+                        <div class="relative z-10">
+                            <p class="text-xs font-semibold text-textgray mb-1">Total Distributed</p>
+                            <div class="flex items-end gap-3">
+                                <h3 id="stat-total-paid" class="text-3xl font-extrabold text-textdark">₹0</h3>
+                                <span class="badge-green">✔ Lifetime</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 bg-[#E6F4EA] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">💰</span></div>
                     </div>
-                    <button onclick="window.doLogout()" class="md:hidden text-rose-400 bg-rose-500/10 p-2.5 rounded-lg text-xs font-bold border border-rose-500/20">Logout</button>
+                    <div class="light-card p-6 flex justify-between items-center">
+                        <svg class="card-wave" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="#4680FF" fill-opacity="0.1" d="M0,50 C50,100 150,0 200,50 L200,100 L0,100 Z"></path></svg>
+                        <div class="relative z-10">
+                            <p class="text-xs font-semibold text-textgray mb-1">Today's Pay Run</p>
+                            <div class="flex items-end gap-3">
+                                <h3 id="stat-today-paid" class="text-3xl font-extrabold text-textdark">₹0</h3>
+                                <span class="badge-green">Live</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 bg-[#E8F0FE] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">💳</span></div>
+                    </div>
+                    <div class="light-card p-6 flex justify-between items-center">
+                        <div class="relative z-10">
+                            <p class="text-xs font-semibold text-textgray mb-1">Pending Liabilities</p>
+                            <div class="flex items-end gap-3">
+                                <h3 id="stat-pending-pay" class="text-3xl font-extrabold text-textdark">₹0</h3>
+                                <span class="badge-red">To Pay</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 bg-[#FCEAEA] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">⏳</span></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Today Tasks Gen.</p><h3 id="stat-today-tasks" class="text-xl font-bold text-textdark mt-1">₹0</h3></div>
+                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Total Tasks Gen.</p><h3 id="stat-total-tasks" class="text-xl font-bold text-textdark mt-1">₹0</h3></div>
+                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Active Referrers</p><h3 id="stat-refer-earn" class="text-xl font-bold text-textdark mt-1">0</h3></div>
+                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Total Registered</p><h3 id="stat-users" class="text-2xl font-black text-primary mt-1">0</h3></div>
                 </div>
                 
-                <div class="glass-card p-5 rounded-3xl mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Growth Trajectory</h3>
-                    </div>
-                    <div class="w-full h-[200px] md:h-[300px]">
+                <div class="light-card p-6 mb-8">
+                    <h3 class="text-sm font-bold text-textdark mb-4">Traffic & Activity Overview</h3>
+                    <div class="w-full h-[250px]">
                         <canvas id="revenueChart"></canvas>
                     </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="glass-card p-6 rounded-3xl border-t-2 border-t-emerald-500 relative overflow-hidden group hover:bg-slate-800 transition cursor-default">
-                        <div class="absolute -right-4 -top-4 text-5xl opacity-10 group-hover:scale-110 transition">💸</div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Today Paid</p>
-                        <h3 id="stat-today-paid" class="text-3xl font-black text-emerald-400 mt-1 drop-shadow-md">₹0</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-3xl border-t-2 border-t-emerald-500">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Total Paid Lifetime</p>
-                        <h3 id="stat-total-paid" class="text-2xl font-black text-white mt-1">₹0</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-3xl border-t-2 border-t-rose-500">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Pending Liabilities</p>
-                        <h3 id="stat-pending-pay" class="text-2xl font-black text-rose-400 mt-1">₹0</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-3xl border-t-2 border-t-blue-500">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Total User Wallet</p>
-                        <h3 id="stat-user-bal" class="text-2xl font-black text-blue-400 mt-1">₹0</h3>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="glass-card p-6 rounded-3xl"><p class="text-[10px] font-black text-slate-400 uppercase">Today Tasks Gen.</p><h3 id="stat-today-tasks" class="text-xl font-bold text-white mt-1">₹0</h3></div>
-                    <div class="glass-card p-6 rounded-3xl"><p class="text-[10px] font-black text-slate-400 uppercase">Total Tasks Gen.</p><h3 id="stat-total-tasks" class="text-xl font-bold text-white mt-1">₹0</h3></div>
-                    <div class="glass-card p-6 rounded-3xl"><p class="text-[10px] font-black text-slate-400 uppercase">Active Referrers</p><h3 id="stat-refer-earn" class="text-xl font-bold text-white mt-1">0</h3></div>
-                    <div class="glass-card p-6 rounded-3xl bg-indigo-600/10 border-indigo-500/30"><p class="text-[10px] font-black text-indigo-300 uppercase">Total Registered</p><h3 id="stat-users" class="text-2xl font-black text-indigo-400 mt-1 neon-text">0</h3></div>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-                    <h2 class="text-3xl font-extrabold text-white">User Base</h2>
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-extrabold text-textdark">User Management</h2>
                     <div class="flex gap-2">
-                        <input type="text" id="search-users" onkeyup="window.searchItems('search-users', 'user-list', 'user-item')" placeholder="Search Name/Phone..." class="glass-card px-5 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium w-full md:w-64">
-                        <button onclick="window.exportCSV('users')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-bold px-4 rounded-xl text-xs hover:bg-emerald-600/40 transition flex items-center gap-1 shrink-0"><span class="text-lg">📥</span> CSV</button>
+                        <input type="text" id="search-users" onkeyup="window.searchItems('search-users', 'user-list', 'user-item')" placeholder="Search Name/Phone..." class="light-card px-5 py-2.5 outline-none focus:border-primary text-sm font-medium w-full md:w-64">
+                        <button onclick="window.exportCSV('users')" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 rounded-xl text-xs hover:bg-slate-50 transition flex items-center gap-1 shrink-0"><span class="text-lg">📥</span> Export</button>
                     </div>
                 </div>
                 <div id="user-list" class="grid gap-3"></div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-3xl font-extrabold text-white mb-8">Pending Proofs</h2>
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">Task Verification Queue</h2>
                 <div id="review-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
             </section>
 
             <section id="view-payouts" class="view-section">
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-                    <h2 class="text-3xl font-extrabold text-white">Payout Queue</h2>
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-extrabold text-textdark">Payout Requests</h2>
                     <div class="flex gap-2">
-                        <input type="text" id="search-payouts" onkeyup="window.searchItems('search-payouts', 'payouts-list', 'payout-item')" placeholder="Search UPI/Phone..." class="glass-card px-5 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium w-full md:w-64">
-                        <button onclick="window.exportCSV('payouts')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-bold px-4 rounded-xl text-xs hover:bg-emerald-600/40 transition flex items-center gap-1 shrink-0"><span class="text-lg">📥</span> CSV</button>
+                        <input type="text" id="search-payouts" onkeyup="window.searchItems('search-payouts', 'payouts-list', 'payout-item')" placeholder="Search UPI/Phone..." class="light-card px-5 py-2.5 outline-none focus:border-primary text-sm font-medium w-full md:w-64">
+                        <button onclick="window.exportCSV('payouts')" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 rounded-xl text-xs hover:bg-slate-50 transition flex items-center gap-1 shrink-0"><span class="text-lg">📥</span> Export</button>
                     </div>
                 </div>
-                <div id="payouts-list" class="grid gap-4 md:grid-cols-2"></div>
+                <div id="payouts-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-3xl font-extrabold text-white mb-8">Gig Management</h2>
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] space-y-4 mb-10 max-w-3xl">
-                    <h3 class="font-black text-xl text-white border-b border-slate-700 pb-4">Deploy New Target</h3>
-                    <input type="text" id="gig-title" placeholder="Target Objective (Title)" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 outline-none font-bold text-white">
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">Manage Tasks & Gigs</h2>
+                <div class="light-card p-6 md:p-8 space-y-4 mb-8 max-w-3xl">
+                    <h3 class="font-bold text-lg text-textdark border-b border-slate-100 pb-3">Create New Gig</h3>
+                    <input type="text" id="gig-title" placeholder="Task Title (e.g. Install App)" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark">
                     <div class="flex flex-col md:flex-row gap-4">
-                        <input type="number" id="gig-reward" placeholder="Bounty ₹" min="1" class="w-full md:w-1/4 bg-emerald-900/20 p-4 rounded-xl border border-emerald-500/30 font-black text-emerald-400 outline-none">
-                        <select id="gig-category" class="w-full md:w-1/4 bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/30 font-bold text-indigo-400 outline-none cursor-pointer">
+                        <input type="number" id="gig-reward" placeholder="Reward ₹" min="1" class="w-full md:w-1/4 bg-[#E6F4EA] p-3.5 rounded-xl border border-[#13C296] font-black text-[#13C296] outline-none">
+                        <select id="gig-category" class="w-full md:w-1/4 bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-semibold text-textdark outline-none">
                             <option value="App Install">App Install</option>
                             <option value="Normal Task">Normal Task</option>
                             <option value="Follower Task">Follower Task</option>
                             <option value="Finance">Finance</option>
                         </select>
-                        <input type="url" id="gig-link" placeholder="Target Vector (URL)" class="w-full md:w-2/4 bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-medium outline-none text-white">
+                        <input type="url" id="gig-link" placeholder="Task URL / Link" class="w-full md:w-2/4 bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark">
                     </div>
-                    <textarea id="gig-desc" placeholder="Execution Protocol (Instructions)..." rows="3" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-medium outline-none text-white"></textarea>
-                    <button onclick="window.addGigToDB(this)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.4)] active:scale-95 transition">Deploy Target 🚀</button>
+                    <textarea id="gig-desc" placeholder="Instructions for user..." rows="3" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark"></textarea>
+                    <button onclick="window.addGigToDB(this)" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition">Publish Gig 🚀</button>
                 </div>
-                <h3 class="font-black text-xl text-white mb-4">Active Targets</h3>
                 <div id="live-gigs-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </section>
 
             <section id="view-deals" class="view-section">
-                <h2 class="text-3xl font-extrabold text-white mb-8">Loot Deal Network</h2>
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] space-y-4 mb-10 max-w-3xl">
-                    <h3 class="font-black text-xl text-white border-b border-slate-700 pb-4">Inject Affiliate Deal</h3>
-                    <input type="text" id="deal-title" placeholder="Asset Name" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 outline-none font-bold text-white">
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">Loot Deals Config</h2>
+                <div class="light-card p-6 md:p-8 space-y-4 mb-8 max-w-3xl">
+                    <h3 class="font-bold text-lg text-textdark border-b border-slate-100 pb-3">Add Affiliate Deal</h3>
+                    <input type="text" id="deal-title" placeholder="Product Name" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark">
                     <div class="flex gap-4">
-                        <input type="number" id="deal-mrp" placeholder="Base Value (₹)" class="w-1/2 bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-bold text-slate-400 outline-none line-through">
-                        <input type="number" id="deal-price" placeholder="Loot Value (₹)" class="w-1/2 bg-rose-900/20 p-4 rounded-xl border border-rose-500/30 font-black text-rose-400 outline-none">
+                        <input type="number" id="deal-mrp" placeholder="Original MRP (₹)" class="w-1/2 bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-semibold text-textgray outline-none line-through">
+                        <input type="number" id="deal-price" placeholder="Deal Price (₹)" class="w-1/2 bg-[#FCEAEA] p-3.5 rounded-xl border border-[#DC2626] font-black text-[#DC2626] outline-none">
                     </div>
-                    <input type="url" id="deal-image" placeholder="Asset Visual URL" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-medium outline-none text-white">
-                    <input type="url" id="deal-link" placeholder="Affiliate Vector (URL)" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-medium outline-none text-white">
-                    <button onclick="window.addDealToDB(this)" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-black py-4 rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.4)] active:scale-95 transition mt-2">Inject Deal 🛒</button>
+                    <input type="url" id="deal-image" placeholder="Product Image URL" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark">
+                    <input type="url" id="deal-link" placeholder="Your Affiliate Link" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark">
+                    <button onclick="window.addDealToDB(this)" class="w-full bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition mt-2">Publish Deal 🛒</button>
                 </div>
                 <div id="live-deals-list" class="grid md:grid-cols-2 gap-4"></div>
             </section>
 
             <section id="view-notify" class="view-section">
-                <h2 class="text-3xl font-extrabold text-white mb-8">System Broadcast</h2>
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] space-y-4 max-w-2xl mb-10">
-                    <h3 class="font-black text-xl text-white border-b border-slate-700 pb-4">Global Override Message</h3>
-                    <input type="text" id="notify-title" placeholder="Signal Header" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-bold outline-none text-white">
-                    <textarea id="notify-msg" placeholder="Payload content..." rows="3" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 font-medium outline-none text-white"></textarea>
-                    <button onclick="window.sendNotification(this)" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] active:scale-95 transition">Transmit Signal 📡</button>
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">Push Notifications</h2>
+                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl mb-8">
+                    <h3 class="font-bold text-lg text-textdark border-b border-slate-100 pb-3">Broadcast Alert</h3>
+                    <input type="text" id="notify-title" placeholder="Alert Title" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-bold outline-none text-textdark">
+                    <textarea id="notify-msg" placeholder="Message content..." rows="3" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark"></textarea>
+                    <button onclick="window.sendNotification(this)" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition">Send Broadcast 📡</button>
                 </div>
                 <div id="notify-list" class="grid md:grid-cols-2 gap-4"></div>
             </section>
 
             <section id="view-settings" class="view-section">
-                <h2 class="text-3xl font-extrabold text-white mb-8">Configuration & Security</h2>
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">System Settings</h2>
                 
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] space-y-4 max-w-2xl border-l-4 border-l-indigo-500 mb-8">
-                    <h3 class="font-black text-xl text-white border-b border-slate-700 pb-4 flex items-center gap-2">🔐 Master Protocol (Password)</h3>
-                    <p class="text-xs text-slate-400 font-bold mb-2">Update your God Mode login PIN. Ensures encryption via SHA-256 in DB.</p>
-                    <input type="password" id="new-admin-pass" placeholder="Enter New Secret PIN" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 outline-none font-bold text-white tracking-widest text-center">
-                    <button onclick="window.updateAdminPassword(this)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-3 rounded-xl border border-slate-600 active:scale-95 transition">Lock New Protocol</button>
+                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl border-l-4 border-l-primary mb-6">
+                    <h3 class="font-bold text-lg text-textdark pb-2">🔐 Change Master PIN</h3>
+                    <input type="password" id="new-admin-pass" placeholder="Enter New PIN" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark text-center tracking-widest">
+                    <button onclick="window.updateAdminPassword(this)" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl active:scale-95 transition">Update Password</button>
                 </div>
 
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] space-y-4 max-w-2xl mb-8">
-                    <h3 class="font-black text-xl text-white border-b border-slate-700 pb-4">UI Banner Hologram 🖼️</h3>
-                    <input type="url" id="banner-url-input" placeholder="https://example.com/banner.jpg" class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 outline-none font-medium text-white">
-                    <div class="mt-4 p-2 rounded-xl bg-slate-900/30">
-                        <img id="banner-preview" src="" alt="Preview" class="w-full h-[120px] object-cover rounded-lg opacity-80 hover:opacity-100 transition">
+                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl mb-6">
+                    <h3 class="font-bold text-lg text-textdark pb-2">🖼️ Promo Banner Settings</h3>
+                    <input type="url" id="banner-url-input" placeholder="Banner Image URL" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none text-sm text-textdark">
+                    <div class="mt-4 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                        <img id="banner-preview" src="" alt="Preview" class="w-full h-[120px] object-cover rounded-lg">
                     </div>
-                    <button onclick="window.updateAppBanner(this)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-3 rounded-xl border border-slate-600 active:scale-95 transition">Sync Hologram</button>
+                    <button onclick="window.updateAppBanner(this)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl border border-slate-200 active:scale-95 transition">Save Banner</button>
                 </div>
 
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] space-y-4 max-w-2xl">
-                    <h3 class="font-black text-xl text-emerald-400 border-b border-slate-700 pb-4 flex items-center gap-2">🛡️ Trust Matrix Images</h3>
+                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl">
+                    <h3 class="font-bold text-lg text-textdark pb-2">🛡️ Trust Reels Images</h3>
                     <div class="flex gap-2">
-                        <input type="url" id="trust-url-input" placeholder="Inject Asset URL (9:16)..." class="w-full bg-slate-900/50 p-4 rounded-xl border border-slate-700 outline-none font-medium text-sm text-white">
-                        <button onclick="window.addTrustImage(this)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-6 rounded-xl active:scale-95 transition shrink-0">Inject</button>
+                        <input type="url" id="trust-url-input" placeholder="Image URL (9:16)..." class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-medium text-sm text-textdark">
+                        <button onclick="window.addTrustImage(this)" class="bg-[#13C296] hover:bg-emerald-600 text-white font-bold px-6 rounded-xl active:scale-95 transition shrink-0">Add</button>
                     </div>
-                    <div class="mt-4 pt-4">
+                    <div class="mt-4 pt-4 border-t border-slate-100">
                         <div id="trust-images-list" class="grid grid-cols-3 md:grid-cols-5 gap-3"></div>
                     </div>
                 </div>
@@ -244,18 +272,18 @@
         </main>
     </div>
 
-    <div id="modal-edit" class="fixed inset-0 bg-[#020617]/80 backdrop-blur-md hidden z-[10000] items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm rounded-[2rem] p-6 border border-white/10 shadow-2xl relative">
-            <h3 class="text-xl font-black text-white mb-6 border-b border-slate-700 pb-3">Override User Data</h3>
+    <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[10000] items-center justify-center p-4">
+        <div class="light-card w-full max-w-sm p-6 relative">
+            <h3 class="text-xl font-bold text-textdark mb-6 border-b border-slate-100 pb-3">Edit User</h3>
             <div class="space-y-4 mb-6">
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Identity</label><input type="text" id="edit-name" class="w-full bg-slate-900/50 p-3 rounded-xl border border-slate-700 font-bold text-sm outline-none text-white"></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Comm Link</label><input type="tel" id="edit-phone" class="w-full bg-slate-900/50 p-3 rounded-xl border border-slate-700 font-bold text-sm outline-none text-slate-500" readonly disabled></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Payout Vector (UPI)</label><input type="text" id="edit-upi" class="w-full bg-slate-900/50 p-3 rounded-xl border border-slate-700 font-bold text-sm outline-none text-white"></div>
-                <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Asset Bal (₹)</label><input type="number" id="edit-bal" min="0" class="w-full bg-emerald-900/20 p-3 rounded-xl border border-emerald-500/30 text-emerald-400 font-black text-lg outline-none"></div>
+                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Full Name</label><input type="text" id="edit-name" class="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 font-bold text-sm outline-none text-textdark"></div>
+                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Phone</label><input type="tel" id="edit-phone" class="w-full bg-slate-100 p-3 rounded-xl border border-slate-200 font-bold text-sm outline-none text-slate-400" readonly disabled></div>
+                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">UPI ID</label><input type="text" id="edit-upi" class="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 font-bold text-sm outline-none text-textdark"></div>
+                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Wallet Balance</label><input type="number" id="edit-bal" min="0" class="w-full bg-[#E8F0FE] p-3 rounded-xl border border-primary text-primary font-black text-lg outline-none"></div>
             </div>
             <div class="flex gap-2">
-                <button onclick="window.saveUserData(this)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl active:scale-95 transition shadow-[0_0_10px_rgba(5,150,105,0.4)]">Force Save</button>
-                <button onclick="document.getElementById('modal-edit').classList.remove('active'); document.getElementById('modal-edit').style.display='none';" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl active:scale-95 transition border border-slate-600">Abort</button>
+                <button onclick="window.saveUserData(this)" class="flex-1 bg-[#13C296] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl active:scale-95 transition">Save Changes</button>
+                <button onclick="document.getElementById('modal-edit').classList.remove('active'); document.getElementById('modal-edit').style.display='none';" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition">Cancel</button>
             </div>
         </div>
     </div>
@@ -264,7 +292,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, doc, query, where, onSnapshot, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // DO NOT CHANGE THIS CONFIG (As provided by you)
         const firebaseConfig = { 
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
             authDomain: "earnproxuc.firebaseapp.com", 
@@ -276,9 +303,7 @@
         const app = initializeApp(firebaseConfig); 
         const db = getFirestore(app);
 
-        const DEFAULT_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; 
         const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; 
-        let DB_HASH = DEFAULT_HASH; // Will dynamically load from Firebase
 
         let globalUsersData = {}; let globalTasksData = {}; let globalWithdrawData = {}; let activeUserId = "";
         let currentTrustImages = []; 
@@ -289,14 +314,6 @@
         const maskPhone = (phone) => phone && phone.length >= 10 ? phone.substring(0,2) + '****' + phone.substring(8) : 'N/A';
         const maskUpi = (upi) => { if(!upi || upi=='None') return 'NULL'; const pts = upi.split('@'); return pts[0].length > 2 ? pts[0].substring(0,2) + '***@' + (pts[1]||'') : upi; };
 
-        // Cryptography for Security
-        async function hashString(str) {
-            const msgBuffer = new TextEncoder().encode(str);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // Backend Bridge
         async function callAdminApi(actionName, payloadData, btnElement) {
             const ogText = btnElement ? btnElement.innerText : "";
             if(btnElement) { btnElement.innerText = "⏳"; btnElement.disabled = true; }
@@ -304,42 +321,35 @@
                 const response = await fetch('/api/Rashiandakash', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: actionName, payload: payloadData, secureToken: SECURE_API_TOKEN }) });
                 const data = await response.json();
                 if (response.ok && data.success) return true; 
-                else { alert("❌ System Override Failed: " + (data.error || "Unknown")); return false; }
+                else { alert("❌ Request Failed: " + (data.error || "Unknown")); return false; }
             } catch (error) { alert("❌ Net-Link Severed!"); return false; } 
             finally { if(btnElement) { btnElement.innerText = ogText; setTimeout(() => btnElement.disabled = false, 1500); } }
         }
 
-        // Setup Chart
         function initChart() {
             const ctx = document.getElementById('revenueChart').getContext('2d');
             if(dashboardChart) dashboardChart.destroy();
             dashboardChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'Yesterday', 'Today'], datasets: [{ label: 'App Installs & Tasks Generated (Dummy Trend)', data: [10, 25, 15, 40, 35, 60, 85], borderColor: '#818CF8', backgroundColor: 'rgba(99, 102, 241, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } } } }
+                data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'App Installs & Engagement', data: [15, 30, 20, 50, 45, 80, 110], borderColor: '#4680FF', backgroundColor: 'rgba(70, 128, 255, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#94A3B8' } }, y: { grid: { color: '#F1F5F9', borderDash: [5, 5] }, ticks: { color: '#94A3B8' } } } }
             });
         }
 
-        // Secure Login Check against Dynamic Hash
-        window.doLogin = async (btn) => { 
+        // 🔐 SECURE LOGIN (HARDCODED AS REQUESTED)
+        window.doLogin = (btn) => { 
             const pass = document.getElementById('admin-pass').value;
-            btn.innerText = "Decrypting..."; btn.disabled = true;
+            btn.innerText = "Checking..."; btn.disabled = true;
             
-            // Fast-fetch master config just for hash checking before full sync
-            try {
-                const docSnap = await getFirestore().doc("app_settings/master_config").get(); // Needs manual get if snap not running
-            }catch(e){} // We rely on snap, but snap is blocked. Workaround:
-            
-            const hashHex = await hashString(pass);
-            
-            // Temporary bypass if snap hasn't loaded DB_HASH, we trust DEFAULT_HASH until synced, then restrict.
-            if (hashHex === DB_HASH || hashHex === DEFAULT_HASH) { 
-                sessionStorage.setItem("secure_master_session", hashHex); 
+            // 🔥 DEFAULT PASSWORD SET TO: Akash@2026
+            if (pass === "Akash@2026") { 
+                sessionStorage.setItem("secure_master_session", "verified_god_mode"); 
                 document.body.classList.add('authenticated'); 
                 window.startServerSync(); 
             } else { 
-                alert("❌ INTRUSION ATTEMPT BLOCKED."); 
-                btn.innerText = "INITIALIZE ⚡"; btn.disabled = false;
+                alert("❌ Incorrect Password."); 
+                btn.innerText = "Secure Login"; 
+                btn.disabled = false;
             } 
         };
 
@@ -362,7 +372,6 @@
             }
         };
 
-        // CSV Export (God Mode Feature)
         window.exportCSV = (type) => {
             let csvContent = "data:text/csv;charset=utf-8,";
             if(type === 'users') {
@@ -381,21 +390,26 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `EarnproX_${type}_Export.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.setAttribute("download", `EarnproX_${type}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
 
-        // Firebase Sync Engine
+        // 🔥 IMPERSONATION FUNCTION: LOGIN AS ANY USER
+        window.loginAsUser = (phone, token) => {
+            if(!token) return alert("❌ User has not generated a session token yet.");
+            if(confirm(`Login directly to ${phone}'s account?`)) {
+                localStorage.setItem("earnprox_user_phone", phone);
+                sessionStorage.setItem("earnprox_secure_token", token);
+                window.open('dashboard.html', '_blank'); // Opens the user dashboard
+            }
+        };
+
         window.startServerSync = function() {
-            initChart(); // Setup graphics
+            initChart(); 
             
-            // Dynamic Config Sync
             onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.adminHash) DB_HASH = data.adminHash; // Secure sync
                     if(data.bannerUrl) { document.getElementById('banner-url-input').value = data.bannerUrl; document.getElementById('banner-preview').src = data.bannerUrl; }
                     if(data.trustImages) { currentTrustImages = data.trustImages; window.renderTrustImages(); }
                 }
@@ -408,9 +422,29 @@
                     const u = d.data(); globalUsersData[d.id] = u; totalUserBal += parseFloat(u.balance || 0);
                     if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
                     const isB = u.status === 'blocked';
-                    html += `<div class="user-item glass-card p-4 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isB ? 'opacity-50 grayscale' : ''}"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-black shrink-0">${(u.name?u.name.charAt(0):"U").toUpperCase()}</div><div><p class="font-extrabold text-white text-sm">${u.name || "Ghost"} ${isB ? '🛑' : ''}</p><p class="text-xs font-bold text-slate-400">+91 ${maskPhone(u.phone)}</p><p class="text-[10px] font-black text-indigo-400 uppercase mt-0.5">UPI: ${maskUpi(u.upi)}</p></div></div><div class="flex items-center gap-3"><p class="font-black text-emerald-400 text-lg">₹${parseFloat(u.balance || 0).toFixed(2)}</p><div class="flex gap-1.5"><button onclick="window.openEditModal('${d.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-black px-3 py-2 rounded border border-slate-600 transition">EDIT</button><button onclick="window.toggleBlockUser('${d.id}', '${u.status}', this)" class="${isB?'bg-emerald-900/40 text-emerald-400 border-emerald-500/50':'bg-rose-900/40 text-rose-400 border-rose-500/50'} border text-[10px] font-black px-3 py-2 rounded transition">${isB?'UNBAN':'BAN'}</button></div></div></div>`;
+                    
+                    // User Row (With Login As Button)
+                    html += `
+                    <div class="user-item light-card p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isB ? 'opacity-50 grayscale bg-slate-50' : ''}">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#E8F0FE] text-primary flex items-center justify-center font-bold text-xl">${(u.name?u.name.charAt(0):"U").toUpperCase()}</div>
+                            <div>
+                                <p class="font-bold text-textdark">${u.name || "Unknown"} ${isB ? '🛑' : ''}</p>
+                                <p class="text-[11px] font-semibold text-textgray mt-0.5">+91 ${maskPhone(u.phone)} • ${maskUpi(u.upi)}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                            <p class="font-black text-primary text-xl">₹${parseFloat(u.balance || 0).toFixed(2)}</p>
+                            <div class="flex gap-2">
+                                <button onclick="window.loginAsUser('${u.phone}', '${u.sessionToken}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[10px] font-bold px-3 py-2 rounded-lg transition" title="Login as this user">LOGIN AS 🔑</button>
+                                
+                                <button onclick="window.openEditModal('${d.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold px-3 py-2 rounded-lg transition">EDIT</button>
+                                <button onclick="window.toggleBlockUser('${d.id}', '${u.status}', this)" class="${isB?'bg-[#E6F4EA] text-[#13C296]':'bg-[#FCEAEA] text-[#DC2626]'} text-[10px] font-bold px-3 py-2 rounded-lg transition">${isB?'UNBAN':'BAN'}</button>
+                            </div>
+                        </div>
+                    </div>`;
                 });
-                document.getElementById('user-list').innerHTML = html || "<p class='text-slate-500 italic'>No data traces.</p>";
+                document.getElementById('user-list').innerHTML = html || "<p class='text-slate-500'>No users found.</p>";
                 document.getElementById('stat-user-bal').innerText = `₹${totalUserBal.toFixed(2)}`;
                 document.getElementById('stat-refer-earn').innerText = `${totalReferUsers}`; 
             });
@@ -423,12 +457,24 @@
                     globalTasksData[t.id] = t; const rAmt = parseFloat(t.gigReward || 0);
                     if(t.status === "Completed" || t.status === "Approved") { totalTaskEarn += rAmt; if(isToday(t.timestamp)) todayTaskEarn += rAmt; }
                     if(t.status === "Pending Approval") {
-                        html += `<div class="glass-card p-5 rounded-2xl border-l-4 border-l-orange-500 flex flex-col justify-between"><div class="mb-4"><div><p class="text-[9px] font-black text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded inline-block mb-1">AWAITING VERIFICATION</p><h4 class="font-bold text-white leading-tight">${t.gigName}</h4><p class="text-xs text-slate-400 mt-1">+91 ${maskPhone(t.userPhone)}</p></div></div><div class="flex gap-2 w-full"><a href="${t.proofLink}" target="_blank" class="flex-1 bg-slate-800 text-center text-slate-300 font-black text-[10px] py-2 rounded border border-slate-600">PROOF ↗</a><button onclick="window.approveTask('${t.id}', this)" class="flex-1 bg-emerald-600/80 hover:bg-emerald-500 text-white font-black text-[10px] py-2 rounded">PAY ₹${rAmt}</button><button onclick="window.rejectTask('${t.id}', this)" class="bg-rose-900/50 hover:bg-rose-800 text-rose-400 border border-rose-500/50 px-3 rounded text-[10px] font-black">X</button></div></div>`;
+                        html += `
+                        <div class="light-card p-5 flex flex-col justify-between border-l-4 border-l-orange-400">
+                            <div class="mb-5">
+                                <span class="text-[9px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded inline-block mb-2">AWAITING VERIFICATION</span>
+                                <h4 class="font-bold text-textdark text-sm leading-tight">${t.gigName}</h4>
+                                <p class="text-[11px] font-semibold text-textgray mt-1">+91 ${maskPhone(t.userPhone)}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="${t.proofLink}" target="_blank" class="flex-1 bg-slate-100 text-center text-slate-600 font-bold text-[10px] py-2.5 rounded-lg border border-slate-200">PROOF ↗</a>
+                                <button onclick="window.approveTask('${t.id}', this)" class="flex-1 bg-[#13C296] text-white font-bold text-[10px] py-2.5 rounded-lg">PAY ₹${rAmt}</button>
+                                <button onclick="window.rejectTask('${t.id}', this)" class="bg-[#FCEAEA] text-[#DC2626] font-bold px-3 py-2.5 rounded-lg text-[10px]">X</button>
+                            </div>
+                        </div>`;
                     }
                 });
                 document.getElementById('stat-today-tasks').innerText = `₹${todayTaskEarn.toFixed(2)}`;
                 document.getElementById('stat-total-tasks').innerText = `₹${totalTaskEarn.toFixed(2)}`;
-                document.getElementById('review-list').innerHTML = html || "<p class='text-slate-500 italic'>Queue empty.</p>";
+                document.getElementById('review-list').innerHTML = html || "<p class='text-slate-500'>No pending tasks.</p>";
             });
 
             onSnapshot(collection(db, "withdrawals"), (snap) => {
@@ -439,89 +485,79 @@
                     globalWithdrawData[w.id] = w; const wAmt = parseFloat(w.amount || 0);
                     if(w.status === "Pending") {
                         pendingAmt += wAmt;
-                        html += `<div class="payout-item glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-rose-500"><div class="w-full"><p class="text-[9px] font-black text-rose-400 mb-0.5 tracking-widest">OUTBOUND TRANSFER</p><h4 class="font-bold text-white text-sm">${w.upi}</h4><p class="text-[10px] text-slate-400">+91 ${maskPhone(w.userPhone)}</p></div><div class="text-right shrink-0 ml-2"><p class="font-black text-rose-400 text-xl mb-1">₹${wAmt}</p><div class="flex gap-1 justify-end"><button onclick="window.markAsPaid('${w.id}', this)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black px-3 py-1.5 rounded">CLEAR</button><button onclick="window.rejectPayout('${w.id}', this)" class="bg-rose-900/50 text-rose-400 border border-rose-500/50 text-[10px] font-black px-2 py-1.5 rounded">DENY</button></div></div></div>`;
+                        html += `
+                        <div class="light-card p-5 flex justify-between items-center border-l-4 border-l-[#DC2626]">
+                            <div class="w-full">
+                                <span class="text-[9px] font-bold text-[#DC2626] tracking-widest mb-1 block uppercase">UPI Transfer</span>
+                                <h4 class="font-bold text-textdark text-sm">${w.upi}</h4>
+                                <p class="text-[10px] font-semibold text-textgray mt-1">+91 ${maskPhone(w.userPhone)}</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="font-black text-[#DC2626] text-xl mb-2">₹${wAmt}</p>
+                                <div class="flex gap-2 justify-end">
+                                    <button onclick="window.markAsPaid('${w.id}', this)" class="bg-[#13C296] text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm">PAY ✅</button>
+                                    <button onclick="window.rejectPayout('${w.id}', this)" class="bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-2 rounded-lg">REJECT</button>
+                                </div>
+                            </div>
+                        </div>`;
                     } else if (w.status === "Completed") { totalPaid += wAmt; if(isToday(w.completedAt || w.timestamp)) todayPaid += wAmt; }
                 });
                 document.getElementById('stat-today-paid').innerText = `₹${todayPaid.toFixed(2)}`;
                 document.getElementById('stat-total-paid').innerText = `₹${totalPaid.toFixed(2)}`;
                 document.getElementById('stat-pending-pay').innerText = `₹${pendingAmt.toFixed(2)}`;
-                document.getElementById('payouts-list').innerHTML = html || "<p class='text-slate-500 italic'>No liabilities.</p>";
+                document.getElementById('payouts-list').innerHTML = html || "<p class='text-slate-500'>No pending payouts.</p>";
             });
 
-            // Gigs & Deals & Notify logic remains similar but styled
             onSnapshot(collection(db, "gigs"), (snap) => {
-                let html = ""; snap.forEach(d => { const g = d.data(); html += `<div class="glass-card p-4 rounded-2xl flex justify-between items-start"><div class="pr-2"><span class="text-[8px] font-black bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded">${g.category}</span><h4 class="font-bold text-white mt-1 leading-tight">${g.title}</h4><p class="text-[10px] text-emerald-400 font-bold mt-1">₹${g.reward}</p></div><button onclick="window.deleteGig('${d.id}', this)" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-2 rounded-lg text-xs font-bold">X</button></div>`; });
-                document.getElementById('live-gigs-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No active vectors.</p>";
+                let html = ""; snap.forEach(d => { const g = d.data(); html += `<div class="light-card p-5 flex justify-between items-start"><div class="pr-2"><span class="text-[9px] font-bold bg-[#E8F0FE] text-primary px-2 py-0.5 rounded-md inline-block mb-2">${g.category}</span><h4 class="font-bold text-textdark text-sm leading-tight mb-1">${g.title}</h4><p class="text-xs text-[#13C296] font-bold">₹${g.reward}</p></div><button onclick="window.deleteGig('${d.id}', this)" class="text-[#DC2626] bg-[#FCEAEA] p-2 rounded-lg text-[10px] font-bold">DELETE</button></div>`; });
+                document.getElementById('live-gigs-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No active gigs.</p>";
             });
 
             onSnapshot(query(collection(db, "deals"), orderBy("timestamp", "desc")), (snap) => {
-                let html = ""; snap.forEach(d => { const deal = d.data(); html += `<div class="glass-card p-4 rounded-2xl flex items-center gap-3"><img src="${deal.image}" class="w-12 h-12 rounded object-cover border border-white/10 shrink-0"><div class="flex-1"><h4 class="text-xs font-bold text-white line-clamp-1">${deal.title}</h4><div class="flex items-center gap-2 mt-1"><span class="text-rose-400 text-sm font-black">₹${deal.dealPrice}</span><span class="text-slate-500 text-[10px] line-through">₹${deal.mrp}</span></div></div><button onclick="window.deleteDeal('${d.id}', this)" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-2 rounded-lg text-xs font-bold">X</button></div>`; });
-                document.getElementById('live-deals-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No assets active.</p>";
+                let html = ""; snap.forEach(d => { const deal = d.data(); html += `<div class="light-card p-5 flex items-center gap-4"><img src="${deal.image}" class="w-14 h-14 rounded-lg object-contain border border-slate-100 shrink-0"><div class="flex-1"><h4 class="text-xs font-bold text-textdark line-clamp-1">${deal.title}</h4><div class="flex items-center gap-2 mt-1"><span class="text-rose-500 text-sm font-black">₹${deal.dealPrice}</span><span class="text-textgray text-[10px] line-through">₹${deal.mrp}</span></div></div><button onclick="window.deleteDeal('${d.id}', this)" class="text-[#DC2626] bg-[#FCEAEA] p-2 rounded-lg text-[10px] font-bold">DEL</button></div>`; });
+                document.getElementById('live-deals-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No active deals.</p>";
             });
             
             onSnapshot(collection(db, "notifications"), (snap) => {
                 let html = ""; const notifs = []; snap.forEach(d => notifs.push({ id: d.id, ...d.data() })); notifs.sort((a, b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-                notifs.forEach(n => { html += `<div class="glass-card p-3 rounded-xl flex justify-between items-start"><div class="pr-2"><h4 class="text-xs font-bold text-white">${n.title}</h4><p class="text-[10px] text-slate-400 mt-0.5 line-clamp-1">${n.message}</p></div><button onclick="window.deleteNotification('${n.id}', this)" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded text-[10px] font-bold">X</button></div>`; });
-                document.getElementById('notify-list').innerHTML = html || "<p class='text-slate-500 text-sm'>Airwaves clear.</p>";
+                notifs.forEach(n => { html += `<div class="light-card p-4 flex justify-between items-start"><div class="pr-2"><h4 class="text-xs font-bold text-textdark">${n.title}</h4><p class="text-[10px] text-textgray mt-1 line-clamp-2">${n.message}</p></div><button onclick="window.deleteNotification('${n.id}', this)" class="text-slate-400 hover:text-rose-500 p-1.5 rounded transition">X</button></div>`; });
+                document.getElementById('notify-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No notifications.</p>";
             });
         };
 
         window.renderTrustImages = function() {
             const container = document.getElementById('trust-images-list');
-            if (currentTrustImages.length === 0) { container.innerHTML = "<p class='text-xs text-slate-500 font-bold col-span-full'>Matrix empty.</p>"; return; }
-            let html = ""; currentTrustImages.forEach((url, i) => { html += `<div class="relative group rounded-lg overflow-hidden border border-white/10 aspect-[9/16]"><img src="${url}" class="w-full h-full object-cover"><button onclick="window.deleteTrustImage(${i}, this)" class="absolute inset-0 bg-red-900/80 text-rose-300 font-black text-[10px] opacity-0 group-hover:opacity-100 transition flex items-center justify-center">PURGE</button></div>`; });
+            if (currentTrustImages.length === 0) { container.innerHTML = "<p class='text-xs text-slate-500'>No images added.</p>"; return; }
+            let html = ""; currentTrustImages.forEach((url, i) => { html += `<div class="relative group rounded-xl overflow-hidden border border-slate-200 aspect-[9/16]"><img src="${url}" class="w-full h-full object-cover"><button onclick="window.deleteTrustImage(${i}, this)" class="absolute inset-0 bg-red-600/80 text-white font-bold text-[10px] opacity-0 group-hover:opacity-100 transition flex items-center justify-center">DELETE</button></div>`; });
             container.innerHTML = html;
         }
 
-        // ================= DYNAMIC SECURITY UPDATE =================
-        window.updateAdminPassword = async (btn) => {
-            const newPass = document.getElementById('new-admin-pass').value.trim();
-            if(newPass.length < 4) return alert("⚠️ Pin too weak. Need minimum 4 characters.");
-            
-            const ogText = btn.innerText; btn.innerText = "Encrypting..."; btn.disabled = true;
-            try {
-                const hashHex = await hashString(newPass);
-                // Requires Firestore rules to allow write to this doc, or backend proxy. 
-                // Using Frontend direct write assuming open/admin rules for MVP.
-                await setDoc(doc(db, "app_settings", "master_config"), { adminHash: hashHex }, { merge: true });
-                alert("✅ Encryption Locked! New Protocol active.");
-                document.getElementById('new-admin-pass').value = "";
-                sessionStorage.setItem("secure_master_session", hashHex); // Auto update session
-            } catch (e) {
-                console.error(e);
-                alert("❌ Override Failed. Check DB Rules.");
-            } finally {
-                btn.innerText = ogText; btn.disabled = false;
-            }
-        }
-
-        // All other API functions remain identical, just pointing to the same buttons
+        window.updateAdminPassword = async (btn) => { alert("This feature is disabled for Hardcoded Login Mode."); }
         window.updateAppBanner = async (btn) => { const url = document.getElementById('banner-url-input').value.trim(); if(url) await callAdminApi('update_banner', { url }, btn); };
         window.addTrustImage = async (btn) => { const url = document.getElementById('trust-url-input').value.trim(); if(url) { const arr = [...currentTrustImages, url]; await callAdminApi('update_trust_images', { images: arr }, btn); document.getElementById('trust-url-input').value = ""; } };
-        window.deleteTrustImage = async (i, btn) => { if(confirm("Purge asset?")) { const arr = [...currentTrustImages]; arr.splice(i, 1); btn.innerText = "⏳"; await callAdminApi('update_trust_images', { images: arr }, null); } };
+        window.deleteTrustImage = async (i, btn) => { if(confirm("Remove image?")) { const arr = [...currentTrustImages]; arr.splice(i, 1); btn.innerText = "⏳"; await callAdminApi('update_trust_images', { images: arr }, null); } };
         
         window.openEditModal = (id) => { activeUserId = id; const u = globalUsersData[id]; document.getElementById('edit-name').value = u.name||""; document.getElementById('edit-phone').value = u.phone||""; document.getElementById('edit-upi').value = (u.upi&&u.upi!=="None")?u.upi:""; document.getElementById('edit-bal').value = parseFloat(u.balance||0); const m=document.getElementById('modal-edit'); m.style.display='flex'; m.classList.add('active'); };
         window.saveUserData = async (btn) => { const n = document.getElementById('edit-name').value; const p = document.getElementById('edit-phone').value; const u = document.getElementById('edit-upi').value; let b = parseFloat(document.getElementById('edit-bal').value)||0; const s = await callAdminApi('edit_user', { userId: activeUserId, name: n, phone: p, upi: u || "None", balance: b }, btn); if(s) { document.getElementById('modal-edit').classList.remove('active'); document.getElementById('modal-edit').style.display='none'; } };
-        window.toggleBlockUser = async (id, status, btn) => { const isB = status === 'blocked'; if(confirm(`Confirm override to ${isB?'Unban':'Ban'}?`)) await callAdminApi('toggle_block_user', { userId: id, status: isB ? "active" : "blocked" }, btn); };
+        window.toggleBlockUser = async (id, status, btn) => { const isB = status === 'blocked'; if(confirm(`${isB?'Unban':'Ban'} user?`)) await callAdminApi('toggle_block_user', { userId: id, status: isB ? "active" : "blocked" }, btn); };
         
         window.approveTask = async (id, btn) => { const t = globalTasksData[id]; if(t.status==="Pending Approval") await callAdminApi('approve_task', { taskId: id, userPhone: t.userPhone, reward: t.gigReward }, btn); };
-        window.rejectTask = async (id, btn) => { const t = globalTasksData[id]; if(t.status==="Pending Approval"){ const r = prompt("Rejection Protocol:")||"Invalid Action"; if(r) await callAdminApi('reject_task', { taskId: id, userPhone: t.userPhone, reason: r }, btn); } };
+        window.rejectTask = async (id, btn) => { const t = globalTasksData[id]; if(t.status==="Pending Approval"){ const r = prompt("Rejection Reason:")||"Invalid Action"; if(r) await callAdminApi('reject_task', { taskId: id, userPhone: t.userPhone, reason: r }, btn); } };
         
-        window.markAsPaid = async (id, btn) => { if(confirm("Fund transfer verified?")) await callAdminApi('mark_paid', { withdrawId: id }, btn); };
-        window.rejectPayout = async (id, btn) => { const w = globalWithdrawData[id]; const r = prompt("Refund Protocol Reason:")||"Network Fail"; if(r) await callAdminApi('reject_payout', { withdrawId: id, userPhone: w.userPhone, amount: w.amount, reason: r }, btn); };
+        window.markAsPaid = async (id, btn) => { if(confirm("Confirm payment?")) await callAdminApi('mark_paid', { withdrawId: id }, btn); };
+        window.rejectPayout = async (id, btn) => { const w = globalWithdrawData[id]; const r = prompt("Refund Reason:")||"Network Fail"; if(r) await callAdminApi('reject_payout', { withdrawId: id, userPhone: w.userPhone, amount: w.amount, reason: r }, btn); };
         
         window.addGigToDB = async (btn) => { const t=document.getElementById('gig-title').value.trim(); let r=parseFloat(document.getElementById('gig-reward').value); const c=document.getElementById('gig-category').value; const l=document.getElementById('gig-link').value.trim(); const d=document.getElementById('gig-desc').value.trim(); if(t && r>0) { const s=await callAdminApi('add_gig', { title: t, reward: r, category: c, link: l, desc: d }, btn); if(s) { document.getElementById('gig-title').value=""; document.getElementById('gig-reward').value=""; document.getElementById('gig-link').value=""; document.getElementById('gig-desc').value=""; } } };
-        window.deleteGig = async (id, btn) => { if(confirm("Delete Target?")) await callAdminApi('delete_gig', { gigId: id }, btn); };
+        window.deleteGig = async (id, btn) => { if(confirm("Delete task?")) await callAdminApi('delete_gig', { gigId: id }, btn); };
         
         window.sendNotification = async (btn) => { const t=document.getElementById('notify-title').value.trim(); const m=document.getElementById('notify-msg').value.trim(); if(t&&m){ const s=await callAdminApi('send_notification', { title: t, message: m }, btn); if(s){ document.getElementById('notify-title').value=""; document.getElementById('notify-msg').value=""; } } };
         window.deleteNotification = async (id, btn) => { await callAdminApi('delete_notification', { notifId: id }, btn); };
         
         window.addDealToDB = async (btn) => { const t=document.getElementById('deal-title').value.trim(); const m=parseFloat(document.getElementById('deal-mrp').value); const d=parseFloat(document.getElementById('deal-price').value); const i=document.getElementById('deal-image').value.trim(); const l=document.getElementById('deal-link').value.trim(); if(t&&m&&d&&l&&i){ const s=await callAdminApi('add_deal', { title: t, mrp: m, dealPrice: d, image: i, link: l }, btn); if(s) { document.getElementById('deal-title').value=""; document.getElementById('deal-mrp').value=""; document.getElementById('deal-price').value=""; document.getElementById('deal-image').value=""; document.getElementById('deal-link').value=""; } } };
-        window.deleteDeal = async (id, btn) => { if(confirm("Purge Deal?")) await callAdminApi('delete_deal', { dealId: id }, btn); };
+        window.deleteDeal = async (id, btn) => { if(confirm("Delete Deal?")) await callAdminApi('delete_deal', { dealId: id }, btn); };
 
-        // INITIAL CHECK
         const savedSession = sessionStorage.getItem("secure_master_session");
-        if(savedSession) {
+        if(savedSession === "verified_god_mode") {
             document.body.classList.add('authenticated'); 
             window.startServerSync();
         }
