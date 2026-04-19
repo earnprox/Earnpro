@@ -22,12 +22,10 @@ module.exports = async function handler(req, res) {
         let l1Codes = [], l2Codes = [];
 
         if (myCode) {
-            // Level 1
             const l1Snap = await db.collection('users').where('referCodeUsed', '==', myCode).get();
             l1Count = l1Snap.size;
             l1Snap.forEach(doc => { if (doc.data().ownReferCode) l1Codes.push(doc.data().ownReferCode); });
 
-            // Level 2
             if (l1Codes.length > 0) {
                 for (let i = 0; i < l1Codes.length; i += 10) {
                     const chunk = l1Codes.slice(i, i + 10);
@@ -37,7 +35,6 @@ module.exports = async function handler(req, res) {
                 }
             }
 
-            // Level 3
             if (l2Codes.length > 0) {
                 for (let i = 0; i < l2Codes.length; i += 10) {
                     const chunk = l2Codes.slice(i, i + 10);
@@ -47,7 +44,6 @@ module.exports = async function handler(req, res) {
             }
         }
 
-        // 🔥 Live Task & Referral Earning Calculation
         let taskEarn = 0;
         let referEarn = 0;
 
@@ -65,7 +61,7 @@ module.exports = async function handler(req, res) {
         }
 
         // ==========================================
-        // 🔥 NEW: TRANSACTION HISTORY LOGIC ADDED HERE
+        // 🔥 TRANSACTION HISTORY LOGIC (IST TIME + SPIN + CONVERT)
         // ==========================================
         let transactions = [];
         try {
@@ -86,27 +82,42 @@ module.exports = async function handler(req, res) {
                 });
             });
 
-            // 2. Earnings (Tasks specific to this user)
+            // 2. Earnings (Tasks, Spin & Coin Conversion logged here)
             const userTasksSnap = await db.collection('task_submissions').where('userPhone', '==', phone).get();
             userTasksSnap.forEach(doc => {
                 const t = doc.data();
                 let dateObj = new Date();
                 if (t.timestamp) dateObj = t.timestamp.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
 
+                let displayTitle = "Task Reward";
+                if (t.gigName) {
+                    displayTitle = t.gigName; // Spin aur Coin Convert ke liye yahan se naam uthayega
+                } else if (t.gigTitle) {
+                    displayTitle = `Task: ${t.gigTitle}`; 
+                }
+
                 transactions.push({
                     type: "Earning",
-                    title: t.gigTitle ? `Task: ${t.gigTitle}` : "Task Reward",
+                    title: displayTitle,
                     dateObj: dateObj,
-                    status: t.status || "Pending",
+                    status: t.status || "Completed",
                     amount: parseFloat(t.gigReward || 0)
                 });
             });
 
-            // 3. Sort by Date and Format
+            // 3. Sort by Date and Format (INDIA TIME FIX 🇮🇳)
             transactions.sort((a, b) => b.dateObj - a.dateObj);
+            
             const formatDate = (date) => {
-                const options = { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true };
-                return date.toLocaleString('en-IN', options).replace(',', '');
+                const options = { 
+                    timeZone: 'Asia/Kolkata', 
+                    day: '2-digit', 
+                    month: 'short', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: true 
+                };
+                return date.toLocaleString('en-IN', options).replace(',', '').toUpperCase();
             };
 
             transactions = transactions.map(t => ({
@@ -116,36 +127,19 @@ module.exports = async function handler(req, res) {
                 status: t.status,
                 amount: t.amount
             }));
+            
         } catch (err) {
             console.error("History fetch error:", err);
         }
 
         // 4. Secure Data Packing
         const responseData = {
-            user: {
-                name: userData.name || "User",
-                referCode: userData.ownReferCode || ""
-            },
-            wallet: {
-                balance: userData.balance || 0
-            },
-            kyc: {
-                bankName: userData.bankName || "",
-                upi: userData.upi || ""
-            },
-            stats: {
-                totalEarn: taskEarn + referEarn,
-                totalWithdraw: userData.totalWithdraw || 0,
-                taskEarn: taskEarn,
-                referEarn: referEarn 
-            },
-            network: {
-                l1: l1Count,
-                l2: l2Count,
-                l3: l3Count,
-                totalCount: l1Count + l2Count + l3Count
-            },
-            transactions: transactions // 🔥 Passbook Data Sent Here!
+            user: { name: userData.name || "User", referCode: userData.ownReferCode || "" },
+            wallet: { balance: userData.balance || 0 },
+            kyc: { bankName: userData.bankName || "", upi: userData.upi || "" },
+            stats: { totalEarn: taskEarn + referEarn, totalWithdraw: userData.totalWithdraw || 0, taskEarn: taskEarn, referEarn: referEarn },
+            network: { l1: l1Count, l2: l2Count, l3: l3Count, totalCount: l1Count + l2Count + l3Count },
+            transactions: transactions
         };
 
         return res.status(200).json(responseData);
