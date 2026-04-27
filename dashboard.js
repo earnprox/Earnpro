@@ -16,6 +16,7 @@ window.savedUPI = "";
 window.savedBankName = ""; 
 window.myReferCode = ""; 
 window.myActiveGig = null;
+window.networkData = null; // 🔥 NAYA: Tab switching data hold karne ke liye
 
 // ================= 1. UI FUNCTIONS (TABS & MODALS) =================
 window.showToast = (m) => { 
@@ -41,6 +42,54 @@ window.switchTab = (id) => {
         }
     });
 };
+
+// 🔥 NAYA FUNCTION: Refer Tabs (All, Today, Yesterday) ko switch karne ke liye
+window.switchReferTab = function(tabName) {
+    const tabs = ['all', 'today', 'yesterday'];
+    tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if(el) {
+            if(t === tabName) {
+                el.className = "pb-3 border-b-4 border-[#00A87A] font-black text-slate-800 text-xs uppercase cursor-pointer transition-all";
+            } else {
+                el.className = "pb-3 text-slate-400 font-bold text-xs uppercase cursor-pointer transition-colors hover:text-slate-600";
+            }
+        }
+    });
+
+    if (window.networkData && window.networkData[tabName]) {
+        const d = window.networkData[tabName];
+        const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+
+        // Update Totals for selected tab
+        setText('total-refers-count', d.totalCount || 0);
+        setText('stat-refer-earn-display', (d.totalEarn || 0).toFixed(2));
+
+        // Update 3-Level Graph variables
+        const l1C = d.l1 || 0, l2C = d.l2 || 0, l3C = d.l3 || 0;
+        const maxCount = Math.max(l1C, l2C, l3C) || 1; 
+
+        setText('chart-lvl1-count', l1C);
+        setText('chart-lvl2-count', l2C);
+        setText('chart-lvl3-count', l3C);
+
+        const setHeight = (id, val) => { 
+            const el = document.getElementById(id); 
+            if(el) el.style.height = ((val / maxCount) * 80) + "%"; 
+        };
+        setHeight('chart-lvl1-bar', l1C);
+        setHeight('chart-lvl2-bar', l2C);
+        setHeight('chart-lvl3-bar', l3C);
+
+        // Update Table
+        setText('lvl1-count', l1C);
+        setText('lvl1-earn', (d.l1Earn || 0).toFixed(2));
+        setText('lvl2-count', l2C);
+        setText('lvl2-earn', (d.l2Earn || 0).toFixed(2));
+        setText('lvl3-count', l3C);
+        setText('lvl3-earn', (d.l3Earn || 0).toFixed(2));
+    }
+}
 
 window.openSheet = (id) => { 
     const overlay = document.getElementById('universal-overlay');
@@ -78,10 +127,11 @@ window.copyReferLink = () => {
 
 // ================= 2. SECURE DATA FETCHING =================
 document.addEventListener("DOMContentLoaded", async () => {
+    // Show cached UI immediately for speed
     const cachedName = localStorage.getItem("epx_cached_name");
     if(cachedName) {
         const nameEl = document.getElementById("home-card-user-name");
-        if (nameEl) nameEl.innerText = cachedName;
+        if(nameEl) nameEl.innerText = cachedName;
     }
 
     await syncDashboard();
@@ -106,102 +156,66 @@ async function syncDashboard() {
             window.logoutUser();
         }
     } catch (e) {
-        console.error(e);
         window.showToast("❌ Network Error while syncing.");
-        const logContainer = document.getElementById("referral-list-container");
-        if(logContainer) {
-            logContainer.innerHTML = `<div class="bg-red-50 text-red-500 p-4 rounded-xl text-center font-bold text-sm border border-red-100 shadow-sm">Backend API (/api/dashboard-data) is not responding or connected yet.</div>`;
-        }
     }
 }
 
-// ================= 3. POPULATE UI WITH REAL DATA (IDS FIXED) =================
+// ================= 3. POPULATE UI WITH REAL DATA =================
 function updateDashboardUI(data) {
-    window.currentBalance = data.wallet?.balance || 0;
-    window.savedUPI = data.kyc?.upi || "";
-    window.savedBankName = data.kyc?.bankName || "";
-    window.myReferCode = data.user?.referCode || "";
+    window.currentBalance = data.wallet.balance;
+    window.savedUPI = data.kyc.upi;
+    window.savedBankName = data.kyc.bankName;
+    window.myReferCode = data.user.referCode;
     
-    if(data.user?.name) localStorage.setItem("epx_cached_name", data.user.name);
+    localStorage.setItem("epx_cached_name", data.user.name);
 
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
-    // --- Header & Home Profile ---
-    const userName = data.user?.name || "User";
-    setText("home-card-user-name", userName);
-    setText("profile-user-name", userName);
-    setText("refer-page-name", userName);
-    setText("home-card-refer-code", window.myReferCode);
-    setText("referral-code-text", window.myReferCode);
-    setText("top-nav-profile-initial", userName.charAt(0).toUpperCase());
+    // Header & Home Profile
+    setText("home-card-user-name", data.user.name);
+    setText("profile-user-name", data.user.name);
+    setText("refer-page-name", data.user.name);
+    setText("home-card-refer-code", data.user.referCode);
+    setText("referral-code-text", data.user.referCode);
     
-    // --- Set Avatars ---
-    const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${userName}&backgroundColor=b6e3f4`;
+    const initials = data.user.name.charAt(0).toUpperCase();
+    setText("top-nav-profile-initial", initials);
+    
+    // Set Avatars
+    const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${data.user.name}&backgroundColor=b6e3f4`;
     const setImg = (id) => { const el = document.getElementById(id); if(el) el.src = avatarUrl; };
     setImg("home-profile-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
 
-    // --- Wallet Balances ---
-    setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
-    setText("home-card-big-balance", window.currentBalance.toFixed(2));
-    setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
+    // Wallet Balances
+    setText("home-top-balance", `₹${data.wallet.balance.toFixed(2)}`);
+    setText("withdraw-page-balance", `₹${data.wallet.balance.toFixed(2)}`);
+    setText("home-card-big-balance", data.wallet.balance.toFixed(2));
     
     const mainBal = document.getElementById("main-balance-display");
-    if(mainBal) {
-        const splitBal = window.currentBalance.toFixed(2).split('.');
-        mainBal.innerHTML = `₹${splitBal[0]}<span class="text-xl text-white/80 font-bold drop-shadow-none">.${splitBal[1]}</span>`;
+    if(mainBal) mainBal.innerHTML = `₹${Math.floor(data.wallet.balance)}<span class="text-xl text-white/80 font-bold drop-shadow-none">.${(data.wallet.balance % 1).toFixed(2).split('.')[1]}</span>`;
+
+    // Stats (Vault)
+    setText("stat-total-earn", `₹${data.stats.totalEarn.toFixed(2)}`);
+    setText("stat-total-withdraw", `₹${data.stats.totalWithdraw.toFixed(2)}`);
+    setText("stat-task-earn", `₹${data.stats.taskEarn.toFixed(2)}`);
+    setText("stat-refer-earn", `₹${data.stats.referEarn.toFixed(2)}`);
+
+    // 🔥 FIX: Store Network Data globally for Tab Switching
+    if (data.network && data.network.all) {
+        window.networkData = data.network;
+    } else {
+        // Fallback matching backend structure
+        window.networkData = {
+            all: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
+            today: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
+            yesterday: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 }
+        };
     }
 
-    // --- Vault Stats ---
-    setText("stat-total-earn", `₹${(data.stats?.totalEarn || 0).toFixed(2)}`);
-    setText("stat-total-withdraw", `₹${(data.stats?.totalWithdraw || 0).toFixed(2)}`);
-    setText("stat-task-earn", `₹${(data.stats?.taskEarn || 0).toFixed(2)}`);
-    setText("stat-refer-earn", `₹${(data.stats?.referEarn || 0).toFixed(2)}`);
-    setText("stat-refer-earn-display", (data.stats?.referEarn || 0).toFixed(2));
+    // Load 'ALL' tab by default
+    window.switchReferTab('all');
 
-    // --- 3-Level Network UI Updates (FIXED) ---
-    const n = data.network || {};
-    const l1C = n.l1 || 0, l2C = n.l2 || 0, l3C = n.l3 || 0;
-    const totalC = n.totalCount || (l1C + l2C + l3C);
-
-    setText("total-refers-count", totalC);
-    
-    // Count Texts in Graph
-    setText("chart-lvl1-count", l1C);
-    setText("chart-lvl2-count", l2C);
-    setText("chart-lvl3-count", l3C);
-
-    // Dynamic Graph Heights (FIXED IDs)
-    let maxLvl = Math.max(1, l1C, l2C, l3C);
-    const setHeight = (id, val) => { 
-        const el = document.getElementById(id); 
-        if(el) el.style.height = ((val / maxLvl) * 80) + "%"; 
-    };
-    setHeight("chart-lvl1-bar", l1C);
-    setHeight("chart-lvl2-bar", l2C);
-    setHeight("chart-lvl3-bar", l3C);
-
-    // Table Counts & Commission Split (FIXED IDs)
-    setText("lvl1-count", l1C);
-    setText("lvl1-earn", (n.l1Earn || 0).toFixed(2));
-    
-    setText("lvl2-count", l2C);
-    setText("lvl2-earn", (n.l2Earn || 0).toFixed(2));
-    
-    setText("lvl3-count", l3C);
-    setText("lvl3-earn", (n.l3Earn || 0).toFixed(2));
-
-    // --- Network Logs Fallback ---
-    const logsContainer = document.getElementById('referral-list-container');
-    if (logsContainer) {
-        logsContainer.innerHTML = `
-            <div class="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
-                <span class="text-3xl mb-2 block opacity-50">👥</span>
-                <p class="text-sm font-bold text-slate-400">Network sync active.</p>
-            </div>
-        `;
-    }
-
-    // --- KYC Settings update ---
+    // KYC Settings update
     if (window.savedUPI) {
         document.getElementById("bank-name-input").value = window.savedBankName;
         document.getElementById("upi-input-box").value = window.savedUPI;
