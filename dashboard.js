@@ -35,7 +35,7 @@ window.switchTab = (id) => {
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
         if(btn.dataset.target === id) {
-            btn.classList.remove('text-slate-400'); btn.classList.add('text-[#00A87A]'); // Updated to EarnproX Green
+            btn.classList.remove('text-slate-400'); btn.classList.add('text-[#00A87A]');
         } else {
             btn.classList.add('text-slate-400'); btn.classList.remove('text-[#00A87A]');
         }
@@ -78,9 +78,11 @@ window.copyReferLink = () => {
 
 // ================= 2. SECURE DATA FETCHING =================
 document.addEventListener("DOMContentLoaded", async () => {
-    // Show cached UI immediately for speed
     const cachedName = localStorage.getItem("epx_cached_name");
-    if(cachedName) document.getElementById("home-card-user-name").innerText = cachedName;
+    if(cachedName) {
+        const nameEl = document.getElementById("home-card-user-name");
+        if (nameEl) nameEl.innerText = cachedName;
+    }
 
     await syncDashboard();
 });
@@ -104,66 +106,102 @@ async function syncDashboard() {
             window.logoutUser();
         }
     } catch (e) {
+        console.error(e);
         window.showToast("❌ Network Error while syncing.");
+        const logContainer = document.getElementById("referral-list-container");
+        if(logContainer) {
+            logContainer.innerHTML = `<div class="bg-red-50 text-red-500 p-4 rounded-xl text-center font-bold text-sm border border-red-100 shadow-sm">Backend API (/api/dashboard-data) is not responding or connected yet.</div>`;
+        }
     }
 }
 
-// ================= 3. POPULATE UI WITH REAL DATA =================
+// ================= 3. POPULATE UI WITH REAL DATA (IDS FIXED) =================
 function updateDashboardUI(data) {
-    window.currentBalance = data.wallet.balance;
-    window.savedUPI = data.kyc.upi;
-    window.savedBankName = data.kyc.bankName;
-    window.myReferCode = data.user.referCode;
+    window.currentBalance = data.wallet?.balance || 0;
+    window.savedUPI = data.kyc?.upi || "";
+    window.savedBankName = data.kyc?.bankName || "";
+    window.myReferCode = data.user?.referCode || "";
     
-    localStorage.setItem("epx_cached_name", data.user.name);
+    if(data.user?.name) localStorage.setItem("epx_cached_name", data.user.name);
 
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
-    // Header & Home Profile
-    setText("home-card-user-name", data.user.name);
-    setText("profile-user-name", data.user.name);
-    setText("refer-page-name", data.user.name);
-    setText("home-card-refer-code", data.user.referCode);
-    setText("referral-code-text", data.user.referCode);
+    // --- Header & Home Profile ---
+    const userName = data.user?.name || "User";
+    setText("home-card-user-name", userName);
+    setText("profile-user-name", userName);
+    setText("refer-page-name", userName);
+    setText("home-card-refer-code", window.myReferCode);
+    setText("referral-code-text", window.myReferCode);
+    setText("top-nav-profile-initial", userName.charAt(0).toUpperCase());
     
-    // Set Avatars
-    const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${data.user.name}&backgroundColor=b6e3f4`;
+    // --- Set Avatars ---
+    const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${userName}&backgroundColor=b6e3f4`;
     const setImg = (id) => { const el = document.getElementById(id); if(el) el.src = avatarUrl; };
     setImg("home-profile-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
 
-    // Wallet Balances
-    setText("home-top-balance", `₹${data.wallet.balance.toFixed(2)}`);
-    setText("withdraw-page-balance", `₹${data.wallet.balance.toFixed(2)}`);
+    // --- Wallet Balances ---
+    setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
+    setText("home-card-big-balance", window.currentBalance.toFixed(2));
+    setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
     
     const mainBal = document.getElementById("main-balance-display");
-    if(mainBal) mainBal.innerHTML = `₹ ${Math.floor(data.wallet.balance)}<span class="text-xl text-white/80 font-bold drop-shadow-none">.${(data.wallet.balance % 1).toFixed(2).split('.')[1]}</span>`;
+    if(mainBal) {
+        const splitBal = window.currentBalance.toFixed(2).split('.');
+        mainBal.innerHTML = `₹${splitBal[0]}<span class="text-xl text-white/80 font-bold drop-shadow-none">.${splitBal[1]}</span>`;
+    }
 
-    // Stats
-    setText("stat-total-earn", `₹${data.stats.totalEarn.toFixed(2)}`);
-    setText("stat-total-withdraw", `₹${data.stats.totalWithdraw.toFixed(2)}`);
-    setText("stat-task-earn", `₹${data.stats.taskEarn.toFixed(2)}`);
-    setText("stat-refer-earn", `₹${data.stats.referEarn.toFixed(2)}`);
+    // --- Vault Stats ---
+    setText("stat-total-earn", `₹${(data.stats?.totalEarn || 0).toFixed(2)}`);
+    setText("stat-total-withdraw", `₹${(data.stats?.totalWithdraw || 0).toFixed(2)}`);
+    setText("stat-task-earn", `₹${(data.stats?.taskEarn || 0).toFixed(2)}`);
+    setText("stat-refer-earn", `₹${(data.stats?.referEarn || 0).toFixed(2)}`);
+    setText("stat-refer-earn-display", (data.stats?.referEarn || 0).toFixed(2));
 
-    // 3-Level Network UI Updates
-    setText("total-refers-count", data.network.totalCount);
-    setText("graph-active-members", data.network.totalCount);
-    setText("graph-network-income", `₹${data.stats.referEarn.toFixed(2)}`);
+    // --- 3-Level Network UI Updates (FIXED) ---
+    const n = data.network || {};
+    const l1C = n.l1 || 0, l2C = n.l2 || 0, l3C = n.l3 || 0;
+    const totalC = n.totalCount || (l1C + l2C + l3C);
+
+    setText("total-refers-count", totalC);
     
-    setText("badge-l1", data.network.l1);
-    setText("badge-l2", data.network.l2);
-    setText("badge-l3", data.network.l3);
+    // Count Texts in Graph
+    setText("chart-lvl1-count", l1C);
+    setText("chart-lvl2-count", l2C);
+    setText("chart-lvl3-count", l3C);
 
-    // 🔥 FIX: Graph Level Heights (ग्राफ की पीली लाइनें भरेंगी)
-    let maxLvl = Math.max(1, data.network.l1, data.network.l2, data.network.l3);
+    // Dynamic Graph Heights (FIXED IDs)
+    let maxLvl = Math.max(1, l1C, l2C, l3C);
     const setHeight = (id, val) => { 
         const el = document.getElementById(id); 
-        if(el) el.style.height = Math.max(5, (val / maxLvl) * 80) + "%"; 
+        if(el) el.style.height = ((val / maxLvl) * 80) + "%"; 
     };
-    setHeight("bar-l1", data.network.l1);
-    setHeight("bar-l2", data.network.l2);
-    setHeight("bar-l3", data.network.l3);
+    setHeight("chart-lvl1-bar", l1C);
+    setHeight("chart-lvl2-bar", l2C);
+    setHeight("chart-lvl3-bar", l3C);
 
-    // KYC Settings update
+    // Table Counts & Commission Split (FIXED IDs)
+    setText("lvl1-count", l1C);
+    setText("lvl1-earn", (n.l1Earn || 0).toFixed(2));
+    
+    setText("lvl2-count", l2C);
+    setText("lvl2-earn", (n.l2Earn || 0).toFixed(2));
+    
+    setText("lvl3-count", l3C);
+    setText("lvl3-earn", (n.l3Earn || 0).toFixed(2));
+
+    // --- Network Logs Fallback ---
+    const logsContainer = document.getElementById('referral-list-container');
+    if (logsContainer) {
+        logsContainer.innerHTML = `
+            <div class="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
+                <span class="text-3xl mb-2 block opacity-50">👥</span>
+                <p class="text-sm font-bold text-slate-400">Network sync active.</p>
+            </div>
+        `;
+    }
+
+    // --- KYC Settings update ---
     if (window.savedUPI) {
         document.getElementById("bank-name-input").value = window.savedBankName;
         document.getElementById("upi-input-box").value = window.savedUPI;
@@ -242,7 +280,7 @@ window.processWithdrawReal = async function() {
     } 
 }
 
-// ================= 5. TRANSACTION HISTORY (NEW) =================
+// ================= 5. TRANSACTION HISTORY =================
 window.loadTransactionHistory = async function() {
     const container = document.getElementById('history-container');
     
@@ -255,9 +293,7 @@ window.loadTransactionHistory = async function() {
     `;
 
     try {
-        // Fetch data from Vercel Backend
         const response = await fetch('/api/dashboard-data', {
- 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone: userPhone, token: userToken })
@@ -265,9 +301,8 @@ window.loadTransactionHistory = async function() {
 
         const data = await response.json();
 
-        // Render Data
         if (response.ok && data.transactions && data.transactions.length > 0) {
-            container.innerHTML = ''; // Clear loading spinner
+            container.innerHTML = ''; 
             
             data.transactions.forEach(txn => {
                 const isWithdrawal = txn.type === 'Withdrawal';
@@ -276,7 +311,6 @@ window.loadTransactionHistory = async function() {
                 const icon = isWithdrawal ? '📤' : '🎯';
                 const statusColor = txn.status === 'Completed' ? 'text-[#00A87A]' : (txn.status === 'Rejected' ? 'text-rose-500' : 'text-amber-500');
 
-                // Create Transaction Row
                 container.innerHTML += `
                     <div class="bg-slate-50 border border-slate-100 rounded-[16px] p-4 flex justify-between items-center hover:bg-slate-100 transition-colors mb-2">
                         <div class="flex items-center gap-3">
@@ -297,7 +331,6 @@ window.loadTransactionHistory = async function() {
                 `;
             });
         } else {
-            // No transactions found
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-12">
                     <div class="text-5xl mb-3">📭</div>
