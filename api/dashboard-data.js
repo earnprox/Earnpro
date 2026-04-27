@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
 
         const myCode = userData.ownReferCode;
         
-        // 🔥 NAYA LOGIC: All, Today aur Yesterday ka data alag alag store karne ke liye
+        // Date Logic for ALL, TODAY, YESTERDAY
         const now = new Date();
         const todayStr = getISTDateString(now);
         const yesterdayStr = getISTDateString(new Date(now.getTime() - 24 * 60 * 60 * 1000));
@@ -35,7 +35,6 @@ module.exports = async function handler(req, res) {
             yesterday: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 }
         };
 
-        // Helper: User kis din aya uske hisab se counter badhana
         const evaluateNetworkDate = (docData, level) => {
             networkStats.all[level]++;
             networkStats.all.totalCount++;
@@ -90,6 +89,7 @@ module.exports = async function handler(req, res) {
 
         let taskEarn = 0;
         let referEarn = 0;
+        let networkLogs = []; // 🔥 NAYA: UI ke "Network Logs" section ke liye
 
         try {
             const tasksSnap = await db.collection('task_submissions').where('status', 'in', ['Approved', 'Completed']).get();
@@ -99,14 +99,15 @@ module.exports = async function handler(req, res) {
                 
                 if (t.userPhone === phone) taskEarn += reward;
                 
-                // Task kis din pura hua uska time check karna
                 let timeStr = "";
+                let logDateObj = new Date();
                 if (t.timestamp) {
-                    let dateObj = t.timestamp.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
-                    timeStr = getISTDateString(dateObj);
+                    logDateObj = t.timestamp.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
+                    timeStr = getISTDateString(logDateObj);
                 }
 
-                const applyComm = (level, comm) => {
+                // Helper to apply commission and push to logs
+                const applyComm = (level, comm, percentStr, colorName) => {
                     referEarn += comm;
                     networkStats.all[level] += comm;
                     networkStats.all.totalEarn += comm;
@@ -118,13 +119,31 @@ module.exports = async function handler(req, res) {
                         networkStats.yesterday[level] += comm;
                         networkStats.yesterday.totalEarn += comm;
                     }
+
+                    // Log Data Format for UI
+                    let formatTime = logDateObj.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+                    let displayTime = timeStr === todayStr ? "Today" : (timeStr === yesterdayStr ? "Yesterday" : timeStr);
+                    
+                    networkLogs.push({
+                        name: t.userName || "Network Member", // Fallback agar name na ho
+                        initial: (t.userName || "N").charAt(0).toUpperCase(),
+                        color: colorName,
+                        amount: parseFloat(comm.toFixed(2)),
+                        comm: percentStr,
+                        time: `${displayTime}, ${formatTime}`,
+                        timestamp: logDateObj.getTime()
+                    });
                 };
 
-                // 🔥 COMMISSION SPLIT LOGIC
-                if (t.referrerCode === myCode) applyComm('l1Earn', reward * 0.10);
-                else if (l1Codes.includes(t.referrerCode)) applyComm('l2Earn', reward * 0.06);
-                else if (l2Codes.includes(t.referrerCode)) applyComm('l3Earn', reward * 0.03);
+                // 🔥 COMMISSION SPLIT & LOGGING LOGIC
+                if (t.referrerCode === myCode) applyComm('l1Earn', reward * 0.10, "10%", "emerald");
+                else if (l1Codes.includes(t.referrerCode)) applyComm('l2Earn', reward * 0.06, "6%", "blue");
+                else if (l2Codes.includes(t.referrerCode)) applyComm('l3Earn', reward * 0.03, "3%", "purple");
             });
+
+            // Sabse nayi earning sabse upar dikhane ke liye sort karein
+            networkLogs.sort((a, b) => b.timestamp - a.timestamp);
+
         } catch (err) {
             console.error("Task fetch error:", err);
         }
@@ -194,9 +213,9 @@ module.exports = async function handler(req, res) {
                 taskEarn: taskEarn, 
                 referEarn: referEarn 
             },
-            // 🔥 NAYA NETWORK OBJECT: Ab isme 'all', 'today', aur 'yesterday' aayega
             network: networkStats, 
-            transactions: transactions
+            transactions: transactions,
+            logs: networkLogs // 🔥 NAYA: UI ko ab real logs milenge
         };
 
         return res.status(200).json(responseData);
