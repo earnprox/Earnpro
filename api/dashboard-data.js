@@ -46,15 +46,33 @@ module.exports = async function handler(req, res) {
 
         let taskEarn = 0;
         let referEarn = 0;
+        // 🔥 NAYE VARIABLES: Level-wise earning track karne ke liye
+        let l1Earn = 0, l2Earn = 0, l3Earn = 0; 
 
         try {
             const tasksSnap = await db.collection('task_submissions').where('status', 'in', ['Approved', 'Completed']).get();
             tasksSnap.forEach(doc => {
                 const t = doc.data();
-                if (t.userPhone === phone) taskEarn += (t.gigReward || 0);
-                if (t.referrerCode === myCode) referEarn += (t.gigReward * 0.10);
-                else if (l1Codes.includes(t.referrerCode)) referEarn += (t.gigReward * 0.06);
-                else if (l2Codes.includes(t.referrerCode)) referEarn += (t.gigReward * 0.03);
+                const reward = t.gigReward || 0; // Default to 0 agar reward undefined ho
+                
+                if (t.userPhone === phone) taskEarn += reward;
+                
+                // 🔥 COMMISSION SPLIT LOGIC
+                if (t.referrerCode === myCode) {
+                    const comm = reward * 0.10;
+                    referEarn += comm;
+                    l1Earn += comm;
+                }
+                else if (l1Codes.includes(t.referrerCode)) {
+                    const comm = reward * 0.06;
+                    referEarn += comm;
+                    l2Earn += comm;
+                }
+                else if (l2Codes.includes(t.referrerCode)) {
+                    const comm = reward * 0.03;
+                    referEarn += comm;
+                    l3Earn += comm;
+                }
             });
         } catch (err) {
             console.error("Task fetch error:", err);
@@ -137,8 +155,22 @@ module.exports = async function handler(req, res) {
             user: { name: userData.name || "User", referCode: userData.ownReferCode || "" },
             wallet: { balance: userData.balance || 0 },
             kyc: { bankName: userData.bankName || "", upi: userData.upi || "" },
-            stats: { totalEarn: taskEarn + referEarn, totalWithdraw: userData.totalWithdraw || 0, taskEarn: taskEarn, referEarn: referEarn },
-            network: { l1: l1Count, l2: l2Count, l3: l3Count, totalCount: l1Count + l2Count + l3Count },
+            stats: { 
+                totalEarn: taskEarn + referEarn, 
+                totalWithdraw: userData.totalWithdraw || 0, 
+                taskEarn: taskEarn, 
+                referEarn: referEarn 
+            },
+            network: { 
+                l1: l1Count, 
+                l2: l2Count, 
+                l3: l3Count, 
+                // 🔥 NAYA DATA: Jo frontend table me show hoga
+                l1Earn: l1Earn, 
+                l2Earn: l2Earn, 
+                l3Earn: l3Earn, 
+                totalCount: l1Count + l2Count + l3Count 
+            },
             transactions: transactions
         };
 
