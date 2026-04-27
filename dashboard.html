@@ -257,10 +257,10 @@
                     </div>
                 </div>
 
-                <div class="flex gap-6 border-b border-slate-200 mb-4 px-2">
-                    <div class="pb-3 border-b-4 border-[#00A87A] font-black text-slate-800 text-xs uppercase">ALL</div>
-                    <div class="pb-3 text-slate-400 font-bold text-xs uppercase">TODAY</div>
-                    <div class="pb-3 text-slate-400 font-bold text-xs uppercase">YESTERDAY</div>
+                <div class="flex gap-6 border-b border-slate-200 mb-4 px-2" id="refer-tabs-container">
+                    <div id="tab-all" onclick="switchReferTab('all')" class="pb-3 border-b-4 border-[#00A87A] font-black text-slate-800 text-xs uppercase cursor-pointer transition-all">ALL</div>
+                    <div id="tab-today" onclick="switchReferTab('today')" class="pb-3 text-slate-400 font-bold text-xs uppercase cursor-pointer transition-colors hover:text-slate-600">TODAY</div>
+                    <div id="tab-yesterday" onclick="switchReferTab('yesterday')" class="pb-3 text-slate-400 font-bold text-xs uppercase cursor-pointer transition-colors hover:text-slate-600">YESTERDAY</div>
                 </div>
 
                 <div class="bg-white rounded-[20px] shadow-sm border border-slate-100 overflow-hidden mb-6">
@@ -498,44 +498,35 @@
     <script src="dashboard.js"></script>
 
     <script>
-        // === NAYA CODE: API Se Real Data Fetch Karne Ke Liye ===
-        async function fetchRealReferralData() {
-            try {
-                // User ki details nikal rahe hain jo aapne save ki thi
-                const userPhone = localStorage.getItem("earnprox_user_phone");
-                const userToken = sessionStorage.getItem("earnprox_secure_token");
-
-                // 🔴 YAHAN APNA BACKEND API URL DAALEIN 🔴
-                // Jab tak yahan aapka sahi link nahi dalega, data nahi aayega aur catch block error dega.
-                const API_URL = "https://your-domain.com/api/get-referral-data"; 
-
-                // Backend se data mangwana
-                const response = await fetch(API_URL, {
-                    method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userToken}` 
-                    },
-                    body: JSON.stringify({ phone: userPhone, token: userToken }) 
-                });
-
-                if (!response.ok) throw new Error("API se data nahi mila");
-
-                // API ka response (JSON) receive karna
-                const realData = await response.json();
-
-                // 1. Stats update (FIXED: Using realData.network.totalCount)
-                if(document.getElementById('total-refers-count')) {
-                    document.getElementById('total-refers-count').innerText = realData.network.totalCount || 0;
+        // === FIXED SCRIPT WITH TAB SWITCHING LOGIC ===
+        
+        // Tab switch UI update AND Data update
+        window.switchReferTab = function(tabName) {
+            // Update UI Styles
+            const tabs = ['all', 'today', 'yesterday'];
+            tabs.forEach(t => {
+                const el = document.getElementById('tab-' + t);
+                if(el) {
+                    if(t === tabName) {
+                        el.className = "pb-3 border-b-4 border-[#00A87A] font-black text-slate-800 text-xs uppercase cursor-pointer transition-all";
+                    } else {
+                        el.className = "pb-3 text-slate-400 font-bold text-xs uppercase cursor-pointer transition-colors hover:text-slate-600";
+                    }
                 }
-                if(document.getElementById('stat-refer-earn-display')) {
-                    document.getElementById('stat-refer-earn-display').innerText = (realData.stats.referEarn || 0).toFixed(2);
-                }
+            });
 
-                // 2. 3-Level Graph update (FIXED: Using realData.network.l1, l2, l3)
-                const l1C = realData.network.l1 || 0;
-                const l2C = realData.network.l2 || 0;
-                const l3C = realData.network.l3 || 0;
+            // Update Real Data in UI
+            if (window.networkData && window.networkData[tabName]) {
+                const d = window.networkData[tabName];
+
+                // Update Refer Page Totals
+                if(document.getElementById('total-refers-count')) document.getElementById('total-refers-count').innerText = d.totalCount || 0;
+                if(document.getElementById('stat-refer-earn-display')) document.getElementById('stat-refer-earn-display').innerText = (d.totalEarn || 0).toFixed(2);
+
+                // Update 3-Level Graph
+                const l1C = d.l1 || 0;
+                const l2C = d.l2 || 0;
+                const l3C = d.l3 || 0;
                 const maxCount = Math.max(l1C, l2C, l3C) || 1; 
                 
                 if(document.getElementById('chart-lvl1-count')) {
@@ -551,26 +542,63 @@
                     document.getElementById('chart-lvl3-bar').style.height = `${(l3C / maxCount) * 80}%`;
                 }
 
-                // 3. Table update (FIXED: Using realData.network.l1Earn etc)
+                // Update Commission Table
                 if(document.getElementById('lvl1-count')) {
                     document.getElementById('lvl1-count').innerText = l1C;
-                    document.getElementById('lvl1-earn').innerText = (realData.network.l1Earn || 0).toFixed(2);
+                    document.getElementById('lvl1-earn').innerText = (d.l1Earn || 0).toFixed(2);
                     
                     document.getElementById('lvl2-count').innerText = l2C;
-                    document.getElementById('lvl2-earn').innerText = (realData.network.l2Earn || 0).toFixed(2);
+                    document.getElementById('lvl2-earn').innerText = (d.l2Earn || 0).toFixed(2);
                     
                     document.getElementById('lvl3-count').innerText = l3C;
-                    document.getElementById('lvl3-earn').innerText = (realData.network.l3Earn || 0).toFixed(2);
+                    document.getElementById('lvl3-earn').innerText = (d.l3Earn || 0).toFixed(2);
+                }
+            }
+        }
+
+        async function fetchRealReferralData() {
+            try {
+                const userPhone = localStorage.getItem("earnprox_user_phone");
+                const userToken = sessionStorage.getItem("earnprox_secure_token");
+
+                // 🔴 YAHAN APNA BACKEND API URL DAALEIN 🔴
+                const API_URL = "https://your-domain.com/api/get-referral-data"; 
+
+                const response = await fetch(API_URL, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}` 
+                    },
+                    body: JSON.stringify({ phone: userPhone, token: userToken }) 
+                });
+
+                if (!response.ok) throw new Error("API Request Failed");
+
+                const realData = await response.json();
+
+                // Save data globally to use when clicking tabs
+                if (realData.network && realData.network.all) {
+                    window.networkData = realData.network;
+                } else {
+                    // Fallback just in case backend hasn't updated yet
+                    window.networkData = {
+                        all: realData.network || {},
+                        today: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
+                        yesterday: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 }
+                    };
                 }
 
-                // 4. Network Logs Update (Agar API ne logs bheje hain)
+                // Trigger 'ALL' tab to render the initial data
+                window.switchReferTab('all');
+
+                // Update Network Logs Fallback text
                 const logsContainer = document.getElementById('referral-list-container');
                 if(logsContainer && realData.transactions && realData.transactions.length > 0) {
-                    // Agar backend refer specific log nahi bhej raha, toh abhi fallback message dikha rahe hain
                      logsContainer.innerHTML = `
                         <div class="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
                             <span class="text-3xl mb-2 block opacity-50">👥</span>
-                            <p class="text-sm font-bold text-slate-400">Network logs feature coming soon.</p>
+                            <p class="text-sm font-bold text-slate-400">Network sync active.</p>
                         </div>`;
                 } else if(logsContainer) {
                      logsContainer.innerHTML = `
@@ -581,7 +609,7 @@
                 }
 
             } catch (error) {
-                console.error("Data fetch me error aaya ya API link galat hai:", error);
+                console.error("Data fetch error:", error);
                 const logsContainer = document.getElementById('referral-list-container');
                 if(logsContainer) {
                     logsContainer.innerHTML = `
@@ -592,10 +620,9 @@
             }
         }
 
-        // Jaise hi page open ho, API se real data call ho jaye
         window.addEventListener('DOMContentLoaded', fetchRealReferralData);
 
-        // === AAPKA PURANA SYNC CODE YAHAN HAI ===
+        // Basic Profile and UI Interval Sync (Safely filtered to prevent data overwrite)
         setInterval(() => {
             const bigBal = document.getElementById('home-card-big-balance');
             const topBal = document.getElementById('home-top-balance');
@@ -616,12 +643,6 @@
             const homeWithdraw = document.getElementById('home-card-withdrawn');
             if(statWithdraw && homeWithdraw) {
                 homeWithdraw.innerText = statWithdraw.innerText;
-            }
-
-            const statReferEarnDisplay = document.getElementById('stat-refer-earn-display');
-            const statReferEarn = document.getElementById('stat-refer-earn');
-            if(statReferEarnDisplay && statReferEarn && statReferEarn.innerText !== '₹0.00') {
-                statReferEarnDisplay.innerText = statReferEarn.innerText.replace('₹', '').trim();
             }
 
             const statCode = document.getElementById('referral-code-text');
