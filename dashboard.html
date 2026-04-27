@@ -227,19 +227,19 @@
                 <div class="flex items-end gap-6 h-24 w-full justify-center opacity-90 mt-4 px-6 relative z-10">
                     <div class="flex-1 flex flex-col items-center justify-end h-full gap-2">
                         <span class="text-[10px] font-black text-[#00A87A]" id="chart-lvl1-count">0</span>
-                        <div class="w-full bg-gradient-to-t from-[#00A87A]/50 to-[#00A87A] rounded-t-md transition-all duration-500" style="height: 80%" id="chart-lvl1-bar"></div>
+                        <div class="w-full bg-gradient-to-t from-[#00A87A]/50 to-[#00A87A] rounded-t-md transition-all duration-500" style="height: 0%" id="chart-lvl1-bar"></div>
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Level 1</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-end h-full gap-2">
                         <span class="text-[10px] font-black text-white/70" id="chart-lvl2-count">0</span>
-                        <div class="w-full bg-gradient-to-t from-white/10 to-white/30 rounded-t-md transition-all duration-500" style="height: 50%" id="chart-lvl2-bar"></div>
+                        <div class="w-full bg-gradient-to-t from-white/10 to-white/30 rounded-t-md transition-all duration-500" style="height: 0%" id="chart-lvl2-bar"></div>
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Level 2</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-end h-full gap-2">
                         <span class="text-[10px] font-black text-white/70" id="chart-lvl3-count">0</span>
-                        <div class="w-full bg-gradient-to-t from-white/5 to-white/20 rounded-t-md transition-all duration-500" style="height: 30%" id="chart-lvl3-bar"></div>
+                        <div class="w-full bg-gradient-to-t from-white/5 to-white/20 rounded-t-md transition-all duration-500" style="height: 0%" id="chart-lvl3-bar"></div>
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Level 3</span>
                     </div>
                 </div>
@@ -297,7 +297,7 @@
                 <div id="referral-list-container" class="space-y-2 pb-20">
                     <div class="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
                         <span class="text-3xl mb-2 block opacity-50">👥</span>
-                        <p class="text-sm font-bold text-slate-400">No network logs yet.</p>
+                        <p class="text-sm font-bold text-slate-400">Loading Network Data...</p>
                     </div>
                 </div>
             </div>
@@ -498,6 +498,126 @@
     <script src="dashboard.js"></script>
 
     <script>
+        // === NAYA CODE: API Se Real Data Fetch Karne Ke Liye ===
+        async function fetchRealReferralData() {
+            try {
+                // User ki details nikal rahe hain jo aapne save ki thi
+                const userPhone = localStorage.getItem("earnprox_user_phone");
+                const userToken = sessionStorage.getItem("earnprox_secure_token");
+
+                // 🔴 YAHAN APNA BACKEND API URL DAALEIN 🔴
+                // Jab tak yahan aapka sahi link nahi dalega, data nahi aayega aur catch block error dega.
+                const API_URL = "https://your-domain.com/api/get-referral-data"; 
+
+                // Backend se data mangwana
+                const response = await fetch(API_URL, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}` 
+                    },
+                    body: JSON.stringify({ phone: userPhone })
+                });
+
+                if (!response.ok) throw new Error("API se data nahi mila");
+
+                // API ka response (JSON) receive karna
+                const realData = await response.json();
+
+                /* Hume assume kar rahe hain ki aapka API aesa data bhej raha hai:
+                 {
+                    level1: { count: 10, earning: 100 },
+                    level2: { count: 5, earning: 30 },
+                    level3: { count: 2, earning: 10 },
+                    logs: [ { name: "Rahul", initial: "R", color: "emerald", amount: 15, comm: "10%", time: "Today, 10:AM" } ]
+                 }
+                */
+
+                const level1 = realData.level1 || { count: 0, earning: 0 };
+                const level2 = realData.level2 || { count: 0, earning: 0 };
+                const level3 = realData.level3 || { count: 0, earning: 0 };
+
+                // Total calculate karna
+                const totalMembers = level1.count + level2.count + level3.count;
+                const totalEarnings = (level1.earning + level2.earning + level3.earning).toFixed(2);
+
+                // 1. Stats update
+                if(document.getElementById('total-refers-count')) document.getElementById('total-refers-count').innerText = totalMembers;
+                if(document.getElementById('stat-refer-earn-display')) document.getElementById('stat-refer-earn-display').innerText = totalEarnings;
+
+                // 2. 3-Level Graph update
+                const maxCount = Math.max(level1.count, level2.count, level3.count) || 1; 
+                
+                if(document.getElementById('chart-lvl1-count')) {
+                    document.getElementById('chart-lvl1-count').innerText = level1.count;
+                    document.getElementById('chart-lvl1-bar').style.height = `${(level1.count / maxCount) * 80}%`;
+                }
+                if(document.getElementById('chart-lvl2-count')) {
+                    document.getElementById('chart-lvl2-count').innerText = level2.count;
+                    document.getElementById('chart-lvl2-bar').style.height = `${(level2.count / maxCount) * 80}%`;
+                }
+                if(document.getElementById('chart-lvl3-count')) {
+                    document.getElementById('chart-lvl3-count').innerText = level3.count;
+                    document.getElementById('chart-lvl3-bar').style.height = `${(level3.count / maxCount) * 80}%`;
+                }
+
+                // 3. Table update
+                if(document.getElementById('lvl1-count')) {
+                    document.getElementById('lvl1-count').innerText = level1.count;
+                    document.getElementById('lvl1-earn').innerText = level1.earning.toFixed(2);
+                    
+                    document.getElementById('lvl2-count').innerText = level2.count;
+                    document.getElementById('lvl2-earn').innerText = level2.earning.toFixed(2);
+                    
+                    document.getElementById('lvl3-count').innerText = level3.count;
+                    document.getElementById('lvl3-earn').innerText = level3.earning.toFixed(2);
+                }
+
+                // 4. Network Logs Update (Agar API ne logs bheje hain)
+                const logsContainer = document.getElementById('referral-list-container');
+                if(logsContainer && realData.logs && realData.logs.length > 0) {
+                    let logsHTML = '';
+                    realData.logs.forEach(log => {
+                        logsHTML += `
+                        <div class="bg-white rounded-[16px] p-4 border border-slate-100 shadow-sm flex justify-between items-center active:scale-[0.98] transition-transform cursor-pointer mt-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-${log.color || 'emerald'}-100 text-${log.color || 'emerald'}-600 flex items-center justify-center font-bold text-lg">${log.initial || log.name.charAt(0)}</div>
+                                <div>
+                                    <p class="text-[13px] font-bold text-slate-800">${log.name}</p>
+                                    <p class="text-[10px] font-bold text-slate-400 mt-0.5">${log.time}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[13px] font-black text-[#00A87A]">+ ₹${log.amount}</p>
+                                <p class="text-[10px] font-bold text-slate-400 mt-0.5">${log.comm} Comm.</p>
+                            </div>
+                        </div>`;
+                    });
+                    logsContainer.innerHTML = logsHTML;
+                } else if(logsContainer) {
+                     logsContainer.innerHTML = `
+                        <div class="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
+                            <span class="text-3xl mb-2 block opacity-50">👥</span>
+                            <p class="text-sm font-bold text-slate-400">No network logs yet.</p>
+                        </div>`;
+                }
+
+            } catch (error) {
+                console.error("Data fetch me error aaya ya API link galat hai:", error);
+                const logsContainer = document.getElementById('referral-list-container');
+                if(logsContainer) {
+                    logsContainer.innerHTML = `
+                        <div class="bg-white rounded-xl p-6 text-center border border-red-100 shadow-sm">
+                            <p class="text-sm font-bold text-red-400">Please connect your Backend API.</p>
+                        </div>`;
+                }
+            }
+        }
+
+        // Jaise hi page open ho, API se real data call ho jaye
+        window.addEventListener('DOMContentLoaded', fetchRealReferralData);
+
+        // === AAPKA PURANA SYNC CODE YAHAN HAI ===
         setInterval(() => {
             const bigBal = document.getElementById('home-card-big-balance');
             const topBal = document.getElementById('home-top-balance');
@@ -505,7 +625,6 @@
                 bigBal.innerText = topBal.innerText.replace('₹', '').trim();
             }
             
-            // Dynamic Profile Initial
             const userNameEl = document.getElementById('home-card-user-name');
             const profileInitialEl = document.getElementById('top-nav-profile-initial');
             if (userNameEl && userNameEl.innerText && profileInitialEl) {
@@ -515,23 +634,15 @@
                 }
             }
 
-            // Sync stats for the new 3 columns in the home card
             const statWithdraw = document.getElementById('stat-total-withdraw');
             const homeWithdraw = document.getElementById('home-card-withdrawn');
             if(statWithdraw && homeWithdraw) {
                 homeWithdraw.innerText = statWithdraw.innerText;
             }
 
-            const statTeam = document.getElementById('total-refers-count');
-            const homeTeam = document.getElementById('home-card-team-size');
-            if(statTeam && homeTeam) {
-                homeTeam.innerText = statTeam.innerText;
-            }
-
-            // Sync dynamic values for the Refer Page
             const statReferEarnDisplay = document.getElementById('stat-refer-earn-display');
             const statReferEarn = document.getElementById('stat-refer-earn');
-            if(statReferEarnDisplay && statReferEarn) {
+            if(statReferEarnDisplay && statReferEarn && statReferEarn.innerText !== '₹0.00') {
                 statReferEarnDisplay.innerText = statReferEarn.innerText.replace('₹', '').trim();
             }
 
