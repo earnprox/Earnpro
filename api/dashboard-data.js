@@ -1,5 +1,10 @@
 const { db } = require('./_firebase');
 
+// Naya Helper Function: IST Date nikalne ke liye (ex: "27/4/2026")
+const getISTDateString = (dateObj) => {
+    return new Date(dateObj).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+};
+
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
@@ -18,72 +23,117 @@ module.exports = async function handler(req, res) {
         }
 
         const myCode = userData.ownReferCode;
-        let l1Count = 0, l2Count = 0, l3Count = 0;
+        
+        // 🔥 NAYA LOGIC: All, Today aur Yesterday ka data alag alag store karne ke liye
+        const now = new Date();
+        const todayStr = getISTDateString(now);
+        const yesterdayStr = getISTDateString(new Date(now.getTime() - 24 * 60 * 60 * 1000));
+
+        let networkStats = {
+            all: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
+            today: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
+            yesterday: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 }
+        };
+
+        // Helper: User kis din aya uske hisab se counter badhana
+        const evaluateNetworkDate = (docData, level) => {
+            networkStats.all[level]++;
+            networkStats.all.totalCount++;
+
+            if (docData.createdAt) {
+                let dateObj = docData.createdAt.toDate ? docData.createdAt.toDate() : new Date(docData.createdAt);
+                let docDateStr = getISTDateString(dateObj);
+                
+                if (docDateStr === todayStr) {
+                    networkStats.today[level]++;
+                    networkStats.today.totalCount++;
+                } else if (docDateStr === yesterdayStr) {
+                    networkStats.yesterday[level]++;
+                    networkStats.yesterday.totalCount++;
+                }
+            }
+        };
+
         let l1Codes = [], l2Codes = [];
 
         if (myCode) {
+            // Level 1 Fetch
             const l1Snap = await db.collection('users').where('referCodeUsed', '==', myCode).get();
-            l1Count = l1Snap.size;
-            l1Snap.forEach(doc => { if (doc.data().ownReferCode) l1Codes.push(doc.data().ownReferCode); });
+            l1Snap.forEach(doc => { 
+                const d = doc.data();
+                evaluateNetworkDate(d, 'l1');
+                if (d.ownReferCode) l1Codes.push(d.ownReferCode); 
+            });
 
+            // Level 2 Fetch
             if (l1Codes.length > 0) {
                 for (let i = 0; i < l1Codes.length; i += 10) {
                     const chunk = l1Codes.slice(i, i + 10);
                     const l2Snap = await db.collection('users').where('referCodeUsed', 'in', chunk).get();
-                    l2Count += l2Snap.size;
-                    l2Snap.forEach(doc => { if (doc.data().ownReferCode) l2Codes.push(doc.data().ownReferCode); });
+                    l2Snap.forEach(doc => { 
+                        const d = doc.data();
+                        evaluateNetworkDate(d, 'l2');
+                        if (d.ownReferCode) l2Codes.push(d.ownReferCode); 
+                    });
                 }
             }
 
+            // Level 3 Fetch
             if (l2Codes.length > 0) {
                 for (let i = 0; i < l2Codes.length; i += 10) {
                     const chunk = l2Codes.slice(i, i + 10);
                     const l3Snap = await db.collection('users').where('referCodeUsed', 'in', chunk).get();
-                    l3Count += l3Snap.size;
+                    l3Snap.forEach(doc => { evaluateNetworkDate(doc.data(), 'l3'); });
                 }
             }
         }
 
         let taskEarn = 0;
         let referEarn = 0;
-        // 🔥 NAYE VARIABLES: Level-wise earning track karne ke liye
-        let l1Earn = 0, l2Earn = 0, l3Earn = 0; 
 
         try {
             const tasksSnap = await db.collection('task_submissions').where('status', 'in', ['Approved', 'Completed']).get();
             tasksSnap.forEach(doc => {
                 const t = doc.data();
-                const reward = t.gigReward || 0; // Default to 0 agar reward undefined ho
+                const reward = t.gigReward || 0; 
                 
                 if (t.userPhone === phone) taskEarn += reward;
                 
+                // Task kis din pura hua uska time check karna
+                let timeStr = "";
+                if (t.timestamp) {
+                    let dateObj = t.timestamp.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
+                    timeStr = getISTDateString(dateObj);
+                }
+
+                const applyComm = (level, comm) => {
+                    referEarn += comm;
+                    networkStats.all[level] += comm;
+                    networkStats.all.totalEarn += comm;
+
+                    if (timeStr === todayStr) {
+                        networkStats.today[level] += comm;
+                        networkStats.today.totalEarn += comm;
+                    } else if (timeStr === yesterdayStr) {
+                        networkStats.yesterday[level] += comm;
+                        networkStats.yesterday.totalEarn += comm;
+                    }
+                };
+
                 // 🔥 COMMISSION SPLIT LOGIC
-                if (t.referrerCode === myCode) {
-                    const comm = reward * 0.10;
-                    referEarn += comm;
-                    l1Earn += comm;
-                }
-                else if (l1Codes.includes(t.referrerCode)) {
-                    const comm = reward * 0.06;
-                    referEarn += comm;
-                    l2Earn += comm;
-                }
-                else if (l2Codes.includes(t.referrerCode)) {
-                    const comm = reward * 0.03;
-                    referEarn += comm;
-                    l3Earn += comm;
-                }
+                if (t.referrerCode === myCode) applyComm('l1Earn', reward * 0.10);
+                else if (l1Codes.includes(t.referrerCode)) applyComm('l2Earn', reward * 0.06);
+                else if (l2Codes.includes(t.referrerCode)) applyComm('l3Earn', reward * 0.03);
             });
         } catch (err) {
             console.error("Task fetch error:", err);
         }
 
         // ==========================================
-        // 🔥 TRANSACTION HISTORY LOGIC (IST TIME + SPIN + CONVERT)
+        // 🔥 TRANSACTION HISTORY LOGIC 
         // ==========================================
         let transactions = [];
         try {
-            // 1. Withdrawals
             const withdrawalsSnap = await db.collection('withdrawals').where('phone', '==', phone).get();
             withdrawalsSnap.forEach(doc => {
                 const w = doc.data();
@@ -100,7 +150,6 @@ module.exports = async function handler(req, res) {
                 });
             });
 
-            // 2. Earnings (Tasks, Spin & Coin Conversion logged here)
             const userTasksSnap = await db.collection('task_submissions').where('userPhone', '==', phone).get();
             userTasksSnap.forEach(doc => {
                 const t = doc.data();
@@ -108,11 +157,8 @@ module.exports = async function handler(req, res) {
                 if (t.timestamp) dateObj = t.timestamp.toDate ? t.timestamp.toDate() : new Date(t.timestamp);
 
                 let displayTitle = "Task Reward";
-                if (t.gigName) {
-                    displayTitle = t.gigName; // Spin aur Coin Convert ke liye yahan se naam uthayega
-                } else if (t.gigTitle) {
-                    displayTitle = `Task: ${t.gigTitle}`; 
-                }
+                if (t.gigName) displayTitle = t.gigName; 
+                else if (t.gigTitle) displayTitle = `Task: ${t.gigTitle}`; 
 
                 transactions.push({
                     type: "Earning",
@@ -123,27 +169,14 @@ module.exports = async function handler(req, res) {
                 });
             });
 
-            // 3. Sort by Date and Format (INDIA TIME FIX 🇮🇳)
             transactions.sort((a, b) => b.dateObj - a.dateObj);
-            
             const formatDate = (date) => {
-                const options = { 
-                    timeZone: 'Asia/Kolkata', 
-                    day: '2-digit', 
-                    month: 'short', 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    hour12: true 
-                };
+                const options = { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true };
                 return date.toLocaleString('en-IN', options).replace(',', '').toUpperCase();
             };
 
             transactions = transactions.map(t => ({
-                type: t.type,
-                title: t.title,
-                date: formatDate(t.dateObj),
-                status: t.status,
-                amount: t.amount
+                type: t.type, title: t.title, date: formatDate(t.dateObj), status: t.status, amount: t.amount
             }));
             
         } catch (err) {
@@ -161,16 +194,8 @@ module.exports = async function handler(req, res) {
                 taskEarn: taskEarn, 
                 referEarn: referEarn 
             },
-            network: { 
-                l1: l1Count, 
-                l2: l2Count, 
-                l3: l3Count, 
-                // 🔥 NAYA DATA: Jo frontend table me show hoga
-                l1Earn: l1Earn, 
-                l2Earn: l2Earn, 
-                l3Earn: l3Earn, 
-                totalCount: l1Count + l2Count + l3Count 
-            },
+            // 🔥 NAYA NETWORK OBJECT: Ab isme 'all', 'today', aur 'yesterday' aayega
+            network: networkStats, 
             transactions: transactions
         };
 
