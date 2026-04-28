@@ -16,7 +16,8 @@ window.savedUPI = "";
 window.savedBankName = ""; 
 window.myReferCode = ""; 
 window.myActiveGig = null;
-window.networkData = null; // 🔥 NAYA: Tab switching data hold karne ke liye
+window.networkData = null; // Tabs ke liye
+window.networkDetails = null; // 🔥 FIX: Level list show karne ke liye
 
 // ================= 1. UI FUNCTIONS (TABS & MODALS) =================
 window.showToast = (m) => { 
@@ -43,7 +44,7 @@ window.switchTab = (id) => {
     });
 };
 
-// 🔥 NAYA FUNCTION: Refer Tabs (All, Today, Yesterday) ko switch karne ke liye
+// --- Refer Tabs (All, Today, Yesterday) ko switch karne ke liye ---
 window.switchReferTab = function(tabName) {
     const tabs = ['all', 'today', 'yesterday'];
     tabs.forEach(t => {
@@ -61,11 +62,9 @@ window.switchReferTab = function(tabName) {
         const d = window.networkData[tabName];
         const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
-        // Update Totals for selected tab
         setText('total-refers-count', d.totalCount || 0);
         setText('stat-refer-earn-display', (d.totalEarn || 0).toFixed(2));
 
-        // Update 3-Level Graph variables
         const l1C = d.l1 || 0, l2C = d.l2 || 0, l3C = d.l3 || 0;
         const maxCount = Math.max(l1C, l2C, l3C) || 1; 
 
@@ -81,7 +80,6 @@ window.switchReferTab = function(tabName) {
         setHeight('chart-lvl2-bar', l2C);
         setHeight('chart-lvl3-bar', l3C);
 
-        // Update Table
         setText('lvl1-count', l1C);
         setText('lvl1-earn', (d.l1Earn || 0).toFixed(2));
         setText('lvl2-count', l2C);
@@ -89,6 +87,44 @@ window.switchReferTab = function(tabName) {
         setText('lvl3-count', l3C);
         setText('lvl3-earn', (d.l3Earn || 0).toFixed(2));
     }
+}
+
+// 🔥 Downline List Sheet open karne ka logic 🔥
+window.showDownline = function(level) {
+    const container = document.getElementById('downline-container');
+    const title = document.getElementById('downline-sheet-title');
+    
+    if(!window.networkDetails || !window.networkDetails[level] || window.networkDetails[level].length === 0) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12">
+                <div class="text-5xl mb-3">📭</div>
+                <p class="text-slate-400 font-bold text-sm">No members found.</p>
+            </div>`;
+    } else {
+        let listHTML = '';
+        window.networkDetails[level].forEach(user => {
+            listHTML += `
+            <div class="bg-white rounded-[16px] p-4 border border-slate-100 shadow-sm flex justify-between items-center mb-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-lg border border-slate-200">
+                        ${(user.name || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <p class="text-[13px] font-bold text-slate-800">${user.name || "User"}</p>
+                        <p class="text-[10px] font-bold text-slate-400 mt-0.5">Joined: ${user.date}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[13px] font-black text-[#00A87A]">₹${parseFloat(user.earned || 0).toFixed(2)}</p>
+                    <p class="text-[10px] font-bold text-slate-400 mt-0.5">Earned</p>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = listHTML;
+    }
+
+    title.innerText = level === 'l1' ? "Level 1 Team" : (level === 'l2' ? "Level 2 Team" : "Level 3 Team");
+    window.openSheet('downline-sheet');
 }
 
 window.openSheet = (id) => { 
@@ -127,7 +163,6 @@ window.copyReferLink = () => {
 
 // ================= 2. SECURE DATA FETCHING =================
 document.addEventListener("DOMContentLoaded", async () => {
-    // Show cached UI immediately for speed
     const cachedName = localStorage.getItem("epx_cached_name");
     if(cachedName) {
         const nameEl = document.getElementById("home-card-user-name");
@@ -156,55 +191,62 @@ async function syncDashboard() {
             window.logoutUser();
         }
     } catch (e) {
+        console.error(e);
         window.showToast("❌ Network Error while syncing.");
+        const logContainer = document.getElementById("referral-list-container");
+        if(logContainer) {
+            logContainer.innerHTML = `<div class="bg-red-50 text-red-500 p-4 rounded-xl text-center font-bold text-sm border border-red-100 shadow-sm">Backend API (/api/dashboard-data) is not responding or connected yet.</div>`;
+        }
     }
 }
 
 // ================= 3. POPULATE UI WITH REAL DATA =================
 function updateDashboardUI(data) {
-    window.currentBalance = data.wallet.balance;
-    window.savedUPI = data.kyc.upi;
-    window.savedBankName = data.kyc.bankName;
-    window.myReferCode = data.user.referCode;
+    window.currentBalance = data.wallet?.balance || 0;
+    window.savedUPI = data.kyc?.upi || "";
+    window.savedBankName = data.kyc?.bankName || "";
+    window.myReferCode = data.user?.referCode || "";
     
-    localStorage.setItem("epx_cached_name", data.user.name);
+    if(data.user?.name) localStorage.setItem("epx_cached_name", data.user.name);
 
     const setText = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
 
-    // Header & Home Profile
-    setText("home-card-user-name", data.user.name);
-    setText("profile-user-name", data.user.name);
-    setText("refer-page-name", data.user.name);
-    setText("home-card-refer-code", data.user.referCode);
-    setText("referral-code-text", data.user.referCode);
+    // --- Header & Home Profile ---
+    const userName = data.user?.name || "User";
+    setText("home-card-user-name", userName);
+    setText("profile-user-name", userName);
+    setText("refer-page-name", userName);
+    setText("home-card-refer-code", window.myReferCode);
+    setText("referral-code-text", window.myReferCode);
+    setText("top-nav-profile-initial", userName.charAt(0).toUpperCase());
     
-    const initials = data.user.name.charAt(0).toUpperCase();
-    setText("top-nav-profile-initial", initials);
-    
-    // Set Avatars
-    const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${data.user.name}&backgroundColor=b6e3f4`;
+    // --- Set Avatars ---
+    const avatarUrl = `https://api.dicebear.com/7.x/micah/svg?seed=${userName}&backgroundColor=b6e3f4`;
     const setImg = (id) => { const el = document.getElementById(id); if(el) el.src = avatarUrl; };
     setImg("home-profile-avatar"); setImg("profile-avatar"); setImg("refer-profile-img");
 
-    // Wallet Balances
-    setText("home-top-balance", `₹${data.wallet.balance.toFixed(2)}`);
-    setText("withdraw-page-balance", `₹${data.wallet.balance.toFixed(2)}`);
-    setText("home-card-big-balance", data.wallet.balance.toFixed(2));
+    // --- Wallet Balances ---
+    setText("home-top-balance", `₹${window.currentBalance.toFixed(2)}`);
+    setText("home-card-big-balance", window.currentBalance.toFixed(2));
+    setText("withdraw-page-balance", `₹${window.currentBalance.toFixed(2)}`);
     
     const mainBal = document.getElementById("main-balance-display");
-    if(mainBal) mainBal.innerHTML = `₹${Math.floor(data.wallet.balance)}<span class="text-xl text-white/80 font-bold drop-shadow-none">.${(data.wallet.balance % 1).toFixed(2).split('.')[1]}</span>`;
+    if(mainBal) {
+        const splitBal = window.currentBalance.toFixed(2).split('.');
+        mainBal.innerHTML = `₹${splitBal[0]}<span class="text-xl text-white/80 font-bold drop-shadow-none">.${splitBal[1]}</span>`;
+    }
 
-    // Stats (Vault)
-    setText("stat-total-earn", `₹${data.stats.totalEarn.toFixed(2)}`);
-    setText("stat-total-withdraw", `₹${data.stats.totalWithdraw.toFixed(2)}`);
-    setText("stat-task-earn", `₹${data.stats.taskEarn.toFixed(2)}`);
-    setText("stat-refer-earn", `₹${data.stats.referEarn.toFixed(2)}`);
+    // --- Vault Stats ---
+    setText("stat-total-earn", `₹${(data.stats?.totalEarn || 0).toFixed(2)}`);
+    setText("stat-total-withdraw", `₹${(data.stats?.totalWithdraw || 0).toFixed(2)}`);
+    setText("stat-task-earn", `₹${(data.stats?.taskEarn || 0).toFixed(2)}`);
+    setText("stat-refer-earn", `₹${(data.stats?.referEarn || 0).toFixed(2)}`);
+    setText("stat-refer-earn-display", (data.stats?.referEarn || 0).toFixed(2));
 
-    // 🔥 FIX: Store Network Data globally for Tab Switching
+    // --- Store Data Globally ---
     if (data.network && data.network.all) {
         window.networkData = data.network;
     } else {
-        // Fallback matching backend structure
         window.networkData = {
             all: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
             today: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 },
@@ -212,10 +254,47 @@ function updateDashboardUI(data) {
         };
     }
 
-    // Load 'ALL' tab by default
+    // 🔥 FIX: Store individual user details globally for bottom sheet
+    if (data.networkDetails) {
+        window.networkDetails = data.networkDetails;
+    }
+
+    // Tab Load Karein
     window.switchReferTab('all');
 
-    // KYC Settings update
+    // --- Network Logs Fallback ---
+    const logsContainer = document.getElementById('referral-list-container');
+    if (logsContainer) {
+        if(data.logs && data.logs.length > 0) {
+            let logsHTML = '';
+            data.logs.forEach(log => {
+                logsHTML += `
+                <div class="bg-white rounded-[16px] p-4 border border-slate-100 shadow-sm flex justify-between items-center active:scale-[0.98] transition-transform cursor-pointer mt-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-${log.color || 'emerald'}-100 text-${log.color || 'emerald'}-600 flex items-center justify-center font-bold text-lg">${log.initial}</div>
+                        <div>
+                            <p class="text-[13px] font-bold text-slate-800">${log.name}</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-0.5">${log.time}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[13px] font-black text-[#00A87A]">+ ₹${log.amount}</p>
+                        <p class="text-[10px] font-bold text-slate-400 mt-0.5">${log.comm} Comm.</p>
+                    </div>
+                </div>`;
+            });
+            logsContainer.innerHTML = logsHTML;
+        } else {
+            logsContainer.innerHTML = `
+                <div class="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
+                    <span class="text-3xl mb-2 block opacity-50">👥</span>
+                    <p class="text-sm font-bold text-slate-400">No network logs yet.</p>
+                </div>
+            `;
+        }
+    }
+
+    // --- KYC Settings update ---
     if (window.savedUPI) {
         document.getElementById("bank-name-input").value = window.savedBankName;
         document.getElementById("upi-input-box").value = window.savedUPI;
@@ -298,7 +377,6 @@ window.processWithdrawReal = async function() {
 window.loadTransactionHistory = async function() {
     const container = document.getElementById('history-container');
     
-    // Show Loading State
     container.innerHTML = `
         <div class="flex flex-col items-center justify-center py-10">
             <svg class="animate-spin h-8 w-8 text-[#00A87A] mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
