@@ -483,13 +483,20 @@
         window.myReferCode = ""; 
         window.networkData = null;
         window.networkDetails = null;
-        window.currentReferTab = 'all'; // 🔥 NAYA: Tab state track karne ke liye
+        window.currentReferTab = 'all'; 
 
-        // Function for IST Date matching
         const getISTDate = (offsetDays = 0) => {
             let d = new Date();
             d.setTime(d.getTime() + offsetDays * 24 * 60 * 60 * 1000);
             return d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+        };
+
+        // 🔥 NAYA: Smart Date Matcher (Fix for "Today/Yesterday" empty list)
+        const isSameDate = (dateStr1, dateStr2) => {
+            if(!dateStr1 || !dateStr2 || dateStr1 === 'N/A' || dateStr2 === 'N/A') return false;
+            let [d1, m1, y1] = dateStr1.split(/[-/]/);
+            let [d2, m2, y2] = dateStr2.split(/[-/]/);
+            return parseInt(d1) === parseInt(d2) && parseInt(m1) === parseInt(m2) && parseInt(y1) === parseInt(y2);
         };
 
         window.showToast = (m) => { 
@@ -517,7 +524,7 @@
         };
 
         window.switchReferTab = function(tabName) {
-            window.currentReferTab = tabName; // Status save
+            window.currentReferTab = tabName; 
             
             const tabs = ['all', 'today', 'yesterday'];
             tabs.forEach(t => {
@@ -562,7 +569,7 @@
             }
         }
 
-        // 🔥 FIX: Tab-specific Downline List Filtering
+        // 🔥 FIX: Tab-specific Downline List Filtering & 'N/A' Date Update
         window.showDownline = function(level) {
             const container = document.getElementById('downline-container');
             const title = document.getElementById('downline-sheet-title');
@@ -570,13 +577,12 @@
             let allUsers = window.networkDetails && window.networkDetails[level] ? window.networkDetails[level] : [];
             let filteredUsers = allUsers;
 
-            // Date ke hisab se logo ko filter karo
             if (window.currentReferTab === 'today') {
                 const todayStr = getISTDate(0);
-                filteredUsers = allUsers.filter(u => u.date === todayStr);
+                filteredUsers = allUsers.filter(u => isSameDate(u.date, todayStr));
             } else if (window.currentReferTab === 'yesterday') {
                 const yestStr = getISTDate(-1);
-                filteredUsers = allUsers.filter(u => u.date === yestStr);
+                filteredUsers = allUsers.filter(u => isSameDate(u.date, yestStr));
             }
             
             if(filteredUsers.length === 0) {
@@ -589,7 +595,7 @@
                 let listHTML = '';
                 filteredUsers.forEach(user => {
                     // "N/A" ko 'Old Member' me badal diya jisse design acha lage
-                    let displayDate = user.date === 'N/A' ? 'Old Member' : user.date;
+                    let displayDate = (user.date === 'N/A' || !user.date) ? 'Old Member' : user.date;
                     listHTML += `
                     <div class="bg-white rounded-[16px] p-4 border border-slate-100 shadow-sm flex justify-between items-center mb-2">
                         <div class="flex items-center gap-3">
@@ -736,7 +742,7 @@
                 window.networkDetails = data.networkDetails;
             }
             
-            window.switchReferTab(window.currentReferTab); // Maintain tab state
+            window.switchReferTab(window.currentReferTab); 
 
             const logsContainer = document.getElementById('referral-list-container');
             if(logsContainer && data.logs && data.logs.length > 0) {
