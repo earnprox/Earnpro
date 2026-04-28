@@ -483,6 +483,14 @@
         window.myReferCode = ""; 
         window.networkData = null;
         window.networkDetails = null;
+        window.currentReferTab = 'all'; // 🔥 NAYA: Tab state track karne ke liye
+
+        // Function for IST Date matching
+        const getISTDate = (offsetDays = 0) => {
+            let d = new Date();
+            d.setTime(d.getTime() + offsetDays * 24 * 60 * 60 * 1000);
+            return d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+        };
 
         window.showToast = (m) => { 
             const t = document.getElementById("toast"); 
@@ -509,6 +517,8 @@
         };
 
         window.switchReferTab = function(tabName) {
+            window.currentReferTab = tabName; // Status save
+            
             const tabs = ['all', 'today', 'yesterday'];
             tabs.forEach(t => {
                 const el = document.getElementById('tab-' + t);
@@ -552,19 +562,34 @@
             }
         }
 
+        // 🔥 FIX: Tab-specific Downline List Filtering
         window.showDownline = function(level) {
             const container = document.getElementById('downline-container');
             const title = document.getElementById('downline-sheet-title');
             
-            if(!window.networkDetails || !window.networkDetails[level] || window.networkDetails[level].length === 0) {
+            let allUsers = window.networkDetails && window.networkDetails[level] ? window.networkDetails[level] : [];
+            let filteredUsers = allUsers;
+
+            // Date ke hisab se logo ko filter karo
+            if (window.currentReferTab === 'today') {
+                const todayStr = getISTDate(0);
+                filteredUsers = allUsers.filter(u => u.date === todayStr);
+            } else if (window.currentReferTab === 'yesterday') {
+                const yestStr = getISTDate(-1);
+                filteredUsers = allUsers.filter(u => u.date === yestStr);
+            }
+            
+            if(filteredUsers.length === 0) {
                 container.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-12">
                         <div class="text-5xl mb-3">📭</div>
-                        <p class="text-slate-400 font-bold text-sm">No members found.</p>
+                        <p class="text-slate-400 font-bold text-sm">No members found for this period.</p>
                     </div>`;
             } else {
                 let listHTML = '';
-                window.networkDetails[level].forEach(user => {
+                filteredUsers.forEach(user => {
+                    // "N/A" ko 'Old Member' me badal diya jisse design acha lage
+                    let displayDate = user.date === 'N/A' ? 'Old Member' : user.date;
                     listHTML += `
                     <div class="bg-white rounded-[16px] p-4 border border-slate-100 shadow-sm flex justify-between items-center mb-2">
                         <div class="flex items-center gap-3">
@@ -573,7 +598,7 @@
                             </div>
                             <div>
                                 <p class="text-[13px] font-bold text-slate-800">${user.name || "User"}</p>
-                                <p class="text-[10px] font-bold text-slate-400 mt-0.5">Joined: ${user.date}</p>
+                                <p class="text-[10px] font-bold text-slate-400 mt-0.5">Joined: ${displayDate}</p>
                             </div>
                         </div>
                         <div class="text-right">
@@ -711,7 +736,7 @@
                 window.networkDetails = data.networkDetails;
             }
             
-            window.switchReferTab('all');
+            window.switchReferTab(window.currentReferTab); // Maintain tab state
 
             const logsContainer = document.getElementById('referral-list-container');
             if(logsContainer && data.logs && data.logs.length > 0) {
