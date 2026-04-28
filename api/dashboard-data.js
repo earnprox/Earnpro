@@ -35,13 +35,17 @@ module.exports = async function handler(req, res) {
             yesterday: { l1: 0, l2: 0, l3: 0, l1Earn: 0, l2Earn: 0, l3Earn: 0, totalCount: 0, totalEarn: 0 }
         };
 
+        // 🔥 NAYA: UI List ke liye har level ke users ki detail hold karega
+        let networkDetails = { l1: [], l2: [], l3: [] };
+
         const evaluateNetworkDate = (docData, level) => {
             networkStats.all[level]++;
             networkStats.all.totalCount++;
 
+            let docDateStr = "N/A";
             if (docData.createdAt) {
                 let dateObj = docData.createdAt.toDate ? docData.createdAt.toDate() : new Date(docData.createdAt);
-                let docDateStr = getISTDateString(dateObj);
+                docDateStr = getISTDateString(dateObj);
                 
                 if (docDateStr === todayStr) {
                     networkStats.today[level]++;
@@ -51,6 +55,14 @@ module.exports = async function handler(req, res) {
                     networkStats.yesterday.totalCount++;
                 }
             }
+
+            // 🔥 USER KI LIST BANAYEIN (Frontend me show karne ke liye)
+            networkDetails[level].push({
+                phone: docData.phone,
+                name: docData.name || "Network User",
+                date: docDateStr,
+                earned: 0 // Earning default 0 hai, niche update hogi
+            });
         };
 
         let l1Codes = [], l2Codes = [];
@@ -89,7 +101,7 @@ module.exports = async function handler(req, res) {
 
         let taskEarn = 0;
         let referEarn = 0;
-        let networkLogs = []; // 🔥 NAYA: UI ke "Network Logs" section ke liye
+        let networkLogs = []; 
 
         try {
             const tasksSnap = await db.collection('task_submissions').where('status', 'in', ['Approved', 'Completed']).get();
@@ -106,18 +118,26 @@ module.exports = async function handler(req, res) {
                     timeStr = getISTDateString(logDateObj);
                 }
 
-                // Helper to apply commission and push to logs
-                const applyComm = (level, comm, percentStr, colorName) => {
+                // Helper to apply commission and push to logs + Update List
+                const applyComm = (levelStr, comm, percentStr, colorName) => {
+                    let earnKey = levelStr + 'Earn'; // jaise 'l1' ban jayega 'l1Earn'
+                    
                     referEarn += comm;
-                    networkStats.all[level] += comm;
+                    networkStats.all[earnKey] += comm;
                     networkStats.all.totalEarn += comm;
 
                     if (timeStr === todayStr) {
-                        networkStats.today[level] += comm;
+                        networkStats.today[earnKey] += comm;
                         networkStats.today.totalEarn += comm;
                     } else if (timeStr === yesterdayStr) {
-                        networkStats.yesterday[level] += comm;
+                        networkStats.yesterday[earnKey] += comm;
                         networkStats.yesterday.totalEarn += comm;
+                    }
+
+                    // 🔥 SPECIFIC USER KI EARNING BADAHO
+                    let userIndex = networkDetails[levelStr].findIndex(x => x.phone === t.userPhone);
+                    if (userIndex !== -1) {
+                        networkDetails[levelStr][userIndex].earned += comm;
                     }
 
                     // Log Data Format for UI
@@ -125,7 +145,7 @@ module.exports = async function handler(req, res) {
                     let displayTime = timeStr === todayStr ? "Today" : (timeStr === yesterdayStr ? "Yesterday" : timeStr);
                     
                     networkLogs.push({
-                        name: t.userName || "Network Member", // Fallback agar name na ho
+                        name: t.userName || "Network Member", 
                         initial: (t.userName || "N").charAt(0).toUpperCase(),
                         color: colorName,
                         amount: parseFloat(comm.toFixed(2)),
@@ -135,10 +155,10 @@ module.exports = async function handler(req, res) {
                     });
                 };
 
-                // 🔥 COMMISSION SPLIT & LOGGING LOGIC
-                if (t.referrerCode === myCode) applyComm('l1Earn', reward * 0.10, "10%", "emerald");
-                else if (l1Codes.includes(t.referrerCode)) applyComm('l2Earn', reward * 0.06, "6%", "blue");
-                else if (l2Codes.includes(t.referrerCode)) applyComm('l3Earn', reward * 0.03, "3%", "purple");
+                // 🔥 COMMISSION SPLIT LOGIC
+                if (t.referrerCode === myCode) applyComm('l1', reward * 0.10, "10%", "emerald");
+                else if (l1Codes.includes(t.referrerCode)) applyComm('l2', reward * 0.06, "6%", "blue");
+                else if (l2Codes.includes(t.referrerCode)) applyComm('l3', reward * 0.03, "3%", "purple");
             });
 
             // Sabse nayi earning sabse upar dikhane ke liye sort karein
@@ -214,8 +234,9 @@ module.exports = async function handler(req, res) {
                 referEarn: referEarn 
             },
             network: networkStats, 
+            networkDetails: networkDetails, // 🔥 WOH DATA JISKA HUMEIN INTEZAR THA (Member lists)
             transactions: transactions,
-            logs: networkLogs // 🔥 NAYA: UI ko ab real logs milenge
+            logs: networkLogs 
         };
 
         return res.status(200).json(responseData);
