@@ -13,279 +13,119 @@
     <style>
         body { background-color: #F4F7FA; color: #1D2630; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
         @media (min-width: 768px) { body { padding-left: 260px; } }
-        @media (max-width: 767px) { body { padding-top: 64px; padding-bottom: 30px; } } /* Space for mobile top bar */
-        
-        /* Light Theme Cards */
+        @media (max-width: 767px) { body { padding-top: 64px; padding-bottom: 30px; } }
         .light-card { background: #FFFFFF; box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.03); border-radius: 16px; border: 1px solid #F3F5F7; overflow: hidden; position: relative; }
-        .card-wave { position: absolute; right: 0; top: 0; height: 100%; opacity: 0.4; pointer-events: none; }
-        
-        /* Navigation Sidebar */
         .sidebar { background: #FFFFFF; box-shadow: 4px 0 24px rgba(0,0,0,0.05); }
         .nav-btn { color: #5B6B79; display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
         .nav-active { background: #E8F0FE; color: #4680FF !important; font-weight: 700; border-right: 3px solid #4680FF; border-radius: 8px 0 0 8px; }
-        
-        /* Smooth View Transitions */
         .view-section { display: none; opacity: 0; transform: translateY(10px); }
         .view-section.active { display: block; opacity: 1; transform: translateY(0); transition: all 0.3s ease-out; }
-        
-        /* Auth Screen */
         #auth-screen { display: flex; position: fixed; inset: 0; background: #F4F7FA; z-index: 9999; }
         #admin-app { display: none; }
         .authenticated #auth-screen { display: none; }
         .authenticated #admin-app { display: block; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #F4F7FA; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-        
-        /* Badges */
         .badge-green { background: #E6F4EA; color: #13C296; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-red { background: #FCEAEA; color: #DC2626; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-primary">
 
-    <div id="auth-screen" class="flex flex-col items-center justify-center p-6 relative">
-        <div class="light-card p-10 w-full max-w-sm text-center relative z-10">
-            <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            </div>
+    <div id="auth-screen">
+        <div class="light-card p-10 w-full max-w-sm text-center relative z-10 mx-auto mt-20">
             <h2 class="text-2xl font-black text-textdark mb-2">Admin Portal</h2>
-            <p class="text-textgray text-xs font-semibold mb-8">Sign in to manage EarnproX</p>
-            <input type="password" id="admin-pass" placeholder="Enter Master PIN" class="w-full bg-[#F8FAFC] p-4 rounded-xl mb-6 outline-none border border-slate-200 focus:border-primary font-bold text-center text-textdark transition tracking-widest">
-            <button onclick="window.doLogin(this)" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Secure Login</button>
+            <input type="password" id="admin-pass" placeholder="Enter Master PIN" class="w-full bg-[#F8FAFC] p-4 rounded-xl mb-6 outline-none border border-slate-200 focus:border-primary font-bold text-center tracking-widest">
+            <button onclick="window.doLogin(this)" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Secure Login</button>
         </div>
     </div>
 
     <div id="admin-app">
-        
-        <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-            <div class="flex items-center gap-3">
-                <button onclick="window.toggleSidebar()" class="p-2 -ml-2 text-slate-600 rounded-lg hover:bg-slate-100 transition active:scale-95">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-                <div class="font-black text-xl text-textdark flex items-center">
-                    EarnproX<span class="bg-blue-100 text-primary px-1.5 py-0.5 rounded text-[9px] font-black ml-1.5">PRO</span>
-                </div>
+        <aside id="main-sidebar" class="sidebar fixed inset-y-0 left-0 w-[260px] flex flex-col z-[100] transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black">E</div>
+                <h1 class="text-xl font-black text-textdark">EarnproX</h1>
             </div>
-            <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 text-primary font-bold flex items-center justify-center text-sm shadow-sm">A</div>
-        </div>
-
-        <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[90] hidden md:hidden transition-opacity"></div>
-
-        <aside id="main-sidebar" class="sidebar fixed inset-y-0 left-0 w-[260px] flex flex-col z-[100] transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black text-lg shadow-md">E</div>
-                    <h1 class="text-xl font-black text-textdark">EarnproX</h1>
-                </div>
-                <button onclick="window.toggleSidebar()" class="md:hidden p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            
-            <div class="px-6 py-4 overflow-y-auto hide-scrollbar flex-1">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 mt-2">Dashboard</p>
+            <div class="px-6 py-4 flex-1 overflow-y-auto">
                 <nav class="flex flex-col gap-1">
-                    <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg> Analytics</button>
-                    <button onclick="window.switchView('users', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Manage Users</button>
-                </nav>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-6 mb-3">Finance & Approvals</p>
-                <nav class="flex flex-col gap-1">
-                    <button onclick="window.switchView('reviews', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Task Proofs</button>
-                    <button onclick="window.switchView('payouts', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg> Payout Queue</button>
-                </nav>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-6 mb-3">Content & Setup</p>
-                <nav class="flex flex-col gap-1">
-                    <button onclick="window.switchView('gigs', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Manage Gigs</button>
-                    <button onclick="window.switchView('deals', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg> Loot Deals</button>
-                    <button onclick="window.switchView('notify', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg> Broadcasts</button>
-                    <button onclick="window.switchView('settings', this)" class="nav-btn p-3 text-left font-semibold hover:bg-slate-50 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> UI Settings</button>
+                    <button onclick="window.switchView('dash', this)" class="nav-btn nav-active p-3 font-semibold rounded-lg transition">Analytics</button>
+                    <button onclick="window.switchView('users', this)" class="nav-btn p-3 font-semibold rounded-lg transition">Manage Users</button>
+                    <button onclick="window.switchView('reviews', this)" class="nav-btn p-3 font-semibold rounded-lg transition">Task Proofs</button>
+                    <button onclick="window.switchView('payouts', this)" class="nav-btn p-3 font-semibold rounded-lg transition">Payout Queue</button>
+                    <button onclick="window.switchView('gigs', this)" class="nav-btn p-3 font-semibold rounded-lg transition">Manage Gigs</button>
+                    <button onclick="window.switchView('settings', this)" class="nav-btn p-3 font-semibold rounded-lg transition">Settings</button>
                 </nav>
             </div>
-            <div class="p-6 mt-auto border-t border-slate-100">
-                <button onclick="window.doLogout()" class="w-full py-3 flex items-center justify-center gap-2 text-rose-500 font-bold bg-rose-50 rounded-xl hover:bg-rose-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Logout</button>
+            <div class="p-6 border-t">
+                <button onclick="window.doLogout()" class="w-full py-3 text-rose-500 font-bold bg-rose-50 rounded-xl transition">Logout</button>
             </div>
         </aside>
 
-        <main class="p-5 md:p-8 max-w-7xl mx-auto md:pt-8">
-            
-            <div class="hidden md:flex justify-between items-center mb-8">
-                <div>
-                    <div class="text-[11px] font-semibold text-textgray mb-1 flex items-center gap-2">Home <span class="text-slate-300">/</span> Dashboard</div>
-                    <h2 class="text-3xl font-extrabold text-textdark tracking-tight">Main Dashboard</h2>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center font-bold text-slate-600">A</div>
-            </div>
-
+        <main class="p-5 md:p-8 max-w-7xl mx-auto">
             <section id="view-dash" class="view-section active">
+                <h2 class="text-3xl font-extrabold text-textdark mb-6">Dashboard Overview</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="light-card p-6 flex justify-between items-center">
-                        <svg class="card-wave" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="#13C296" fill-opacity="0.1" d="M0,50 C50,100 150,0 200,50 L200,100 L0,100 Z"></path></svg>
-                        <div class="relative z-10">
-                            <p class="text-xs font-semibold text-textgray mb-1">Total Distributed</p>
-                            <div class="flex items-end gap-3"><h3 id="stat-total-paid" class="text-3xl font-extrabold text-textdark">₹0</h3><span class="badge-green">✔ Lifetime</span></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#E6F4EA] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">💰</span></div>
+                    <div class="light-card p-6">
+                        <p class="text-xs font-semibold text-textgray mb-1">Total Distributed</p>
+                        <h3 id="stat-total-paid" class="text-3xl font-extrabold text-textdark">₹0</h3>
                     </div>
-                    <div class="light-card p-6 flex justify-between items-center">
-                        <svg class="card-wave" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="#4680FF" fill-opacity="0.1" d="M0,50 C50,100 150,0 200,50 L200,100 L0,100 Z"></path></svg>
-                        <div class="relative z-10">
-                            <p class="text-xs font-semibold text-textgray mb-1">Today's Pay Run</p>
-                            <div class="flex items-end gap-3"><h3 id="stat-today-paid" class="text-3xl font-extrabold text-textdark">₹0</h3><span class="badge-green">Live</span></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#E8F0FE] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">💳</span></div>
+                    <div class="light-card p-6">
+                        <p class="text-xs font-semibold text-textgray mb-1">Today's Pay Run</p>
+                        <h3 id="stat-today-paid" class="text-3xl font-extrabold text-textdark">₹0</h3>
                     </div>
-                    <div class="light-card p-6 flex justify-between items-center">
-                        <div class="relative z-10">
-                            <p class="text-xs font-semibold text-textgray mb-1">Pending Liabilities</p>
-                            <div class="flex items-end gap-3"><h3 id="stat-pending-pay" class="text-3xl font-extrabold text-textdark">₹0</h3><span class="badge-red">To Pay</span></div>
-                        </div>
-                        <div class="w-12 h-12 bg-[#FCEAEA] rounded-xl flex items-center justify-center shrink-0 relative z-10"><span class="text-xl">⏳</span></div>
+                    <div class="light-card p-6">
+                        <p class="text-xs font-semibold text-textgray mb-1">Total Users</p>
+                        <h3 id="stat-users" class="text-3xl font-extrabold text-textdark">0</h3>
                     </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Today Tasks Gen.</p><h3 id="stat-today-tasks" class="text-xl font-bold text-textdark mt-1">₹0</h3></div>
-                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Total Tasks Gen.</p><h3 id="stat-total-tasks" class="text-xl font-bold text-textdark mt-1">₹0</h3></div>
-                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Active Referrers</p><h3 id="stat-refer-earn" class="text-xl font-bold text-textdark mt-1">0</h3></div>
-                    <div class="light-card p-5"><p class="text-[10px] font-bold text-textgray uppercase">Total Registered</p><h3 id="stat-users" class="text-2xl font-black text-primary mt-1">0</h3></div>
-                </div>
-                
-                <div class="light-card p-6 mb-8">
-                    <h3 class="text-sm font-bold text-textdark mb-4">Traffic & Activity Overview</h3>
-                    <div class="w-full h-[250px]"><canvas id="revenueChart"></canvas></div>
                 </div>
             </section>
 
             <section id="view-users" class="view-section">
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-                    <h2 class="text-2xl font-extrabold text-textdark">User Management</h2>
-                    <div class="flex gap-2">
-                        <input type="text" id="search-users" onkeyup="window.searchItems('search-users', 'user-list', 'user-item')" placeholder="Search Name/Phone..." class="light-card px-5 py-2.5 outline-none focus:border-primary text-sm font-medium w-full md:w-64">
-                        <button onclick="window.exportCSV('users')" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 rounded-xl text-xs hover:bg-slate-50 transition flex items-center gap-1 shrink-0"><span class="text-lg">📥</span> Export</button>
-                    </div>
-                </div>
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">User Management</h2>
                 <div id="user-list" class="grid gap-3"></div>
             </section>
 
             <section id="view-reviews" class="view-section">
-                <h2 class="text-2xl font-extrabold text-textdark mb-6">Task Verification Queue</h2>
-                <div id="review-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">New Task Proofs</h2>
+                <div id="review-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    </div>
             </section>
 
             <section id="view-payouts" class="view-section">
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-                    <h2 class="text-2xl font-extrabold text-textdark">Payout Requests</h2>
-                    <div class="flex gap-2">
-                        <input type="text" id="search-payouts" onkeyup="window.searchItems('search-payouts', 'payouts-list', 'payout-item')" placeholder="Search UPI/Phone..." class="light-card px-5 py-2.5 outline-none focus:border-primary text-sm font-medium w-full md:w-64">
-                        <button onclick="window.exportCSV('payouts')" class="bg-white border border-slate-200 text-slate-600 font-bold px-4 rounded-xl text-xs hover:bg-slate-50 transition flex items-center gap-1 shrink-0"><span class="text-lg">📥</span> Export</button>
-                    </div>
-                </div>
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">Payout Requests</h2>
                 <div id="payouts-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
             </section>
 
             <section id="view-gigs" class="view-section">
-                <h2 class="text-2xl font-extrabold text-textdark mb-6">Manage Tasks & Gigs</h2>
-                <div class="light-card p-6 md:p-8 space-y-4 mb-8 max-w-3xl">
-                    <h3 class="font-bold text-lg text-textdark border-b border-slate-100 pb-3">Create New Gig</h3>
-                    <input type="text" id="gig-title" placeholder="Task Title (e.g. Install App)" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark">
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <input type="number" id="gig-reward" placeholder="Reward ₹" min="1" class="w-full md:w-1/4 bg-[#E6F4EA] p-3.5 rounded-xl border border-[#13C296] font-black text-[#13C296] outline-none">
-                        <select id="gig-category" class="w-full md:w-1/4 bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-semibold text-textdark outline-none">
+                <h2 class="text-2xl font-extrabold text-textdark mb-6">Create New Gig</h2>
+                <div class="light-card p-6 space-y-4 mb-8">
+                    <input type="text" id="gig-title" placeholder="Task Title" class="w-full p-3.5 rounded-xl border outline-none">
+                    <div class="flex gap-4">
+                        <input type="number" id="gig-reward" placeholder="Reward ₹" class="w-1/2 p-3.5 rounded-xl border outline-none font-bold text-emerald-600">
+                        <select id="gig-category" class="w-1/2 p-3.5 rounded-xl border outline-none">
                             <option value="App Install">App Install</option>
                             <option value="Normal Task">Normal Task</option>
-                            <option value="Follower Task">Follower Task</option>
-                            <option value="Finance">Finance</option>
                         </select>
-                        <input type="url" id="gig-link" placeholder="Task URL / Link" class="w-full md:w-2/4 bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark">
                     </div>
-                    <textarea id="gig-desc" placeholder="Instructions for user..." rows="3" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark"></textarea>
-                    <button onclick="window.addGigToDB(this)" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition">Publish Gig 🚀</button>
+                    <input type="url" id="gig-link" placeholder="Link" class="w-full p-3.5 rounded-xl border outline-none">
+                    <textarea id="gig-desc" placeholder="Instructions..." rows="3" class="w-full p-3.5 rounded-xl border outline-none"></textarea>
+                    <button onclick="window.addGigToDB(this)" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-md">Publish Gig</button>
                 </div>
-                <div id="live-gigs-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </section>
-
-            <section id="view-deals" class="view-section">
-                <h2 class="text-2xl font-extrabold text-textdark mb-6">Loot Deals Config</h2>
-                <div class="light-card p-6 md:p-8 space-y-4 mb-8 max-w-3xl">
-                    <h3 class="font-bold text-lg text-textdark border-b border-slate-100 pb-3">Add Affiliate Deal</h3>
-                    <input type="text" id="deal-title" placeholder="Product Name" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark">
-                    <div class="flex gap-4">
-                        <input type="number" id="deal-mrp" placeholder="Original MRP (₹)" class="w-1/2 bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-semibold text-textgray outline-none line-through">
-                        <input type="number" id="deal-price" placeholder="Deal Price (₹)" class="w-1/2 bg-[#FCEAEA] p-3.5 rounded-xl border border-[#DC2626] font-black text-[#DC2626] outline-none">
-                    </div>
-                    <input type="url" id="deal-image" placeholder="Product Image URL" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark">
-                    <input type="url" id="deal-link" placeholder="Your Affiliate Link" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark">
-                    <button onclick="window.addDealToDB(this)" class="w-full bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition mt-2">Publish Deal 🛒</button>
-                </div>
-                <div id="live-deals-list" class="grid md:grid-cols-2 gap-4"></div>
-            </section>
-
-            <section id="view-notify" class="view-section">
-                <h2 class="text-2xl font-extrabold text-textdark mb-6">Push Notifications</h2>
-                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl mb-8">
-                    <h3 class="font-bold text-lg text-textdark border-b border-slate-100 pb-3">Broadcast Alert</h3>
-                    <input type="text" id="notify-title" placeholder="Alert Title" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-bold outline-none text-textdark">
-                    <textarea id="notify-msg" placeholder="Message content..." rows="3" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 font-medium outline-none text-textdark"></textarea>
-                    <button onclick="window.sendNotification(this)" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition">Send Broadcast 📡</button>
-                </div>
-                <div id="notify-list" class="grid md:grid-cols-2 gap-4"></div>
+                <div id="live-gigs-list" class="grid md:grid-cols-2 gap-4"></div>
             </section>
 
             <section id="view-settings" class="view-section">
                 <h2 class="text-2xl font-extrabold text-textdark mb-6">System Settings</h2>
-                
-                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl border-l-4 border-l-primary mb-6">
-                    <h3 class="font-bold text-lg text-textdark pb-2">🔐 Change Master PIN (Full Control)</h3>
-                    <p class="text-xs font-semibold text-textgray mb-2">Update your Admin Password. It gets encrypted instantly and saved safely.</p>
-                    <input type="password" id="new-admin-pass" placeholder="Enter New PIN" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-bold text-textdark text-center tracking-widest">
-                    <button onclick="window.updateAdminPassword(this)" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl active:scale-95 transition">Update Password Securely</button>
-                </div>
-
-                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl mb-6">
-                    <h3 class="font-bold text-lg text-textdark pb-2">🖼️ Promo Banner Settings</h3>
-                    <input type="url" id="banner-url-input" placeholder="Banner Image URL" class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none text-sm text-textdark">
-                    <div class="mt-4 p-2 rounded-xl bg-slate-50 border border-slate-100">
-                        <img id="banner-preview" src="" alt="Preview" class="w-full h-[120px] object-cover rounded-lg">
-                    </div>
-                    <button onclick="window.updateAppBanner(this)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl border border-slate-200 active:scale-95 transition">Save Banner</button>
-                </div>
-
-                <div class="light-card p-6 md:p-8 space-y-4 max-w-2xl">
-                    <h3 class="font-bold text-lg text-textdark pb-2">🛡️ Trust Reels Images</h3>
-                    <div class="flex gap-2">
-                        <input type="url" id="trust-url-input" placeholder="Image URL (9:16)..." class="w-full bg-[#F8FAFC] p-3.5 rounded-xl border border-slate-200 outline-none font-medium text-sm text-textdark">
-                        <button onclick="window.addTrustImage(this)" class="bg-[#13C296] hover:bg-emerald-600 text-white font-bold px-6 rounded-xl active:scale-95 transition shrink-0">Add</button>
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-slate-100">
-                        <div id="trust-images-list" class="grid grid-cols-3 md:grid-cols-5 gap-3"></div>
-                    </div>
+                <div class="light-card p-6 space-y-4 border-l-4 border-l-primary">
+                    <h3 class="font-bold text-lg">Change Master PIN</h3>
+                    <input type="password" id="new-admin-pass" placeholder="Enter New PIN" class="w-full p-3.5 rounded-xl border outline-none text-center tracking-widest">
+                    <button onclick="window.updateAdminPassword(this)" class="w-full bg-slate-800 text-white font-bold py-3 rounded-xl transition">Update PIN</button>
                 </div>
             </section>
-
         </main>
-    </div>
-
-    <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[10000] items-center justify-center p-4">
-        <div class="light-card w-full max-w-sm p-6 relative">
-            <h3 class="text-xl font-bold text-textdark mb-6 border-b border-slate-100 pb-3">Edit User</h3>
-            <div class="space-y-4 mb-6">
-                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Full Name</label><input type="text" id="edit-name" class="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 font-bold text-sm outline-none text-textdark"></div>
-                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Phone</label><input type="tel" id="edit-phone" class="w-full bg-slate-100 p-3 rounded-xl border border-slate-200 font-bold text-sm outline-none text-slate-400" readonly disabled></div>
-                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">UPI ID</label><input type="text" id="edit-upi" class="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 font-bold text-sm outline-none text-textdark"></div>
-                <div><label class="text-[10px] font-bold text-textgray uppercase ml-1 block">Wallet Balance</label><input type="number" id="edit-bal" min="0" class="w-full bg-[#E8F0FE] p-3 rounded-xl border border-primary text-primary font-black text-lg outline-none"></div>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="window.saveUserData(this)" class="flex-1 bg-[#13C296] hover:bg-emerald-600 text-white font-bold py-3 rounded-xl active:scale-95 transition">Save</button>
-                <button onclick="document.getElementById('modal-edit').classList.remove('active'); document.getElementById('modal-edit').style.display='none';" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition">Cancel</button>
-            </div>
-        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, doc, getDoc, query, where, onSnapshot, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDoc, query, where, onSnapshot, orderBy, updateDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
@@ -298,25 +138,18 @@
         const app = initializeApp(firebaseConfig); 
         const db = getFirestore(app);
 
-        const SECURE_API_TOKEN = "RashiAkash@2026_Secure"; // Backend needs this to accept changes
-        let DB_HASH = null; // Will fetch from DB dynamically
+        const SECURE_API_TOKEN = "RashiAkash@2026_Secure";
+        let DB_HASH = null;
+        let globalUsersData = {}; 
 
-        let globalUsersData = {}; let globalTasksData = {}; let globalWithdrawData = {}; let activeUserId = "";
-        let currentTrustImages = []; 
-        let dashboardChart = null;
-
-        const isToday = (dateObj) => { if(!dateObj) return false; const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); };
-        const getSafeTime = (ts) => ts ? (ts.toMillis ? ts.toMillis() : new Date(ts).getTime()) : 0;
-        const maskPhone = (phone) => phone && phone.length >= 10 ? phone.substring(0,2) + '****' + phone.substring(8) : 'N/A';
-        const maskUpi = (upi) => { if(!upi || upi=='None') return 'NULL'; const pts = upi.split('@'); return pts[0].length > 2 ? pts[0].substring(0,2) + '***@' + (pts[1]||'') : upi; };
-
-        // 🔐 Hashing Function (Creates secure code from PIN)
+        // 🔐 Security Hash
         async function hashString(str) {
             const msgBuffer = new TextEncoder().encode(str);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
             return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
+        // 🛠 Admin API Helper (Stays Same)
         async function callAdminApi(actionName, payloadData, btnElement) {
             const ogText = btnElement ? btnElement.innerText : "";
             if(btnElement) { btnElement.innerText = "⏳"; btnElement.disabled = true; }
@@ -324,294 +157,133 @@
                 const response = await fetch('/api/Rashiandakash', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: actionName, payload: payloadData, secureToken: SECURE_API_TOKEN }) });
                 const data = await response.json();
                 if (response.ok && data.success) return true; 
-                else { alert("❌ Request Failed: " + (data.error || "Unknown")); return false; }
-            } catch (error) { alert("❌ Server connection lost!"); return false; } 
-            finally { if(btnElement) { btnElement.innerText = ogText; setTimeout(() => btnElement.disabled = false, 1500); } }
+                else { alert("❌ Failed: " + (data.error || "Unknown")); return false; }
+            } catch (error) { alert("❌ Connection lost!"); return false; } 
+            finally { if(btnElement) { btnElement.innerText = ogText; btnElement.disabled = false; } }
         }
-
-        function initChart() {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            if(dashboardChart) dashboardChart.destroy();
-            dashboardChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'App Installs & Engagement', data: [15, 30, 20, 50, 45, 80, 110], borderColor: '#4680FF', backgroundColor: 'rgba(70, 128, 255, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#94A3B8' } }, y: { grid: { color: '#F1F5F9', borderDash: [5, 5] }, ticks: { color: '#94A3B8' } } } }
-            });
-        }
-
-        // 🔥 DYNAMIC LOGIN LOGIC (Fetches from DB and Compares Hash)
-        window.doLogin = async (btn) => { 
-            const pass = document.getElementById('admin-pass').value.trim();
-            if(!pass) return alert("Enter PIN first.");
-            btn.innerText = "Verifying..."; btn.disabled = true;
-            
-            try {
-                // Fetch Master Config directly to get the latest Hash
-                const docSnap = await getDoc(doc(db, "app_settings", "master_config"));
-                if (docSnap.exists() && docSnap.data().adminHash) {
-                    DB_HASH = docSnap.data().adminHash;
-                }
-
-                const inputHash = await hashString(pass);
-
-                // If DB has Hash, check it. If DB is empty (first run), check fallback "Akash@2026"
-                if ((DB_HASH && inputHash === DB_HASH) || (!DB_HASH && pass === "Akash@2026")) { 
-                    sessionStorage.setItem("secure_master_session", "verified"); 
-                    document.body.classList.add('authenticated'); 
-                    window.startServerSync(); 
-                } else { 
-                    alert("❌ Incorrect Password."); 
-                    btn.innerText = "Secure Login"; 
-                    btn.disabled = false;
-                } 
-            } catch (error) {
-                alert("❌ Database Connection Failed.");
-                btn.innerText = "Secure Login"; 
-                btn.disabled = false;
-            }
-        };
-
-        window.doLogout = () => { sessionStorage.removeItem("secure_master_session"); location.reload(); };
-
-        // 📱 Hamburger Menu Toggle
-        window.toggleSidebar = () => {
-            const sidebar = document.getElementById('main-sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        };
-
-        window.switchView = (id, btn) => { 
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); 
-            if(btn) btn.classList.add('nav-active'); 
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active')); 
-            document.getElementById('view-' + id).classList.add('active'); 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            if(id === 'dash') initChart();
-            
-            // Auto close sidebar on mobile after clicking
-            if(window.innerWidth < 768) {
-                window.toggleSidebar();
-            }
-        };
-
-        window.searchItems = (inputId, listId, itemClass) => {
-            const query = document.getElementById(inputId).value.toLowerCase();
-            const items = document.getElementById(listId).getElementsByClassName(itemClass);
-            for(let i = 0; i < items.length; i++) {
-                items[i].style.display = items[i].innerText.toLowerCase().includes(query) ? "flex" : "none";
-            }
-        };
-
-        window.exportCSV = (type) => {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            if(type === 'users') {
-                csvContent += "ID,Name,Phone,UPI,Balance,Status,Refer Code\n";
-                Object.keys(globalUsersData).forEach(k => {
-                    const u = globalUsersData[k];
-                    csvContent += `${k},${u.name},${u.phone},${u.upi||'None'},${u.balance||0},${u.status},${u.ownReferCode||'None'}\n`;
-                });
-            } else if (type === 'payouts') {
-                csvContent += "ID,UserPhone,Amount,UPI,Status,Date\n";
-                Object.keys(globalWithdrawData).forEach(k => {
-                    const w = globalWithdrawData[k];
-                    csvContent += `${k},${w.userPhone},${w.amount},${w.upi},${w.status},${new Date(getSafeTime(w.timestamp)).toLocaleDateString()}\n`;
-                });
-            }
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", `EarnproX_${type}.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        };
-
-        // 🔥 LOGIN AS USER (Impersonation)
-        window.loginAsUser = (phone, token) => {
-            if(!token) return alert("❌ User has not generated a session token yet.");
-            if(confirm(`Login directly to ${phone}'s account?`)) {
-                localStorage.setItem("earnprox_user_phone", phone);
-                sessionStorage.setItem("earnprox_secure_token", token);
-                window.open('dashboard.html', '_blank'); 
-            }
-        };
 
         window.startServerSync = function() {
-            initChart(); 
-            
-            onSnapshot(doc(db, "app_settings", "master_config"), (docSnap) => {
-                if(docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(data.adminHash) DB_HASH = data.adminHash; // Keep hash updated
-                    if(data.bannerUrl) { document.getElementById('banner-url-input').value = data.bannerUrl; document.getElementById('banner-preview').src = data.bannerUrl; }
-                    if(data.trustImages) { currentTrustImages = data.trustImages; window.renderTrustImages(); }
-                }
-            });
-
+            // Real-time Stats & Users
             onSnapshot(collection(db, "users"), (snap) => {
                 document.getElementById('stat-users').innerText = snap.size;
-                let html = ""; let totalUserBal = 0; let totalReferUsers = 0;
+                let html = "";
                 snap.forEach(d => {
-                    const u = d.data(); globalUsersData[d.id] = u; totalUserBal += parseFloat(u.balance || 0);
-                    if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
-                    const isB = u.status === 'blocked';
-                    
-                    html += `
-                    <div class="user-item light-card p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isB ? 'opacity-50 grayscale bg-slate-50' : ''}">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-[#E8F0FE] text-primary flex items-center justify-center font-bold text-xl">${(u.name?u.name.charAt(0):"U").toUpperCase()}</div>
-                            <div>
-                                <p class="font-bold text-textdark">${u.name || "Unknown"} ${isB ? '🛑' : ''}</p>
-                                <p class="text-[11px] font-semibold text-textgray mt-0.5">+91 ${maskPhone(u.phone)} • ${maskUpi(u.upi)}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                            <p class="font-black text-primary text-xl">₹${parseFloat(u.balance || 0).toFixed(2)}</p>
-                            <div class="flex gap-2">
-                                <button onclick="window.loginAsUser('${u.phone}', '${u.sessionToken}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[10px] font-bold px-3 py-2 rounded-lg transition" title="Login as this user">LOGIN AS 🔑</button>
-                                <button onclick="window.openEditModal('${d.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold px-3 py-2 rounded-lg transition">EDIT</button>
-                                <button onclick="window.toggleBlockUser('${d.id}', '${u.status}', this)" class="${isB?'bg-[#E6F4EA] text-[#13C296]':'bg-[#FCEAEA] text-[#DC2626]'} text-[10px] font-bold px-3 py-2 rounded-lg transition">${isB?'UNBAN':'BAN'}</button>
-                            </div>
-                        </div>
+                    const u = d.data(); globalUsersData[d.id] = u;
+                    html += `<div class="light-card p-4 flex justify-between items-center">
+                        <div class="font-bold text-textdark">${u.name || u.phone}</div>
+                        <div class="font-black text-primary">₹${parseFloat(u.balance || 0).toFixed(2)}</div>
                     </div>`;
                 });
-                document.getElementById('user-list').innerHTML = html || "<p class='text-slate-500'>No users found.</p>";
-                document.getElementById('stat-user-bal').innerText = `₹${totalUserBal.toFixed(2)}`;
-                document.getElementById('stat-refer-earn').innerText = `${totalReferUsers}`; 
+                document.getElementById('user-list').innerHTML = html;
             });
 
-            onSnapshot(collection(db, "task_submissions"), (snap) => {
-                let html = ""; let todayTaskEarn = 0; let totalTaskEarn = 0; const tasks = [];
-                snap.forEach(d => tasks.push({id: d.id, ...d.data()}));
-                tasks.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-                tasks.forEach(t => {
-                    globalTasksData[t.id] = t; const rAmt = parseFloat(t.gigReward || 0);
-                    if(t.status === "Completed" || t.status === "Approved") { totalTaskEarn += rAmt; if(isToday(t.timestamp)) todayTaskEarn += rAmt; }
-                    if(t.status === "Pending Approval") {
+            // 🚀 NEW SYNC: Task Submissions (For Verification)
+            onSnapshot(collection(db, "submissions"), (snap) => {
+                let html = "";
+                const subs = [];
+                snap.forEach(d => subs.push({ id: d.id, ...d.data() }));
+                subs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                subs.forEach(s => {
+                    if(s.status === "PENDING") {
                         html += `
-                        <div class="light-card p-5 flex flex-col justify-between border-l-4 border-l-orange-400">
-                            <div class="mb-5">
-                                <span class="text-[9px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded inline-block mb-2">AWAITING VERIFICATION</span>
-                                <h4 class="font-bold text-textdark text-sm leading-tight">${t.gigName}</h4>
-                                <p class="text-[11px] font-semibold text-textgray mt-1">+91 ${maskPhone(t.userPhone)}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <a href="${t.proofLink}" target="_blank" class="flex-1 bg-slate-100 text-center text-slate-600 font-bold text-[10px] py-2.5 rounded-lg border border-slate-200">PROOF ↗</a>
-                                <button onclick="window.approveTask('${t.id}', this)" class="flex-1 bg-[#13C296] text-white font-bold text-[10px] py-2.5 rounded-lg">PAY ₹${rAmt}</button>
-                                <button onclick="window.rejectTask('${t.id}', this)" class="bg-[#FCEAEA] text-[#DC2626] font-bold px-3 py-2.5 rounded-lg text-[10px]">X</button>
+                        <div class="light-card p-5 border-l-4 border-l-indigo-500">
+                            <span class="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded inline-block mb-2 uppercase">New Proof</span>
+                            <h4 class="font-bold text-sm leading-tight">${s.taskTitle}</h4>
+                            <p class="text-[11px] font-bold text-slate-400 mt-1">User: +91 ${s.userPhone}</p>
+                            <div class="flex gap-2 mt-4">
+                                <a href="${s.screenshotUrl}" target="_blank" class="flex-1 bg-slate-100 text-center font-bold text-[10px] py-3 rounded-xl border transition">VIEW 🖼️</a>
+                                <button onclick="window.processSubmission('${s.id}', 'COMPLETED', '${s.userPhone}', this)" class="flex-1 bg-emerald-500 text-white font-bold text-[10px] py-3 rounded-xl shadow-md transition">APPROVE</button>
+                                <button onclick="window.processSubmission('${s.id}', 'REJECTED', '${s.userPhone}', this)" class="bg-rose-50 text-rose-500 font-bold px-4 py-3 rounded-xl text-[10px] transition">✖</button>
                             </div>
                         </div>`;
                     }
                 });
-                document.getElementById('stat-today-tasks').innerText = `₹${todayTaskEarn.toFixed(2)}`;
-                document.getElementById('stat-total-tasks').innerText = `₹${totalTaskEarn.toFixed(2)}`;
-                document.getElementById('review-list').innerHTML = html || "<p class='text-slate-500'>No pending tasks.</p>";
+                document.getElementById('review-list').innerHTML = html || "<p class='text-slate-400 font-bold py-10 text-center col-span-full'>No pending proofs.</p>";
             });
 
-            onSnapshot(collection(db, "withdrawals"), (snap) => {
-                let html = ""; let pendingAmt = 0; let totalPaid = 0; let todayPaid = 0; const withs = [];
-                snap.forEach(d => withs.push({ id: d.id, ...d.data() }));
-                withs.sort((a, b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-                withs.forEach(w => {
-                    globalWithdrawData[w.id] = w; const wAmt = parseFloat(w.amount || 0);
-                    if(w.status === "Pending") {
-                        pendingAmt += wAmt;
-                        html += `
-                        <div class="light-card p-5 flex justify-between items-center border-l-4 border-l-[#DC2626]">
-                            <div class="w-full">
-                                <span class="text-[9px] font-bold text-[#DC2626] tracking-widest mb-1 block uppercase">UPI Transfer</span>
-                                <h4 class="font-bold text-textdark text-sm">${w.upi}</h4>
-                                <p class="text-[10px] font-semibold text-textgray mt-1">+91 ${maskPhone(w.userPhone)}</p>
-                            </div>
-                            <div class="text-right shrink-0">
-                                <p class="font-black text-[#DC2626] text-xl mb-2">₹${wAmt}</p>
-                                <div class="flex gap-2 justify-end">
-                                    <button onclick="window.markAsPaid('${w.id}', this)" class="bg-[#13C296] text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm">PAY ✅</button>
-                                    <button onclick="window.rejectPayout('${w.id}', this)" class="bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-2 rounded-lg">REJECT</button>
-                                </div>
-                            </div>
-                        </div>`;
-                    } else if (w.status === "Completed") { totalPaid += wAmt; if(isToday(w.completedAt || w.timestamp)) todayPaid += wAmt; }
-                });
-                document.getElementById('stat-today-paid').innerText = `₹${todayPaid.toFixed(2)}`;
-                document.getElementById('stat-total-paid').innerText = `₹${totalPaid.toFixed(2)}`;
-                document.getElementById('stat-pending-pay').innerText = `₹${pendingAmt.toFixed(2)}`;
-                document.getElementById('payouts-list').innerHTML = html || "<p class='text-slate-500'>No pending payouts.</p>";
-            });
-
+            // Gigs Listener
             onSnapshot(collection(db, "gigs"), (snap) => {
-                let html = ""; snap.forEach(d => { const g = d.data(); html += `<div class="light-card p-5 flex justify-between items-start"><div class="pr-2"><span class="text-[9px] font-bold bg-[#E8F0FE] text-primary px-2 py-0.5 rounded-md inline-block mb-2">${g.category}</span><h4 class="font-bold text-textdark text-sm leading-tight mb-1">${g.title}</h4><p class="text-xs text-[#13C296] font-bold">₹${g.reward}</p></div><button onclick="window.deleteGig('${d.id}', this)" class="text-[#DC2626] bg-[#FCEAEA] p-2 rounded-lg text-[10px] font-bold">DELETE</button></div>`; });
-                document.getElementById('live-gigs-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No active gigs.</p>";
-            });
-
-            onSnapshot(query(collection(db, "deals"), orderBy("timestamp", "desc")), (snap) => {
-                let html = ""; snap.forEach(d => { const deal = d.data(); html += `<div class="light-card p-5 flex items-center gap-4"><img src="${deal.image}" class="w-14 h-14 rounded-lg object-contain border border-slate-100 shrink-0"><div class="flex-1"><h4 class="text-xs font-bold text-textdark line-clamp-1">${deal.title}</h4><div class="flex items-center gap-2 mt-1"><span class="text-rose-500 text-sm font-black">₹${deal.dealPrice}</span><span class="text-textgray text-[10px] line-through">₹${deal.mrp}</span></div></div><button onclick="window.deleteDeal('${d.id}', this)" class="text-[#DC2626] bg-[#FCEAEA] p-2 rounded-lg text-[10px] font-bold">DEL</button></div>`; });
-                document.getElementById('live-deals-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No active deals.</p>";
-            });
-            
-            onSnapshot(collection(db, "notifications"), (snap) => {
-                let html = ""; const notifs = []; snap.forEach(d => notifs.push({ id: d.id, ...d.data() })); notifs.sort((a, b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
-                notifs.forEach(n => { html += `<div class="light-card p-4 flex justify-between items-start"><div class="pr-2"><h4 class="text-xs font-bold text-textdark">${n.title}</h4><p class="text-[10px] text-textgray mt-1 line-clamp-2">${n.message}</p></div><button onclick="window.deleteNotification('${n.id}', this)" class="text-slate-400 hover:text-rose-500 p-1.5 rounded transition">X</button></div>`; });
-                document.getElementById('notify-list').innerHTML = html || "<p class='text-slate-500 text-sm'>No notifications.</p>";
+                let html = ""; snap.forEach(d => { const g = d.data(); html += `<div class="light-card p-4 flex justify-between items-center"><h4 class="font-bold text-sm">${g.title}</h4><button onclick="window.deleteGig('${d.id}', this)" class="text-rose-500 font-bold">DEL</button></div>`; });
+                document.getElementById('live-gigs-list').innerHTML = html;
             });
         };
 
-        window.renderTrustImages = function() {
-            const container = document.getElementById('trust-images-list');
-            if (currentTrustImages.length === 0) { container.innerHTML = "<p class='text-xs text-slate-500'>No images added.</p>"; return; }
-            let html = ""; currentTrustImages.forEach((url, i) => { html += `<div class="relative group rounded-xl overflow-hidden border border-slate-200 aspect-[9/16]"><img src="${url}" class="w-full h-full object-cover"><button onclick="window.deleteTrustImage(${i}, this)" class="absolute inset-0 bg-red-600/80 text-white font-bold text-[10px] opacity-0 group-hover:opacity-100 transition flex items-center justify-center">DELETE</button></div>`; });
-            container.innerHTML = html;
-        }
+        // 🚀 SUBMISSION PROCESSOR (Syncs with user app)
+        window.processSubmission = async (docId, newStatus, phone, btn) => {
+            if(!confirm(`Mark this task as ${newStatus}?`)) return;
+            const ogText = btn.innerText; btn.innerText = "⏳"; btn.disabled = true;
 
-        // 🔥 FULLY DYNAMIC PASSWORD CONTROL
-        window.updateAdminPassword = async (btn) => {
-            const newPass = document.getElementById('new-admin-pass').value.trim();
-            if(newPass.length < 4) return alert("⚠️ PIN must be at least 4 characters long.");
-            
-            const ogText = btn.innerText; btn.innerText = "Encrypting..."; btn.disabled = true;
             try {
-                // 1. Password ko Hash me convert karo (Taki koi plain text me padh na sake)
-                const hashHex = await hashString(newPass);
-                
-                // 2. Firebase me save kar do
-                await setDoc(doc(db, "app_settings", "master_config"), { adminHash: hashHex }, { merge: true });
-                
-                alert("✅ Password Successfully Changed! Your new PIN is active.");
-                document.getElementById('new-admin-pass').value = "";
-                DB_HASH = hashHex; // Local update
+                // Update submission status
+                await updateDoc(doc(db, "submissions", docId), { status: newStatus, processedAt: new Date().toISOString() });
+
+                // If Approved, trigger wallet update via your Vercel Admin API
+                if(newStatus === 'COMPLETED') {
+                    // Fetch submission data to get reward
+                    const subSnap = await getDoc(doc(db, "submissions", docId));
+                    const subData = subSnap.data();
+                    
+                    // Fetch gig to get exact reward amount
+                    const gigQuery = query(collection(db, "gigs"), where("title", "==", subData.taskTitle));
+                    const gigSnap = await getDoc(doc(db, "gigs", subData.taskId)); // Assuming taskId is the doc ID in gigs
+                    
+                    const reward = gigSnap.exists() ? gigSnap.data().reward : 0;
+
+                    // Call your existing Vercel API action to update balance
+                    await callAdminApi('approve_task', { 
+                        taskId: docId, 
+                        userPhone: phone, 
+                        reward: reward 
+                    }, btn);
+                }
+                alert(`Task ${newStatus}!`);
             } catch (e) {
                 console.error(e);
-                alert("❌ Could not save password. Check Firebase rules.");
+                alert("Processing failed.");
             } finally {
                 btn.innerText = ogText; btn.disabled = false;
             }
         };
 
-        window.updateAppBanner = async (btn) => { const url = document.getElementById('banner-url-input').value.trim(); if(url) await callAdminApi('update_banner', { url }, btn); };
-        window.addTrustImage = async (btn) => { const url = document.getElementById('trust-url-input').value.trim(); if(url) { const arr = [...currentTrustImages, url]; await callAdminApi('update_trust_images', { images: arr }, btn); document.getElementById('trust-url-input').value = ""; } };
-        window.deleteTrustImage = async (i, btn) => { if(confirm("Remove image?")) { const arr = [...currentTrustImages]; arr.splice(i, 1); btn.innerText = "⏳"; await callAdminApi('update_trust_images', { images: arr }, null); } };
-        
-        window.openEditModal = (id) => { activeUserId = id; const u = globalUsersData[id]; document.getElementById('edit-name').value = u.name||""; document.getElementById('edit-phone').value = u.phone||""; document.getElementById('edit-upi').value = (u.upi&&u.upi!=="None")?u.upi:""; document.getElementById('edit-bal').value = parseFloat(u.balance||0); const m=document.getElementById('modal-edit'); m.style.display='flex'; m.classList.add('active'); };
-        window.saveUserData = async (btn) => { const n = document.getElementById('edit-name').value; const p = document.getElementById('edit-phone').value; const u = document.getElementById('edit-upi').value; let b = parseFloat(document.getElementById('edit-bal').value)||0; const s = await callAdminApi('edit_user', { userId: activeUserId, name: n, phone: p, upi: u || "None", balance: b }, btn); if(s) { document.getElementById('modal-edit').classList.remove('active'); document.getElementById('modal-edit').style.display='none'; } };
-        window.toggleBlockUser = async (id, status, btn) => { const isB = status === 'blocked'; if(confirm(`${isB?'Unban':'Ban'} user?`)) await callAdminApi('toggle_block_user', { userId: id, status: isB ? "active" : "blocked" }, btn); };
-        
-        window.approveTask = async (id, btn) => { const t = globalTasksData[id]; if(t.status==="Pending Approval") await callAdminApi('approve_task', { taskId: id, userPhone: t.userPhone, reward: t.gigReward }, btn); };
-        window.rejectTask = async (id, btn) => { const t = globalTasksData[id]; if(t.status==="Pending Approval"){ const r = prompt("Rejection Reason:")||"Invalid Action"; if(r) await callAdminApi('reject_task', { taskId: id, userPhone: t.userPhone, reason: r }, btn); } };
-        
-        window.markAsPaid = async (id, btn) => { if(confirm("Confirm payment?")) await callAdminApi('mark_paid', { withdrawId: id }, btn); };
-        window.rejectPayout = async (id, btn) => { const w = globalWithdrawData[id]; const r = prompt("Refund Reason:")||"Network Fail"; if(r) await callAdminApi('reject_payout', { withdrawId: id, userPhone: w.userPhone, amount: w.amount, reason: r }, btn); };
-        
-        window.addGigToDB = async (btn) => { const t=document.getElementById('gig-title').value.trim(); let r=parseFloat(document.getElementById('gig-reward').value); const c=document.getElementById('gig-category').value; const l=document.getElementById('gig-link').value.trim(); const d=document.getElementById('gig-desc').value.trim(); if(t && r>0) { const s=await callAdminApi('add_gig', { title: t, reward: r, category: c, link: l, desc: d }, btn); if(s) { document.getElementById('gig-title').value=""; document.getElementById('gig-reward').value=""; document.getElementById('gig-link').value=""; document.getElementById('gig-desc').value=""; } } };
-        window.deleteGig = async (id, btn) => { if(confirm("Delete task?")) await callAdminApi('delete_gig', { gigId: id }, btn); };
-        
-        window.sendNotification = async (btn) => { const t=document.getElementById('notify-title').value.trim(); const m=document.getElementById('notify-msg').value.trim(); if(t&&m){ const s=await callAdminApi('send_notification', { title: t, message: m }, btn); if(s){ document.getElementById('notify-title').value=""; document.getElementById('notify-msg').value=""; } } };
-        window.deleteNotification = async (id, btn) => { await callAdminApi('delete_notification', { notifId: id }, btn); };
-        
-        window.addDealToDB = async (btn) => { const t=document.getElementById('deal-title').value.trim(); const m=parseFloat(document.getElementById('deal-mrp').value); const d=parseFloat(document.getElementById('deal-price').value); const i=document.getElementById('deal-image').value.trim(); const l=document.getElementById('deal-link').value.trim(); if(t&&m&&d&&l&&i){ const s=await callAdminApi('add_deal', { title: t, mrp: m, dealPrice: d, image: i, link: l }, btn); if(s) { document.getElementById('deal-title').value=""; document.getElementById('deal-mrp').value=""; document.getElementById('deal-price').value=""; document.getElementById('deal-image').value=""; document.getElementById('deal-link').value=""; } } };
-        window.deleteDeal = async (id, btn) => { if(confirm("Delete Deal?")) await callAdminApi('delete_deal', { dealId: id }, btn); };
+        // Auth & Login
+        window.doLogin = async (btn) => {
+            const pass = document.getElementById('admin-pass').value.trim();
+            btn.innerText = "Verifying...";
+            try {
+                const docSnap = await getDoc(doc(db, "app_settings", "master_config"));
+                const dbHash = docSnap.exists() ? docSnap.data().adminHash : null;
+                const inputHash = await hashString(pass);
+                if ((dbHash && inputHash === dbHash) || (!dbHash && pass === "Akash@2026")) {
+                    sessionStorage.setItem("secure_master_session", "verified");
+                    document.body.classList.add('authenticated');
+                    window.startServerSync();
+                } else { alert("Wrong PIN"); }
+            } catch (e) { alert("Error"); }
+            finally { btn.innerText = "Secure Login"; }
+        };
+
+        window.doLogout = () => { sessionStorage.removeItem("secure_master_session"); location.reload(); };
+        window.switchView = (id, btn) => { 
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); 
+            if(btn) btn.classList.add('nav-active');
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active')); 
+            document.getElementById('view-' + id).classList.add('active'); 
+        };
+
+        window.addGigToDB = async (btn) => {
+            const t = document.getElementById('gig-title').value;
+            const r = parseFloat(document.getElementById('gig-reward').value);
+            const c = document.getElementById('gig-category').value;
+            const l = document.getElementById('gig-link').value;
+            const d = document.getElementById('gig-desc').value;
+            await callAdminApi('add_gig', { title: t, reward: r, category: c, link: l, desc: d }, btn);
+        };
+
+        window.deleteGig = async (id, btn) => { if(confirm("Delete?")) await callAdminApi('delete_gig', { gigId: id }, btn); };
 
         const savedSession = sessionStorage.getItem("secure_master_session");
-        if(savedSession === "verified") {
-            document.body.classList.add('authenticated'); 
-            window.startServerSync();
-        }
+        if(savedSession === "verified") { document.body.classList.add('authenticated'); window.startServerSync(); }
     </script>
 </body>
 </html>
