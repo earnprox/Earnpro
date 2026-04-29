@@ -6,6 +6,7 @@
     "axios": "^1.6.8",
     "https-proxy-agent": "^7.0.4",
     "@google/generative-ai": "latest",
-    "@supabase/supabase-js": "latest"
+    "@supabase/supabase-js": "latest",
+    "formidable": "^3.5.1"
   }
 }
