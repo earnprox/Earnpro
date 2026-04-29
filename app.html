@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <script>
+        // Auth Check - Untouched
         const userPhone = localStorage.getItem("earnprox_user_phone");
         const userToken = sessionStorage.getItem("earnprox_secure_token");
         if (!userPhone || !userToken) {
@@ -18,44 +19,74 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth Entry Animation for Cards */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* Glassmorphism for Header */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
     </style>
 </head>
-<body class="bg-[#F2F5F8] font-['Inter'] antialiased text-slate-900 selection:bg-emerald-100 flex justify-center min-h-screen">
+<body class="bg-[#F4F7F9] font-['Inter'] antialiased text-slate-900 selection:bg-emerald-100 flex justify-center min-h-screen">
 
-    <div class="w-full max-w-md bg-[#F2F5F8] relative shadow-2xl overflow-hidden min-h-screen flex flex-col">
+    <div class="w-full max-w-md bg-[#F4F7F9] relative shadow-2xl overflow-hidden min-h-screen flex flex-col">
         
-        <div class="px-5 pt-6 pb-4 bg-white sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-b border-slate-100">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <button onclick="window.history.back()" class="p-2 bg-slate-50 hover:bg-slate-100 rounded-full active:scale-90 transition-all border border-slate-100">
+        <div class="px-5 pt-6 pb-4 glass-header sticky top-0 z-40 border-b border-slate-200/60 shadow-sm">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.history.back()" class="p-2.5 bg-white shadow-sm rounded-full active:scale-90 transition-transform border border-slate-200 text-slate-700 hover:text-black">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </button>
-                    <h3 class="font-black text-[18px] text-slate-900">App Hub</h3>
+                    <div>
+                        <h3 class="font-black text-[20px] tracking-tight text-slate-900 leading-tight">App Hub</h3>
+                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Earn Rewards</p>
+                    </div>
                 </div>
-                <div id="task-count" class="bg-slate-100 text-slate-500 font-bold text-xs px-3 py-1.5 rounded-lg border border-slate-200">
-                    <span class="animate-pulse">Loading...</span>
+                <div id="task-count" class="bg-indigo-50 text-indigo-600 font-bold text-[11px] px-3.5 py-2 rounded-xl border border-indigo-100 shadow-inner flex items-center gap-1.5 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                    Loading
                 </div>
             </div>
 
-            <div class="flex overflow-x-auto gap-2 no-scrollbar pb-1">
-                <button class="bg-[#0B100E] text-white px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all">All Apps</button>
-                <button class="bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all">🎮 Gaming</button>
-                <button class="bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all">🛠 Utilities</button>
-                <button class="bg-[#E8EBF0] text-slate-600 hover:bg-slate-200 px-5 py-2 rounded-full text-[11px] font-bold whitespace-nowrap active:scale-95 transition-all">🛍 Shopping</button>
+            <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-1">
+                <button class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-md shadow-slate-900/20">All Apps</button>
+                <button class="bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-sm">🎮 Gaming</button>
+                <button class="bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-sm">🛠 Utilities</button>
+                <button class="bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-sm">🛍 Shopping</button>
             </div>
         </div>
 
-        <div class="px-5 mt-5 space-y-4 pb-20 flex-1" id="task-list">
+        <div class="px-5 mt-6 space-y-4 pb-24 flex-1" id="task-list">
             
-            <div class="bg-white rounded-[24px] p-4 shadow-sm border border-slate-100 flex items-center justify-between animate-pulse">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-slate-200 rounded-2xl"></div>
-                    <div class="space-y-2">
-                        <div class="w-24 h-4 bg-slate-200 rounded"></div>
-                        <div class="w-16 h-3 bg-slate-200 rounded"></div>
+            <div class="bg-white rounded-[24px] p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100 flex items-center justify-between animate-pulse">
+                <div class="flex items-center gap-4 w-full">
+                    <div class="w-16 h-16 bg-slate-100 rounded-[18px]"></div>
+                    <div class="space-y-3 flex-1 pr-4">
+                        <div class="w-3/4 h-4 bg-slate-100 rounded-md"></div>
+                        <div class="w-1/2 h-3 bg-slate-100 rounded-md"></div>
                     </div>
                 </div>
-                <div class="w-12 h-8 bg-slate-200 rounded-xl"></div>
+                <div class="w-16 h-10 bg-slate-100 rounded-xl shrink-0"></div>
+            </div>
+            <div class="bg-white rounded-[24px] p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100 flex items-center justify-between animate-pulse opacity-70">
+                <div class="flex items-center gap-4 w-full">
+                    <div class="w-16 h-16 bg-slate-100 rounded-[18px]"></div>
+                    <div class="space-y-3 flex-1 pr-4">
+                        <div class="w-2/3 h-4 bg-slate-100 rounded-md"></div>
+                        <div class="w-1/3 h-3 bg-slate-100 rounded-md"></div>
+                    </div>
+                </div>
+                <div class="w-16 h-10 bg-slate-100 rounded-xl shrink-0"></div>
             </div>
 
         </div>
@@ -65,7 +96,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 🔥 Firebase Config
+        // 🔥 Firebase Config - Untouched
         const firebaseConfig = { 
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
             authDomain: "earnproxuc.firebaseapp.com", 
@@ -77,7 +108,6 @@
         const app = initializeApp(firebaseConfig); 
         const db = getFirestore(app);
 
-        // Fetch Live Tasks (Checking both "Normal Task" and "App Install" categories just in case)
         const q = query(collection(db, "gigs"), where("category", "in", ["Normal Task", "App Install"]));
         
         onSnapshot(q, (snapshot) => {
@@ -85,67 +115,89 @@
             const taskCount = document.getElementById("task-count");
             
             if (snapshot.empty) {
-                taskCount.innerText = "0 Available";
+                taskCount.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> 0 Apps`;
                 taskList.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-10 opacity-70">
-                        <span class="text-5xl mb-3 drop-shadow-md">🚀</span>
-                        <h4 class="font-black text-slate-700">All Caught Up!</h4>
-                        <p class="text-xs font-bold text-slate-400 mt-1 text-center px-4">Admin is uploading new amazing apps. Stay tuned!</p>
+                    <div class="flex flex-col items-center justify-center py-16 opacity-80 animate-fade-in-up">
+                        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                            <span class="text-4xl">🚀</span>
+                        </div>
+                        <h4 class="font-black text-slate-800 text-lg">All Caught Up!</h4>
+                        <p class="text-[13px] font-medium text-slate-500 mt-2 text-center px-6 leading-relaxed">Admin is preparing new premium apps for you. Check back shortly!</p>
                     </div>`;
                 return;
             }
 
-            taskCount.innerText = `${snapshot.size} Available`;
+            // Update Counter Style
+            taskCount.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span> ${snapshot.size} Available`;
+            taskCount.className = "bg-emerald-50 text-emerald-700 font-bold text-[11px] px-3.5 py-2 rounded-xl border border-emerald-100 flex items-center gap-1.5";
+            
             let html = "";
+            let delay = 0; // For staggered animation
 
             snapshot.forEach((doc) => {
                 const task = doc.data();
                 const reward = parseFloat(task.reward || 0);
                 
-                // 🚀 Gamified Dynamic Logic based on Reward Amount
-                let difficulty = "Easy"; let barColor = "bg-[#00A87A]"; let badgeColor = "bg-emerald-100 text-emerald-600 border-white"; let icon = "🎯"; let timeEst = "~2 mins";
+                // 🚀 Gamified Dynamic Logic
+                let difficulty = "Easy"; 
+                let barColor = "bg-[#00A87A]"; 
+                let badgeColor = "bg-emerald-100 text-emerald-700"; 
+                let icon = "🎯"; 
+                let timeEst = "~2 mins";
+                let rewardColor = "text-[#00A87A]";
                 
                 if (reward > 10 && reward <= 25) {
-                    difficulty = "Medium"; barColor = "bg-amber-400"; badgeColor = "bg-amber-100 text-amber-600 border-white"; icon = "🛒"; timeEst = "~5 mins";
+                    difficulty = "Medium"; 
+                    barColor = "bg-amber-400"; 
+                    badgeColor = "bg-amber-100 text-amber-700"; 
+                    icon = "🛒"; 
+                    timeEst = "~5 mins";
+                    rewardColor = "text-amber-500";
                 } else if (reward > 25) {
-                    difficulty = "Hard"; barColor = "bg-rose-500"; badgeColor = "bg-rose-100 text-rose-600 border-white"; icon = "🔥"; timeEst = "~10 mins";
+                    difficulty = "Hard"; 
+                    barColor = "bg-rose-500"; 
+                    badgeColor = "bg-rose-100 text-rose-700"; 
+                    icon = "🔥"; 
+                    timeEst = "~10 mins";
+                    rewardColor = "text-rose-600";
                 }
 
-                // Shorten description for the tiny pill tag
-                const shortDesc = task.desc ? (task.desc.length > 20 ? task.desc.substring(0, 18) + ".." : task.desc) : "Install & Open";
+                const shortDesc = task.desc ? (task.desc.length > 22 ? task.desc.substring(0, 20) + ".." : task.desc) : "Install & Open App";
 
-                // Affiliate Tracking Link
+                // Affiliate Tracking Link - Untouched
                 let trackingLink = task.link;
                 trackingLink += trackingLink.includes('?') ? `&subid=${userPhone}` : `?subid=${userPhone}`;
 
                 html += `
-                <div class="bg-white rounded-[24px] p-1 shadow-sm border border-slate-100 flex items-center justify-between pr-4 relative overflow-hidden mb-4 transition-transform active:scale-[0.98]">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${barColor}"></div>
+                <div class="bg-white rounded-[24px] p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex items-center justify-between pr-5 relative overflow-hidden mb-4 transition-all active:scale-[0.98] hover:-translate-y-0.5 animate-fade-in-up" style="animation-delay: ${delay}s; opacity: 0;">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${barColor} opacity-90"></div>
                     
-                    <div class="flex items-center gap-3 py-3 pl-4 w-3/4">
+                    <div class="flex items-center gap-4 py-2 pl-4 w-full">
                         <div class="relative shrink-0">
-                            <div class="w-14 h-14 bg-[#F2F5F8] rounded-[18px] flex items-center justify-center p-2 shadow-inner border border-slate-50">
-                                <span class="text-3xl">${icon}</span>
+                            <div class="w-14 h-14 bg-slate-50 rounded-[18px] flex items-center justify-center p-2 shadow-sm border border-slate-100 group-hover:scale-105 transition-transform">
+                                <span class="text-3xl drop-shadow-sm">${icon}</span>
                             </div>
-                            <span class="absolute -bottom-2 -right-2 ${badgeColor} border text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase shadow-sm">${difficulty}</span>
+                            <span class="absolute -bottom-2 -right-2 ${badgeColor} text-[9px] font-black px-2 py-0.5 rounded-lg uppercase shadow-sm border border-white tracking-wide">${difficulty}</span>
                         </div>
-                        <div class="pr-2">
-                            <h4 class="text-[14px] font-black text-slate-900 mb-0.5 line-clamp-1">${task.title}</h4>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase whitespace-nowrap truncate max-w-[120px]">${shortDesc}</span>
+                        
+                        <div class="flex-1 pr-2 min-w-0">
+                            <h4 class="text-[15px] font-black text-slate-900 mb-1 truncate">${task.title}</h4>
+                            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                <span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase whitespace-nowrap truncate max-w-full border border-slate-200/60">${shortDesc}</span>
                             </div>
-                            <div class="flex items-center gap-1 text-[10px] text-slate-400 font-semibold">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Takes ${timeEst}
+                            <div class="flex items-center gap-1 text-[11px] text-slate-400 font-semibold">
+                                <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                ${timeEst}
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-end gap-2 shrink-0">
-                        <span class="text-[16px] font-black text-[#00A87A]">₹${reward.toFixed(2)}</span>
-                        <a href="${trackingLink}" target="_blank" class="bg-[#0B100E] hover:bg-slate-800 text-white text-[10px] font-bold px-5 py-2 rounded-xl shadow-md transition-all text-center uppercase tracking-widest block">Get</a>
+                    <div class="flex flex-col items-end gap-2.5 shrink-0 pl-2 border-l border-slate-100">
+                        <span class="text-[18px] font-black ${rewardColor} tracking-tight">₹${reward.toFixed(0)}</span>
+                        <a href="${trackingLink}" target="_blank" class="bg-slate-900 hover:bg-black text-white text-[11px] font-bold px-6 py-2.5 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-all text-center uppercase tracking-wider block active:scale-95">Get</a>
                     </div>
                 </div>`;
+                delay += 0.08; // Stagger next card's animation slightly
             });
             
             taskList.innerHTML = html;
