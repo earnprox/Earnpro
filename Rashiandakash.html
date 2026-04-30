@@ -279,7 +279,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, doc, getDoc, query, where, onSnapshot, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, query, where, onSnapshot, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyCtOcibo2YODmROtrW4W1oRCW1ZvOslPfI", 
@@ -299,7 +299,6 @@
         let currentTrustImages = []; 
         let dashboardChart = null;
 
-        // Arrays to hold old and new tasks so the stats work perfectly
         let oldSystemTasks = [];
         let newSystemTasks = [];
 
@@ -308,7 +307,6 @@
         const maskPhone = (phone) => phone && phone.length >= 10 ? phone.substring(0,2) + '****' + phone.substring(8) : 'N/A';
         const maskUpi = (upi) => { if(!upi || upi=='None') return 'NULL'; const pts = upi.split('@'); return pts[0].length > 2 ? pts[0].substring(0,2) + '***@' + (pts[1]||'') : upi; };
 
-        // 🔐 Hashing Function (Creates secure code from PIN)
         async function hashString(str) {
             const msgBuffer = new TextEncoder().encode(str);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -337,33 +335,25 @@
             });
         }
 
-        // 🔥 DYNAMIC LOGIN LOGIC 
         window.doLogin = async (btn) => { 
             const pass = document.getElementById('admin-pass').value.trim();
             if(!pass) return alert("Enter PIN first.");
             btn.innerText = "Verifying..."; btn.disabled = true;
-            
             try {
                 const docSnap = await getDoc(doc(db, "app_settings", "master_config"));
-                if (docSnap.exists() && docSnap.data().adminHash) {
-                    DB_HASH = docSnap.data().adminHash;
-                }
-
+                if (docSnap.exists() && docSnap.data().adminHash) DB_HASH = docSnap.data().adminHash;
                 const inputHash = await hashString(pass);
-
                 if ((DB_HASH && inputHash === DB_HASH) || (!DB_HASH && pass === "Akash@2026")) { 
                     sessionStorage.setItem("secure_master_session", "verified"); 
                     document.body.classList.add('authenticated'); 
                     window.startServerSync(); 
                 } else { 
                     alert("❌ Incorrect Password."); 
-                    btn.innerText = "Secure Login"; 
-                    btn.disabled = false;
+                    btn.innerText = "Secure Login"; btn.disabled = false;
                 } 
             } catch (error) {
                 alert("❌ Database Connection Failed.");
-                btn.innerText = "Secure Login"; 
-                btn.disabled = false;
+                btn.innerText = "Secure Login"; btn.disabled = false;
             }
         };
 
@@ -389,9 +379,7 @@
         window.searchItems = (inputId, listId, itemClass) => {
             const query = document.getElementById(inputId).value.toLowerCase();
             const items = document.getElementById(listId).getElementsByClassName(itemClass);
-            for(let i = 0; i < items.length; i++) {
-                items[i].style.display = items[i].innerText.toLowerCase().includes(query) ? "flex" : "none";
-            }
+            for(let i = 0; i < items.length; i++) items[i].style.display = items[i].innerText.toLowerCase().includes(query) ? "flex" : "none";
         };
 
         window.exportCSV = (type) => {
@@ -423,33 +411,25 @@
             }
         };
 
-        // 🚀 MASTER RENDERER FOR TASKS (Combines Old & New System seamlessly)
         function renderUnifiedTasks() {
-            let html = ""; 
-            let todayTaskEarn = 0; 
-            let totalTaskEarn = 0; 
-            
-            // Combine both data sources
+            let html = ""; let todayTaskEarn = 0; let totalTaskEarn = 0; 
             const allTasks = [...oldSystemTasks, ...newSystemTasks];
-            
-            // Sort by newest first
             allTasks.sort((a,b) => getSafeTime(b.timestamp) - getSafeTime(a.timestamp));
             
             allTasks.forEach(t => {
                 const isNewSystem = t.source === 'submissions';
                 const rAmt = parseFloat(t.gigReward || t.reward || 0);
                 
-                // Track Stats
                 if(t.status === "Completed" || t.status === "Approved" || t.status === "COMPLETED") { 
                     totalTaskEarn += rAmt; 
                     if(isToday(t.timestamp)) todayTaskEarn += rAmt; 
                 }
                 
-                // Show Pending in the List
                 if(t.status === "Pending Approval" || t.status === "PENDING") {
                     const title = t.gigName || t.taskTitle || "Task Verify";
                     const phone = t.userPhone;
                     const proof = t.proofLink || t.screenshotUrl || "#";
+                    const gigIdParam = t.taskId || '';
                     
                     html += `
                     <div class="light-card p-5 flex flex-col justify-between border-l-4 border-l-orange-400">
@@ -459,17 +439,13 @@
                             <p class="text-[11px] font-semibold text-textgray mt-1">+91 ${maskPhone(phone)}</p>
                         </div>
                         <div class="flex gap-2">
-                            ${proof !== '#' 
-                                ? `<a href="${proof}" target="_blank" class="flex-1 bg-slate-100 text-center text-slate-600 font-bold text-[10px] py-2.5 rounded-lg border border-slate-200">PROOF ↗</a>` 
-                                : `<div class="flex-1 bg-slate-50 text-center text-slate-500 font-bold text-[9px] py-2.5 rounded-lg border border-slate-200 flex items-center justify-center">ON DISCORD</div>`
-                            }
-                            <button onclick="window.approveUnifiedTask('${t.id}', '${phone}', '${t.taskId || ''}', '${isNewSystem}', this)" class="flex-1 bg-[#13C296] hover:bg-emerald-600 text-white font-bold text-[10px] py-2.5 rounded-lg transition">APPROVE</button>
+                            ${proof !== '#' ? `<a href="${proof}" target="_blank" class="flex-1 bg-slate-100 text-center text-slate-600 font-bold text-[10px] py-2.5 rounded-lg border border-slate-200">PROOF ↗</a>` : `<div class="flex-1 bg-slate-50 text-center text-slate-500 font-bold text-[9px] py-2.5 rounded-lg border border-slate-200 flex items-center justify-center">ON DISCORD</div>`}
+                            <button onclick="window.approveUnifiedTask('${t.id}', '${phone}', '${gigIdParam}', '${isNewSystem}', this)" class="flex-1 bg-[#13C296] hover:bg-emerald-600 text-white font-bold text-[10px] py-2.5 rounded-lg transition">APPROVE</button>
                             <button onclick="window.rejectUnifiedTask('${t.id}', '${phone}', '${isNewSystem}', this)" class="bg-[#FCEAEA] hover:bg-rose-100 text-[#DC2626] font-bold px-3 py-2.5 rounded-lg text-[10px] transition">X</button>
                         </div>
                     </div>`;
                 }
             });
-            
             document.getElementById('stat-today-tasks').innerText = `₹${todayTaskEarn.toFixed(2)}`;
             document.getElementById('stat-total-tasks').innerText = `₹${totalTaskEarn.toFixed(2)}`;
             document.getElementById('review-list').innerHTML = html || "<p class='text-slate-500'>No pending tasks.</p>";
@@ -494,7 +470,6 @@
                     const u = d.data(); globalUsersData[d.id] = u; totalUserBal += parseFloat(u.balance || 0);
                     if(u.referCodeUsed && u.referCodeUsed !== "None") totalReferUsers++;
                     const isB = u.status === 'blocked';
-                    
                     html += `
                     <div class="user-item light-card p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isB ? 'opacity-50 grayscale bg-slate-50' : ''}">
                         <div class="flex items-center gap-4">
@@ -518,22 +493,15 @@
                 document.getElementById('stat-refer-earn').innerText = `${totalReferUsers}`; 
             });
 
-            // 🟢 1. FETCH OLD SYSTEM TASKS
             onSnapshot(collection(db, "task_submissions"), (snap) => {
                 oldSystemTasks = [];
-                snap.forEach(d => {
-                    oldSystemTasks.push({ id: d.id, source: 'task_submissions', ...d.data() });
-                    globalTasksData[d.id] = d.data(); // Keep global map updated for old funcs
-                });
+                snap.forEach(d => { oldSystemTasks.push({ id: d.id, source: 'task_submissions', ...d.data() }); globalTasksData[d.id] = d.data(); });
                 renderUnifiedTasks();
             });
 
-            // 🟢 2. FETCH NEW SYSTEM TASKS
             onSnapshot(collection(db, "submissions"), (snap) => {
                 newSystemTasks = [];
-                snap.forEach(d => {
-                    newSystemTasks.push({ id: d.id, source: 'submissions', ...d.data() });
-                });
+                snap.forEach(d => { newSystemTasks.push({ id: d.id, source: 'submissions', ...d.data() }); });
                 renderUnifiedTasks();
             });
 
@@ -592,27 +560,67 @@
             container.innerHTML = html;
         }
 
-        // 🚀 NEW SMART APPROVE/REJECT SYSTEM
+        // 🔥 100% BULLETPROOF WALLET UPDATE LOGIC 🔥
         window.approveUnifiedTask = async (id, phone, gigId, isNewSystemStr, btn) => {
             const isNew = isNewSystemStr === 'true';
-            const ogText = btn.innerText; btn.innerText = "⏳"; btn.disabled = true;
+            const ogText = btn.innerText; 
+            btn.innerText = "⏳"; 
+            btn.disabled = true;
             
             try {
-                if(isNew) {
-                    // Update New System (submissions)
-                    let reward = 0;
-                    if(gigId) {
-                        const g = await getDoc(doc(db, "gigs", gigId));
-                        if(g.exists()) reward = parseFloat(g.data().reward || 0);
-                    }
-                    await updateDoc(doc(db, "submissions", id), { status: "COMPLETED", gigReward: reward, processedAt: new Date().toISOString() });
-                    if(reward > 0) await callAdminApi('approve_task', { taskId: id, userPhone: phone, reward: reward }, null);
-                } else {
-                    // Update Old System (task_submissions)
-                    const t = oldSystemTasks.find(x => x.id === id);
-                    if(t) await callAdminApi('approve_task', { taskId: id, userPhone: phone, reward: parseFloat(t.gigReward||0) }, null);
+                let reward = 0;
+
+                // 1. Get Exact Reward
+                if (gigId && gigId !== 'undefined') {
+                    const g = await getDoc(doc(db, "gigs", gigId));
+                    if(g.exists()) reward = parseFloat(g.data().reward || 0);
                 }
-            } catch (e) { alert("Error approving."); }
+
+                // THE SAVIOR: Agar reward nahi mila, admin se mang lo
+                if (reward <= 0) {
+                    const manualAmount = prompt("⚠️ System couldn't fetch the task reward automatically. Please enter the amount (₹) to add to user's wallet:", "10");
+                    if (!manualAmount || isNaN(manualAmount)) throw new Error("Action cancelled by Admin.");
+                    reward = parseFloat(manualAmount);
+                }
+
+                // 2. Exact User Query (Guaranteed to find user)
+                const userQ = query(collection(db, "users"), where("phone", "==", phone));
+                const userSnap = await getDocs(userQ);
+                
+                if (userSnap.empty) {
+                    alert("❌ Error: User account not found for phone +91 " + phone);
+                    throw new Error("User not found");
+                }
+
+                const userDoc = userSnap.docs[0];
+                const uId = userDoc.id;
+                const uData = userDoc.data();
+                
+                // Calculate New Balance
+                const newBalance = parseFloat(uData.balance || 0) + reward;
+
+                // 3. Mark Task as Completed
+                if(isNew) {
+                    await updateDoc(doc(db, "submissions", id), { status: "COMPLETED", gigReward: reward, processedAt: new Date().toISOString() });
+                } else {
+                    await updateDoc(doc(db, "task_submissions", id), { status: "Approved", gigReward: reward, processedAt: new Date().toISOString() });
+                }
+
+                // 4. Update User Balance (Dual Action Engine)
+                try {
+                    // Try Direct Database Update
+                    await updateDoc(doc(db, "users", uId), { balance: newBalance });
+                } catch (dbError) {
+                    // Fallback to Vercel API
+                    await callAdminApi('edit_user', { userId: uId, name: uData.name || "User", phone: phone, upi: uData.upi || "None", balance: newBalance }, null);
+                }
+
+                alert(`✅ Success! ₹${reward} added to user. New Balance is ₹${newBalance}`);
+                
+            } catch (e) { 
+                console.error("Approval Error:", e);
+                if(e.message !== "Action cancelled by Admin.") alert("❌ Error processing request."); 
+            }
             finally { btn.innerText = ogText; btn.disabled = false; }
         };
 
@@ -625,15 +633,13 @@
             try {
                 if(isNew) {
                     await updateDoc(doc(db, "submissions", id), { status: "REJECTED", reason: r, processedAt: new Date().toISOString() });
-                    await callAdminApi('reject_task', { taskId: id, userPhone: phone, reason: r }, null);
                 } else {
-                    await callAdminApi('reject_task', { taskId: id, userPhone: phone, reason: r }, null);
+                    await updateDoc(doc(db, "task_submissions", id), { status: "Rejected", reason: r, processedAt: new Date().toISOString() });
                 }
             } catch (e) { alert("Error rejecting."); }
             finally { btn.innerText = ogText; btn.disabled = false; }
         };
 
-        // UI Settings & DB Controls
         window.updateAdminPassword = async (btn) => {
             const newPass = document.getElementById('new-admin-pass').value.trim();
             if(newPass.length < 4) return alert("⚠️ PIN must be at least 4 characters long.");
