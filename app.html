@@ -45,6 +45,10 @@
         .toast-animate {
             animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+
+        /* Filter Tab Styles */
+        .filter-tab { transition: all 0.2s ease; }
+        .filter-tab.active { background-color: #0B100E; color: white; box-shadow: 0 4px 14px rgba(0,0,0,0.15); border-color: #0B100E; }
     </style>
 </head>
 <body class="bg-[#F4F7F9] font-['Inter'] antialiased text-slate-900 selection:bg-emerald-100 flex justify-center min-h-screen">
@@ -53,7 +57,7 @@
 
     <div class="w-full max-w-md bg-[#F4F7F9] relative shadow-2xl overflow-x-hidden overflow-y-auto min-h-screen flex flex-col">
         
-        <div class="px-5 pt-6 pb-4 bg-white/85 backdrop-blur-xl sticky top-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-b border-slate-100/80 transition-all">
+        <div class="px-5 pt-6 pb-2 bg-white/85 backdrop-blur-xl sticky top-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-b border-slate-100/80 transition-all">
             <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-3.5">
                     <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center bg-white shadow-sm hover:shadow-md rounded-full active:scale-90 transition-all border border-slate-200/80 text-slate-700">
@@ -70,10 +74,10 @@
                 </div>
             </div>
 
-            <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-1">
-                <button class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-lg shadow-slate-900/20">All Apps</button>
-                <button class="bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-sm">🎮 Gaming</button>
-                <button class="bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95 transition-all shadow-sm">🛠 Utilities</button>
+            <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-2">
+                <button onclick="window.setFilter('AVAILABLE')" id="tab-AVAILABLE" class="filter-tab active bg-white text-slate-600 border border-slate-200/80 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95">🟢 Available</button>
+                <button onclick="window.setFilter('PENDING')" id="tab-PENDING" class="filter-tab bg-white text-slate-600 border border-slate-200/80 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95">⏳ In Progress</button>
+                <button onclick="window.setFilter('COMPLETED')" id="tab-COMPLETED" class="filter-tab bg-white text-slate-600 border border-slate-200/80 px-5 py-2.5 rounded-xl text-[12px] font-bold whitespace-nowrap active:scale-95">✅ Complete</button>
             </div>
         </div>
 
@@ -91,18 +95,15 @@
 
     <div id="instructionModal" class="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
         <div id="modalOverlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 modal-overlay transition-opacity duration-300"></div>
-        
         <div id="modalSheet" class="relative w-full max-w-md bg-white rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] translate-y-full modal-content pointer-events-auto flex flex-col max-h-[85vh]">
             <div class="w-full flex justify-center pt-5 pb-3" id="closeModalArea">
                 <div class="w-12 h-1.5 bg-slate-200 rounded-full cursor-pointer hover:bg-slate-300 transition-colors"></div>
             </div>
-            <div class="px-6 pb-8 pt-1 overflow-y-auto no-scrollbar" id="modalDynamicContent">
-                </div>
+            <div class="px-6 pb-8 pt-1 overflow-y-auto no-scrollbar" id="modalDynamicContent"></div>
         </div>
     </div>
 
     <script type="module">
-        // Added 'doc', 'setDoc' for Firebase Admin Status saving
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, query, where, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -117,23 +118,18 @@
         const app = initializeApp(firebaseConfig); 
         const db = getFirestore(app);
 
-        // 🌟 Premium Toast Notification Logic
+        // Toast Logic
         window.showToast = function(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            
             const bgColor = type === 'success' ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200';
             const textColor = type === 'success' ? 'text-emerald-800' : 'text-rose-800';
             const icon = type === 'success' ? '✅' : '⚠️';
-
             toast.className = `toast-animate flex items-center gap-3 w-full p-4 rounded-2xl shadow-lg border ${bgColor} ${textColor} font-semibold text-[13px] backdrop-blur-md bg-opacity-90`;
             toast.innerHTML = `<span class="text-lg">${icon}</span> <span>${message}</span>`;
-            
             container.appendChild(toast);
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, -20px)';
-                toast.style.transition = 'all 0.4s ease';
+                toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -20px)';
                 setTimeout(() => toast.remove(), 400);
             }, 3500);
         };
@@ -141,67 +137,80 @@
         let tasksDataMap = {};
         let userStatusMap = {}; 
         let latestTaskSnapshot = null;
+        let currentFilter = "AVAILABLE"; // Default tab
 
-        // 1. Fetch Live User Status (Admin Control)
+        // 🚀 FILTER TAB LOGIC
+        window.setFilter = function(filterType) {
+            currentFilter = filterType;
+            // Update Tab UI
+            document.querySelectorAll('.filter-tab').forEach(t => {
+                t.classList.remove('active', 'bg-[#0B100E]', 'text-white');
+                t.classList.add('bg-white', 'text-slate-600');
+            });
+            const activeTab = document.getElementById(`tab-${filterType}`);
+            activeTab.classList.remove('bg-white', 'text-slate-600');
+            activeTab.classList.add('active', 'bg-[#0B100E]', 'text-white');
+            
+            // Re-render list
+            renderTasks();
+        };
+
+        // Fetch User Status
         const statusQuery = query(collection(db, "submissions"), where("userPhone", "==", userPhone));
         onSnapshot(statusQuery, (statusSnapshot) => {
             userStatusMap = {};
             statusSnapshot.forEach((doc) => {
                 const data = doc.data();
-                userStatusMap[data.taskId] = data.status; // Tracks "PENDING", "COMPLETED", "REJECTED"
+                userStatusMap[data.taskId] = data.status; 
             });
             renderTasks(); 
         });
 
-        // 2. Fetch Live Tasks
+        // Fetch Live Tasks
         const q = query(collection(db, "gigs"), where("category", "in", ["Normal Task", "App Install"]));
         onSnapshot(q, (snapshot) => {
             latestTaskSnapshot = snapshot;
             renderTasks();
         });
 
-        // 3. Render UI Function
+        // Render UI
         function renderTasks() {
             if(!latestTaskSnapshot) return;
             const snapshot = latestTaskSnapshot;
-
             const taskList = document.getElementById("task-list");
             const taskCount = document.getElementById("task-count");
-            
             tasksDataMap = {}; 
-            
-            if (snapshot.empty) {
-                taskCount.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> 0 Apps`;
-                taskList.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-16 opacity-80">
-                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 shadow-inner text-4xl border border-slate-100">🚀</div>
-                        <h4 class="font-black text-slate-800 text-lg">All Caught Up!</h4>
-                        <p class="text-[13px] font-medium text-slate-500 mt-1 text-center px-6">Admin is preparing new premium apps for you.</p>
-                    </div>`;
-                return;
-            }
-
-            taskCount.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span> ${snapshot.size} Apps`;
-            taskCount.className = "bg-emerald-50 text-emerald-700 font-bold text-[11px] px-3.5 py-2 rounded-xl border border-emerald-100 flex items-center gap-1.5 shadow-sm";
             
             let html = "";
             let delay = 0;
+            let displayCount = 0;
 
             snapshot.forEach((docSnap) => {
                 const task = docSnap.data();
                 const taskId = docSnap.id;
                 const reward = parseFloat(task.reward || 0);
-                
                 tasksDataMap[taskId] = task;
-                const status = userStatusMap[taskId] || "NONE";
                 
+                const status = userStatusMap[taskId] || "NONE"; // NONE, PENDING, COMPLETED, REJECTED
+                
+                // 🛑 FILTERING LOGIC
+                // AVAILABLE: Show tasks with status "NONE" or "REJECTED" (needs retry)
+                if (currentFilter === "AVAILABLE" && (status === "PENDING" || status === "COMPLETED")) return;
+                
+                // IN PROGRESS: Show only "PENDING" tasks
+                if (currentFilter === "PENDING" && status !== "PENDING") return;
+                
+                // COMPLETE: Show only "COMPLETED" tasks
+                if (currentFilter === "COMPLETED" && status !== "COMPLETED") return;
+
+                displayCount++;
+
                 let difficulty = "EASY"; let barColor = "bg-[#00A87A]"; let badgeColor = "bg-emerald-100 text-emerald-700"; let timeEst = "2 mins"; let rewardColor = "text-[#00A87A]";
                 let btnText = "VIEW"; let btnBg = "bg-slate-900"; let btnTextColor = "text-white"; let pointerEvents = "auto"; let opacity = "1";
 
                 if (reward > 10 && reward <= 25) { difficulty = "MEDIUM"; barColor = "bg-amber-400"; badgeColor = "bg-amber-100 text-amber-700"; timeEst = "5 mins"; rewardColor = "text-amber-500"; } 
                 else if (reward > 25) { difficulty = "HARD"; barColor = "bg-rose-500"; badgeColor = "bg-rose-100 text-rose-700"; timeEst = "10 mins"; rewardColor = "text-rose-600"; }
 
-                // 🚨 Dynamic Admin Status Logic
                 if (status === "PENDING") {
                     btnText = "IN PROGRESS"; btnBg = "bg-amber-50 border border-amber-200"; btnTextColor = "text-amber-600";
                     barColor = "bg-amber-300"; opacity = "0.75"; pointerEvents = "none";
@@ -220,11 +229,9 @@
                 html += `
                 <div class="bg-white rounded-[20px] p-3 shadow-sm hover:shadow-md border border-slate-100 flex items-center relative overflow-hidden mb-3.5 active:scale-[0.98] transition-all duration-300 task-card cursor-pointer animate-fade-in-up" data-task-id="${taskId}" style="animation-delay: ${delay}s; opacity: ${opacity}; pointer-events: ${pointerEvents};">
                     <div class="absolute left-0 top-0 bottom-0 w-[5px] ${barColor} opacity-90 transition-colors"></div>
-                    
                     <div class="w-[54px] h-[54px] ml-2 shrink-0 bg-slate-50 rounded-[14px] border border-slate-100 overflow-hidden shadow-sm flex items-center justify-center p-0.5 group-hover:scale-105 transition-transform">
                         <img src="${appImage}" alt="app" class="w-full h-full object-cover rounded-[12px] bg-white">
                     </div>
-                    
                     <div class="flex-1 min-w-0 px-3.5">
                         <h4 class="text-[14.5px] font-black text-slate-900 truncate mb-0.5 tracking-tight">${task.title}</h4>
                         <div class="text-[10px] text-slate-500 font-semibold truncate bg-slate-50 inline-block px-2 py-0.5 rounded border border-slate-100">${shortDesc}</div>
@@ -236,7 +243,6 @@
                             </span>
                         </div>
                     </div>
-
                     <div class="shrink-0 flex flex-col items-end pl-2 border-l border-slate-100 min-w-[75px]">
                         <span class="text-[17px] font-black ${rewardColor} mb-1.5 tracking-tighter">₹${reward.toFixed(0)}</span>
                         <div class="w-full ${btnBg} ${btnTextColor} text-[9px] font-black py-2 rounded-xl shadow-sm text-center uppercase tracking-widest transition-colors">${btnText}</div>
@@ -244,16 +250,26 @@
                 </div>`;
                 delay += 0.06; 
             });
+
+            // Empty State Logic
+            if (displayCount === 0) {
+                let emptyIcon = "🚀"; let emptyMsg = "Admin is preparing new premium apps.";
+                if(currentFilter === "PENDING") { emptyIcon = "⏳"; emptyMsg = "You don't have any tasks waiting for approval."; }
+                if(currentFilter === "COMPLETED") { emptyIcon = "✅"; emptyMsg = "You haven't completed any tasks yet."; }
+
+                html = `
+                    <div class="flex flex-col items-center justify-center py-16 opacity-80 animate-fade-in-up">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 shadow-inner text-4xl border border-slate-100">${emptyIcon}</div>
+                        <h4 class="font-black text-slate-800 text-lg">Nothing Here!</h4>
+                        <p class="text-[13px] font-medium text-slate-500 mt-1 text-center px-6">${emptyMsg}</p>
+                    </div>`;
+            }
+
+            taskCount.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${displayCount > 0 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse' : 'bg-slate-400'}"></span> ${displayCount} Apps`;
+            taskCount.className = `font-bold text-[11px] px-3.5 py-2 rounded-xl border flex items-center gap-1.5 shadow-sm transition-colors ${displayCount > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-200'}`;
             
             taskList.innerHTML = html;
         }
-
-        // --- MODAL & VERCEL UPLOAD LOGIC ---
-        const taskListContainer = document.getElementById("task-list");
-        const modalOverlay = document.getElementById("modalOverlay");
-        const modalSheet = document.getElementById("modalSheet");
-        const modalDynamicContent = document.getElementById("modalDynamicContent");
-        const closeModalArea = document.getElementById("closeModalArea");
 
         const VERCEL_API_URL = "/api/submit"; 
 
@@ -334,62 +350,40 @@
             const fileInput = document.getElementById('screenshotInput');
             const file = fileInput.files[0];
             
-            if (!file) {
-                showToast("Please upload a screenshot proof first!", "error");
-                return;
-            }
+            if (!file) { showToast("Please upload a screenshot proof first!", "error"); return; }
 
             const btn = document.getElementById('submitBtn');
             const btnText = document.getElementById('btnText');
             const btnLoader = document.getElementById('btnLoader');
 
-            btn.disabled = true;
-            btnText.classList.add('hidden');
-            btnLoader.classList.remove('hidden');
+            btn.disabled = true; btnText.classList.add('hidden'); btnLoader.classList.remove('hidden');
 
             try {
-                // 1. Send Image to Vercel -> Discord
                 const formData = new FormData();
                 formData.append('image', file);
                 formData.append('userPhone', userPhone);
                 formData.append('taskId', taskId);
                 formData.append('taskTitle', taskTitle);
 
-                const vercelRes = await fetch(VERCEL_API_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const vercelRes = await fetch(VERCEL_API_URL, { method: 'POST', body: formData });
                 if (!vercelRes.ok) throw new Error("Backend submission failed");
 
-                // 2. Safely Store Status in Firebase (Admin Tracker)
                 const uniqueId = `${userPhone}_${taskId}`;
-                await setDoc(doc(db, "submissions", uniqueId), {
-                    userPhone: userPhone,
-                    taskId: taskId,
-                    taskTitle: taskTitle,
-                    status: "PENDING",
-                    timestamp: new Date().toISOString()
-                });
+                await setDoc(doc(db, "submissions", uniqueId), { userPhone: userPhone, taskId: taskId, taskTitle: taskTitle, status: "PENDING", timestamp: new Date().toISOString() });
 
                 showToast("Submitted successfully! Admin will verify.", "success");
                 closeModalFn();
-
+                // Re-render handled by onSnapshot
             } catch (error) {
-                console.error(error);
                 showToast("Something went wrong. Try again.", "error");
             } finally {
-                btn.disabled = false;
-                btnText.classList.remove('hidden');
-                btnLoader.classList.add('hidden');
+                btn.disabled = false; btnText.classList.remove('hidden'); btnLoader.classList.add('hidden');
             }
         }
 
         function closeModalFn() {
-            modalOverlay.style.opacity = "0";
-            modalSheet.style.transform = "translateY(100%)";
+            modalOverlay.style.opacity = "0"; modalSheet.style.transform = "translateY(100%)";
             setTimeout(() => { modalOverlay.classList.remove("pointer-events-auto"); }, 300);
-            
             setTimeout(() => {
                 const preview = document.getElementById('imagePreview');
                 const placeholder = document.getElementById('uploadPlaceholder');
@@ -402,10 +396,7 @@
 
         taskListContainer.addEventListener("click", (e) => {
             const card = e.target.closest(".task-card");
-            if (card) {
-                const taskId = card.getAttribute("data-task-id");
-                openModal(taskId);
-            }
+            if (card) { openModal(card.getAttribute("data-task-id")); }
         });
 
         modalOverlay.addEventListener("click", closeModalFn);
